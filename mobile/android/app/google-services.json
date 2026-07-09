@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1029956122",
+    "project_id": "vedadarshi-20989",
+    "storage_bucket": "vedadarshi-20989.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1029956122:android:85e2848efaa8b15e0327a3",
+        "android_client_info": {
+          "package_name": "com.vedadarshi.vedadarshi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDg1BmMyypsSHdPY9SbM73ktUABUB3viFU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
