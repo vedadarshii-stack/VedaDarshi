@@ -1,0 +1,15 @@
+{
+  "@@locale": "en",
+  "appName": "Vedadarshi",
+  "@appName": {
+    "description": "The application name, shown in the OS task switcher, app title bar and splash wordmark. Stays in Latin script across all locales per approved brand design."
+  },
+  "splashTagline": "Your trusted Vedic companion",
+  "@splashTagline": {
+    "description": "Short tagline shown under the wordmark on the splash screen."
+  },
+  "splashBlessing": "।। शुभम् भवतु ।।",
+  "@splashBlessing": {
+    "description": "Sanskrit blessing shown at the bottom of the splash screen. Identical across all locales."
+  }
+}

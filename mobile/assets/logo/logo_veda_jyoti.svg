@@ -1,0 +1,30 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="260" height="260" viewBox="0 0 260 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="icon/veda-jyoti" clip-path="url(#clip0_0_4)">
+<path id="Vector" d="M201 1H59C26.9675 1 1 26.9675 1 59V201C1 233.033 26.9675 259 59 259H201C233.033 259 259 233.033 259 201V59C259 26.9675 233.033 1 201 1Z" fill="url(#paint0_linear_0_4)" stroke="#E2B332" stroke-width="2"/>
+<path id="Vector_2" opacity="0.32" d="M130 202C171.974 202 206 167.974 206 126C206 84.0264 171.974 50 130 50C88.0264 50 54 84.0264 54 126C54 167.974 88.0264 202 130 202Z" stroke="#E2B332" stroke-width="2"/>
+<path id="Vector_3" d="M79 73L70 63M99 59L94 46M130 54V39M161 59L166 46M181 73L190 63" stroke="#F0C64B" stroke-width="4" stroke-linecap="round"/>
+<path id="Vector_4" d="M130 90C146 110 151 127 145 141C141 152 136 159 130 164C124 159 119 152 115 141C109 127 114 110 130 90Z" fill="url(#paint1_linear_0_4)" stroke="#FFE39B" stroke-width="2"/>
+<path id="Vector_5" d="M130 170C111 170 95 160 84 143C101 142 116 148 130 160C144 148 159 142 176 143C165 160 149 170 130 170Z" fill="url(#paint2_linear_0_4)" stroke="#FFE39B" stroke-width="2" stroke-linejoin="round"/>
+<path id="Vector_6" d="M130 170V194" stroke="#E2B332" stroke-width="3" stroke-linecap="round"/>
+<path id="Vector_7" d="M75 185C94 180 112 183 130 194C148 183 166 180 185 185" stroke="#F2CC57" stroke-width="4" stroke-linecap="round"/>
+<path id="Vector_8" opacity="0.75" d="M76 195C95 190 113 193 130 203C147 193 165 190 184 195" stroke="#E2B332" stroke-width="2" stroke-linecap="round"/>
+<path id="Vector_9" opacity="0.55" d="M130 214C178.601 214 218 174.601 218 126C218 77.3989 178.601 38 130 38C81.3989 38 42 77.3989 42 126C42 174.601 81.3989 214 130 214Z" stroke="#F0C64B" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 11"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_4" x1="36" y1="22" x2="222" y2="238" gradientUnits="userSpaceOnUse">
+<stop stop-color="#243A73"/>
+<stop offset="1" stop-color="#0A122B"/>
+</linearGradient>
+<linearGradient id="paint1_linear_0_4" x1="130" y1="93" x2="130" y2="166" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FFB52E"/>
+<stop offset="1" stop-color="#E85D04"/>
+</linearGradient>
+<linearGradient id="paint2_linear_0_4" x1="130" y1="50" x2="130" y2="205" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FFD56A"/>
+<stop offset="1" stop-color="#D99B16"/>
+</linearGradient>
+<clipPath id="clip0_0_4">
+<rect width="260" height="260" fill="white"/>
+</clipPath>
+</defs>
+</svg>

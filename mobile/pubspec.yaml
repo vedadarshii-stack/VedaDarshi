@@ -10,11 +10,36 @@ dependencies:
   firebase_core: ^4.11.0
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.4
 
 flutter:
   uses-material-design: true
+  generate: true
+  assets:
+    - assets/logo/
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/logo/logo_veda_jyoti.png"
+  adaptive_icon_background: "#172144"
+  adaptive_icon_foreground: "assets/logo/logo_adaptive_foreground.png"
+
+flutter_native_splash:
+  color: "#172144"
+  image: assets/logo/logo_veda_jyoti.png
+  android_12:
+    image: assets/logo/logo_adaptive_foreground.png
+    icon_background_color: "#172144"
+  android: true
+  ios: false

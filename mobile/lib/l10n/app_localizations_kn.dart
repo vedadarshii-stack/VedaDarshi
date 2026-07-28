@@ -1,0 +1,19 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Kannada (`kn`).
+class AppLocalizationsKn extends AppLocalizations {
+  AppLocalizationsKn([String locale = 'kn']) : super(locale);
+
+  @override
+  String get appName => 'Vedadarshi';
+
+  @override
+  String get splashTagline => 'ನಿಮ್ಮ ವಿಶ್ವಾಸಾರ್ಹ ವೇದ ಸಂಗಾತಿ';
+
+  @override
+  String get splashBlessing => '।। शुभम् भवतु ।।';
+}
