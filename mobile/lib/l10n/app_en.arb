@@ -79,5 +79,77 @@
   "termsNotice": "By continuing you agree to our Terms of Service & Privacy Policy",
   "@termsNotice": {
     "description": "Fine-print notice at the bottom of the Welcome/Login screen referencing the legal terms."
+  },
+  "otpTitle": "Verify your number",
+  "@otpTitle": {
+    "description": "Heading of the OTP verification screen."
+  },
+  "otpSubtitle": "Enter the 6-digit code sent to {phone}",
+  "@otpSubtitle": {
+    "description": "Subtitle of the OTP verification screen, naming the masked phone number the code was sent to.",
+    "placeholders": {
+      "phone": {
+        "type": "String",
+        "example": "+91 98••• ••210"
+      }
+    }
+  },
+  "otpNoCode": "Didn't receive the code?",
+  "@otpNoCode": {
+    "description": "Prompt introducing the resend option on the OTP verification screen."
+  },
+  "otpResendIn": "Resend in {seconds}",
+  "@otpResendIn": {
+    "description": "Countdown shown before the resend option becomes available on the OTP verification screen.",
+    "placeholders": {
+      "seconds": {
+        "type": "String",
+        "example": "00:24"
+      }
+    }
+  },
+  "otpResend": "Resend",
+  "@otpResend": {
+    "description": "Tappable label to request a new OTP once the resend countdown has finished."
+  },
+  "otpVerify": "Verify & Continue",
+  "@otpVerify": {
+    "description": "Label of the CTA button that submits the entered OTP code."
+  },
+  "otpPrivacy": "🔒 Your number is kept private and secure",
+  "@otpPrivacy": {
+    "description": "Reassurance notice at the bottom of the OTP verification screen."
+  },
+  "otpResent": "A new code has been sent.",
+  "@otpResent": {
+    "description": "Confirmation snackbar shown after successfully requesting a new OTP code."
+  },
+  "authErrorNetwork": "No internet connection. Please check your network and try again.",
+  "@authErrorNetwork": {
+    "description": "Error message shown when an auth operation fails due to no/unstable network connectivity."
+  },
+  "authErrorInvalidPhone": "That phone number doesn't look right. Please check and try again.",
+  "@authErrorInvalidPhone": {
+    "description": "Error message shown when the entered phone number is not a valid, dialable number."
+  },
+  "authErrorInvalidOtp": "That code is incorrect. Please try again.",
+  "@authErrorInvalidOtp": {
+    "description": "Error message shown when the entered OTP code does not match what was sent."
+  },
+  "authErrorOtpExpired": "That code has expired. Please request a new one.",
+  "@authErrorOtpExpired": {
+    "description": "Error message shown when the OTP session/code expired before it was verified."
+  },
+  "authErrorTooManyRequests": "Too many attempts. Please wait a while before trying again.",
+  "@authErrorTooManyRequests": {
+    "description": "Error message shown when too many auth attempts trigger Firebase's abuse protection."
+  },
+  "authErrorProviderDisabled": "This sign-in method isn't available yet. Please try another option.",
+  "@authErrorProviderDisabled": {
+    "description": "Error message shown when the requested sign-in provider isn't enabled for the app."
+  },
+  "authErrorUnknown": "Something went wrong. Please try again.",
+  "@authErrorUnknown": {
+    "description": "Generic fallback error message shown for any unclassified auth failure."
   }
 }

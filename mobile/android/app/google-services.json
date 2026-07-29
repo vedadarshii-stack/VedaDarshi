@@ -12,7 +12,20 @@
           "package_name": "com.vedadarshi.vedadarshi"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1029956122-v8m3v0r9conluoup129nlg4p4teilpcn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vedadarshi.vedadarshi",
+            "certificate_hash": "beafb637efe51baad9c1e397598cb7234570921c"
+          }
+        },
+        {
+          "client_id": "1029956122-p8j1kq5kj6li995h81t69tspv6e2vvtn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDg1BmMyypsSHdPY9SbM73ktUABUB3viFU"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1029956122-p8j1kq5kj6li995h81t69tspv6e2vvtn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1029956122-eknbbi4ldc1a37pscj1aiq07motqd7kl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.vedadarshi.vedadarshi"
+              }
+            }
+          ]
         }
       }
     }

@@ -71,4 +71,58 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get termsNotice =>
       'जारी रखकर आप हमारी सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं';
+
+  @override
+  String get otpTitle => 'अपना नंबर सत्यापित करें';
+
+  @override
+  String otpSubtitle(String phone) {
+    return '$phone पर भेजा गया 6-अंकों का कोड दर्ज करें';
+  }
+
+  @override
+  String get otpNoCode => 'कोड नहीं मिला?';
+
+  @override
+  String otpResendIn(String seconds) {
+    return '$seconds में पुनः भेजें';
+  }
+
+  @override
+  String get otpResend => 'पुनः भेजें';
+
+  @override
+  String get otpVerify => 'सत्यापित करें और जारी रखें';
+
+  @override
+  String get otpPrivacy => '🔒 आपका नंबर निजी और सुरक्षित रखा जाता है';
+
+  @override
+  String get otpResent => 'एक नया कोड भेजा गया है।';
+
+  @override
+  String get authErrorNetwork =>
+      'इंटरनेट कनेक्शन नहीं है। कृपया अपना नेटवर्क जांचें और पुनः प्रयास करें।';
+
+  @override
+  String get authErrorInvalidPhone =>
+      'यह फ़ोन नंबर सही नहीं लगता। कृपया जांचें और पुनः प्रयास करें।';
+
+  @override
+  String get authErrorInvalidOtp => 'यह कोड गलत है। कृपया पुनः प्रयास करें।';
+
+  @override
+  String get authErrorOtpExpired =>
+      'यह कोड समाप्त हो गया है। कृपया एक नया अनुरोध करें।';
+
+  @override
+  String get authErrorTooManyRequests =>
+      'बहुत अधिक प्रयास। कृपया पुनः प्रयास करने से पहले कुछ समय प्रतीक्षा करें।';
+
+  @override
+  String get authErrorProviderDisabled =>
+      'यह साइन-इन विधि अभी उपलब्ध नहीं है। कृपया कोई अन्य विकल्प आज़माएं।';
+
+  @override
+  String get authErrorUnknown => 'कुछ गलत हो गया। कृपया पुनः प्रयास करें।';
 }

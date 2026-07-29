@@ -72,4 +72,58 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get termsNotice =>
       'By continuing you agree to our Terms of Service & Privacy Policy';
+
+  @override
+  String get otpTitle => 'Verify your number';
+
+  @override
+  String otpSubtitle(String phone) {
+    return 'Enter the 6-digit code sent to $phone';
+  }
+
+  @override
+  String get otpNoCode => 'Didn\'t receive the code?';
+
+  @override
+  String otpResendIn(String seconds) {
+    return 'Resend in $seconds';
+  }
+
+  @override
+  String get otpResend => 'Resend';
+
+  @override
+  String get otpVerify => 'Verify & Continue';
+
+  @override
+  String get otpPrivacy => '🔒 Your number is kept private and secure';
+
+  @override
+  String get otpResent => 'A new code has been sent.';
+
+  @override
+  String get authErrorNetwork =>
+      'No internet connection. Please check your network and try again.';
+
+  @override
+  String get authErrorInvalidPhone =>
+      'That phone number doesn\'t look right. Please check and try again.';
+
+  @override
+  String get authErrorInvalidOtp => 'That code is incorrect. Please try again.';
+
+  @override
+  String get authErrorOtpExpired =>
+      'That code has expired. Please request a new one.';
+
+  @override
+  String get authErrorTooManyRequests =>
+      'Too many attempts. Please wait a while before trying again.';
+
+  @override
+  String get authErrorProviderDisabled =>
+      'This sign-in method isn\'t available yet. Please try another option.';
+
+  @override
+  String get authErrorUnknown => 'Something went wrong. Please try again.';
 }

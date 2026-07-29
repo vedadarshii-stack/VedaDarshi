@@ -35,6 +35,10 @@ abstract final class AppColors {
   /// button.
   static const Color googleBlue = Color(0xFF4285F4);
 
+  /// Border color of an OTP box that already has a digit typed into it (but
+  /// isn't currently focused) — see "A4 · OTP Verify" (Figma node 7:27).
+  static const Color otpBorderFilled = Color(0xFFD8CFC0);
+
   static const LinearGradient navyGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,

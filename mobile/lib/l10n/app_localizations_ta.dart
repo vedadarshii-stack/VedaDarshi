@@ -73,4 +73,60 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get termsNotice =>
       'தொடர்வதன் மூலம் நீங்கள் எங்கள் சேவை விதிமுறைகள் & தனியுரிமைக் கொள்கையை ஏற்கிறீர்கள்';
+
+  @override
+  String get otpTitle => 'உங்கள் எண்ணைச் சரிபார்க்கவும்';
+
+  @override
+  String otpSubtitle(String phone) {
+    return '$phone க்கு அனுப்பப்பட்ட 6-இலக்க குறியீட்டை உள்ளிடவும்';
+  }
+
+  @override
+  String get otpNoCode => 'குறியீடு கிடைக்கவில்லையா?';
+
+  @override
+  String otpResendIn(String seconds) {
+    return '$secondsஇல் மீண்டும் அனுப்பவும்';
+  }
+
+  @override
+  String get otpResend => 'மீண்டும் அனுப்பவும்';
+
+  @override
+  String get otpVerify => 'சரிபார்த்து தொடரவும்';
+
+  @override
+  String get otpPrivacy =>
+      '🔒 உங்கள் எண் தனிப்பட்டதாகவும் பாதுகாப்பாகவும் வைக்கப்படுகிறது';
+
+  @override
+  String get otpResent => 'புதிய குறியீடு அனுப்பப்பட்டது.';
+
+  @override
+  String get authErrorNetwork =>
+      'இணைய இணைப்பு இல்லை. உங்கள் நெட்வொர்க்கைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get authErrorInvalidPhone =>
+      'அந்த தொலைபேசி எண் சரியாகத் தெரியவில்லை. சரிபார்த்து மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get authErrorInvalidOtp =>
+      'அந்த குறியீடு தவறானது. மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get authErrorOtpExpired =>
+      'அந்த குறியீடு காலாவதியானது. புதிதாக ஒன்றைக் கோரவும்.';
+
+  @override
+  String get authErrorTooManyRequests =>
+      'அதிக முயற்சிகள். மீண்டும் முயற்சிக்கும் முன் சிறிது நேரம் காத்திருக்கவும்.';
+
+  @override
+  String get authErrorProviderDisabled =>
+      'இந்த உள்நுழைவு முறை இன்னும் கிடைக்கவில்லை. வேறு விருப்பத்தை முயற்சிக்கவும்.';
+
+  @override
+  String get authErrorUnknown => 'ஏதோ தவறு நடந்தது. மீண்டும் முயற்சிக்கவும்.';
 }

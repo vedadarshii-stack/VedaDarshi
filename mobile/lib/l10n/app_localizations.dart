@@ -223,6 +223,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'By continuing you agree to our Terms of Service & Privacy Policy'**
   String get termsNotice;
+
+  /// Heading of the OTP verification screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify your number'**
+  String get otpTitle;
+
+  /// Subtitle of the OTP verification screen, naming the masked phone number the code was sent to.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 6-digit code sent to {phone}'**
+  String otpSubtitle(String phone);
+
+  /// Prompt introducing the resend option on the OTP verification screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Didn\'t receive the code?'**
+  String get otpNoCode;
+
+  /// Countdown shown before the resend option becomes available on the OTP verification screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend in {seconds}'**
+  String otpResendIn(String seconds);
+
+  /// Tappable label to request a new OTP once the resend countdown has finished.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend'**
+  String get otpResend;
+
+  /// Label of the CTA button that submits the entered OTP code.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify & Continue'**
+  String get otpVerify;
+
+  /// Reassurance notice at the bottom of the OTP verification screen.
+  ///
+  /// In en, this message translates to:
+  /// **'🔒 Your number is kept private and secure'**
+  String get otpPrivacy;
+
+  /// Confirmation snackbar shown after successfully requesting a new OTP code.
+  ///
+  /// In en, this message translates to:
+  /// **'A new code has been sent.'**
+  String get otpResent;
+
+  /// Error message shown when an auth operation fails due to no/unstable network connectivity.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection. Please check your network and try again.'**
+  String get authErrorNetwork;
+
+  /// Error message shown when the entered phone number is not a valid, dialable number.
+  ///
+  /// In en, this message translates to:
+  /// **'That phone number doesn\'t look right. Please check and try again.'**
+  String get authErrorInvalidPhone;
+
+  /// Error message shown when the entered OTP code does not match what was sent.
+  ///
+  /// In en, this message translates to:
+  /// **'That code is incorrect. Please try again.'**
+  String get authErrorInvalidOtp;
+
+  /// Error message shown when the OTP session/code expired before it was verified.
+  ///
+  /// In en, this message translates to:
+  /// **'That code has expired. Please request a new one.'**
+  String get authErrorOtpExpired;
+
+  /// Error message shown when too many auth attempts trigger Firebase's abuse protection.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Please wait a while before trying again.'**
+  String get authErrorTooManyRequests;
+
+  /// Error message shown when the requested sign-in provider isn't enabled for the app.
+  ///
+  /// In en, this message translates to:
+  /// **'This sign-in method isn\'t available yet. Please try another option.'**
+  String get authErrorProviderDisabled;
+
+  /// Generic fallback error message shown for any unclassified auth failure.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get authErrorUnknown;
 }
 
 class _AppLocalizationsDelegate

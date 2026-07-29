@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/auth/auth_providers.dart';
+import '../../core/auth/auth_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../l10n/app_localizations.dart';
 import '../home/home_placeholder_screen.dart';
+import 'auth_error_messages.dart';
+import 'otp_verify_screen.dart';
 
 /// Welcome/Login screen, matching the approved Figma "A3 · Welcome / Login"
 /// (node 7:2) concept.
@@ -23,6 +27,10 @@ class _WelcomeLoginScreenState extends ConsumerState<WelcomeLoginScreen> {
   final _phoneController = TextEditingController();
   final _phoneFocusNode = FocusNode();
 
+  bool _isSendingOtp = false;
+  bool _isGoogleLoading = false;
+  bool _isGuestLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -38,6 +46,9 @@ class _WelcomeLoginScreenState extends ConsumerState<WelcomeLoginScreen> {
     _phoneFocusNode.dispose();
     super.dispose();
   }
+
+  bool get _isAnyLoading =>
+      _isSendingOtp || _isGoogleLoading || _isGuestLoading;
 
   void _onPhoneChanged() => setState(() {});
 
@@ -58,29 +69,109 @@ class _WelcomeLoginScreenState extends ConsumerState<WelcomeLoginScreen> {
     );
   }
 
-  /// TODO-free interim handler: real Firebase phone-OTP verification is
-  /// wired in M1 together with "A4 · OTP Verify" (Figma node 7:27). Until
-  /// then this proceeds straight to Home, matching the same interim
-  /// convention already used by [HomePlaceholderScreen]'s other entry
-  /// points — no fake OTP flow, delay or mock auth state is introduced here.
-  void _requestOtp() {
-    if (!_isPhoneValid) return;
-    _goToHome();
+  void _goToOtpVerify(String phoneE164, PhoneCodeSent sent) {
+    Navigator.of(context).push<void>(
+      PageRouteBuilder<void>(
+        transitionDuration: const Duration(milliseconds: 350),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            OtpVerifyScreen(
+              phoneE164: phoneE164,
+              verificationId: sent.verificationId,
+              resendToken: sent.resendToken,
+            ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+    );
   }
 
-  /// TODO-free interim handler: real Google sign-in is wired in M1 together
-  /// with "A4 · OTP Verify" (Figma node 7:27). Until then this proceeds
-  /// straight to Home, matching the same interim convention already used by
-  /// [HomePlaceholderScreen]'s other entry points — no mock auth state is
-  /// introduced here.
-  void _continueWithGoogle() {
-    _goToHome();
+  Future<void> _requestOtp() async {
+    if (!_isPhoneValid || _isAnyLoading) return;
+    final l10n = AppLocalizations.of(context)!;
+    final authService = ref.read(authServiceProvider);
+    setState(() => _isSendingOtp = true);
+    final phoneE164 = '+91${_phoneController.text}';
+    try {
+      final sent = await authService.sendOtp(phoneE164: phoneE164);
+      if (!mounted) return;
+      if (sent.autoVerified) {
+        // Android instant verification already signed the user in — skip
+        // the OTP entry screen entirely.
+        _goToHome();
+      } else {
+        _goToOtpVerify(phoneE164, sent);
+      }
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      final message = authErrorMessage(l10n, e.code);
+      if (message != null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
+      }
+    } finally {
+      if (mounted) setState(() => _isSendingOtp = false);
+    }
+  }
+
+  Future<void> _continueWithGoogle() async {
+    if (_isAnyLoading) return;
+    final l10n = AppLocalizations.of(context)!;
+    final authService = ref.read(authServiceProvider);
+    setState(() => _isGoogleLoading = true);
+    try {
+      await authService.signInWithGoogle();
+      if (!mounted) return;
+      _goToHome();
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      // A user-cancelled Google sign-in (they closed the account picker)
+      // isn't a real failure, so authErrorMessage returns null and no
+      // snackbar is shown.
+      final message = authErrorMessage(l10n, e.code);
+      if (message != null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
+      }
+    } finally {
+      if (mounted) setState(() => _isGoogleLoading = false);
+    }
+  }
+
+  Future<void> _continueAsGuest() async {
+    if (_isAnyLoading) return;
+    final authService = ref.read(authServiceProvider);
+    setState(() => _isGuestLoading = true);
+    try {
+      await authService.signInAnonymously();
+    } on AuthException {
+      // Guest browsing is account-less by definition — even if anonymous
+      // sign-in fails (e.g. no network), still let the user into the app
+      // rather than blocking them behind an auth error.
+    } finally {
+      if (mounted) {
+        setState(() => _isGuestLoading = false);
+        _goToHome();
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final locale = Localizations.localeOf(context);
+
+    // The hero and body spacing scale with screen height so the hero
+    // doesn't eat too much of the screen on short/compact phones, while
+    // taller screens keep the original Figma proportions (300px hero /
+    // generous spacing).
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final heroHeight = (screenHeight * 0.32).clamp(200.0, 300.0);
+    final isCompact = screenHeight < 840;
+    final bodyTopPadding = isCompact ? 24.0 : 36.0;
+    final bodyGap = isCompact ? 14.0 : 20.0;
 
     return Scaffold(
       backgroundColor: AppColors.cream,
@@ -91,16 +182,16 @@ class _WelcomeLoginScreenState extends ConsumerState<WelcomeLoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _Hero(l10n: l10n, locale: locale),
+                _Hero(l10n: l10n, locale: locale, heroHeight: heroHeight),
                 // Expanded (not a bare Padding) so the body column gets a
                 // bounded height — the terms notice is pushed to the bottom
                 // by a Spacer, which needs finite constraints to resolve.
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.only(
+                    padding: EdgeInsets.only(
                       left: 24,
                       right: 24,
-                      top: 36,
+                      top: bodyTopPadding,
                       bottom: 32,
                     ),
                     child: Column(
@@ -115,7 +206,7 @@ class _WelcomeLoginScreenState extends ConsumerState<WelcomeLoginScreen> {
                             color: AppColors.ink,
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: bodyGap),
                         Text(
                           l10n.welcomeSubtitle,
                           style: AppFonts.body(
@@ -124,34 +215,40 @@ class _WelcomeLoginScreenState extends ConsumerState<WelcomeLoginScreen> {
                             color: AppColors.muted,
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: bodyGap),
                         _PhoneField(
                           l10n: l10n,
                           locale: locale,
                           controller: _phoneController,
                           focusNode: _phoneFocusNode,
+                          enabled: !_isAnyLoading,
                           onSubmitted: (_) => _requestOtp(),
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: bodyGap),
                         _GetOtpButton(
                           l10n: l10n,
                           locale: locale,
-                          enabled: _isPhoneValid,
+                          enabled: _isPhoneValid && !_isAnyLoading,
+                          loading: _isSendingOtp,
                           onTap: _requestOtp,
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: bodyGap),
                         _DividerRow(l10n: l10n, locale: locale),
-                        const SizedBox(height: 20),
+                        SizedBox(height: bodyGap),
                         _GoogleButton(
                           l10n: l10n,
                           locale: locale,
+                          enabled: !_isAnyLoading,
+                          loading: _isGoogleLoading,
                           onTap: _continueWithGoogle,
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: bodyGap),
                         _GuestLink(
                           l10n: l10n,
                           locale: locale,
-                          onTap: _goToHome,
+                          enabled: !_isAnyLoading,
+                          loading: _isGuestLoading,
+                          onTap: _continueAsGuest,
                         ),
                         const Spacer(),
                         SafeArea(
@@ -185,15 +282,19 @@ class _WelcomeLoginScreenState extends ConsumerState<WelcomeLoginScreen> {
 /// Section 1 — navy hero with the ॐ mark, wordmark and tagline. Deliberately
 /// not wrapped in `SafeArea` so the navy gradient runs under the status bar.
 class _Hero extends StatelessWidget {
-  const _Hero({required this.l10n, required this.locale});
+  const _Hero({required this.l10n, required this.locale, required this.heroHeight});
 
   final AppLocalizations l10n;
   final Locale locale;
 
+  /// Height of the hero, scaled by the parent from screen height (clamped
+  /// 200–300px) so it doesn't dominate short/compact screens.
+  final double heroHeight;
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: heroHeight,
       width: double.infinity,
       decoration: const BoxDecoration(
         gradient: AppColors.navyHeroGradient,
@@ -210,7 +311,7 @@ class _Hero extends StatelessWidget {
               'ॐ',
               style: AppFonts.body(
                 const Locale('hi'),
-                fontSize: 44,
+                fontSize: heroHeight >= 280 ? 44 : 36,
                 fontWeight: FontWeight.w600,
                 color: AppColors.gold,
               ),
@@ -257,6 +358,7 @@ class _PhoneField extends StatelessWidget {
     required this.locale,
     required this.controller,
     required this.focusNode,
+    required this.enabled,
     required this.onSubmitted,
   });
 
@@ -264,6 +366,7 @@ class _PhoneField extends StatelessWidget {
   final Locale locale;
   final TextEditingController controller;
   final FocusNode focusNode;
+  final bool enabled;
   final ValueChanged<String> onSubmitted;
 
   @override
@@ -301,6 +404,7 @@ class _PhoneField extends StatelessWidget {
             child: TextField(
               controller: controller,
               focusNode: focusNode,
+              enabled: enabled,
               keyboardType: TextInputType.phone,
               maxLength: 10,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -340,12 +444,14 @@ class _GetOtpButton extends StatelessWidget {
     required this.l10n,
     required this.locale,
     required this.enabled,
+    required this.loading,
     required this.onTap,
   });
 
   final AppLocalizations l10n;
   final Locale locale;
   final bool enabled;
+  final bool loading;
   final VoidCallback onTap;
 
   @override
@@ -383,15 +489,26 @@ class _GetOtpButton extends StatelessWidget {
                     : AppColors.saffron.withValues(alpha: 0.35),
               ),
               child: Center(
-                child: Text(
-                  l10n.getOtp,
-                  style: AppFonts.body(
-                    locale,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
+                child: loading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
+                        ),
+                      )
+                    : Text(
+                        l10n.getOtp,
+                        style: AppFonts.body(
+                          locale,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
               ),
             ),
           ),
@@ -444,24 +561,29 @@ class _GoogleButton extends StatelessWidget {
   const _GoogleButton({
     required this.l10n,
     required this.locale,
+    required this.enabled,
+    required this.loading,
     required this.onTap,
   });
 
   final AppLocalizations l10n;
   final Locale locale;
+  final bool enabled;
+  final bool loading;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
+      enabled: enabled,
       label: l10n.continueWithGoogle,
       child: Material(
         color: Colors.white,
         borderRadius: BorderRadius.circular(999),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: onTap,
+          onTap: enabled ? onTap : null,
           child: Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 15),
@@ -472,34 +594,48 @@ class _GoogleButton extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
-              children: [
-                // The Google "G" wordmark is intentionally not localised —
-                // it is a fixed brand mark, not user-facing prose.
-                Text(
-                  'G',
-                  style: AppFonts.body(
-                    const Locale('en'),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.googleBlue,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                // Flexible so the longer Indic translations wrap instead of
-                // overflowing the pill.
-                Flexible(
-                  child: Text(
-                    l10n.continueWithGoogle,
-                    textAlign: TextAlign.center,
-                    style: AppFonts.body(
-                      locale,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.ink,
-                    ),
-                  ),
-                ),
-              ],
+              children: loading
+                  ? const [
+                      SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            AppColors.saffron,
+                          ),
+                        ),
+                      ),
+                    ]
+                  : [
+                      // The Google "G" wordmark is intentionally not
+                      // localised — it is a fixed brand mark, not
+                      // user-facing prose.
+                      Text(
+                        'G',
+                        style: AppFonts.body(
+                          const Locale('en'),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.googleBlue,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      // Flexible so the longer Indic translations wrap
+                      // instead of overflowing the pill.
+                      Flexible(
+                        child: Text(
+                          l10n.continueWithGoogle,
+                          textAlign: TextAlign.center,
+                          style: AppFonts.body(
+                            locale,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.ink,
+                          ),
+                        ),
+                      ),
+                    ],
             ),
           ),
         ),
@@ -513,24 +649,29 @@ class _GuestLink extends StatelessWidget {
   const _GuestLink({
     required this.l10n,
     required this.locale,
+    required this.enabled,
+    required this.loading,
     required this.onTap,
   });
 
   final AppLocalizations l10n;
   final Locale locale;
+  final bool enabled;
+  final bool loading;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
+      enabled: enabled,
       label: l10n.exploreAsGuest,
       // Full width so the label sits centred on the screen, not left-aligned
       // by the body column's CrossAxisAlignment.start.
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: onTap,
+          onTap: enabled ? onTap : null,
           borderRadius: BorderRadius.circular(999),
           child: Container(
             width: double.infinity,
@@ -555,11 +696,23 @@ class _GuestLink extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 6),
-                const Icon(
-                  Icons.arrow_forward,
-                  size: 16,
-                  color: AppColors.saffron,
-                ),
+                if (loading)
+                  const SizedBox(
+                    width: 14,
+                    height: 14,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.saffron,
+                      ),
+                    ),
+                  )
+                else
+                  const Icon(
+                    Icons.arrow_forward,
+                    size: 16,
+                    color: AppColors.saffron,
+                  ),
               ],
             ),
           ),

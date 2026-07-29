@@ -72,4 +72,60 @@ class AppLocalizationsKn extends AppLocalizations {
   @override
   String get termsNotice =>
       'ಮುಂದುವರಿಸುವ ಮೂಲಕ ನೀವು ನಮ್ಮ ಸೇವಾ ನಿಯಮಗಳು ಮತ್ತು ಗೌಪ್ಯತಾ ನೀತಿಗೆ ಒಪ್ಪುತ್ತೀರಿ';
+
+  @override
+  String get otpTitle => 'ನಿಮ್ಮ ಸಂಖ್ಯೆಯನ್ನು ಪರಿಶೀಲಿಸಿ';
+
+  @override
+  String otpSubtitle(String phone) {
+    return '$phoneಗೆ ಕಳುಹಿಸಲಾದ 6-ಅಂಕಿಯ ಕೋಡ್ ಅನ್ನು ನಮೂದಿಸಿ';
+  }
+
+  @override
+  String get otpNoCode => 'ಕೋಡ್ ಸಿಗಲಿಲ್ಲವೇ?';
+
+  @override
+  String otpResendIn(String seconds) {
+    return '$secondsರಲ್ಲಿ ಮರುಕಳುಹಿಸಿ';
+  }
+
+  @override
+  String get otpResend => 'ಮರುಕಳುಹಿಸಿ';
+
+  @override
+  String get otpVerify => 'ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮುಂದುವರಿಸಿ';
+
+  @override
+  String get otpPrivacy =>
+      '🔒 ನಿಮ್ಮ ಸಂಖ್ಯೆಯನ್ನು ಖಾಸಗಿ ಮತ್ತು ಸುರಕ್ಷಿತವಾಗಿ ಇರಿಸಲಾಗುತ್ತದೆ';
+
+  @override
+  String get otpResent => 'ಹೊಸ ಕೋಡ್ ಕಳುಹಿಸಲಾಗಿದೆ.';
+
+  @override
+  String get authErrorNetwork =>
+      'ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕವಿಲ್ಲ. ದಯವಿಟ್ಟು ನಿಮ್ಮ ನೆಟ್‌ವರ್ಕ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get authErrorInvalidPhone =>
+      'ಆ ಫೋನ್ ಸಂಖ್ಯೆ ಸರಿಯಾಗಿ ಕಾಣುತ್ತಿಲ್ಲ. ದಯವಿಟ್ಟು ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get authErrorInvalidOtp =>
+      'ಆ ಕೋಡ್ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get authErrorOtpExpired =>
+      'ಆ ಕೋಡ್ ಅವಧಿ ಮುಗಿದಿದೆ. ದಯವಿಟ್ಟು ಹೊಸದನ್ನು ವಿನಂತಿಸಿ.';
+
+  @override
+  String get authErrorTooManyRequests =>
+      'ಹಲವು ಪ್ರಯತ್ನಗಳು. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸುವ ಮೊದಲು ಸ್ವಲ್ಪ ಸಮಯ ಕಾಯಿರಿ.';
+
+  @override
+  String get authErrorProviderDisabled =>
+      'ಈ ಸೈನ್-ಇನ್ ವಿಧಾನ ಇನ್ನೂ ಲಭ್ಯವಿಲ್ಲ. ದಯವಿಟ್ಟು ಬೇರೆ ಆಯ್ಕೆಯನ್ನು ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get authErrorUnknown => 'ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
 }

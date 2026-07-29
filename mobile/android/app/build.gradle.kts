@@ -22,6 +22,12 @@ android {
         applicationId = "com.vedadarshi.vedadarshi"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
+        // firebase_auth requires minSdk 23 — this Flutter SDK's default
+        // flutter.minSdkVersion (24) already satisfies that, so no explicit
+        // override is needed. (An explicit `minSdk = 23` pin was tried, but
+        // Flutter's Gradle tooling rewrites this file to the template form
+        // on every build and discards it — if a future Flutter SDK ever
+        // lowers the default below 23, pin it explicitly here instead.)
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

@@ -86,35 +86,42 @@ class _LanguageSelectScreenState extends ConsumerState<LanguageSelectScreen> {
                   ? locale.languageCode
                   : 'en'));
 
+    // Five cards plus a header and CTA is a tall stack, so compact phones
+    // get tighter padding/spacing to fit the whole screen without scrolling;
+    // taller screens keep the roomier Figma proportions.
+    final isCompact = MediaQuery.sizeOf(context).height < 840;
+    final sectionGap = isCompact ? 18.0 : 28.0;
+
     return Scaffold(
       backgroundColor: AppColors.cream,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.only(
+          padding: EdgeInsets.only(
             left: 24,
             right: 24,
-            top: 80,
-            bottom: 40,
+            top: isCompact ? 32 : 64,
+            bottom: 32,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _Header(l10n: l10n, locale: locale, promptLocale: _promptLocale),
-              const SizedBox(height: 28),
+              SizedBox(height: sectionGap),
               Column(
                 children: [
                   for (final option in _languageOptions) ...[
                     _LanguageCard(
                       option: option,
                       isSelected: option.languageCode == selectedCode,
+                      isCompact: isCompact,
                       onTap: () => _selectLanguage(option.languageCode),
                     ),
                     if (option != _languageOptions.last)
-                      const SizedBox(height: 12),
+                      SizedBox(height: isCompact ? 10 : 12),
                   ],
                 ],
               ),
-              const SizedBox(height: 28),
+              SizedBox(height: sectionGap),
               _ContinueButton(l10n: l10n, locale: locale, onTap: _goToWelcome),
             ],
           ),
@@ -199,11 +206,13 @@ class _LanguageCard extends StatelessWidget {
   const _LanguageCard({
     required this.option,
     required this.isSelected,
+    required this.isCompact,
     required this.onTap,
   });
 
   final _LanguageOption option;
   final bool isSelected;
+  final bool isCompact;
   final VoidCallback onTap;
 
   @override
@@ -223,7 +232,7 @@ class _LanguageCard extends StatelessWidget {
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeInOut,
             width: double.infinity,
-            padding: const EdgeInsets.all(18),
+            padding: EdgeInsets.all(isCompact ? 14 : 18),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
