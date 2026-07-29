@@ -15,5 +15,19 @@ class AppLocalizationsHi extends AppLocalizations {
   String get splashTagline => 'आपका विश्वसनीय वैदिक साथी';
 
   @override
-  String get splashBlessing => '।। शुभम् भवतु ।।';
+  String get introStarsTitle => 'आपके सितारे, सरल भाषा में';
+
+  @override
+  String get introStarsSubtitle =>
+      'दैनिक राशिफल, पंचांग और कुंडली — प्रामाणिक वैदिक गणनाओं से';
+
+  @override
+  String get introAiTitle => 'AI ज्योतिषी से पूछें';
+
+  @override
+  String get introAiSubtitle =>
+      'आपकी कुंडली पर आधारित व्यक्तिगत मार्गदर्शन — आपकी अपनी भाषा में';
+
+  @override
+  String get getStarted => 'शुरू करें';
 }

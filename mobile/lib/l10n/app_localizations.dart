@@ -116,11 +116,35 @@ abstract class AppLocalizations {
   /// **'Your trusted Vedic companion'**
   String get splashTagline;
 
-  /// Sanskrit blessing shown at the bottom of the splash screen. Identical across all locales.
+  /// Title of the second splash/intro carousel slide, about horoscope/panchang/kundli features.
   ///
   /// In en, this message translates to:
-  /// **'।। शुभम् भवतु ।।'**
-  String get splashBlessing;
+  /// **'Your Stars, Decoded'**
+  String get introStarsTitle;
+
+  /// Subtitle of the second splash/intro carousel slide, about horoscope/panchang/kundli features.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily horoscope, Panchang & Kundli — from authentic Vedic calculations'**
+  String get introStarsSubtitle;
+
+  /// Title of the third splash/intro carousel slide, about the AI astrologer chat feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask the AI Astrologer'**
+  String get introAiTitle;
+
+  /// Subtitle of the third splash/intro carousel slide, about the AI astrologer chat feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal guidance from your birth chart — in your own language'**
+  String get introAiSubtitle;
+
+  /// Label of the CTA button on the final splash/intro carousel slide that proceeds into the app.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get getStarted;
 }
 
 class _AppLocalizationsDelegate

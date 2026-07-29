@@ -15,5 +15,19 @@ class AppLocalizationsKn extends AppLocalizations {
   String get splashTagline => 'ನಿಮ್ಮ ವಿಶ್ವಾಸಾರ್ಹ ವೇದ ಸಂಗಾತಿ';
 
   @override
-  String get splashBlessing => '।। शुभम् भवतु ।।';
+  String get introStarsTitle => 'ನಿಮ್ಮ ನಕ್ಷತ್ರಗಳು, ಸರಳವಾಗಿ';
+
+  @override
+  String get introStarsSubtitle =>
+      'ದೈನಂದಿನ ರಾಶಿಫಲ, ಪಂಚಾಂಗ ಮತ್ತು ಕುಂಡಲಿ — ಪ್ರಾಮಾಣಿಕ ವೇದ ಗಣನೆಗಳಿಂದ';
+
+  @override
+  String get introAiTitle => 'AI ಜ್ಯೋತಿಷಿಯನ್ನು ಕೇಳಿ';
+
+  @override
+  String get introAiSubtitle =>
+      'ನಿಮ್ಮ ಕುಂಡಲಿಯ ಆಧಾರದಲ್ಲಿ ವೈಯಕ್ತಿಕ ಮಾರ್ಗದರ್ಶನ — ನಿಮ್ಮ ಭಾಷೆಯಲ್ಲಿ';
+
+  @override
+  String get getStarted => 'ಪ್ರಾರಂಭಿಸಿ';
 }

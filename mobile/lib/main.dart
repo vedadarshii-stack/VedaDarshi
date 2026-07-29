@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'core/theme/app_colors.dart';
 import 'features/splash/splash_screen.dart';
@@ -11,6 +12,11 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // All brand/UI fonts are bundled in assets/google_fonts/ (see AppFonts).
+  // Disabling runtime fetching means a missing font throws immediately in
+  // debug instead of silently falling back to a network request, and it
+  // guarantees offline launches always show the correct branding fonts.
+  GoogleFonts.config.allowRuntimeFetching = false;
   runApp(const MainApp());
 }
 

@@ -2,5 +2,9 @@
   "@@locale": "hi",
   "appName": "Vedadarshi",
   "splashTagline": "आपका विश्वसनीय वैदिक साथी",
-  "splashBlessing": "।। शुभम् भवतु ।।"
+  "introStarsTitle": "आपके सितारे, सरल भाषा में",
+  "introStarsSubtitle": "दैनिक राशिफल, पंचांग और कुंडली — प्रामाणिक वैदिक गणनाओं से",
+  "introAiTitle": "AI ज्योतिषी से पूछें",
+  "introAiSubtitle": "आपकी कुंडली पर आधारित व्यक्तिगत मार्गदर्शन — आपकी अपनी भाषा में",
+  "getStarted": "शुरू करें"
 }

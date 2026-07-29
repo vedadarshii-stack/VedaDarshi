@@ -15,5 +15,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get splashTagline => 'Your trusted Vedic companion';
 
   @override
-  String get splashBlessing => '।। शुभम् भवतु ।।';
+  String get introStarsTitle => 'Your Stars, Decoded';
+
+  @override
+  String get introStarsSubtitle =>
+      'Daily horoscope, Panchang & Kundli — from authentic Vedic calculations';
+
+  @override
+  String get introAiTitle => 'Ask the AI Astrologer';
+
+  @override
+  String get introAiSubtitle =>
+      'Personal guidance from your birth chart — in your own language';
+
+  @override
+  String get getStarted => 'Get Started';
 }

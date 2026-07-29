@@ -1,17 +1,21 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_fonts.dart';
 import '../../core/widgets/app_logo.dart';
 import '../../l10n/app_localizations.dart';
 import '../home/home_placeholder_screen.dart';
 
-/// Splash screen matching the approved Figma "A1 · Splash" concept.
+/// Splash / intro carousel matching the approved Figma "A1 · Splash",
+/// "A1b · Intro — Your Stars" and "A1c · Intro — AI Astrologer" concepts.
 ///
-/// Fades/slides its content in over 800ms, holds for a total of 2.5s, then
-/// cross-fades into [HomePlaceholderScreen].
+/// The whole content fades/slides in over 800ms. It then presents a
+/// 3-slide carousel (brand → horoscope/panchang/kundli → AI astrologer)
+/// that auto-advances the first two slides before waiting on the user to
+/// tap "Get Started" on the final slide. Any manual swipe permanently
+/// cancels the remaining auto-advance timers.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -24,7 +28,11 @@ class _SplashScreenState extends State<SplashScreen>
   late final AnimationController _controller;
   late final Animation<double> _fadeAnimation;
   late final Animation<Offset> _slideAnimation;
-  Timer? _navigationTimer;
+  late final PageController _pageController;
+
+  final List<Timer> _autoAdvanceTimers = [];
+  bool _autoAdvanceCancelled = false;
+  int _currentPage = 0;
 
   @override
   void initState() {
@@ -41,7 +49,35 @@ class _SplashScreenState extends State<SplashScreen>
     ).animate(curved);
     _controller.forward();
 
-    _navigationTimer = Timer(const Duration(milliseconds: 2500), _goToHome);
+    _pageController = PageController();
+
+    _autoAdvanceTimers
+      ..add(Timer(const Duration(milliseconds: 2500), () => _advanceTo(1)))
+      ..add(Timer(const Duration(milliseconds: 5500), () => _advanceTo(2)));
+  }
+
+  void _advanceTo(int page) {
+    if (!mounted || _autoAdvanceCancelled) return;
+    _pageController.animateToPage(
+      page,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void _cancelAutoAdvance() {
+    if (_autoAdvanceCancelled) return;
+    _autoAdvanceCancelled = true;
+    for (final timer in _autoAdvanceTimers) {
+      timer.cancel();
+    }
+  }
+
+  bool _handleScrollStart(ScrollStartNotification notification) {
+    if (notification.dragDetails != null) {
+      _cancelAutoAdvance();
+    }
+    return false;
   }
 
   void _goToHome() {
@@ -60,7 +96,8 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   void dispose() {
-    _navigationTimer?.cancel();
+    _cancelAutoAdvance();
+    _pageController.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -68,6 +105,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context);
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(gradient: AppColors.navyGradient),
@@ -79,55 +117,34 @@ class _SplashScreenState extends State<SplashScreen>
               child: Column(
                 children: [
                   Expanded(
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
+                    child: NotificationListener<ScrollStartNotification>(
+                      onNotification: _handleScrollStart,
+                      child: PageView(
+                        controller: _pageController,
+                        onPageChanged: (index) =>
+                            setState(() => _currentPage = index),
                         children: [
-                          const AppLogo(size: 148),
-                          const SizedBox(height: 24),
-                          Text(
-                            l10n.appName,
-                            style: GoogleFonts.playfairDisplay(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 40,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 18),
-                          Text(
-                            l10n.splashTagline,
-                            style: GoogleFonts.poppins(
-                              fontSize: 15,
-                              color: AppColors.gold,
-                            ),
+                          _BrandSlide(l10n: l10n, locale: locale),
+                          _StarsSlide(l10n: l10n, locale: locale),
+                          _AiSlide(
+                            l10n: l10n,
+                            locale: locale,
+                            onGetStarted: _goToHome,
                           ),
                         ],
                       ),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 28),
-                    child: Column(
+                    padding: const EdgeInsets.only(bottom: 36),
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _Dot(color: AppColors.gold),
-                            const SizedBox(width: 8),
-                            _Dot(color: Colors.white.withValues(alpha: 0.3)),
-                            const SizedBox(width: 8),
-                            _Dot(color: Colors.white.withValues(alpha: 0.3)),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          l10n.splashBlessing,
-                          style: GoogleFonts.notoSansDevanagari(
-                            fontSize: 12,
-                            color: Colors.white.withValues(alpha: 0.55),
-                          ),
-                        ),
+                        _Dot(isActive: _currentPage == 0),
+                        const SizedBox(width: 8),
+                        _Dot(isActive: _currentPage == 1),
+                        const SizedBox(width: 8),
+                        _Dot(isActive: _currentPage == 2),
                       ],
                     ),
                   ),
@@ -141,17 +158,229 @@ class _SplashScreenState extends State<SplashScreen>
   }
 }
 
+/// A single carousel dot; the active dot grows into a rounded pill.
 class _Dot extends StatelessWidget {
-  const _Dot({required this.color});
+  const _Dot({required this.isActive});
 
-  final Color color;
+  final bool isActive;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
+      width: isActive ? 20 : 8,
+      height: 8,
+      decoration: BoxDecoration(
+        color: isActive
+            ? AppColors.gold
+            : Colors.white.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(4),
+      ),
+    );
+  }
+}
+
+/// Slide 1 — brand: logo, wordmark and tagline (identical to the original
+/// static splash content).
+class _BrandSlide extends StatelessWidget {
+  const _BrandSlide({required this.l10n, required this.locale});
+
+  final AppLocalizations l10n;
+  final Locale locale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const AppLogo(size: 148),
+          const SizedBox(height: 24),
+          Text(
+            l10n.appName,
+            style: AppFonts.heading(
+              locale,
+              fontWeight: FontWeight.w700,
+              fontSize: 40,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 18),
+          Text(
+            l10n.splashTagline,
+            style: AppFonts.body(locale, fontSize: 15, color: AppColors.gold),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Slide 2 — daily horoscope, Panchang & Kundli teaser.
+class _StarsSlide extends StatelessWidget {
+  const _StarsSlide({required this.l10n, required this.locale});
+
+  final AppLocalizations l10n;
+  final Locale locale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const _IntroRing(icon: Icons.auto_awesome),
+          const SizedBox(height: 24),
+          Text(
+            l10n.introStarsTitle,
+            textAlign: TextAlign.center,
+            style: AppFonts.heading(
+              locale,
+              fontWeight: FontWeight.w700,
+              fontSize: 28,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 48),
+            child: Text(
+              l10n.introStarsSubtitle,
+              textAlign: TextAlign.center,
+              style: AppFonts.body(
+                locale,
+                fontSize: 14,
+                color: Colors.white.withValues(alpha: 0.8),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Slide 3 — AI Astrologer teaser + the "Get Started" CTA that exits the
+/// carousel into the app.
+class _AiSlide extends StatelessWidget {
+  const _AiSlide({
+    required this.l10n,
+    required this.locale,
+    required this.onGetStarted,
+  });
+
+  final AppLocalizations l10n;
+  final Locale locale;
+  final VoidCallback onGetStarted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const _IntroRing(icon: Icons.forum_outlined),
+          const SizedBox(height: 24),
+          Text(
+            l10n.introAiTitle,
+            textAlign: TextAlign.center,
+            style: AppFonts.heading(
+              locale,
+              fontWeight: FontWeight.w700,
+              fontSize: 28,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 48),
+            child: Text(
+              l10n.introAiSubtitle,
+              textAlign: TextAlign.center,
+              style: AppFonts.body(
+                locale,
+                fontSize: 14,
+                color: Colors.white.withValues(alpha: 0.8),
+              ),
+            ),
+          ),
+          const SizedBox(height: 28),
+          _GetStartedButton(
+            label: l10n.getStarted,
+            locale: locale,
+            onTap: onGetStarted,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Shared circular icon badge used by the feature-teaser slides.
+class _IntroRing extends StatelessWidget {
+  const _IntroRing({required this.icon});
+
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 8,
-      height: 8,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      width: 148,
+      height: 148,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.white.withValues(alpha: 0.06),
+        border: Border.all(color: AppColors.gold, width: 1.5),
+      ),
+      child: Icon(icon, size: 56, color: AppColors.gold),
+    );
+  }
+}
+
+/// Saffron gradient pill CTA that ends the intro carousel.
+class _GetStartedButton extends StatelessWidget {
+  const _GetStartedButton({
+    required this.label,
+    required this.locale,
+    required this.onTap,
+  });
+
+  final String label;
+  final Locale locale;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(27),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 44, vertical: 14),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [Color(0xFFF0821E), Color(0xFFD95F06)],
+            ),
+          ),
+          child: Text(
+            label,
+            style: AppFonts.body(
+              locale,
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

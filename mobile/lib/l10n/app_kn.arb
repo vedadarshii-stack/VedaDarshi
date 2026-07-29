@@ -2,5 +2,9 @@
   "@@locale": "kn",
   "appName": "Vedadarshi",
   "splashTagline": "ನಿಮ್ಮ ವಿಶ್ವಾಸಾರ್ಹ ವೇದ ಸಂಗಾತಿ",
-  "splashBlessing": "।। शुभम् भवतु ।।"
+  "introStarsTitle": "ನಿಮ್ಮ ನಕ್ಷತ್ರಗಳು, ಸರಳವಾಗಿ",
+  "introStarsSubtitle": "ದೈನಂದಿನ ರಾಶಿಫಲ, ಪಂಚಾಂಗ ಮತ್ತು ಕುಂಡಲಿ — ಪ್ರಾಮಾಣಿಕ ವೇದ ಗಣನೆಗಳಿಂದ",
+  "introAiTitle": "AI ಜ್ಯೋತಿಷಿಯನ್ನು ಕೇಳಿ",
+  "introAiSubtitle": "ನಿಮ್ಮ ಕುಂಡಲಿಯ ಆಧಾರದಲ್ಲಿ ವೈಯಕ್ತಿಕ ಮಾರ್ಗದರ್ಶನ — ನಿಮ್ಮ ಭಾಷೆಯಲ್ಲಿ",
+  "getStarted": "ಪ್ರಾರಂಭಿಸಿ"
 }

@@ -2,5 +2,9 @@
   "@@locale": "te",
   "appName": "Vedadarshi",
   "splashTagline": "మీ విశ్వసనీయ వేద సహచరుడు",
-  "splashBlessing": "।। शुभम् भवतु ।।"
+  "introStarsTitle": "మీ నక్షత్రాలు, విడమరిచి",
+  "introStarsSubtitle": "దైనందిన రాశిఫలం, పంచాంగం మరియు జాతకం — ప్రామాణిక వేద గణనలతో",
+  "introAiTitle": "AI జ్యోతిష్యుడిని అడగండి",
+  "introAiSubtitle": "మీ జాతకం ఆధారంగా వ్యక్తిగత మార్గదర్శకత్వం — మీ సొంత భాషలో",
+  "getStarted": "ప్రారంభించండి"
 }

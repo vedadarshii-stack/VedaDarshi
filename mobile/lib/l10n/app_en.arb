@@ -8,8 +8,24 @@
   "@splashTagline": {
     "description": "Short tagline shown under the wordmark on the splash screen."
   },
-  "splashBlessing": "।। शुभम् भवतु ।।",
-  "@splashBlessing": {
-    "description": "Sanskrit blessing shown at the bottom of the splash screen. Identical across all locales."
+  "introStarsTitle": "Your Stars, Decoded",
+  "@introStarsTitle": {
+    "description": "Title of the second splash/intro carousel slide, about horoscope/panchang/kundli features."
+  },
+  "introStarsSubtitle": "Daily horoscope, Panchang & Kundli — from authentic Vedic calculations",
+  "@introStarsSubtitle": {
+    "description": "Subtitle of the second splash/intro carousel slide, about horoscope/panchang/kundli features."
+  },
+  "introAiTitle": "Ask the AI Astrologer",
+  "@introAiTitle": {
+    "description": "Title of the third splash/intro carousel slide, about the AI astrologer chat feature."
+  },
+  "introAiSubtitle": "Personal guidance from your birth chart — in your own language",
+  "@introAiSubtitle": {
+    "description": "Subtitle of the third splash/intro carousel slide, about the AI astrologer chat feature."
+  },
+  "getStarted": "Get Started",
+  "@getStarted": {
+    "description": "Label of the CTA button on the final splash/intro carousel slide that proceeds into the app."
   }
 }

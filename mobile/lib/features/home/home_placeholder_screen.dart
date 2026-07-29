@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_fonts.dart';
 import '../../core/widgets/app_logo.dart';
 import '../../l10n/app_localizations.dart';
 
@@ -15,6 +15,7 @@ class HomePlaceholderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context);
     return Scaffold(
       backgroundColor: AppColors.cream,
       body: Center(
@@ -25,7 +26,8 @@ class HomePlaceholderScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               l10n.appName,
-              style: GoogleFonts.playfairDisplay(
+              style: AppFonts.heading(
+                locale,
                 fontWeight: FontWeight.w700,
                 fontSize: 26,
                 color: AppColors.ink,
