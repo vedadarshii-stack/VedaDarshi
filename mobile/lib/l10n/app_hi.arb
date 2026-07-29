@@ -6,5 +6,18 @@
   "introStarsSubtitle": "दैनिक राशिफल, पंचांग और कुंडली — प्रामाणिक वैदिक गणनाओं से",
   "introAiTitle": "AI ज्योतिषी से पूछें",
   "introAiSubtitle": "आपकी कुंडली पर आधारित व्यक्तिगत मार्गदर्शन — आपकी अपनी भाषा में",
-  "getStarted": "शुरू करें"
+  "getStarted": "शुरू करें",
+  "languageTitle": "अपनी भाषा चुनें",
+  "languageNativePrompt": "अपनी भाषा चुनें",
+  "languageSettingsHint": "आप इसे कभी भी सेटिंग्स में बदल सकते हैं",
+  "continueLabel": "जारी रखें",
+  "welcomeHeroTagline": "पंचांग · कुंडली · राशिफल · AI ज्योतिषी",
+  "welcomeGreeting": "नमस्ते 🙏",
+  "welcomeSubtitle": "अपनी जन्म कुंडली सहेजने और व्यक्तिगत भविष्यवाणियाँ अनलॉक करने के लिए साइन इन करें।",
+  "phoneHint": "मोबाइल नंबर",
+  "getOtp": "OTP प्राप्त करें",
+  "orContinueWith": "या इसके साथ जारी रखें",
+  "continueWithGoogle": "Google से जारी रखें",
+  "exploreAsGuest": "अतिथि के रूप में देखें",
+  "termsNotice": "जारी रखकर आप हमारी सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं"
 }

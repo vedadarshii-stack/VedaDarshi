@@ -30,4 +30,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get getStarted => 'Get Started';
+
+  @override
+  String get languageTitle => 'Choose your language';
+
+  @override
+  String get languageNativePrompt => 'अपनी भाषा चुनें';
+
+  @override
+  String get languageSettingsHint => 'You can change this anytime in Settings';
+
+  @override
+  String get continueLabel => 'Continue';
+
+  @override
+  String get welcomeHeroTagline =>
+      'Panchang · Kundli · Horoscope · AI Astrologer';
+
+  @override
+  String get welcomeGreeting => 'Namaste 🙏';
+
+  @override
+  String get welcomeSubtitle =>
+      'Sign in to save your birth profiles and unlock personalised predictions.';
+
+  @override
+  String get phoneHint => 'Mobile number';
+
+  @override
+  String get getOtp => 'Get OTP';
+
+  @override
+  String get orContinueWith => 'or continue with';
+
+  @override
+  String get continueWithGoogle => 'Continue with Google';
+
+  @override
+  String get exploreAsGuest => 'Explore as Guest';
+
+  @override
+  String get termsNotice =>
+      'By continuing you agree to our Terms of Service & Privacy Policy';
 }

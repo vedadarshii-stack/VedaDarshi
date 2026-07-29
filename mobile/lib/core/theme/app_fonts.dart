@@ -18,7 +18,7 @@ import 'package:google_fonts/google_fonts.dart';
 ///
 /// Only the TTFs bundled in `assets/google_fonts/` are available offline
 /// (see `pubspec.yaml` and `GoogleFonts.config.allowRuntimeFetching`):
-/// Playfair Display (Bold only), Poppins (Regular/Medium/SemiBold), and
+/// Playfair Display (SemiBold/Bold), Poppins (Regular/Medium/SemiBold), and
 /// each Noto Sans Indic face (Regular/SemiBold only). Requested weights
 /// that aren't bundled are clamped to the closest bundled weight so the
 /// font never silently falls back to a network fetch.
@@ -131,7 +131,10 @@ abstract final class AppFonts {
     }
   }
 
-  static const List<FontWeight> _playfairBundledWeights = [FontWeight.w700];
+  static const List<FontWeight> _playfairBundledWeights = [
+    FontWeight.w600,
+    FontWeight.w700,
+  ];
   static const List<FontWeight> _poppinsBundledWeights = [
     FontWeight.w400,
     FontWeight.w500,

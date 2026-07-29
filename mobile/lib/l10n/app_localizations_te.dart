@@ -30,4 +30,47 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get getStarted => 'ప్రారంభించండి';
+
+  @override
+  String get languageTitle => 'మీ భాషను ఎంచుకోండి';
+
+  @override
+  String get languageNativePrompt => 'మీ భాషను ఎంచుకోండి';
+
+  @override
+  String get languageSettingsHint =>
+      'మీరు దీన్ని ఎప్పుడైనా సెట్టింగ్‌లలో మార్చుకోవచ్చు';
+
+  @override
+  String get continueLabel => 'కొనసాగించు';
+
+  @override
+  String get welcomeHeroTagline =>
+      'పంచాంగం · జాతకం · రాశిఫలం · AI జ్యోతిష్యుడు';
+
+  @override
+  String get welcomeGreeting => 'నమస్తే 🙏';
+
+  @override
+  String get welcomeSubtitle =>
+      'మీ జనన వివరాలను సేవ్ చేసి, వ్యక్తిగత అంచనాలను అన్‌లాక్ చేయడానికి సైన్ ఇన్ చేయండి.';
+
+  @override
+  String get phoneHint => 'మొబైల్ నంబర్';
+
+  @override
+  String get getOtp => 'OTP పొందండి';
+
+  @override
+  String get orContinueWith => 'లేదా దీనితో కొనసాగించండి';
+
+  @override
+  String get continueWithGoogle => 'Googleతో కొనసాగించండి';
+
+  @override
+  String get exploreAsGuest => 'అతిథిగా అన్వేషించండి';
+
+  @override
+  String get termsNotice =>
+      'కొనసాగించడం ద్వారా మీరు మా సేవా నిబంధనలు & గోప్యతా విధానానికి అంగీకరిస్తున్నారు';
 }

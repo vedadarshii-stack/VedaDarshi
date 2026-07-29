@@ -30,4 +30,46 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get getStarted => 'ಪ್ರಾರಂಭಿಸಿ';
+
+  @override
+  String get languageTitle => 'ನಿಮ್ಮ ಭಾಷೆಯನ್ನು ಆರಿಸಿ';
+
+  @override
+  String get languageNativePrompt => 'ನಿಮ್ಮ ಭಾಷೆಯನ್ನು ಆರಿಸಿ';
+
+  @override
+  String get languageSettingsHint =>
+      'ನೀವು ಇದನ್ನು ಯಾವಾಗ ಬೇಕಾದರೂ ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಬದಲಾಯಿಸಬಹುದು';
+
+  @override
+  String get continueLabel => 'ಮುಂದುವರಿಸಿ';
+
+  @override
+  String get welcomeHeroTagline => 'ಪಂಚಾಂಗ · ಕುಂಡಲಿ · ರಾಶಿಫಲ · AI ಜ್ಯೋತಿಷಿ';
+
+  @override
+  String get welcomeGreeting => 'ನಮಸ್ತೆ 🙏';
+
+  @override
+  String get welcomeSubtitle =>
+      'ನಿಮ್ಮ ಜನ್ಮ ವಿವರಗಳನ್ನು ಉಳಿಸಲು ಮತ್ತು ವೈಯಕ್ತಿಕ ಭವಿಷ್ಯವಾಣಿಗಳನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಲು ಸೈನ್ ಇನ್ ಮಾಡಿ.';
+
+  @override
+  String get phoneHint => 'ಮೊಬೈಲ್ ಸಂಖ್ಯೆ';
+
+  @override
+  String get getOtp => 'OTP ಪಡೆಯಿರಿ';
+
+  @override
+  String get orContinueWith => 'ಅಥವಾ ಇದರೊಂದಿಗೆ ಮುಂದುವರಿಸಿ';
+
+  @override
+  String get continueWithGoogle => 'Google ನೊಂದಿಗೆ ಮುಂದುವರಿಸಿ';
+
+  @override
+  String get exploreAsGuest => 'ಅತಿಥಿಯಾಗಿ ಅನ್ವೇಷಿಸಿ';
+
+  @override
+  String get termsNotice =>
+      'ಮುಂದುವರಿಸುವ ಮೂಲಕ ನೀವು ನಮ್ಮ ಸೇವಾ ನಿಯಮಗಳು ಮತ್ತು ಗೌಪ್ಯತಾ ನೀತಿಗೆ ಒಪ್ಪುತ್ತೀರಿ';
 }

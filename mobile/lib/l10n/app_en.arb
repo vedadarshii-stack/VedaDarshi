@@ -27,5 +27,57 @@
   "getStarted": "Get Started",
   "@getStarted": {
     "description": "Label of the CTA button on the final splash/intro carousel slide that proceeds into the app."
+  },
+  "languageTitle": "Choose your language",
+  "@languageTitle": {
+    "description": "Heading of the language select screen."
+  },
+  "languageNativePrompt": "अपनी भाषा चुनें",
+  "@languageNativePrompt": {
+    "description": "Decorative subtitle phrase meaning 'choose your language', always written in that locale's own native script (per approved design, the English locale shows the Hindi/Devanagari phrase)."
+  },
+  "languageSettingsHint": "You can change this anytime in Settings",
+  "@languageSettingsHint": {
+    "description": "Secondary hint on the language select screen reassuring the user the choice is not final."
+  },
+  "continueLabel": "Continue",
+  "@continueLabel": {
+    "description": "Label of the CTA button on the language select screen that confirms the choice and proceeds into the app."
+  },
+  "welcomeHeroTagline": "Panchang · Kundli · Horoscope · AI Astrologer",
+  "@welcomeHeroTagline": {
+    "description": "Tagline shown under the app name in the Welcome/Login screen's navy hero."
+  },
+  "welcomeGreeting": "Namaste 🙏",
+  "@welcomeGreeting": {
+    "description": "Greeting heading on the Welcome/Login screen. The 🙏 emoji is kept in every locale; only the greeting word is translated."
+  },
+  "welcomeSubtitle": "Sign in to save your birth profiles and unlock personalised predictions.",
+  "@welcomeSubtitle": {
+    "description": "Subtitle under the greeting on the Welcome/Login screen, explaining why the user should sign in."
+  },
+  "phoneHint": "Mobile number",
+  "@phoneHint": {
+    "description": "Placeholder hint text in the phone number input field on the Welcome/Login screen."
+  },
+  "getOtp": "Get OTP",
+  "@getOtp": {
+    "description": "Label of the CTA button that requests an OTP for the entered phone number."
+  },
+  "orContinueWith": "or continue with",
+  "@orContinueWith": {
+    "description": "Divider label between the phone sign-in section and the Google sign-in button."
+  },
+  "continueWithGoogle": "Continue with Google",
+  "@continueWithGoogle": {
+    "description": "Label of the Google sign-in button on the Welcome/Login screen."
+  },
+  "exploreAsGuest": "Explore as Guest",
+  "@exploreAsGuest": {
+    "description": "Label of the link that lets the user skip sign-in and browse the app as a guest."
+  },
+  "termsNotice": "By continuing you agree to our Terms of Service & Privacy Policy",
+  "@termsNotice": {
+    "description": "Fine-print notice at the bottom of the Welcome/Login screen referencing the legal terms."
   }
 }

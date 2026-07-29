@@ -6,7 +6,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../core/widgets/app_logo.dart';
 import '../../l10n/app_localizations.dart';
-import '../home/home_placeholder_screen.dart';
+import '../language/language_select_screen.dart';
 
 /// Splash / intro carousel matching the approved Figma "A1 · Splash",
 /// "A1b · Intro — Your Stars" and "A1c · Intro — AI Astrologer" concepts.
@@ -80,13 +80,16 @@ class _SplashScreenState extends State<SplashScreen>
     return false;
   }
 
-  void _goToHome() {
+  /// Ends the intro carousel and hands off to language selection (the next
+  /// step of the onboarding flow, per the approved Figma prototype wiring:
+  /// Splash → intro slides → Get Started → Language Select).
+  void _goToLanguageSelect() {
     if (!mounted) return;
     Navigator.of(context).pushReplacement<void, void>(
       PageRouteBuilder<void>(
         transitionDuration: const Duration(milliseconds: 350),
         pageBuilder: (context, animation, secondaryAnimation) =>
-            const HomePlaceholderScreen(),
+            const LanguageSelectScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
         },
@@ -129,7 +132,7 @@ class _SplashScreenState extends State<SplashScreen>
                           _AiSlide(
                             l10n: l10n,
                             locale: locale,
-                            onGetStarted: _goToHome,
+                            onGetStarted: _goToLanguageSelect,
                           ),
                         ],
                       ),
@@ -363,13 +366,7 @@ class _GetStartedButton extends StatelessWidget {
         onTap: onTap,
         child: Ink(
           padding: const EdgeInsets.symmetric(horizontal: 44, vertical: 14),
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [Color(0xFFF0821E), Color(0xFFD95F06)],
-            ),
-          ),
+          decoration: const BoxDecoration(gradient: AppColors.saffronGradient),
           child: Text(
             label,
             style: AppFonts.body(

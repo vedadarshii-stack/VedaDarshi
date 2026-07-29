@@ -145,6 +145,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Get Started'**
   String get getStarted;
+
+  /// Heading of the language select screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your language'**
+  String get languageTitle;
+
+  /// Decorative subtitle phrase meaning 'choose your language', always written in that locale's own native script (per approved design, the English locale shows the Hindi/Devanagari phrase).
+  ///
+  /// In en, this message translates to:
+  /// **'अपनी भाषा चुनें'**
+  String get languageNativePrompt;
+
+  /// Secondary hint on the language select screen reassuring the user the choice is not final.
+  ///
+  /// In en, this message translates to:
+  /// **'You can change this anytime in Settings'**
+  String get languageSettingsHint;
+
+  /// Label of the CTA button on the language select screen that confirms the choice and proceeds into the app.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueLabel;
+
+  /// Tagline shown under the app name in the Welcome/Login screen's navy hero.
+  ///
+  /// In en, this message translates to:
+  /// **'Panchang · Kundli · Horoscope · AI Astrologer'**
+  String get welcomeHeroTagline;
+
+  /// Greeting heading on the Welcome/Login screen. The 🙏 emoji is kept in every locale; only the greeting word is translated.
+  ///
+  /// In en, this message translates to:
+  /// **'Namaste 🙏'**
+  String get welcomeGreeting;
+
+  /// Subtitle under the greeting on the Welcome/Login screen, explaining why the user should sign in.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to save your birth profiles and unlock personalised predictions.'**
+  String get welcomeSubtitle;
+
+  /// Placeholder hint text in the phone number input field on the Welcome/Login screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile number'**
+  String get phoneHint;
+
+  /// Label of the CTA button that requests an OTP for the entered phone number.
+  ///
+  /// In en, this message translates to:
+  /// **'Get OTP'**
+  String get getOtp;
+
+  /// Divider label between the phone sign-in section and the Google sign-in button.
+  ///
+  /// In en, this message translates to:
+  /// **'or continue with'**
+  String get orContinueWith;
+
+  /// Label of the Google sign-in button on the Welcome/Login screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get continueWithGoogle;
+
+  /// Label of the link that lets the user skip sign-in and browse the app as a guest.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore as Guest'**
+  String get exploreAsGuest;
+
+  /// Fine-print notice at the bottom of the Welcome/Login screen referencing the legal terms.
+  ///
+  /// In en, this message translates to:
+  /// **'By continuing you agree to our Terms of Service & Privacy Policy'**
+  String get termsNotice;
 }
 
 class _AppLocalizationsDelegate

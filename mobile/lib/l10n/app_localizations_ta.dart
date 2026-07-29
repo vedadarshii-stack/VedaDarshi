@@ -30,4 +30,47 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get getStarted => 'தொடங்குங்கள்';
+
+  @override
+  String get languageTitle => 'உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get languageNativePrompt => 'உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get languageSettingsHint =>
+      'இதை நீங்கள் எப்போது வேண்டுமானாலும் அமைப்புகளில் மாற்றலாம்';
+
+  @override
+  String get continueLabel => 'தொடரவும்';
+
+  @override
+  String get welcomeHeroTagline =>
+      'பஞ்சாங்கம் · ஜாதகம் · ராசிபலன் · AI ஜோதிடர்';
+
+  @override
+  String get welcomeGreeting => 'வணக்கம் 🙏';
+
+  @override
+  String get welcomeSubtitle =>
+      'உங்கள் பிறப்பு விவரங்களைச் சேமித்து, தனிப்பயன் கணிப்புகளைத் திறக்க உள்நுழையவும்.';
+
+  @override
+  String get phoneHint => 'மொபைல் எண்';
+
+  @override
+  String get getOtp => 'OTP பெறவும்';
+
+  @override
+  String get orContinueWith => 'அல்லது இதனுடன் தொடரவும்';
+
+  @override
+  String get continueWithGoogle => 'Google உடன் தொடரவும்';
+
+  @override
+  String get exploreAsGuest => 'விருந்தினராக ஆராயவும்';
+
+  @override
+  String get termsNotice =>
+      'தொடர்வதன் மூலம் நீங்கள் எங்கள் சேவை விதிமுறைகள் & தனியுரிமைக் கொள்கையை ஏற்கிறீர்கள்';
 }
