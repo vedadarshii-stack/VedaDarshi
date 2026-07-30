@@ -137,4 +137,27 @@ abstract final class AppColors {
 
   /// Hairline divider between rows in the Panchang elements card.
   static const Color rowDivider = Color(0xFFF3EDE2);
+
+  // --- Horoscope Detail — see "B4 · Horoscope Detail" (Figma node 16:2) ---
+
+  /// "Avoid time" value text on the Horoscope Detail screen.
+  static const Color avoidText = Color(0xFF8A2F2F);
+
+  /// Dark premium-card gradient (Home's Daily Quote card, Horoscope Detail's
+  /// premium teaser) — extracted here so both screens share one definition
+  /// instead of duplicating the same literal gradient.
+  static const LinearGradient premiumDarkGradient = LinearGradient(
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    colors: [Color(0xFF3A2E11), Color(0xFF191405)],
+  );
+
+  /// Horoscope Detail header gradient — reuses [panchangOrange1]/
+  /// [panchangOrange3] rather than introducing new orange literals.
+  static const LinearGradient horoscopeHeaderGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [panchangOrange1, panchangOrange3],
+    stops: [0.0, 0.714],
+  );
 }

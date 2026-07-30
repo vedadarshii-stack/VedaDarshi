@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../features/home/home_dashboard_screen.dart';
+import '../../features/kundli/kundli_input_screen.dart';
 import '../../features/panchang/panchang_screen.dart';
 import '../../l10n/app_localizations.dart';
+import '../motion/app_motion.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_fonts.dart';
 
@@ -141,6 +143,18 @@ class AppBottomNav extends StatelessWidget {
           context,
         ).pushReplacement(_instantRoute(const PanchangScreen()));
       case AppTab.kundli:
+        // The Figma design gives the Kundli screen a back button and NO
+        // bottom nav (it isn't a tab root visually), so — unlike Home/
+        // Panchang above — this is a `push` (not `pushReplacement`) using
+        // the shared fade-through transition: the back button must return
+        // to whatever tab/screen the user came from, not to a fixed root,
+        // and the back stack SHOULD grow here. When this app later moves to
+        // an IndexedStack-based shell (see this file's class doc comment),
+        // the Kundli tab's root should become this screen WITH the bottom
+        // nav visible, and this push-based wiring should be revisited.
+        Navigator.of(
+          context,
+        ).push<void>(fadeThroughRoute(const KundliInputScreen()));
       case AppTab.askAi:
       case AppTab.profile:
         // These screens don't exist yet — no-op until they're built.

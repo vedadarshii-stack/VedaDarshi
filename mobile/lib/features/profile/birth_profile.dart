@@ -8,6 +8,26 @@ import '../../core/geo/city.dart';
 /// Details Setup" (Figma node 8:2).
 enum Gender { male, female, other }
 
+/// Month abbreviations used by [BirthProfile.formatDate] to format dates
+/// without pulling in `intl`'s `DateFormat` — shared by every screen that
+/// needs to render a date/time before (or without) a full [BirthProfile]
+/// (e.g. the Birth Details form, which formats `DateTime`/`TimeOfDay` form
+/// fields as the user picks them, ahead of a [BirthProfile] existing).
+const List<String> _monthAbbreviations = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
 /// A user's (or, later, a family/friend's) birth details, as captured on the
 /// Birth Details screen.
 ///
@@ -178,6 +198,39 @@ class BirthProfile {
   /// [BirthProfile] exists).
   String get utcOffsetLabel =>
       utcOffsetLabelFor(city, dateOfBirth, timeOfBirth);
+
+  /// Formats [date] like `"14 Aug 1990"` without pulling in `intl`'s
+  /// `DateFormat`. A static method (not just an instance getter) because the
+  /// Birth Details screen needs to format its `DateTime` form field as the
+  /// user picks it, before a full [BirthProfile] exists to call
+  /// [formattedDate] on.
+  static String formatDate(DateTime date) {
+    return '${date.day} ${_monthAbbreviations[date.month - 1]} ${date.year}';
+  }
+
+  /// Formats [time] like `"06:45 AM"` — 12-hour clock, zero-padded minutes,
+  /// manual AM/PM logic — without pulling in `intl`'s `DateFormat`. See
+  /// [formatDate] for why this is a static method rather than only an
+  /// instance getter.
+  static String formatTime(TimeOfDay time) {
+    final hour12 = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;
+    final minute = time.minute.toString().padLeft(2, '0');
+    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
+    return '${hour12.toString().padLeft(2, '0')}:$minute $period';
+  }
+
+  /// This profile's birth date, formatted like `"14 Aug 1990"`.
+  String get formattedDate => formatDate(dateOfBirth);
+
+  /// This profile's birth time, formatted like `"06:45 AM"`.
+  String get formattedTime => formatTime(timeOfBirth);
+
+  /// One-line summary combining date, time and birth city — e.g.
+  /// `"14 Aug 1990 · 06:45 AM · Hyderabad"` — used by compact profile
+  /// presentations (e.g. the Kundli input screen's profile card). Uses
+  /// [City.name] (the bare city name), not [City.displayLabel] (which also
+  /// includes the state), to keep the line short.
+  String get summaryLine => '$formattedDate · $formattedTime · ${city.name}';
 }
 
 /// Resolves the UTC offset AT [date] + [time] in [city]'s timezone — e.g.

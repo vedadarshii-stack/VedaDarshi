@@ -751,6 +751,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your sign'**
   String get yourSign;
+
+  /// Heading of the score-bars card on the Horoscope Detail screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s scores'**
+  String get todaysScores;
+
+  /// Label of the career score bar on the Horoscope Detail screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Career'**
+  String get scoreCareer;
+
+  /// Label of the love score bar on the Horoscope Detail screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Love'**
+  String get scoreLove;
+
+  /// Label of the health score bar on the Horoscope Detail screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Health'**
+  String get scoreHealth;
+
+  /// Label of the money score bar on the Horoscope Detail screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Money'**
+  String get scoreMoney;
+
+  /// Label of the luck score bar on the Horoscope Detail screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Luck'**
+  String get scoreLuck;
+
+  /// Uppercased badge label on the lucky-time card of the Horoscope Detail screen.
+  ///
+  /// In en, this message translates to:
+  /// **'LUCKY TIME'**
+  String get luckyTime;
+
+  /// Uppercased badge label on the avoid-time card of the Horoscope Detail screen.
+  ///
+  /// In en, this message translates to:
+  /// **'AVOID TIME'**
+  String get avoidTime;
+
+  /// Title of the Career & Money prediction card on the Horoscope Detail screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Career & Money'**
+  String get sectionCareerMoney;
+
+  /// Title of the Love & Relationships prediction card on the Horoscope Detail screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Love & Relationships'**
+  String get sectionLoveRelationships;
+
+  /// Title of the Health & Energy prediction card on the Horoscope Detail screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Health & Energy'**
+  String get sectionHealthEnergy;
+
+  /// Copy on the premium teaser card of the Horoscope Detail screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock detailed monthly & yearly predictions'**
+  String get premiumUnlockPredictions;
+
+  /// Call-to-action label on the premium teaser card of the Horoscope Detail screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium'**
+  String get premiumCta;
+
+  /// Heading of the Kundli — New Chart screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Kundli'**
+  String get generateKundliTitle;
+
+  /// Uppercased section label above the profile list on the Kundli — New Chart screen.
+  ///
+  /// In en, this message translates to:
+  /// **'SELECT PROFILE'**
+  String get selectProfile;
+
+  /// Label of the dashed placeholder button on the Kundli — New Chart screen for the not-yet-built multi-profile (family/friends) feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Add family or friend'**
+  String get addFamilyFriend;
+
+  /// Uppercased section label above the chart-layout cards on the Kundli — New Chart screen.
+  ///
+  /// In en, this message translates to:
+  /// **'CHART STYLE'**
+  String get chartStyle;
+
+  /// Title of the North Indian chart-style card on the Kundli — New Chart screen.
+  ///
+  /// In en, this message translates to:
+  /// **'North Indian'**
+  String get chartNorthIndian;
+
+  /// Subtitle of the North Indian chart-style card on the Kundli — New Chart screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Diamond layout'**
+  String get chartNorthLayout;
+
+  /// Title of the South Indian chart-style card on the Kundli — New Chart screen.
+  ///
+  /// In en, this message translates to:
+  /// **'South Indian'**
+  String get chartSouthIndian;
+
+  /// Subtitle of the South Indian chart-style card on the Kundli — New Chart screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Grid layout'**
+  String get chartSouthLayout;
+
+  /// Info note on the Kundli — New Chart screen explaining the calculation engine used.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculations use Swiss Ephemeris with Lahiri Ayanamsa'**
+  String get kundliCalcNote;
+
+  /// Label of the CTA button on the Kundli — New Chart screen that generates the chart. The 🪔 emoji suffix is appended in code, not stored in this string.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Kundli'**
+  String get generateKundli;
 }
 
 class _AppLocalizationsDelegate

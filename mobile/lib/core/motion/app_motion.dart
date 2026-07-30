@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_colors.dart';
+
 /// Shared motion vocabulary implementing the client-approved Figma motion
 /// spec ("spec/motion-microinteractions", node 80:2, mobile page) — see
 /// `projects/CLAUDE.md` for the full 8-point list. Centralizing this here
@@ -23,9 +25,10 @@ import 'package:flutter/material.dart';
 ///     so there is no shared Hero/AnimatedContainer to slide between; it
 ///     lands with the
 ///     IndexedStack shell refactor already planned there.
-///  5. Gold glow pulse on premium CTAs — PENDING: blocked on the
-///     Subscription Paywall / premium-gated screens (M4), which don't exist
-///     yet.
+///  5. Gold glow pulse on premium CTAs — DONE: [GoldGlowPulse], a soft
+///     2-second breathing halo. Used on the Horoscope Detail premium teaser
+///     (`horoscope_detail_screen.dart`); the Subscription Paywall (M4) will
+///     reuse it once that screen exists.
 ///  6. Rotating ॐ pull-to-refresh — PENDING: blocked on a screen with real
 ///     refreshable data (Panchang/Home currently show static placeholder
 ///     data, so refreshing does nothing).
@@ -261,6 +264,75 @@ class _EntranceFadeSlideState extends State<EntranceFadeSlide>
         return Opacity(
           opacity: _opacity.value,
           child: Transform.translate(offset: _slide.value, child: child),
+        );
+      },
+      child: widget.child,
+    );
+  }
+}
+
+/// Soft gold glow "breathing halo" behind [child] (spec item 5): a 2-second
+/// loop that pulses a gold [BoxShadow]'s blur and opacity, used behind
+/// premium CTAs/cards (Yearly plan, Upgrade CTA, the Horoscope Detail
+/// premium teaser).
+///
+/// Deliberately subtle — the shadow blur only ranges ~10→22 and its alpha
+/// ~0.15→0.38, so it reads as a gentle glow rather than a flash. [borderRadius]
+/// is applied to the same [DecoratedBox] so the glow follows the shape of
+/// [child] (e.g. a rounded card).
+class GoldGlowPulse extends StatefulWidget {
+  const GoldGlowPulse({
+    super.key,
+    required this.child,
+    this.borderRadius = BorderRadius.zero,
+  });
+
+  final Widget child;
+  final BorderRadius borderRadius;
+
+  @override
+  State<GoldGlowPulse> createState() => _GoldGlowPulseState();
+}
+
+class _GoldGlowPulseState extends State<GoldGlowPulse>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        final t = _controller.value;
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: widget.borderRadius,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.gold.withValues(
+                  alpha: 0.15 + (0.38 - 0.15) * t,
+                ),
+                blurRadius: 10 + (22 - 10) * t,
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+          child: child,
         );
       },
       child: widget.child,

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/locale/locale_controller.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
+import '../../core/widgets/app_radio_dot.dart';
 import '../../l10n/app_localizations.dart';
 import '../auth/welcome_login_screen.dart';
 
@@ -282,46 +283,15 @@ class _LanguageCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 14),
-                _RadioIndicator(isSelected: isSelected),
+                // size: 22 preserves this screen's original radio-indicator
+                // size exactly (the shared widget's default of 20 is for the
+                // Kundli input screen's smaller profile-card indicator).
+                AppRadioDot(isSelected: isSelected, size: 22),
               ],
             ),
           ),
         ),
       ),
-    );
-  }
-}
-
-/// Hand-drawn circular radio indicator (no image asset).
-class _RadioIndicator extends StatelessWidget {
-  const _RadioIndicator({required this.isSelected});
-
-  final bool isSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 22,
-      height: 22,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: isSelected ? AppColors.saffron : AppColors.cardBorder,
-          width: 1.5,
-        ),
-      ),
-      child: isSelected
-          ? Center(
-              child: Container(
-                width: 10,
-                height: 10,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.saffron,
-                ),
-              ),
-            )
-          : null,
     );
   }
 }

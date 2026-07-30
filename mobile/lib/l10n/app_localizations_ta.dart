@@ -355,4 +355,75 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get yourSign => 'உங்கள் ராசி';
+
+  @override
+  String get todaysScores => 'இன்றைய மதிப்பெண்கள்';
+
+  @override
+  String get scoreCareer => 'தொழில்';
+
+  @override
+  String get scoreLove => 'காதல்';
+
+  @override
+  String get scoreHealth => 'ஆரோக்கியம்';
+
+  @override
+  String get scoreMoney => 'பணம்';
+
+  @override
+  String get scoreLuck => 'அதிர்ஷ்டம்';
+
+  @override
+  String get luckyTime => 'சுப நேரம்';
+
+  @override
+  String get avoidTime => 'தவிர்க்க வேண்டிய நேரம்';
+
+  @override
+  String get sectionCareerMoney => 'தொழில் & பணம்';
+
+  @override
+  String get sectionLoveRelationships => 'காதல் & உறவுகள்';
+
+  @override
+  String get sectionHealthEnergy => 'ஆரோக்கியம் & ஆற்றல்';
+
+  @override
+  String get premiumUnlockPredictions =>
+      'விரிவான மாத & வருடாந்திர கணிப்புகளைத் திறக்கவும்';
+
+  @override
+  String get premiumCta => 'பிரீமியம்';
+
+  @override
+  String get generateKundliTitle => 'ஜாதகம் உருவாக்கு';
+
+  @override
+  String get selectProfile => 'சுயவிவரத்தைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get addFamilyFriend => 'குடும்பம் அல்லது நண்பரைச் சேர்க்கவும்';
+
+  @override
+  String get chartStyle => 'விளக்கப்பட பாணி';
+
+  @override
+  String get chartNorthIndian => 'வட இந்திய பாணி';
+
+  @override
+  String get chartNorthLayout => 'வைர வடிவமைப்பு';
+
+  @override
+  String get chartSouthIndian => 'தென் இந்திய பாணி';
+
+  @override
+  String get chartSouthLayout => 'கட்ட வடிவமைப்பு';
+
+  @override
+  String get kundliCalcNote =>
+      'கணக்கீடுகள் ஸ்விஸ் எஃபெமெரிஸ் மற்றும் லாஹிரி அயனாம்சத்தைப் பயன்படுத்துகின்றன';
+
+  @override
+  String get generateKundli => 'ஜாதகம் உருவாக்கு';
 }

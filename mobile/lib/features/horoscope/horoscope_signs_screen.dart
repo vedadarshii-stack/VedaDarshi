@@ -5,6 +5,7 @@ import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../l10n/app_localizations.dart';
+import 'horoscope_detail_screen.dart';
 import 'horoscope_static_data.dart';
 import 'zodiac_sign.dart';
 
@@ -192,11 +193,14 @@ class _PeriodChip extends StatelessWidget {
             border: isSelected ? null : Border.all(color: AppColors.cardBorder),
           ),
           child: Center(
-            // Allowed to shrink: 4 chips across a 360dp screen is tight,
-            // and "Monthly"/"Yearly" run noticeably longer in
-            // Telugu/Tamil/Kannada.
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
+            // Deliberately NOT wrapped in a FittedBox: a FittedBox scales
+            // each chip's label independently, so a long word in one chip
+            // ("Monthly") would render at a visibly smaller size than its
+            // neighbours — four chips with four different text sizes reads
+            // as broken. All four keep the design's 12.5px and ellipsize
+            // uniformly instead if a translation is too long.
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
               child: Text(
                 label,
                 maxLines: 1,
@@ -301,9 +305,9 @@ class _SignCard extends StatelessWidget {
       label: '${sign.sanskritName} ${sign.englishName}',
       child: PressableScale(
         borderRadius: BorderRadius.circular(18),
-        // No-op for now: opens "B4 · Horoscope Detail" once that screen
-        // is built.
-        onTap: () {},
+        onTap: () => Navigator.of(
+          context,
+        ).push<void>(fadeThroughRoute(HoroscopeDetailScreen(sign: sign))),
         child: Container(
           padding: const EdgeInsets.only(top: 16, bottom: 14),
           decoration: BoxDecoration(
@@ -328,7 +332,8 @@ class _SignCard extends StatelessWidget {
                 ),
                 child: Text(
                   sign.glyph,
-                  style: AppFonts.zodiac(fontSize: 22, color: AppColors.gold),
+                  // 20px per the design (node 15:20) — not 22.
+                  style: AppFonts.zodiac(fontSize: 20, color: AppColors.gold),
                 ),
               ),
               const SizedBox(height: 6),

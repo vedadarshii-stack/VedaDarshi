@@ -467,5 +467,97 @@
   "yourSign": "Your sign",
   "@yourSign": {
     "description": "Badge label on the user's own zodiac sign card in the Horoscope — All Signs grid."
+  },
+  "todaysScores": "Today's scores",
+  "@todaysScores": {
+    "description": "Heading of the score-bars card on the Horoscope Detail screen."
+  },
+  "scoreCareer": "Career",
+  "@scoreCareer": {
+    "description": "Label of the career score bar on the Horoscope Detail screen."
+  },
+  "scoreLove": "Love",
+  "@scoreLove": {
+    "description": "Label of the love score bar on the Horoscope Detail screen."
+  },
+  "scoreHealth": "Health",
+  "@scoreHealth": {
+    "description": "Label of the health score bar on the Horoscope Detail screen."
+  },
+  "scoreMoney": "Money",
+  "@scoreMoney": {
+    "description": "Label of the money score bar on the Horoscope Detail screen."
+  },
+  "scoreLuck": "Luck",
+  "@scoreLuck": {
+    "description": "Label of the luck score bar on the Horoscope Detail screen."
+  },
+  "luckyTime": "LUCKY TIME",
+  "@luckyTime": {
+    "description": "Uppercased badge label on the lucky-time card of the Horoscope Detail screen."
+  },
+  "avoidTime": "AVOID TIME",
+  "@avoidTime": {
+    "description": "Uppercased badge label on the avoid-time card of the Horoscope Detail screen."
+  },
+  "sectionCareerMoney": "Career & Money",
+  "@sectionCareerMoney": {
+    "description": "Title of the Career & Money prediction card on the Horoscope Detail screen."
+  },
+  "sectionLoveRelationships": "Love & Relationships",
+  "@sectionLoveRelationships": {
+    "description": "Title of the Love & Relationships prediction card on the Horoscope Detail screen."
+  },
+  "sectionHealthEnergy": "Health & Energy",
+  "@sectionHealthEnergy": {
+    "description": "Title of the Health & Energy prediction card on the Horoscope Detail screen."
+  },
+  "premiumUnlockPredictions": "Unlock detailed monthly & yearly predictions",
+  "@premiumUnlockPredictions": {
+    "description": "Copy on the premium teaser card of the Horoscope Detail screen."
+  },
+  "premiumCta": "Premium",
+  "@premiumCta": {
+    "description": "Call-to-action label on the premium teaser card of the Horoscope Detail screen."
+  },
+  "generateKundliTitle": "Generate Kundli",
+  "@generateKundliTitle": {
+    "description": "Heading of the Kundli — New Chart screen."
+  },
+  "selectProfile": "SELECT PROFILE",
+  "@selectProfile": {
+    "description": "Uppercased section label above the profile list on the Kundli — New Chart screen."
+  },
+  "addFamilyFriend": "Add family or friend",
+  "@addFamilyFriend": {
+    "description": "Label of the dashed placeholder button on the Kundli — New Chart screen for the not-yet-built multi-profile (family/friends) feature."
+  },
+  "chartStyle": "CHART STYLE",
+  "@chartStyle": {
+    "description": "Uppercased section label above the chart-layout cards on the Kundli — New Chart screen."
+  },
+  "chartNorthIndian": "North Indian",
+  "@chartNorthIndian": {
+    "description": "Title of the North Indian chart-style card on the Kundli — New Chart screen."
+  },
+  "chartNorthLayout": "Diamond layout",
+  "@chartNorthLayout": {
+    "description": "Subtitle of the North Indian chart-style card on the Kundli — New Chart screen."
+  },
+  "chartSouthIndian": "South Indian",
+  "@chartSouthIndian": {
+    "description": "Title of the South Indian chart-style card on the Kundli — New Chart screen."
+  },
+  "chartSouthLayout": "Grid layout",
+  "@chartSouthLayout": {
+    "description": "Subtitle of the South Indian chart-style card on the Kundli — New Chart screen."
+  },
+  "kundliCalcNote": "Calculations use Swiss Ephemeris with Lahiri Ayanamsa",
+  "@kundliCalcNote": {
+    "description": "Info note on the Kundli — New Chart screen explaining the calculation engine used."
+  },
+  "generateKundli": "Generate Kundli",
+  "@generateKundli": {
+    "description": "Label of the CTA button on the Kundli — New Chart screen that generates the chart. The 🪔 emoji suffix is appended in code, not stored in this string."
   }
 }

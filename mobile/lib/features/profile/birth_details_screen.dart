@@ -13,23 +13,6 @@ import '../home/home_dashboard_screen.dart';
 import 'birth_profile.dart';
 import 'birth_profile_repository.dart';
 
-/// Month abbreviations used to format dates without pulling in `intl`'s
-/// `DateFormat` (per this screen's "no intl" formatting requirement).
-const List<String> _monthAbbreviations = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
-
 /// Debounce delay before firing a place search as the user types.
 const Duration _searchDebounce = Duration(milliseconds: 250);
 
@@ -169,17 +152,6 @@ class _BirthDetailsScreenState extends ConsumerState<BirthDetailsScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.placeResolveFailed)));
     }
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day} ${_monthAbbreviations[date.month - 1]} ${date.year}';
-  }
-
-  String _formatTime(TimeOfDay time) {
-    final hour12 = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;
-    final minute = time.minute.toString().padLeft(2, '0');
-    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
-    return '${hour12.toString().padLeft(2, '0')}:$minute $period';
   }
 
   ThemeData _pickerTheme(BuildContext context) {
@@ -352,7 +324,7 @@ class _BirthDetailsScreenState extends ConsumerState<BirthDetailsScreen> {
                 ),
                 child: Text(
                   _dateOfBirth != null
-                      ? _formatDate(_dateOfBirth!)
+                      ? BirthProfile.formatDate(_dateOfBirth!)
                       : l10n.birthDateHint,
                   style: AppFonts.body(
                     locale,
@@ -379,7 +351,7 @@ class _BirthDetailsScreenState extends ConsumerState<BirthDetailsScreen> {
                     _isBirthTimeUnknown
                         ? l10n.birthTimeUnknownValue
                         : (_timeOfBirth != null
-                              ? _formatTime(_timeOfBirth!)
+                              ? BirthProfile.formatTime(_timeOfBirth!)
                               : l10n.birthTimeHint),
                     style: AppFonts.body(
                       locale,

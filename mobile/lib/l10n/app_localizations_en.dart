@@ -351,4 +351,75 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yourSign => 'Your sign';
+
+  @override
+  String get todaysScores => 'Today\'s scores';
+
+  @override
+  String get scoreCareer => 'Career';
+
+  @override
+  String get scoreLove => 'Love';
+
+  @override
+  String get scoreHealth => 'Health';
+
+  @override
+  String get scoreMoney => 'Money';
+
+  @override
+  String get scoreLuck => 'Luck';
+
+  @override
+  String get luckyTime => 'LUCKY TIME';
+
+  @override
+  String get avoidTime => 'AVOID TIME';
+
+  @override
+  String get sectionCareerMoney => 'Career & Money';
+
+  @override
+  String get sectionLoveRelationships => 'Love & Relationships';
+
+  @override
+  String get sectionHealthEnergy => 'Health & Energy';
+
+  @override
+  String get premiumUnlockPredictions =>
+      'Unlock detailed monthly & yearly predictions';
+
+  @override
+  String get premiumCta => 'Premium';
+
+  @override
+  String get generateKundliTitle => 'Generate Kundli';
+
+  @override
+  String get selectProfile => 'SELECT PROFILE';
+
+  @override
+  String get addFamilyFriend => 'Add family or friend';
+
+  @override
+  String get chartStyle => 'CHART STYLE';
+
+  @override
+  String get chartNorthIndian => 'North Indian';
+
+  @override
+  String get chartNorthLayout => 'Diamond layout';
+
+  @override
+  String get chartSouthIndian => 'South Indian';
+
+  @override
+  String get chartSouthLayout => 'Grid layout';
+
+  @override
+  String get kundliCalcNote =>
+      'Calculations use Swiss Ephemeris with Lahiri Ayanamsa';
+
+  @override
+  String get generateKundli => 'Generate Kundli';
 }

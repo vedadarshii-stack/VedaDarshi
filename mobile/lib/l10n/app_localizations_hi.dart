@@ -351,4 +351,75 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get yourSign => 'आपकी राशि';
+
+  @override
+  String get todaysScores => 'आज के स्कोर';
+
+  @override
+  String get scoreCareer => 'करियर';
+
+  @override
+  String get scoreLove => 'प्रेम';
+
+  @override
+  String get scoreHealth => 'स्वास्थ्य';
+
+  @override
+  String get scoreMoney => 'धन';
+
+  @override
+  String get scoreLuck => 'भाग्य';
+
+  @override
+  String get luckyTime => 'शुभ समय';
+
+  @override
+  String get avoidTime => 'अशुभ समय';
+
+  @override
+  String get sectionCareerMoney => 'करियर और धन';
+
+  @override
+  String get sectionLoveRelationships => 'प्रेम और रिश्ते';
+
+  @override
+  String get sectionHealthEnergy => 'स्वास्थ्य और ऊर्जा';
+
+  @override
+  String get premiumUnlockPredictions =>
+      'विस्तृत मासिक और वार्षिक भविष्यवाणियां अनलॉक करें';
+
+  @override
+  String get premiumCta => 'प्रीमियम';
+
+  @override
+  String get generateKundliTitle => 'कुंडली बनाएं';
+
+  @override
+  String get selectProfile => 'प्रोफ़ाइल चुनें';
+
+  @override
+  String get addFamilyFriend => 'परिवार या मित्र जोड़ें';
+
+  @override
+  String get chartStyle => 'चार्ट शैली';
+
+  @override
+  String get chartNorthIndian => 'उत्तर भारतीय';
+
+  @override
+  String get chartNorthLayout => 'डायमंड लेआउट';
+
+  @override
+  String get chartSouthIndian => 'दक्षिण भारतीय';
+
+  @override
+  String get chartSouthLayout => 'ग्रिड लेआउट';
+
+  @override
+  String get kundliCalcNote =>
+      'गणना स्विस एफेमेरिस और लाहिड़ी अयनांश का उपयोग करती है';
+
+  @override
+  String get generateKundli => 'कुंडली बनाएं';
 }

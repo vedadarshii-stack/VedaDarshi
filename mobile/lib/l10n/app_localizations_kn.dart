@@ -354,4 +354,75 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get yourSign => 'ನಿಮ್ಮ ರಾಶಿ';
+
+  @override
+  String get todaysScores => 'ಇಂದಿನ ಸ್ಕೋರ್‌ಗಳು';
+
+  @override
+  String get scoreCareer => 'ವೃತ್ತಿ';
+
+  @override
+  String get scoreLove => 'ಪ್ರೀತಿ';
+
+  @override
+  String get scoreHealth => 'ಆರೋಗ್ಯ';
+
+  @override
+  String get scoreMoney => 'ಹಣ';
+
+  @override
+  String get scoreLuck => 'ಅದೃಷ್ಟ';
+
+  @override
+  String get luckyTime => 'ಶುಭ ಸಮಯ';
+
+  @override
+  String get avoidTime => 'ಅಶುಭ ಸಮಯ';
+
+  @override
+  String get sectionCareerMoney => 'ವೃತ್ತಿ & ಹಣ';
+
+  @override
+  String get sectionLoveRelationships => 'ಪ್ರೀತಿ & ಸಂಬಂಧಗಳು';
+
+  @override
+  String get sectionHealthEnergy => 'ಆರೋಗ್ಯ & ಶಕ್ತಿ';
+
+  @override
+  String get premiumUnlockPredictions =>
+      'ವಿವರವಾದ ಮಾಸಿಕ ಮತ್ತು ವಾರ್ಷಿಕ ಭವಿಷ್ಯವಾಣಿಗಳನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಿ';
+
+  @override
+  String get premiumCta => 'ಪ್ರೀಮಿಯಂ';
+
+  @override
+  String get generateKundliTitle => 'ಕುಂಡಲಿ ರಚಿಸಿ';
+
+  @override
+  String get selectProfile => 'ಪ್ರೊಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ';
+
+  @override
+  String get addFamilyFriend => 'ಕುಟುಂಬ ಅಥವಾ ಸ್ನೇಹಿತರನ್ನು ಸೇರಿಸಿ';
+
+  @override
+  String get chartStyle => 'ಚಾರ್ಟ್ ಶೈಲಿ';
+
+  @override
+  String get chartNorthIndian => 'ಉತ್ತರ ಭಾರತೀಯ';
+
+  @override
+  String get chartNorthLayout => 'ಡೈಮಂಡ್ ವಿನ್ಯಾಸ';
+
+  @override
+  String get chartSouthIndian => 'ದಕ್ಷಿಣ ಭಾರತೀಯ';
+
+  @override
+  String get chartSouthLayout => 'ಗ್ರಿಡ್ ವಿನ್ಯಾಸ';
+
+  @override
+  String get kundliCalcNote =>
+      'ಲೆಕ್ಕಾಚಾರಗಳು ಸ್ವಿಸ್ ಎಫೆಮೆರಿಸ್ ಮತ್ತು ಲಾಹಿರಿ ಅಯನಾಂಶವನ್ನು ಬಳಸುತ್ತವೆ';
+
+  @override
+  String get generateKundli => 'ಕುಂಡಲಿ ರಚಿಸಿ';
 }

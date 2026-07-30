@@ -6,7 +6,11 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../core/widgets/app_bottom_nav.dart';
 import '../../l10n/app_localizations.dart';
+import '../horoscope/horoscope_detail_screen.dart';
 import '../horoscope/horoscope_signs_screen.dart';
+import '../horoscope/horoscope_static_data.dart';
+import '../horoscope/zodiac_sign.dart';
+import '../kundli/kundli_input_screen.dart';
 import '../profile/birth_profile_repository.dart';
 import 'home_static_data.dart';
 
@@ -858,11 +862,21 @@ class _FestivalCard extends StatelessWidget {
 
 /// Presentation metadata for one Explore shortcut tile.
 class _ExploreTileMeta {
-  const _ExploreTileMeta(this.label, this.emoji, this.background);
+  const _ExploreTileMeta(
+    this.label,
+    this.emoji,
+    this.background, {
+    this.onTap,
+  });
 
   final String label;
   final String emoji;
   final Color background;
+
+  /// Tap handler — `null` (the default) renders as a no-op, same as before
+  /// this field existed. Only the Kundli tile passes a real callback today;
+  /// Match/Reports/Ask AI stay inert until those screens exist.
+  final VoidCallback? onTap;
 }
 
 /// "Explore" — Kundli / Match / Reports / Ask AI shortcut tiles.
@@ -875,7 +889,18 @@ class _ExploreSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tiles = [
-      _ExploreTileMeta(l10n.navKundli, '🪐', AppColors.genderSelectedBg),
+      _ExploreTileMeta(
+        l10n.navKundli,
+        '🪐',
+        AppColors.genderSelectedBg,
+        // Same fadeThroughRoute push used by the bottom nav's Kundli tab
+        // (see app_bottom_nav.dart) — this screen has no bottom nav of its
+        // own in the Figma design, so both entry points push it as a
+        // destination rather than switching to it as a tab root.
+        onTap: () => Navigator.of(
+          context,
+        ).push<void>(fadeThroughRoute(const KundliInputScreen())),
+      ),
       _ExploreTileMeta(l10n.navMatch, '💍', AppColors.tilePinkBg),
       _ExploreTileMeta(l10n.navReports, '📜', AppColors.tileBlueBg),
       _ExploreTileMeta(l10n.navAskAi, '🔮', AppColors.tilePurpleBg),
@@ -916,7 +941,7 @@ class _ExploreTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: () {},
+          onTap: meta.onTap ?? () {},
           child: Container(
             padding: const EdgeInsets.only(
               top: 14,
@@ -974,6 +999,19 @@ void _openAllSigns(BuildContext context) {
   ).push<void>(fadeThroughRoute(const HoroscopeSignsScreen()));
 }
 
+/// Opens "B4 · Horoscope Detail" for the user's own sign, resolved from
+/// [kZodiacSigns] by [HoroscopeStaticData.userSignId] (falls back to the
+/// first sign if the id is ever missing, so this can never throw).
+void _openHoroscopeDetail(BuildContext context) {
+  final sign = kZodiacSigns.firstWhere(
+    (sign) => sign.id == HoroscopeStaticData.userSignId,
+    orElse: () => kZodiacSigns.first,
+  );
+  Navigator.of(
+    context,
+  ).push<void>(fadeThroughRoute(HoroscopeDetailScreen(sign: sign)));
+}
+
 /// "Today's Horoscope" teaser card.
 class _HoroscopeSection extends StatelessWidget {
   const _HoroscopeSection({required this.l10n, required this.locale});
@@ -1001,7 +1039,7 @@ class _HoroscopeSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             clipBehavior: Clip.antiAlias,
             child: InkWell(
-              onTap: () {},
+              onTap: () => _openHoroscopeDetail(context),
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -1503,11 +1541,7 @@ class _DailyQuoteCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF3A2E11), Color(0xFF191405)],
-        ),
+        gradient: AppColors.premiumDarkGradient,
         border: Border.all(color: AppColors.gold.withValues(alpha: 0.6)),
       ),
       child: Column(
