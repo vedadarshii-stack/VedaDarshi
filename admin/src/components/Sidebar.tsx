@@ -1,14 +1,13 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { NAV_ITEMS } from '../app/navigation';
 import { useAuth } from '../lib/authContext';
 import { useAdminProfile } from '../lib/adminProfileContext';
 import { hasPermission } from '../lib/permissions';
-import { exitConceptMode } from '../lib/conceptMode';
+import { AccountMenu } from './AccountMenu';
 import './Sidebar.css';
 
 export function Sidebar() {
-  const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const profileState = useAdminProfile();
 
   // Concept mode shows the whole sidebar (it is the static walkthrough);
@@ -37,12 +36,6 @@ export function Sidebar() {
         : profileState.status === 'loading'
           ? 'Loading role…'
           : 'No console role';
-
-  async function handleSignOut() {
-    exitConceptMode();
-    await signOut();
-    navigate('/login', { replace: true });
-  }
 
   return (
     <aside className="sidebar">
@@ -84,21 +77,13 @@ export function Sidebar() {
         </ul>
       </nav>
 
-      <button
-        type="button"
-        className="sidebar__account"
-        onClick={() => void handleSignOut()}
-        title={user ? `Sign out ${displayName}` : 'Back to sign-in'}
-      >
-        <span className="sidebar__avatar">{initial}</span>
-        <span className="sidebar__accountText">
-          <span className="sidebar__accountName">{displayName}</span>
-          <span className="sidebar__accountRole">{roleLabel}</span>
-        </span>
-        <span className="sidebar__signOut" aria-label="Sign out">
-          ↪
-        </span>
-      </button>
+      <AccountMenu
+        displayName={displayName}
+        roleLabel={roleLabel}
+        email={user?.email ?? null}
+        initial={initial}
+        signedIn={Boolean(user)}
+      />
     </aside>
   );
 }

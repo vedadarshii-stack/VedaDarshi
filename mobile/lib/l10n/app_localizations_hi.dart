@@ -286,4 +286,69 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get navProfile => 'प्रोफ़ाइल';
+
+  @override
+  String get panchangTitle => 'पंचांग';
+
+  @override
+  String get panchangSunrise => 'सूर्योदय';
+
+  @override
+  String get panchangSunset => 'सूर्यास्त';
+
+  @override
+  String get panchangMoonrise => 'चंद्रोदय';
+
+  @override
+  String get panchangMoonset => 'चंद्रास्त';
+
+  @override
+  String get panchangTithi => 'तिथि';
+
+  @override
+  String get panchangVaar => 'वार';
+
+  @override
+  String get muhuratToday => 'आज का मुहूर्त';
+
+  @override
+  String get muhuratShubh => 'शुभ';
+
+  @override
+  String get muhuratAshubh => 'अशुभ';
+
+  @override
+  String get festivalToday => 'आज का त्योहार';
+
+  @override
+  String get details => 'विवरण';
+
+  @override
+  String get todaysSpiritualAdvice => 'आज की आध्यात्मिक सलाह';
+
+  @override
+  String get viewAllMuhurat => 'सभी मुहूर्त समय देखें';
+
+  @override
+  String availableOffline(String time) {
+    return 'ऑफ़लाइन उपलब्ध · अपडेट किया गया $time';
+  }
+
+  @override
+  String get horoscopeTitle => 'राशिफल';
+
+  @override
+  String get periodDaily => 'दैनिक';
+
+  @override
+  String get periodWeekly => 'साप्ताहिक';
+
+  @override
+  String get periodMonthly => 'मासिक';
+
+  @override
+  String get periodYearly => 'वार्षिक';
+
+  @override
+  String get yourSign => 'आपकी राशि';
 }

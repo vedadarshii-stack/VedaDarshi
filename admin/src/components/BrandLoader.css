@@ -1,0 +1,130 @@
+.brandLoader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  height: 100%;
+  background: var(--vd-grad-brand);
+}
+
+/* ---- Pulsing gold halo around the ॐ ---- */
+
+.brandLoader__halo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+}
+
+.brandLoader__ring {
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid var(--vd-gold);
+  border-radius: var(--vd-r-pill);
+  opacity: 0;
+  animation: brandPulse 2.4s ease-out infinite;
+}
+
+.brandLoader__ring--delayed {
+  animation-delay: 1.2s;
+}
+
+.brandLoader__mark {
+  position: relative;
+  font-size: 38px;
+  color: var(--vd-gold);
+  /* Soft breathing glow, distinct from the expanding rings. */
+  animation: brandGlow 2.4s ease-in-out infinite;
+}
+
+@keyframes brandPulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  35% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.15);
+    opacity: 0;
+  }
+}
+
+@keyframes brandGlow {
+  0%,
+  100% {
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.25);
+    transform: scale(1);
+  }
+  50% {
+    text-shadow: 0 0 26px rgba(212, 175, 55, 0.6);
+    transform: scale(1.06);
+  }
+}
+
+/* ---- Caption with animated dots ---- */
+
+.brandLoader__text {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  font-size: 12.5px;
+  letter-spacing: 0.3px;
+  color: var(--vd-nav-sub);
+}
+
+.brandLoader__dots {
+  display: inline-flex;
+  gap: 3px;
+  margin-left: 2px;
+}
+
+.brandLoader__dots i {
+  width: 3px;
+  height: 3px;
+  border-radius: var(--vd-r-pill);
+  background: var(--vd-gold);
+  opacity: 0.3;
+  animation: brandDot 1.4s ease-in-out infinite;
+}
+
+.brandLoader__dots i:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.brandLoader__dots i:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes brandDot {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+/* Motion is decorative here — a still gold mark reads fine. */
+@media (prefers-reduced-motion: reduce) {
+  .brandLoader__ring,
+  .brandLoader__mark,
+  .brandLoader__dots i {
+    animation: none;
+  }
+
+  .brandLoader__ring {
+    opacity: 0.35;
+  }
+
+  .brandLoader__dots i {
+    opacity: 0.6;
+  }
+}

@@ -377,5 +377,95 @@
   "navProfile": "Profile",
   "@navProfile": {
     "description": "Label of the Profile tab in the bottom navigation bar."
+  },
+  "panchangTitle": "Panchang",
+  "@panchangTitle": {
+    "description": "Heading of the Panchang screen."
+  },
+  "panchangSunrise": "Sunrise",
+  "@panchangSunrise": {
+    "description": "Label of the sunrise stat in the Panchang screen's sun/moon card."
+  },
+  "panchangSunset": "Sunset",
+  "@panchangSunset": {
+    "description": "Label of the sunset stat in the Panchang screen's sun/moon card."
+  },
+  "panchangMoonrise": "Moonrise",
+  "@panchangMoonrise": {
+    "description": "Label of the moonrise stat in the Panchang screen's sun/moon card."
+  },
+  "panchangMoonset": "Moonset",
+  "@panchangMoonset": {
+    "description": "Label of the moonset stat in the Panchang screen's sun/moon card."
+  },
+  "panchangTithi": "Tithi",
+  "@panchangTithi": {
+    "description": "Label of the Tithi row in the Panchang screen's elements card."
+  },
+  "panchangVaar": "Vaar",
+  "@panchangVaar": {
+    "description": "Label of the Vaar (weekday) row in the Panchang screen's elements card."
+  },
+  "muhuratToday": "Muhurat today",
+  "@muhuratToday": {
+    "description": "Section heading on the Panchang screen above the muhurat grid."
+  },
+  "muhuratShubh": "SHUBH",
+  "@muhuratShubh": {
+    "description": "Badge label on an auspicious (shubh) muhurat card."
+  },
+  "muhuratAshubh": "ASHUBH",
+  "@muhuratAshubh": {
+    "description": "Badge label on an inauspicious (ashubh) or caution muhurat card."
+  },
+  "festivalToday": "FESTIVAL TODAY",
+  "@festivalToday": {
+    "description": "Uppercased label above the festival name on the Panchang screen's festival card."
+  },
+  "details": "Details",
+  "@details": {
+    "description": "Trailing link label on the Panchang screen's festival card, leading to festival details."
+  },
+  "todaysSpiritualAdvice": "TODAY'S SPIRITUAL ADVICE",
+  "@todaysSpiritualAdvice": {
+    "description": "Uppercased label above the advice text on the Panchang screen's spiritual advice card."
+  },
+  "viewAllMuhurat": "View all muhurat timings",
+  "@viewAllMuhurat": {
+    "description": "Link at the bottom of the Panchang screen leading to the full list of muhurat timings."
+  },
+  "availableOffline": "Available offline · Updated {time}",
+  "@availableOffline": {
+    "description": "Badge at the bottom of the Panchang screen indicating the panchang data is cached for offline use.",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "6:00 AM"
+      }
+    }
+  },
+  "horoscopeTitle": "Horoscope",
+  "@horoscopeTitle": {
+    "description": "Heading of the Horoscope — All Signs screen."
+  },
+  "periodDaily": "Daily",
+  "@periodDaily": {
+    "description": "Label of the Daily period chip on the Horoscope screen."
+  },
+  "periodWeekly": "Weekly",
+  "@periodWeekly": {
+    "description": "Label of the Weekly period chip on the Horoscope screen."
+  },
+  "periodMonthly": "Monthly",
+  "@periodMonthly": {
+    "description": "Label of the Monthly period chip on the Horoscope screen."
+  },
+  "periodYearly": "Yearly",
+  "@periodYearly": {
+    "description": "Label of the Yearly period chip on the Horoscope screen."
+  },
+  "yourSign": "Your sign",
+  "@yourSign": {
+    "description": "Badge label on the user's own zodiac sign card in the Horoscope — All Signs grid."
   }
 }

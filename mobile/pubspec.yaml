@@ -37,10 +37,24 @@ flutter:
     - assets/logo/
     - assets/google_fonts/
     - assets/data/
+    - assets/fonts/
     # Build-time secrets, loaded at startup by flutter_dotenv. This file is
     # gitignored — copy .env.example to .env before the first build, or the
     # build fails with "asset does not exist".
     - .env
+  # ZodiacGlyphs is a custom-built 4KB subset of Noto Emoji containing only
+  # the 12 zodiac codepoints (U+2648-2653), monochrome so it can be tinted
+  # gold (see AppFonts.zodiac). It is declared as a normal Flutter font
+  # family here — NOT dropped into assets/google_fonts/ — because it must
+  # stay outside google_fonts' `Family-Variant.ttf` bundled-asset naming
+  # convention and its runtime-fetch resolution path: it isn't a Google
+  # Fonts family at all, just a hand-subsetted TTF, and forcing it through
+  # that convention would either break GoogleFonts' name matching or risk
+  # it being treated as fetchable at runtime.
+  fonts:
+    - family: ZodiacGlyphs
+      fonts:
+        - asset: assets/fonts/ZodiacGlyphs.ttf
 
 flutter_launcher_icons:
   android: true

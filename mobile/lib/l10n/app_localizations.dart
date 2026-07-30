@@ -625,6 +625,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Profile'**
   String get navProfile;
+
+  /// Heading of the Panchang screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Panchang'**
+  String get panchangTitle;
+
+  /// Label of the sunrise stat in the Panchang screen's sun/moon card.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunrise'**
+  String get panchangSunrise;
+
+  /// Label of the sunset stat in the Panchang screen's sun/moon card.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunset'**
+  String get panchangSunset;
+
+  /// Label of the moonrise stat in the Panchang screen's sun/moon card.
+  ///
+  /// In en, this message translates to:
+  /// **'Moonrise'**
+  String get panchangMoonrise;
+
+  /// Label of the moonset stat in the Panchang screen's sun/moon card.
+  ///
+  /// In en, this message translates to:
+  /// **'Moonset'**
+  String get panchangMoonset;
+
+  /// Label of the Tithi row in the Panchang screen's elements card.
+  ///
+  /// In en, this message translates to:
+  /// **'Tithi'**
+  String get panchangTithi;
+
+  /// Label of the Vaar (weekday) row in the Panchang screen's elements card.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaar'**
+  String get panchangVaar;
+
+  /// Section heading on the Panchang screen above the muhurat grid.
+  ///
+  /// In en, this message translates to:
+  /// **'Muhurat today'**
+  String get muhuratToday;
+
+  /// Badge label on an auspicious (shubh) muhurat card.
+  ///
+  /// In en, this message translates to:
+  /// **'SHUBH'**
+  String get muhuratShubh;
+
+  /// Badge label on an inauspicious (ashubh) or caution muhurat card.
+  ///
+  /// In en, this message translates to:
+  /// **'ASHUBH'**
+  String get muhuratAshubh;
+
+  /// Uppercased label above the festival name on the Panchang screen's festival card.
+  ///
+  /// In en, this message translates to:
+  /// **'FESTIVAL TODAY'**
+  String get festivalToday;
+
+  /// Trailing link label on the Panchang screen's festival card, leading to festival details.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get details;
+
+  /// Uppercased label above the advice text on the Panchang screen's spiritual advice card.
+  ///
+  /// In en, this message translates to:
+  /// **'TODAY\'S SPIRITUAL ADVICE'**
+  String get todaysSpiritualAdvice;
+
+  /// Link at the bottom of the Panchang screen leading to the full list of muhurat timings.
+  ///
+  /// In en, this message translates to:
+  /// **'View all muhurat timings'**
+  String get viewAllMuhurat;
+
+  /// Badge at the bottom of the Panchang screen indicating the panchang data is cached for offline use.
+  ///
+  /// In en, this message translates to:
+  /// **'Available offline · Updated {time}'**
+  String availableOffline(String time);
+
+  /// Heading of the Horoscope — All Signs screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Horoscope'**
+  String get horoscopeTitle;
+
+  /// Label of the Daily period chip on the Horoscope screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get periodDaily;
+
+  /// Label of the Weekly period chip on the Horoscope screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get periodWeekly;
+
+  /// Label of the Monthly period chip on the Horoscope screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get periodMonthly;
+
+  /// Label of the Yearly period chip on the Horoscope screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly'**
+  String get periodYearly;
+
+  /// Badge label on the user's own zodiac sign card in the Horoscope — All Signs grid.
+  ///
+  /// In en, this message translates to:
+  /// **'Your sign'**
+  String get yourSign;
 }
 
 class _AppLocalizationsDelegate

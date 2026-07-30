@@ -120,4 +120,21 @@ abstract final class AppColors {
   /// Daily Quote card text tones.
   static const Color quoteGold = Color(0xFFF3DE9E);
   static const Color quoteMuted = Color(0xFFC7B67B);
+
+  // --- Panchang — see "B2 · Panchang" (Figma node 14:2) ---
+  //
+  // NOTE: the design's shubh (auspicious) green and amber tones are already
+  // covered by existing tokens — [geoChipBg]/[tileGreenFg] (#E9F6EF/#2E9E6B)
+  // and [mantraLabel] (#B07C1A) respectively — so they're reused directly on
+  // the Muhurat cards rather than duplicated here.
+
+  /// Ashubh (inauspicious) muhurat card background/foreground.
+  static const Color ashubhBg = Color(0xFFFBEDED);
+  static const Color ashubhFg = Color(0xFFD64545);
+
+  /// Caution muhurat card background (foreground reuses [mantraLabel]).
+  static const Color warnBg = Color(0xFFFBF3E0);
+
+  /// Hairline divider between rows in the Panchang elements card.
+  static const Color rowDivider = Color(0xFFF3EDE2);
 }

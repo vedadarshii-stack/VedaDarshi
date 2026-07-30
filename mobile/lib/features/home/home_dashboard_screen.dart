@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
+import '../../core/widgets/app_bottom_nav.dart';
 import '../../l10n/app_localizations.dart';
+import '../horoscope/horoscope_signs_screen.dart';
 import '../profile/birth_profile_repository.dart';
 import 'home_static_data.dart';
 
@@ -63,7 +66,7 @@ class HomeDashboardScreen extends ConsumerWidget {
           ],
         ),
       ),
-      bottomNavigationBar: _BottomNav(l10n: l10n, locale: locale),
+      bottomNavigationBar: const AppBottomNav(currentTab: AppTab.home),
     );
   }
 }
@@ -959,6 +962,18 @@ class _ExploreTile extends StatelessWidget {
   }
 }
 
+/// Opens the full "Horoscope — All Signs" grid (see [HoroscopeSignsScreen]).
+///
+/// A plain `push` (not `pushReplacement`) — unlike the bottom-nav tab
+/// switches elsewhere on this screen, the user must be able to come back to
+/// Home with the back button. Uses the shared [fadeThroughRoute] (motion
+/// spec item 2) instead of a bespoke fade transition.
+void _openAllSigns(BuildContext context) {
+  Navigator.of(
+    context,
+  ).push<void>(fadeThroughRoute(const HoroscopeSignsScreen()));
+}
+
 /// "Today's Horoscope" teaser card.
 class _HoroscopeSection extends StatelessWidget {
   const _HoroscopeSection({required this.l10n, required this.locale});
@@ -976,7 +991,7 @@ class _HoroscopeSection extends StatelessWidget {
           l10n.todaysHoroscope,
           locale: locale,
           actionLabel: l10n.allSigns,
-          onAction: () {},
+          onAction: () => _openAllSigns(context),
         ),
         const SizedBox(height: 10),
         Semantics(
@@ -1544,148 +1559,6 @@ class _DailyQuoteCard extends StatelessWidget {
             ],
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Bottom navigation bar — Home / Panchang / Kundli / Ask AI / Profile.
-class _BottomNav extends StatelessWidget {
-  const _BottomNav({required this.l10n, required this.locale});
-
-  final AppLocalizations l10n;
-  final Locale locale;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: const Border(top: BorderSide(color: AppColors.cardBorder)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.06),
-            blurRadius: 16,
-            offset: const Offset(0, -6),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 12, 10, 22),
-          child: Row(
-            children: [
-              Expanded(
-                child: _NavItem(
-                  label: l10n.navHome,
-                  locale: locale,
-                  isActive: true,
-                ),
-              ),
-              Expanded(
-                child: _NavItem(
-                  label: l10n.navPanchang,
-                  emoji: '🗓',
-                  locale: locale,
-                ),
-              ),
-              Expanded(
-                child: _NavItem(
-                  label: l10n.navKundli,
-                  emoji: '🪐',
-                  locale: locale,
-                ),
-              ),
-              Expanded(
-                child: _NavItem(
-                  label: l10n.navAskAi,
-                  emoji: '🔮',
-                  locale: locale,
-                ),
-              ),
-              Expanded(
-                child: _NavItem(
-                  label: l10n.navProfile,
-                  emoji: '👤',
-                  locale: locale,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  const _NavItem({
-    required this.label,
-    required this.locale,
-    this.emoji,
-    this.isActive = false,
-  });
-
-  final String label;
-  final Locale locale;
-  final String? emoji;
-  final bool isActive;
-
-  @override
-  Widget build(BuildContext context) {
-    final icon = isActive
-        ? Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-            decoration: BoxDecoration(
-              color: AppColors.genderSelectedBg,
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: const Icon(
-              Icons.home_rounded,
-              size: 17,
-              color: AppColors.genderSelectedText,
-            ),
-          )
-        : Text(emoji!, style: AppFonts.body(locale, fontSize: 17));
-
-    final content = Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        icon,
-        const SizedBox(height: 3),
-        Text(
-          label,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.center,
-          style: AppFonts.body(
-            locale,
-            fontSize: 10.5,
-            fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-            color: isActive ? AppColors.navActiveText : AppColors.navInactive,
-          ),
-        ),
-      ],
-    );
-
-    return Semantics(
-      button: true,
-      selected: isActive,
-      label: label,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(18),
-        onTap: () {},
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          decoration: isActive
-              ? BoxDecoration(
-                  color: const Color(0xFFF0821E).withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(18),
-                )
-              : null,
-          child: content,
-        ),
       ),
     );
   }

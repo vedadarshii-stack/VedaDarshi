@@ -289,4 +289,69 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get navProfile => 'ಪ್ರೊಫೈಲ್';
+
+  @override
+  String get panchangTitle => 'ಪಂಚಾಂಗ';
+
+  @override
+  String get panchangSunrise => 'ಸೂರ್ಯೋದಯ';
+
+  @override
+  String get panchangSunset => 'ಸೂರ್ಯಾಸ್ತ';
+
+  @override
+  String get panchangMoonrise => 'ಚಂದ್ರೋದಯ';
+
+  @override
+  String get panchangMoonset => 'ಚಂದ್ರಾಸ್ತ';
+
+  @override
+  String get panchangTithi => 'ತಿಥಿ';
+
+  @override
+  String get panchangVaar => 'ವಾರ';
+
+  @override
+  String get muhuratToday => 'ಇಂದಿನ ಮುಹೂರ್ತ';
+
+  @override
+  String get muhuratShubh => 'ಶುಭ';
+
+  @override
+  String get muhuratAshubh => 'ಅಶುಭ';
+
+  @override
+  String get festivalToday => 'ಇಂದಿನ ಹಬ್ಬ';
+
+  @override
+  String get details => 'ವಿವರಗಳು';
+
+  @override
+  String get todaysSpiritualAdvice => 'ಇಂದಿನ ಆಧ್ಯಾತ್ಮಿಕ ಸಲಹೆ';
+
+  @override
+  String get viewAllMuhurat => 'ಎಲ್ಲಾ ಮುಹೂರ್ತ ಸಮಯಗಳನ್ನು ವೀಕ್ಷಿಸಿ';
+
+  @override
+  String availableOffline(String time) {
+    return 'ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿ ಲಭ್ಯವಿದೆ · ನವೀಕರಿಸಲಾಗಿದೆ $time';
+  }
+
+  @override
+  String get horoscopeTitle => 'ರಾಶಿಫಲ';
+
+  @override
+  String get periodDaily => 'ದೈನಂದಿನ';
+
+  @override
+  String get periodWeekly => 'ಸಾಪ್ತಾಹಿಕ';
+
+  @override
+  String get periodMonthly => 'ಮಾಸಿಕ';
+
+  @override
+  String get periodYearly => 'ವಾರ್ಷಿಕ';
+
+  @override
+  String get yourSign => 'ನಿಮ್ಮ ರಾಶಿ';
 }

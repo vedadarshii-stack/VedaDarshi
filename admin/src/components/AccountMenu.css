@@ -1,0 +1,162 @@
+.accountMenu {
+  position: relative;
+  width: 100%;
+  margin-top: auto;
+}
+
+/* ---- Trigger row (matches the Figma sidebar card) ---- */
+
+.accountMenu__trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px;
+  border-radius: var(--vd-r-lg);
+  background: rgba(255, 255, 255, 0.06);
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+
+.accountMenu__trigger:hover,
+.accountMenu__trigger--open {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.accountMenu__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: var(--vd-r-pill);
+  background: var(--vd-gold);
+  color: var(--vd-gold-ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.accountMenu__text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.accountMenu__name,
+.accountMenu__role {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.accountMenu__name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.accountMenu__role {
+  font-size: 9.5px;
+  color: var(--vd-nav-icon);
+}
+
+.accountMenu__chevron {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--vd-nav-icon);
+  transition: transform 0.18s ease;
+}
+
+.accountMenu__trigger--open .accountMenu__chevron {
+  transform: rotate(180deg);
+}
+
+/* ---- Popover ---- */
+
+.accountMenu__popover {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  padding: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--vd-r-lg);
+  background: #16203d;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+  animation: accountMenuIn 0.16s ease-out;
+}
+
+@keyframes accountMenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.accountMenu__identity {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px 6px;
+}
+
+.accountMenu__identityName {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.accountMenu__identityMeta {
+  font-size: 10px;
+  color: var(--vd-nav-icon);
+  overflow-wrap: anywhere;
+}
+
+.accountMenu__separator {
+  height: 1px;
+  margin: 4px 0;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.accountMenu__signOut {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 10px;
+  border-radius: var(--vd-r-md);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #ffb4b4;
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+
+.accountMenu__signOut:hover:not(:disabled) {
+  background: rgba(255, 99, 99, 0.14);
+}
+
+.accountMenu__signOut:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.accountMenu__signOutIcon {
+  font-size: 13px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .accountMenu__popover {
+    animation: none;
+  }
+
+  .accountMenu__chevron {
+    transition: none;
+  }
+}

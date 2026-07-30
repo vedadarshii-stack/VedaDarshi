@@ -3,7 +3,7 @@ import { useAdminProfile } from '../lib/adminProfileContext';
 import { hasPermission } from '../lib/permissions';
 import type { Permission } from '../lib/permissions';
 import { AccessNotice } from './AccessNotice';
-import './RequirePermission.css';
+import { PageSkeleton } from './PageSkeleton';
 
 /** Per-screen permission gate.
  *
@@ -20,7 +20,7 @@ export function RequirePermission({
   const state = useAdminProfile();
 
   if (state.status === 'loading') {
-    return <p className="permGate">Checking your permissions…</p>;
+    return <PageSkeleton label="Checking your permissions" />;
   }
 
   // The static walkthrough has no role, and reads no real data.

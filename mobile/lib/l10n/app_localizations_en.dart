@@ -286,4 +286,69 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get navProfile => 'Profile';
+
+  @override
+  String get panchangTitle => 'Panchang';
+
+  @override
+  String get panchangSunrise => 'Sunrise';
+
+  @override
+  String get panchangSunset => 'Sunset';
+
+  @override
+  String get panchangMoonrise => 'Moonrise';
+
+  @override
+  String get panchangMoonset => 'Moonset';
+
+  @override
+  String get panchangTithi => 'Tithi';
+
+  @override
+  String get panchangVaar => 'Vaar';
+
+  @override
+  String get muhuratToday => 'Muhurat today';
+
+  @override
+  String get muhuratShubh => 'SHUBH';
+
+  @override
+  String get muhuratAshubh => 'ASHUBH';
+
+  @override
+  String get festivalToday => 'FESTIVAL TODAY';
+
+  @override
+  String get details => 'Details';
+
+  @override
+  String get todaysSpiritualAdvice => 'TODAY\'S SPIRITUAL ADVICE';
+
+  @override
+  String get viewAllMuhurat => 'View all muhurat timings';
+
+  @override
+  String availableOffline(String time) {
+    return 'Available offline · Updated $time';
+  }
+
+  @override
+  String get horoscopeTitle => 'Horoscope';
+
+  @override
+  String get periodDaily => 'Daily';
+
+  @override
+  String get periodWeekly => 'Weekly';
+
+  @override
+  String get periodMonthly => 'Monthly';
+
+  @override
+  String get periodYearly => 'Yearly';
+
+  @override
+  String get yourSign => 'Your sign';
 }

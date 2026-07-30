@@ -290,4 +290,69 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get navProfile => 'ప్రొఫైల్';
+
+  @override
+  String get panchangTitle => 'పంచాంగం';
+
+  @override
+  String get panchangSunrise => 'సూర్యోదయం';
+
+  @override
+  String get panchangSunset => 'సూర్యాస్తమయం';
+
+  @override
+  String get panchangMoonrise => 'చంద్రోదయం';
+
+  @override
+  String get panchangMoonset => 'చంద్రాస్తమయం';
+
+  @override
+  String get panchangTithi => 'తిథి';
+
+  @override
+  String get panchangVaar => 'వారం';
+
+  @override
+  String get muhuratToday => 'ఈరోజు ముహూర్తం';
+
+  @override
+  String get muhuratShubh => 'శుభ';
+
+  @override
+  String get muhuratAshubh => 'అశుభ';
+
+  @override
+  String get festivalToday => 'ఈరోజు పండుగ';
+
+  @override
+  String get details => 'వివరాలు';
+
+  @override
+  String get todaysSpiritualAdvice => 'ఈరోజు ఆధ్యాత్మిక సలహా';
+
+  @override
+  String get viewAllMuhurat => 'అన్ని ముహూర్త సమయాలను చూడండి';
+
+  @override
+  String availableOffline(String time) {
+    return 'ఆఫ్‌లైన్‌లో అందుబాటులో ఉంది · నవీకరించబడింది $time';
+  }
+
+  @override
+  String get horoscopeTitle => 'రాశిఫలం';
+
+  @override
+  String get periodDaily => 'రోజువారీ';
+
+  @override
+  String get periodWeekly => 'వారానికి';
+
+  @override
+  String get periodMonthly => 'నెలవారీ';
+
+  @override
+  String get periodYearly => 'వార్షిక';
+
+  @override
+  String get yourSign => 'మీ రాశి';
 }

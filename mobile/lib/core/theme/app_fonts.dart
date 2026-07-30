@@ -131,6 +131,28 @@ abstract final class AppFonts {
     }
   }
 
+  /// Zodiac glyph face (♈–♓, U+2648–2653).
+  ///
+  /// Backed by `ZodiacGlyphs.ttf` — a hand-subsetted, MONOCHROME copy of
+  /// Noto Emoji covering only those 12 codepoints. It exists because the
+  /// system's colour-emoji font (what Android uses for ♈–♓ by default)
+  /// ignores `TextStyle.color` entirely and renders multicolour glyphs that
+  /// clash with the app's gold-on-navy palette. Routing through this
+  /// bundled font instead makes the glyphs TINTABLE and guarantees they
+  /// look identical on every device, regardless of which system emoji font
+  /// is installed.
+  ///
+  /// Deliberately takes no [Locale] unlike [heading]/[body]: a zodiac glyph
+  /// is a symbol, not translatable text, so there is no script-specific
+  /// font to select.
+  static TextStyle zodiac({required double fontSize, Color? color}) =>
+      TextStyle(
+        fontFamily: 'ZodiacGlyphs',
+        fontSize: fontSize,
+        color: color,
+        height: 1.0,
+      );
+
   static const List<FontWeight> _playfairBundledWeights = [
     FontWeight.w600,
     FontWeight.w700,

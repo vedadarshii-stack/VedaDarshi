@@ -290,4 +290,69 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get navProfile => 'சுயவிவரம்';
+
+  @override
+  String get panchangTitle => 'பஞ்சாங்கம்';
+
+  @override
+  String get panchangSunrise => 'சூரிய உதயம்';
+
+  @override
+  String get panchangSunset => 'சூரிய அஸ்தமனம்';
+
+  @override
+  String get panchangMoonrise => 'சந்திர உதயம்';
+
+  @override
+  String get panchangMoonset => 'சந்திர அஸ்தமனம்';
+
+  @override
+  String get panchangTithi => 'திதி';
+
+  @override
+  String get panchangVaar => 'வாரம்';
+
+  @override
+  String get muhuratToday => 'இன்றைய முகூர்த்தம்';
+
+  @override
+  String get muhuratShubh => 'சுபம்';
+
+  @override
+  String get muhuratAshubh => 'அசுபம்';
+
+  @override
+  String get festivalToday => 'இன்றைய திருவிழா';
+
+  @override
+  String get details => 'விவரங்கள்';
+
+  @override
+  String get todaysSpiritualAdvice => 'இன்றைய ஆன்மீக அறிவுரை';
+
+  @override
+  String get viewAllMuhurat => 'அனைத்து முகூர்த்த நேரங்களையும் காண்க';
+
+  @override
+  String availableOffline(String time) {
+    return 'ஆஃப்லைனில் கிடைக்கும் · புதுப்பிக்கப்பட்டது $time';
+  }
+
+  @override
+  String get horoscopeTitle => 'ராசிபலன்';
+
+  @override
+  String get periodDaily => 'தினசரி';
+
+  @override
+  String get periodWeekly => 'வாராந்திர';
+
+  @override
+  String get periodMonthly => 'மாதாந்திர';
+
+  @override
+  String get periodYearly => 'வருடாந்திர';
+
+  @override
+  String get yourSign => 'உங்கள் ராசி';
 }
