@@ -1,0 +1,46 @@
+.adminLayout {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+  background: var(--vd-canvas);
+}
+
+.adminLayout__content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 24px 28px;
+  overflow: auto;
+}
+
+/* Page header block reused by every screen (title + subtitle on the left,
+   actions on the right). Figma nodes 31:48 / 32:48 / 34:48 / 36:48. */
+.pageHead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.pageHead__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+
+.pageHead__title {
+  font-family: var(--vd-font-heading);
+  font-weight: 600;
+  font-size: 24px;
+  color: var(--vd-ink);
+}
+
+.pageHead__subtitle {
+  font-size: 12px;
+  color: var(--vd-muted);
+}

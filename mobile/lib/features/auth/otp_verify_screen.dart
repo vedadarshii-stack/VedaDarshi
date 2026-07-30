@@ -9,7 +9,7 @@ import '../../core/auth/auth_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../l10n/app_localizations.dart';
-import '../home/home_placeholder_screen.dart';
+import '../profile/post_sign_in_route.dart';
 import 'auth_error_messages.dart';
 
 /// Number of digits in the OTP code.
@@ -23,7 +23,9 @@ const int _kResendCooldownSeconds = 30;
 ///
 /// Reached from [WelcomeLoginScreen] after a phone OTP has been requested.
 /// Confirms the 6-digit SMS code via [AuthService.verifyOtp] and, on
-/// success, proceeds to [HomePlaceholderScreen] clearing the nav stack.
+/// success, hands off to `navigateAfterSignIn` (shared with
+/// [WelcomeLoginScreen]) which routes to Home or Birth Details and clears
+/// the nav stack.
 class OtpVerifyScreen extends ConsumerStatefulWidget {
   const OtpVerifyScreen({
     super.key,
@@ -237,17 +239,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
         smsCode: code,
       );
       if (!mounted) return;
-      Navigator.of(context).pushAndRemoveUntil<void>(
-        PageRouteBuilder<void>(
-          transitionDuration: const Duration(milliseconds: 350),
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              const HomePlaceholderScreen(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-        ),
-        (route) => false,
-      );
+      await navigateAfterSignIn(context, ref);
     } on AuthException catch (e) {
       if (!mounted) return;
       final message = authErrorMessage(l10n, e.code);
@@ -281,18 +273,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
       if (!mounted) return;
 
       if (result.autoVerified) {
-        Navigator.of(context).pushAndRemoveUntil<void>(
-          PageRouteBuilder<void>(
-            transitionDuration: const Duration(milliseconds: 350),
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                const HomePlaceholderScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-                  return FadeTransition(opacity: animation, child: child);
-                },
-          ),
-          (route) => false,
-        );
+        await navigateAfterSignIn(context, ref);
         return;
       }
 

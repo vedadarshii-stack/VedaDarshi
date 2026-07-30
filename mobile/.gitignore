@@ -43,3 +43,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Local secrets (Google Places key, etc). Never commit.
+# Copy .env.example -> .env and fill it in before the first build.
+.env

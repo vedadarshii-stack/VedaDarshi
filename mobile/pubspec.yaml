@@ -18,6 +18,10 @@ dependencies:
   shared_preferences: ^2.5.5
   firebase_auth: ^6.5.6
   google_sign_in: ^7.2.0
+  timezone: ^0.11.1
+  http: ^1.6.0
+  cloud_firestore: ^6.7.1
+  flutter_dotenv: ^6.0.1
 
 dev_dependencies:
   flutter_test:
@@ -32,6 +36,11 @@ flutter:
   assets:
     - assets/logo/
     - assets/google_fonts/
+    - assets/data/
+    # Build-time secrets, loaded at startup by flutter_dotenv. This file is
+    # gitignored — copy .env.example to .env before the first build, or the
+    # build fails with "asset does not exist".
+    - .env
 
 flutter_launcher_icons:
   android: true

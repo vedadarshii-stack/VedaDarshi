@@ -1,0 +1,292 @@
+/* ---- Header controls ---- */
+
+.dash__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 260px;
+  height: 40px;
+  flex-shrink: 0;
+  padding: 0 16px;
+  border: 1px solid var(--vd-border);
+  border-radius: var(--vd-r-md);
+  background: var(--vd-surface);
+  font-size: 12px;
+}
+
+.dash__search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 12px;
+  color: var(--vd-ink);
+}
+
+.dash__search input::placeholder {
+  color: var(--vd-placeholder);
+}
+
+.dash__bell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border: 1px solid var(--vd-border);
+  border-radius: var(--vd-r-md);
+  background: var(--vd-surface);
+  font-size: 15px;
+}
+
+/* ---- Stat cards ---- */
+
+.dash__stats {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  margin-top: 20px;
+  flex-shrink: 0;
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--vd-border-card);
+  border-radius: var(--vd-r-xl);
+  background: var(--vd-surface);
+}
+
+.statCard__top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statCard__label {
+  flex: 1;
+  min-width: 0;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--vd-muted);
+}
+
+.statCard__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: var(--vd-r-md);
+  font-size: 14px;
+}
+
+.statCard__value {
+  font-family: var(--vd-font-heading);
+  font-weight: 700;
+  font-size: 28px;
+  color: var(--vd-ink);
+}
+
+.statCard__delta {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--vd-green);
+}
+
+/* ---- Lower row: chart + today's content ---- */
+
+.dash__lower {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  width: 100%;
+  flex: 1;
+  min-height: 420px;
+  margin-top: 20px;
+}
+
+.chartCard {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+  min-width: 0;
+  padding: 20px;
+}
+
+.chartCard__head {
+  display: flex;
+  align-items: center;
+}
+
+.chartCard__head .card__title {
+  flex: 1;
+  min-width: 0;
+}
+
+.chartCard__range {
+  font-size: 11.5px;
+  color: var(--vd-muted);
+}
+
+.chartCard__plot {
+  display: flex;
+  align-items: flex-end;
+  gap: 26px;
+  flex: 1;
+  min-height: 0;
+  padding: 10px 10px 0;
+}
+
+.chartCard__column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.chartCard__bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.chartCard__bar {
+  display: block;
+  width: 18px;
+  border-radius: 5px;
+}
+
+.chartCard__bar--users {
+  background: var(--vd-grad-saffron-v);
+}
+
+.chartCard__bar--revenue {
+  background: var(--vd-navy);
+}
+
+.chartCard__month {
+  font-size: 10.5px;
+  color: var(--vd-placeholder);
+}
+
+.chartCard__legend {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+}
+
+.chartCard__legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--vd-muted);
+}
+
+.chartCard__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: var(--vd-r-pill);
+}
+
+.chartCard__dot--users {
+  background: var(--vd-saffron-light);
+}
+
+.chartCard__dot--revenue {
+  background: var(--vd-navy);
+}
+
+/* ---- Today's content ---- */
+
+.sideCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 330px;
+  flex-shrink: 0;
+  padding: 20px;
+}
+
+.sideCard__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sideCard__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--vd-r-lg);
+  background: var(--vd-surface-sunken);
+}
+
+.sideCard__icon {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sideCard__icon--ok {
+  color: var(--vd-green);
+}
+
+.sideCard__icon--warn {
+  color: var(--vd-amber);
+}
+
+.sideCard__icon--pending {
+  color: var(--vd-muted);
+}
+
+.sideCard__icon--scheduled {
+  color: var(--vd-blue);
+}
+
+.sideCard__text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.sideCard__title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--vd-ink);
+}
+
+.sideCard__detail {
+  font-size: 10px;
+  color: var(--vd-placeholder);
+}
+
+@media (max-width: 1240px) {
+  .dash__stats {
+    flex-wrap: wrap;
+  }
+
+  .statCard {
+    flex: 1 1 calc(50% - 8px);
+  }
+
+  .dash__lower {
+    flex-direction: column;
+  }
+
+  .sideCard {
+    width: 100%;
+  }
+}

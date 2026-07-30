@@ -128,4 +128,165 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get authErrorUnknown => 'ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get birthTitle => 'ನಿಮ್ಮ ಜನ್ಮ ವಿವರಗಳು';
+
+  @override
+  String get birthSubtitle =>
+      'ಇವು ನಿಮ್ಮ ಕುಂಡಲಿ, ರಾಶಿಫಲ ಮತ್ತು ವೈಯಕ್ತಿಕ ವರದಿಗಳನ್ನು ಬಲಪಡಿಸುತ್ತವೆ. ನಿಖರತೆ ಮುಖ್ಯ ✨';
+
+  @override
+  String get birthFullNameLabel => 'ಪೂರ್ಣ ಹೆಸರು';
+
+  @override
+  String get birthNameHint => 'ನಿಮ್ಮ ಪೂರ್ಣ ಹೆಸರನ್ನು ನಮೂದಿಸಿ';
+
+  @override
+  String get birthGenderLabel => 'ಲಿಂಗ';
+
+  @override
+  String get genderMale => 'ಪುರುಷ';
+
+  @override
+  String get genderFemale => 'ಸ್ತ್ರೀ';
+
+  @override
+  String get genderOther => 'ಇತರೆ';
+
+  @override
+  String get birthDobLabel => 'ಜನ್ಮ ದಿನಾಂಕ';
+
+  @override
+  String get birthDateHint => 'ದಿನಾಂಕ ಆಯ್ಕೆಮಾಡಿ';
+
+  @override
+  String get birthTobLabel => 'ಜನ್ಮ ಸಮಯ';
+
+  @override
+  String get birthTimeHint => 'ಸಮಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ';
+
+  @override
+  String get birthTimeUnknownValue => 'ಮಧ್ಯಾಹ್ನ 12:00 (ನೂನ್)';
+
+  @override
+  String get birthPlaceLabel => 'ಜನ್ಮ ಸ್ಥಳ';
+
+  @override
+  String get birthPlaceHint => 'ನಿಮ್ಮ ಜನ್ಮ ನಗರವನ್ನು ಹುಡುಕಿ';
+
+  @override
+  String birthGeoDetected(String lat, String lon, String offset, String zone) {
+    return '✓ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಪತ್ತೆಯಾಗಿದೆ: $lat, $lon · $offset ($zone)';
+  }
+
+  @override
+  String get birthTimeUnknown => 'ನನ್ನ ನಿಖರವಾದ ಜನ್ಮ ಸಮಯ ನನಗೆ ತಿಳಿದಿಲ್ಲ';
+
+  @override
+  String get birthSave => 'ನನ್ನ ಪ್ರೊಫೈಲ್ ರಚಿಸಿ ✨';
+
+  @override
+  String get birthFooter =>
+      'ನೀವು ನಂತರ ಕುಟುಂಬ ಮತ್ತು ಸ್ನೇಹಿತರ ಪ್ರೊಫೈಲ್‌ಗಳನ್ನು ಸೇರಿಸಬಹುದು';
+
+  @override
+  String get placeResolveFailed =>
+      'ಆ ಸ್ಥಳವನ್ನು ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಇನ್ನೊಂದನ್ನು ಆಯ್ಕೆಮಾಡಿ.';
+
+  @override
+  String get todaysPanchang => 'ಇಂದಿನ ಪಂಚಾಂಗ';
+
+  @override
+  String get nakshatra => 'ನಕ್ಷತ್ರ';
+
+  @override
+  String get yoga => 'ಯೋಗ';
+
+  @override
+  String get karana => 'ಕರಣ';
+
+  @override
+  String get fullPanchang => 'ಪೂರ್ಣ ಪಂಚಾಂಗ';
+
+  @override
+  String get todayAtAGlance => 'ಇಂದು ಒಂದು ನೋಟದಲ್ಲಿ';
+
+  @override
+  String get luckyNumber => 'ಅದೃಷ್ಟ ಸಂಖ್ಯೆ';
+
+  @override
+  String get luckyColor => 'ಅದೃಷ್ಟ ಬಣ್ಣ';
+
+  @override
+  String get direction => 'ದಿಕ್ಕು';
+
+  @override
+  String get todaysPlanet => 'ಇಂದಿನ ಗ್ರಹ';
+
+  @override
+  String get moonPhase => 'ಚಂದ್ರ ಕಲೆ';
+
+  @override
+  String get muhurat => 'ಮುಹೂರ್ತ';
+
+  @override
+  String get todaysRemedy => 'ಇಂದಿನ ಪರಿಹಾರ';
+
+  @override
+  String get todaysMantra => 'ಇಂದಿನ ಮಂತ್ರ';
+
+  @override
+  String get festivalOfTheDay => 'ಇಂದಿನ ಹಬ್ಬ';
+
+  @override
+  String get rituals => 'ಆಚರಣೆಗಳು';
+
+  @override
+  String get explore => 'ಅನ್ವೇಷಿಸಿ';
+
+  @override
+  String get navKundli => 'ಕುಂಡಲಿ';
+
+  @override
+  String get navMatch => 'ಹೊಂದಾಣಿಕೆ';
+
+  @override
+  String get navReports => 'ವರದಿಗಳು';
+
+  @override
+  String get navAskAi => 'AI ಅನ್ನು ಕೇಳಿ';
+
+  @override
+  String get todaysHoroscope => 'ಇಂದಿನ ರಾಶಿಫಲ';
+
+  @override
+  String get allSigns => 'ಎಲ್ಲಾ ರಾಶಿಗಳು';
+
+  @override
+  String get wisdomForYou => 'ನಿಮಗಾಗಿ ಜ್ಞಾನ';
+
+  @override
+  String get seeAll => 'ಎಲ್ಲಾ ನೋಡಿ';
+
+  @override
+  String get continueWithRishiAi => 'ಋಷಿ AI ಜೊತೆ ಮುಂದುವರಿಸಿ';
+
+  @override
+  String get continueAction => 'ಮುಂದುವರಿಸಿ';
+
+  @override
+  String get recentReports => 'ಇತ್ತೀಚಿನ ವರದಿಗಳು';
+
+  @override
+  String get myReports => 'ನನ್ನ ವರದಿಗಳು';
+
+  @override
+  String get navHome => 'ಹೋಮ್';
+
+  @override
+  String get navPanchang => 'ಪಂಚಾಂಗ';
+
+  @override
+  String get navProfile => 'ಪ್ರೊಫೈಲ್';
 }

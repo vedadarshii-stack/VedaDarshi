@@ -1,0 +1,34 @@
+.dataNotice {
+  width: 100%;
+  margin-top: 12px;
+  padding: 8px 12px;
+  flex-shrink: 0;
+  border-radius: var(--vd-r-md);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.dataNotice code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10.5px;
+}
+
+.dataNotice--muted {
+  background: var(--vd-surface-sunken);
+  color: var(--vd-muted);
+}
+
+.dataNotice--live {
+  background: var(--vd-green-bg);
+  color: var(--vd-green);
+}
+
+.dataNotice--warn {
+  background: var(--vd-warn-bg);
+  color: var(--vd-gold-text);
+}
+
+.dataNotice--error {
+  background: var(--vd-rose-bg);
+  color: var(--vd-rose);
+}

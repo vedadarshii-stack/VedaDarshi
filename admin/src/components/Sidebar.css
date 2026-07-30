@@ -1,0 +1,161 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: var(--vd-sidebar-w);
+  flex-shrink: 0;
+  height: 100%;
+  padding: 28px 16px 24px;
+  background: var(--vd-grad-sidebar);
+  overflow: hidden;
+}
+
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 0 18px 10px;
+}
+
+.sidebar__om {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--vd-gold);
+}
+
+.sidebar__brandText {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar__wordmark {
+  font-family: var(--vd-font-heading);
+  font-weight: 700;
+  font-size: 17px;
+  color: #fff;
+}
+
+.sidebar__kicker {
+  font-weight: 500;
+  font-size: 8px;
+  letter-spacing: 3.2px;
+  color: var(--vd-gold);
+}
+
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.sidebar__nav ul {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: var(--vd-r-md);
+  transition: background-color 0.15s ease;
+}
+
+.sidebar__icon {
+  font-size: 14px;
+  color: var(--vd-nav-icon);
+  width: 16px;
+  text-align: center;
+}
+
+.sidebar__label {
+  font-size: 13px;
+  color: var(--vd-nav-label);
+  white-space: nowrap;
+}
+
+a.sidebar__item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.sidebar__item--active,
+a.sidebar__item--active:hover {
+  background: var(--vd-saffron);
+}
+
+.sidebar__item--active .sidebar__icon,
+.sidebar__item--active .sidebar__label {
+  color: #fff;
+}
+
+.sidebar__item--active .sidebar__label {
+  font-weight: 600;
+}
+
+.sidebar__item--inert {
+  cursor: not-allowed;
+}
+
+.sidebar__account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: auto;
+  padding: 10px;
+  border-radius: var(--vd-r-lg);
+  background: rgba(255, 255, 255, 0.06);
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+
+.sidebar__account:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.sidebar__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: var(--vd-r-pill);
+  background: var(--vd-gold);
+  color: var(--vd-gold-ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.sidebar__accountText {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar__accountName,
+.sidebar__accountRole {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar__accountName {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.sidebar__accountRole {
+  font-size: 9.5px;
+  color: var(--vd-nav-icon);
+}
+
+.sidebar__signOut {
+  font-size: 14px;
+  color: var(--vd-nav-icon);
+}

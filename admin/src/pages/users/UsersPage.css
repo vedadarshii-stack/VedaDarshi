@@ -1,0 +1,181 @@
+.users__export {
+  padding: 10px 16px;
+  border: 1px solid var(--vd-border);
+  border-radius: var(--vd-r-md);
+  background: var(--vd-surface);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--vd-ink);
+  white-space: nowrap;
+}
+
+.users__export:hover {
+  border-color: var(--vd-saffron);
+  color: var(--vd-saffron-text);
+}
+
+/* ---- Filter bar ---- */
+
+.users__filters {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  margin-top: 18px;
+  flex-shrink: 0;
+}
+
+.users__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  padding: 11px 14px;
+  border: 1px solid var(--vd-border);
+  border-radius: var(--vd-r-md);
+  background: var(--vd-surface);
+  font-size: 12px;
+}
+
+.users__search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 12px;
+  color: var(--vd-ink);
+}
+
+.users__search input::placeholder {
+  color: var(--vd-placeholder);
+}
+
+.users__filter {
+  padding: 11px 14px;
+  border: 1px solid var(--vd-border);
+  border-radius: var(--vd-r-md);
+  background: var(--vd-surface);
+  font-size: 12px;
+  color: var(--vd-muted);
+  white-space: nowrap;
+}
+
+.users__filter:hover {
+  border-color: var(--vd-saffron);
+}
+
+/* ---- Table ---- */
+
+.users__table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  margin-top: 18px;
+  overflow: hidden;
+}
+
+/* One grid definition keeps the header and every row in the same columns.
+   Widths mirror Figma: flexible USER, then 180 / 150 / 140 / 170 / 120 / 80.
+   Doubled-up selector so it beats the `display: flex` on .table__head/.table__row. */
+.table__head.users__grid,
+.table__row.users__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 180px 150px 140px 170px 120px 80px;
+  align-items: center;
+}
+
+.users__identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.users__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: var(--vd-r-pill);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.users__name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--vd-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.users__cell {
+  font-size: 12px;
+  color: var(--vd-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.users__grid .table__more {
+  justify-self: start;
+}
+
+/* ---- Pagination ---- */
+
+.users__pagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 0 4px;
+  flex-shrink: 0;
+}
+
+.users__count {
+  flex: 1;
+  min-width: 0;
+  font-size: 11.5px;
+  color: var(--vd-faint);
+}
+
+.users__page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 6px;
+  border: 1px solid var(--vd-border);
+  border-radius: var(--vd-r-sm);
+  background: var(--vd-surface);
+  font-size: 12px;
+  color: var(--vd-muted);
+}
+
+.users__page:hover {
+  border-color: var(--vd-saffron);
+}
+
+.users__page--active {
+  border-color: transparent;
+  background: var(--vd-saffron);
+  font-weight: 600;
+  color: #fff;
+}
+
+@media (max-width: 1240px) {
+  .users__table {
+    overflow-x: auto;
+  }
+
+  .users__grid {
+    min-width: 1000px;
+  }
+}

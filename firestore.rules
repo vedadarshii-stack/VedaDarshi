@@ -1,0 +1,105 @@
+rules_version = '2';
+
+// Vedadarshi Firestore security rules.
+//
+// Principle: a signed-in user can read and write ONLY their own document
+// tree under /users/{uid}. Nothing else in the database is reachable from
+// the client — server-side work (Vedika API proxying, cached panchang and
+// horoscopes, payments) runs through Cloud Functions with the Admin SDK,
+// which bypasses these rules entirely.
+//
+// Birth profiles carry date/time/place of birth, i.e. personal data, so the
+// ownership check is deliberately strict: no cross-user reads, no public
+// listing, no client-side deletes of the account document.
+//
+// ADDED 30 Jul 2026: console role management (/adminRoles, /adminUsers).
+// That block is purely ADDITIVE — the /users rules further down are unchanged,
+// so the Flutter app's access is exactly as before.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // ---- Console admin helpers -------------------------------------------
+    //
+    // Membership is a document keyed by the Firebase Auth uid, so authorising
+    // an admin costs exactly one get(). Revoking access means setting
+    // status != 'active' (or deleting the doc) and takes effect immediately —
+    // no token refresh needed, which is the main reason this is a Firestore
+    // document rather than a custom claim.
+    //
+    // BOOTSTRAP: only a super admin may write /adminUsers, so the FIRST
+    // super-admin document cannot come from the client. It was seeded
+    // out-of-band through the Admin API (Firebase MCP) on 30 Jul 2026 —
+    // adminUsers/aoQtxM9rFDc75CpJ3vovA4FRe1h1 (ppradeepd@gmail.com).
+    // Recover the same way if every super admin is ever locked out.
+    function adminDoc() {
+      return get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data;
+    }
+
+    function isAdmin() {
+      return isSignedIn()
+             && exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid))
+             && adminDoc().status == 'active';
+    }
+
+    function isSuperAdmin() {
+      return isAdmin() && adminDoc().roleId == 'super_admin';
+    }
+
+    // Console operators: /adminUsers/{uid}
+    // NOT app end-users — those live in /users/{uid} below. Keep the two
+    // straight; conflating them would hand console access to every app user.
+    match /adminUsers/{adminUid} {
+      // Any signed-in user may read THEIR OWN row, so the console can answer
+      // "which role am I?" immediately after sign-in (and show a clean
+      // "not an admin" screen when the row is absent). Reading anyone else's
+      // row requires already being an admin.
+      allow get: if isAdmin() || isOwner(adminUid);
+      allow list: if isAdmin();
+      // Granting, editing and revoking console access is super-admin only.
+      allow create, update, delete: if isSuperAdmin();
+    }
+
+    // Role definitions: /adminRoles/{roleId}
+    match /adminRoles/{roleId} {
+      allow get, list: if isAdmin();
+      allow create, update: if isSuperAdmin();
+      // System roles (super_admin) must never be deletable, or the project can
+      // lock itself out of its own console.
+      allow delete: if isSuperAdmin() && resource.data.isSystem != true;
+    }
+
+    // ---- App end-users (UNCHANGED from the previously deployed rules) ----
+
+    // Account document: /users/{uid}
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      // No `list` — a client must never be able to enumerate users.
+      allow create, update: if isOwner(userId)
+                            && request.resource.data.uid == userId;
+      // Account deletion must go through a Cloud Function so the whole
+      // subtree (profiles, reports, chat history) is removed atomically.
+      allow delete: if false;
+
+      // Birth profiles: /users/{uid}/birthProfiles/{profileId}
+      // A subcollection rather than a field on the user doc, because the
+      // approved design promises family & friends profiles later.
+      match /birthProfiles/{profileId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Any future per-user subcollection (saved reports, AI chat history)
+      // inherits the same ownership rule instead of being open by omission.
+      match /{subcollection}/{docId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+  }
+}

@@ -313,6 +313,318 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Something went wrong. Please try again.'**
   String get authErrorUnknown;
+
+  /// Heading of the Birth Details Setup screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Your birth details'**
+  String get birthTitle;
+
+  /// Subtitle under the heading on the Birth Details Setup screen.
+  ///
+  /// In en, this message translates to:
+  /// **'These power your Kundli, horoscope and personalised reports. Accuracy matters ✨'**
+  String get birthSubtitle;
+
+  /// Uppercased section label above the full name field on the Birth Details Setup screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get birthFullNameLabel;
+
+  /// Placeholder hint text in the full name field on the Birth Details Setup screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your full name'**
+  String get birthNameHint;
+
+  /// Uppercased section label above the gender picker on the Birth Details Setup screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Gender'**
+  String get birthGenderLabel;
+
+  /// Label of the male option in the gender picker on the Birth Details Setup screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Male'**
+  String get genderMale;
+
+  /// Label of the female option in the gender picker on the Birth Details Setup screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Female'**
+  String get genderFemale;
+
+  /// Label of the third, non-binary option in the gender picker on the Birth Details Setup screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get genderOther;
+
+  /// Uppercased section label above the date-of-birth field on the Birth Details Setup screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Date of birth'**
+  String get birthDobLabel;
+
+  /// Placeholder hint shown in the date-of-birth field before a date is picked.
+  ///
+  /// In en, this message translates to:
+  /// **'Select date'**
+  String get birthDateHint;
+
+  /// Uppercased section label above the time-of-birth field on the Birth Details Setup screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Time of birth'**
+  String get birthTobLabel;
+
+  /// Placeholder hint shown in the time-of-birth field before a time is picked.
+  ///
+  /// In en, this message translates to:
+  /// **'Select time'**
+  String get birthTimeHint;
+
+  /// Value shown in the time-of-birth field when the user has checked 'I don't know my exact birth time'.
+  ///
+  /// In en, this message translates to:
+  /// **'12:00 PM (noon)'**
+  String get birthTimeUnknownValue;
+
+  /// Uppercased section label above the birth-place search field on the Birth Details Setup screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Place of birth'**
+  String get birthPlaceLabel;
+
+  /// Placeholder hint text in the birth-city search field on the Birth Details Setup screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Search your birth city'**
+  String get birthPlaceHint;
+
+  /// Chip shown once a birth city is selected, confirming the auto-detected coordinates, UTC offset and timezone.
+  ///
+  /// In en, this message translates to:
+  /// **'✓ Auto-detected: {lat}, {lon} · {offset} ({zone})'**
+  String birthGeoDetected(String lat, String lon, String offset, String zone);
+
+  /// Label of the checkbox that lets the user skip entering an exact birth time.
+  ///
+  /// In en, this message translates to:
+  /// **'I don\'t know my exact birth time'**
+  String get birthTimeUnknown;
+
+  /// Label of the CTA button that saves the entered birth details and proceeds into the app.
+  ///
+  /// In en, this message translates to:
+  /// **'Create My Profile ✨'**
+  String get birthSave;
+
+  /// Reassurance footnote at the bottom of the Birth Details Setup screen.
+  ///
+  /// In en, this message translates to:
+  /// **'You can add family & friends profiles later'**
+  String get birthFooter;
+
+  /// Snackbar shown when resolving a selected place-of-birth suggestion into full coordinates fails (e.g. network error), so the user can pick a different suggestion or retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load that location. Please pick another.'**
+  String get placeResolveFailed;
+
+  /// Uppercased eyebrow label above the date in the Home Dashboard's Panchang hero card.
+  ///
+  /// In en, this message translates to:
+  /// **'TODAY\'S PANCHANG'**
+  String get todaysPanchang;
+
+  /// Label of the Nakshatra stat chip in the Home Dashboard's Panchang hero card.
+  ///
+  /// In en, this message translates to:
+  /// **'Nakshatra'**
+  String get nakshatra;
+
+  /// Label of the Yoga stat chip in the Home Dashboard's Panchang hero card.
+  ///
+  /// In en, this message translates to:
+  /// **'Yoga'**
+  String get yoga;
+
+  /// Label of the Karana stat chip in the Home Dashboard's Panchang hero card.
+  ///
+  /// In en, this message translates to:
+  /// **'Karana'**
+  String get karana;
+
+  /// Trailing link label in the Home Dashboard's Panchang hero card, leading to the full Panchang screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Panchang'**
+  String get fullPanchang;
+
+  /// Section heading on the Home Dashboard above the grid of quick-fact tiles (lucky number, color, direction, etc.).
+  ///
+  /// In en, this message translates to:
+  /// **'Today at a glance'**
+  String get todayAtAGlance;
+
+  /// Label of the lucky-number tile in the Home Dashboard's 'Today at a glance' grid.
+  ///
+  /// In en, this message translates to:
+  /// **'Lucky Number'**
+  String get luckyNumber;
+
+  /// Label of the lucky-color tile in the Home Dashboard's 'Today at a glance' grid.
+  ///
+  /// In en, this message translates to:
+  /// **'Lucky Color'**
+  String get luckyColor;
+
+  /// Label of the favourable-direction tile in the Home Dashboard's 'Today at a glance' grid.
+  ///
+  /// In en, this message translates to:
+  /// **'Direction'**
+  String get direction;
+
+  /// Label of the ruling-planet tile in the Home Dashboard's 'Today at a glance' grid.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Planet'**
+  String get todaysPlanet;
+
+  /// Label of the moon-phase tile in the Home Dashboard's 'Today at a glance' grid.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon Phase'**
+  String get moonPhase;
+
+  /// Label of the auspicious-time tile in the Home Dashboard's 'Today at a glance' grid.
+  ///
+  /// In en, this message translates to:
+  /// **'Muhurat'**
+  String get muhurat;
+
+  /// Uppercased label above today's remedy text on the Home Dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'TODAY\'S REMEDY'**
+  String get todaysRemedy;
+
+  /// Uppercased label above today's mantra text on the Home Dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'TODAY\'S MANTRA'**
+  String get todaysMantra;
+
+  /// Uppercased label above the festival name on the Home Dashboard's festival strip.
+  ///
+  /// In en, this message translates to:
+  /// **'FESTIVAL OF THE DAY'**
+  String get festivalOfTheDay;
+
+  /// Trailing link label on the Home Dashboard's festival strip, leading to festival ritual details.
+  ///
+  /// In en, this message translates to:
+  /// **'Rituals'**
+  String get rituals;
+
+  /// Section heading on the Home Dashboard above the Kundli/Match/Reports/Ask AI shortcut tiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore'**
+  String get explore;
+
+  /// Label of the Kundli shortcut tile/nav item (birth chart feature).
+  ///
+  /// In en, this message translates to:
+  /// **'Kundli'**
+  String get navKundli;
+
+  /// Label of the Match shortcut tile (Gun Milan compatibility matching feature).
+  ///
+  /// In en, this message translates to:
+  /// **'Match'**
+  String get navMatch;
+
+  /// Label of the Reports shortcut tile (premium astrology reports).
+  ///
+  /// In en, this message translates to:
+  /// **'Reports'**
+  String get navReports;
+
+  /// Label of the Ask AI shortcut tile/nav item (AI Astrologer chat feature).
+  ///
+  /// In en, this message translates to:
+  /// **'Ask AI'**
+  String get navAskAi;
+
+  /// Section heading on the Home Dashboard above the daily horoscope teaser card.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Horoscope'**
+  String get todaysHoroscope;
+
+  /// Action link next to 'Today's Horoscope' on the Home Dashboard, leading to the full horoscope grid.
+  ///
+  /// In en, this message translates to:
+  /// **'All signs'**
+  String get allSigns;
+
+  /// Section heading on the Home Dashboard above the recommended-articles cards.
+  ///
+  /// In en, this message translates to:
+  /// **'Wisdom for you'**
+  String get wisdomForYou;
+
+  /// Action link next to 'Wisdom for you' on the Home Dashboard, leading to the full articles list.
+  ///
+  /// In en, this message translates to:
+  /// **'See all'**
+  String get seeAll;
+
+  /// Title of the Home Dashboard's card inviting the user to resume their AI Astrologer conversation.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Rishi AI'**
+  String get continueWithRishiAi;
+
+  /// Label of the CTA pill on the Home Dashboard's Rishi AI card.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueAction;
+
+  /// Section heading on the Home Dashboard above the recently viewed/generated report cards.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent reports'**
+  String get recentReports;
+
+  /// Action link next to 'Recent reports' on the Home Dashboard, leading to the full reports list.
+  ///
+  /// In en, this message translates to:
+  /// **'My reports'**
+  String get myReports;
+
+  /// Label of the Home tab in the bottom navigation bar.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navHome;
+
+  /// Label of the Panchang tab in the bottom navigation bar.
+  ///
+  /// In en, this message translates to:
+  /// **'Panchang'**
+  String get navPanchang;
+
+  /// Label of the Profile tab in the bottom navigation bar.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get navProfile;
 }
 
 class _AppLocalizationsDelegate

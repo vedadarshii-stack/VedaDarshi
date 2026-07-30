@@ -1,0 +1,73 @@
+/* White panel used across every console screen (Figma "card/*" nodes). */
+
+.card {
+  border: 1px solid var(--vd-border-card);
+  border-radius: var(--vd-r-xl);
+  background: var(--vd-surface);
+}
+
+.card__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--vd-ink);
+}
+
+/* Table primitives shared by Users (E3) and Plans feature gating (E6). */
+
+.table__head {
+  display: flex;
+  align-items: center;
+  padding: 13px 20px;
+  background: var(--vd-surface-sunken);
+}
+
+.table__heading {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.63px;
+  color: var(--vd-faint);
+}
+
+.table__divider {
+  height: 1px;
+  background: var(--vd-divider);
+}
+
+.table__row {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+}
+
+.table__row:hover {
+  background: var(--vd-surface-sunken);
+}
+
+.table__more {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--vd-faint);
+}
+
+/* Pill badges (plan chips, status chips). */
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: var(--vd-r-pill);
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.pill--premium {
+  background: var(--vd-gold-tint);
+  color: var(--vd-gold-text);
+}
+
+.pill--free {
+  background: var(--vd-neutral-bg);
+  color: var(--vd-muted);
+}

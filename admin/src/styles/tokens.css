@@ -1,0 +1,92 @@
+/* Design tokens — Vedadarshi Admin CMS
+ * Source of truth: Figma page "🖥️ Admin CMS — UI Concepts" (file gYj1P23B76uL34UCCFUUwF).
+ * Every colour / radius / font below is lifted from section "E · Admin CMS (React Web)".
+ * Do not hardcode hex values in component CSS — add a token here instead. */
+
+:root {
+  /* ---- Brand ---- */
+  --vd-navy: #22315e;
+  --vd-navy-mid: #1b2547;
+  --vd-navy-deep: #0c1329;
+  --vd-navy-line: #3a4870;
+
+  --vd-saffron: #e8720c;
+  --vd-saffron-light: #f0821e;
+  --vd-saffron-dark: #d95f06;
+  --vd-saffron-text: #c25705;
+  --vd-saffron-tint: #fdebd9;
+
+  --vd-gold: #d4af37;
+  --vd-gold-light: #f3de9e;
+  --vd-gold-text: #8c6d1f;
+  --vd-gold-tint: #f6eed3;
+  --vd-gold-ink: #241c06;
+  --vd-amber: #b07c1a;
+  --vd-warn-bg: #fbf3e0;
+
+  /* ---- Surfaces ---- */
+  --vd-canvas: #f6f7fa;
+  --vd-surface: #ffffff;
+  --vd-surface-sunken: #f8f9fc;
+  --vd-field: #fafafc;
+
+  /* ---- Text ---- */
+  --vd-ink: #1e2433;
+  --vd-muted: #6e7385;
+  --vd-faint: #8a8fa0;
+  --vd-placeholder: #a6aab8;
+  --vd-disabled: #b4b9c6;
+
+  /* ---- Sidebar text ---- */
+  --vd-nav-label: #aeb6ce;
+  --vd-nav-icon: #8e97b5;
+  --vd-nav-sub: #c7cee4;
+
+  /* ---- Borders ---- */
+  --vd-border: #e4e6ee;
+  --vd-border-card: #e9ebf2;
+  --vd-divider: #f0f1f5;
+
+  /* ---- Status ---- */
+  --vd-green: #2e9e6b;
+  --vd-green-bg: #e9f6ef;
+  --vd-green-border: #bce3ce;
+  --vd-blue: #1f3c88;
+  --vd-blue-bg: #eaf0fb;
+  --vd-purple: #6b3fa0;
+  --vd-purple-bg: #f1eafb;
+  --vd-rose: #b0355c;
+  --vd-rose-bg: #fbe9ee;
+  --vd-neutral-bg: #eef0f4;
+  --vd-chip-off-bg: #f5f6f9;
+
+  /* ---- Gradients ---- */
+  --vd-grad-saffron: linear-gradient(90deg, var(--vd-saffron-light) 0%, var(--vd-saffron-dark) 100%);
+  --vd-grad-saffron-v: linear-gradient(180deg, var(--vd-saffron-light) 0%, var(--vd-saffron-dark) 100%);
+  --vd-grad-sidebar: linear-gradient(180deg, var(--vd-navy-mid) 0%, var(--vd-navy-deep) 100%);
+  --vd-grad-brand: linear-gradient(132.57deg, #22315e 0%, #141f42 42.857%, #0c1329 71.429%);
+  --vd-grad-phone: linear-gradient(180deg, var(--vd-navy) 0%, var(--vd-navy-deep) 100%);
+
+  /* ---- Shadows ---- */
+  --vd-shadow-cta: 0 8px 18px rgba(232, 114, 12, 0.3);
+  --vd-shadow-plan: 0 12px 28px rgba(34, 49, 94, 0.25);
+
+  /* ---- Radii ---- */
+  --vd-r-sm: 8px;
+  --vd-r-md: 10px;
+  --vd-r-lg: 12px;
+  --vd-r-xl: 16px;
+  --vd-r-2xl: 18px;
+  --vd-r-pill: 999px;
+
+  /* ---- Typography ---- */
+  --vd-font-heading: 'Playfair Display', Georgia, serif;
+  --vd-font-ui: 'Poppins', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --vd-font-deva: 'Noto Sans Devanagari', var(--vd-font-ui);
+  --vd-font-telu: 'Noto Sans Telugu', var(--vd-font-ui);
+  --vd-font-tamil: 'Noto Sans Tamil', var(--vd-font-ui);
+  --vd-font-kannada: 'Noto Sans Kannada', var(--vd-font-ui);
+
+  /* ---- Layout ---- */
+  --vd-sidebar-w: 248px;
+}

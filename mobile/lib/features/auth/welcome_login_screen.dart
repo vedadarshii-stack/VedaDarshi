@@ -7,7 +7,7 @@ import '../../core/auth/auth_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../l10n/app_localizations.dart';
-import '../home/home_placeholder_screen.dart';
+import '../profile/post_sign_in_route.dart';
 import 'auth_error_messages.dart';
 import 'otp_verify_screen.dart';
 
@@ -56,19 +56,6 @@ class _WelcomeLoginScreenState extends ConsumerState<WelcomeLoginScreen> {
 
   bool get _isPhoneValid => _phoneController.text.length == 10;
 
-  void _goToHome() {
-    Navigator.of(context).pushReplacement<void, void>(
-      PageRouteBuilder<void>(
-        transitionDuration: const Duration(milliseconds: 350),
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            const HomePlaceholderScreen(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-      ),
-    );
-  }
-
   void _goToOtpVerify(String phoneE164, PhoneCodeSent sent) {
     Navigator.of(context).push<void>(
       PageRouteBuilder<void>(
@@ -98,7 +85,7 @@ class _WelcomeLoginScreenState extends ConsumerState<WelcomeLoginScreen> {
       if (sent.autoVerified) {
         // Android instant verification already signed the user in — skip
         // the OTP entry screen entirely.
-        _goToHome();
+        await navigateAfterSignIn(context, ref);
       } else {
         _goToOtpVerify(phoneE164, sent);
       }
@@ -123,7 +110,7 @@ class _WelcomeLoginScreenState extends ConsumerState<WelcomeLoginScreen> {
     try {
       await authService.signInWithGoogle();
       if (!mounted) return;
-      _goToHome();
+      await navigateAfterSignIn(context, ref);
     } on AuthException catch (e) {
       if (!mounted) return;
       // A user-cancelled Google sign-in (they closed the account picker)
@@ -153,7 +140,7 @@ class _WelcomeLoginScreenState extends ConsumerState<WelcomeLoginScreen> {
     } finally {
       if (mounted) {
         setState(() => _isGuestLoading = false);
-        _goToHome();
+        await navigateAfterSignIn(context, ref);
       }
     }
   }

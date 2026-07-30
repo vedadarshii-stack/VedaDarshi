@@ -126,4 +126,164 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authErrorUnknown => 'Something went wrong. Please try again.';
+
+  @override
+  String get birthTitle => 'Your birth details';
+
+  @override
+  String get birthSubtitle =>
+      'These power your Kundli, horoscope and personalised reports. Accuracy matters ✨';
+
+  @override
+  String get birthFullNameLabel => 'Full name';
+
+  @override
+  String get birthNameHint => 'Enter your full name';
+
+  @override
+  String get birthGenderLabel => 'Gender';
+
+  @override
+  String get genderMale => 'Male';
+
+  @override
+  String get genderFemale => 'Female';
+
+  @override
+  String get genderOther => 'Other';
+
+  @override
+  String get birthDobLabel => 'Date of birth';
+
+  @override
+  String get birthDateHint => 'Select date';
+
+  @override
+  String get birthTobLabel => 'Time of birth';
+
+  @override
+  String get birthTimeHint => 'Select time';
+
+  @override
+  String get birthTimeUnknownValue => '12:00 PM (noon)';
+
+  @override
+  String get birthPlaceLabel => 'Place of birth';
+
+  @override
+  String get birthPlaceHint => 'Search your birth city';
+
+  @override
+  String birthGeoDetected(String lat, String lon, String offset, String zone) {
+    return '✓ Auto-detected: $lat, $lon · $offset ($zone)';
+  }
+
+  @override
+  String get birthTimeUnknown => 'I don\'t know my exact birth time';
+
+  @override
+  String get birthSave => 'Create My Profile ✨';
+
+  @override
+  String get birthFooter => 'You can add family & friends profiles later';
+
+  @override
+  String get placeResolveFailed =>
+      'Couldn\'t load that location. Please pick another.';
+
+  @override
+  String get todaysPanchang => 'TODAY\'S PANCHANG';
+
+  @override
+  String get nakshatra => 'Nakshatra';
+
+  @override
+  String get yoga => 'Yoga';
+
+  @override
+  String get karana => 'Karana';
+
+  @override
+  String get fullPanchang => 'Full Panchang';
+
+  @override
+  String get todayAtAGlance => 'Today at a glance';
+
+  @override
+  String get luckyNumber => 'Lucky Number';
+
+  @override
+  String get luckyColor => 'Lucky Color';
+
+  @override
+  String get direction => 'Direction';
+
+  @override
+  String get todaysPlanet => 'Today\'s Planet';
+
+  @override
+  String get moonPhase => 'Moon Phase';
+
+  @override
+  String get muhurat => 'Muhurat';
+
+  @override
+  String get todaysRemedy => 'TODAY\'S REMEDY';
+
+  @override
+  String get todaysMantra => 'TODAY\'S MANTRA';
+
+  @override
+  String get festivalOfTheDay => 'FESTIVAL OF THE DAY';
+
+  @override
+  String get rituals => 'Rituals';
+
+  @override
+  String get explore => 'Explore';
+
+  @override
+  String get navKundli => 'Kundli';
+
+  @override
+  String get navMatch => 'Match';
+
+  @override
+  String get navReports => 'Reports';
+
+  @override
+  String get navAskAi => 'Ask AI';
+
+  @override
+  String get todaysHoroscope => 'Today\'s Horoscope';
+
+  @override
+  String get allSigns => 'All signs';
+
+  @override
+  String get wisdomForYou => 'Wisdom for you';
+
+  @override
+  String get seeAll => 'See all';
+
+  @override
+  String get continueWithRishiAi => 'Continue with Rishi AI';
+
+  @override
+  String get continueAction => 'Continue';
+
+  @override
+  String get recentReports => 'Recent reports';
+
+  @override
+  String get myReports => 'My reports';
+
+  @override
+  String get navHome => 'Home';
+
+  @override
+  String get navPanchang => 'Panchang';
+
+  @override
+  String get navProfile => 'Profile';
 }

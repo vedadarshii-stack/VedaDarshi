@@ -151,5 +151,231 @@
   "authErrorUnknown": "Something went wrong. Please try again.",
   "@authErrorUnknown": {
     "description": "Generic fallback error message shown for any unclassified auth failure."
+  },
+  "birthTitle": "Your birth details",
+  "@birthTitle": {
+    "description": "Heading of the Birth Details Setup screen."
+  },
+  "birthSubtitle": "These power your Kundli, horoscope and personalised reports. Accuracy matters ✨",
+  "@birthSubtitle": {
+    "description": "Subtitle under the heading on the Birth Details Setup screen."
+  },
+  "birthFullNameLabel": "Full name",
+  "@birthFullNameLabel": {
+    "description": "Uppercased section label above the full name field on the Birth Details Setup screen."
+  },
+  "birthNameHint": "Enter your full name",
+  "@birthNameHint": {
+    "description": "Placeholder hint text in the full name field on the Birth Details Setup screen."
+  },
+  "birthGenderLabel": "Gender",
+  "@birthGenderLabel": {
+    "description": "Uppercased section label above the gender picker on the Birth Details Setup screen."
+  },
+  "genderMale": "Male",
+  "@genderMale": {
+    "description": "Label of the male option in the gender picker on the Birth Details Setup screen."
+  },
+  "genderFemale": "Female",
+  "@genderFemale": {
+    "description": "Label of the female option in the gender picker on the Birth Details Setup screen."
+  },
+  "genderOther": "Other",
+  "@genderOther": {
+    "description": "Label of the third, non-binary option in the gender picker on the Birth Details Setup screen."
+  },
+  "birthDobLabel": "Date of birth",
+  "@birthDobLabel": {
+    "description": "Uppercased section label above the date-of-birth field on the Birth Details Setup screen."
+  },
+  "birthDateHint": "Select date",
+  "@birthDateHint": {
+    "description": "Placeholder hint shown in the date-of-birth field before a date is picked."
+  },
+  "birthTobLabel": "Time of birth",
+  "@birthTobLabel": {
+    "description": "Uppercased section label above the time-of-birth field on the Birth Details Setup screen."
+  },
+  "birthTimeHint": "Select time",
+  "@birthTimeHint": {
+    "description": "Placeholder hint shown in the time-of-birth field before a time is picked."
+  },
+  "birthTimeUnknownValue": "12:00 PM (noon)",
+  "@birthTimeUnknownValue": {
+    "description": "Value shown in the time-of-birth field when the user has checked 'I don't know my exact birth time'."
+  },
+  "birthPlaceLabel": "Place of birth",
+  "@birthPlaceLabel": {
+    "description": "Uppercased section label above the birth-place search field on the Birth Details Setup screen."
+  },
+  "birthPlaceHint": "Search your birth city",
+  "@birthPlaceHint": {
+    "description": "Placeholder hint text in the birth-city search field on the Birth Details Setup screen."
+  },
+  "birthGeoDetected": "✓ Auto-detected: {lat}, {lon} · {offset} ({zone})",
+  "@birthGeoDetected": {
+    "description": "Chip shown once a birth city is selected, confirming the auto-detected coordinates, UTC offset and timezone.",
+    "placeholders": {
+      "lat": {
+        "type": "String",
+        "example": "17.384°N"
+      },
+      "lon": {
+        "type": "String",
+        "example": "78.456°E"
+      },
+      "offset": {
+        "type": "String",
+        "example": "GMT+5:30"
+      },
+      "zone": {
+        "type": "String",
+        "example": "Asia/Kolkata"
+      }
+    }
+  },
+  "birthTimeUnknown": "I don't know my exact birth time",
+  "@birthTimeUnknown": {
+    "description": "Label of the checkbox that lets the user skip entering an exact birth time."
+  },
+  "birthSave": "Create My Profile ✨",
+  "@birthSave": {
+    "description": "Label of the CTA button that saves the entered birth details and proceeds into the app."
+  },
+  "birthFooter": "You can add family & friends profiles later",
+  "@birthFooter": {
+    "description": "Reassurance footnote at the bottom of the Birth Details Setup screen."
+  },
+  "placeResolveFailed": "Couldn't load that location. Please pick another.",
+  "@placeResolveFailed": {
+    "description": "Snackbar shown when resolving a selected place-of-birth suggestion into full coordinates fails (e.g. network error), so the user can pick a different suggestion or retry."
+  },
+  "todaysPanchang": "TODAY'S PANCHANG",
+  "@todaysPanchang": {
+    "description": "Uppercased eyebrow label above the date in the Home Dashboard's Panchang hero card."
+  },
+  "nakshatra": "Nakshatra",
+  "@nakshatra": {
+    "description": "Label of the Nakshatra stat chip in the Home Dashboard's Panchang hero card."
+  },
+  "yoga": "Yoga",
+  "@yoga": {
+    "description": "Label of the Yoga stat chip in the Home Dashboard's Panchang hero card."
+  },
+  "karana": "Karana",
+  "@karana": {
+    "description": "Label of the Karana stat chip in the Home Dashboard's Panchang hero card."
+  },
+  "fullPanchang": "Full Panchang",
+  "@fullPanchang": {
+    "description": "Trailing link label in the Home Dashboard's Panchang hero card, leading to the full Panchang screen."
+  },
+  "todayAtAGlance": "Today at a glance",
+  "@todayAtAGlance": {
+    "description": "Section heading on the Home Dashboard above the grid of quick-fact tiles (lucky number, color, direction, etc.)."
+  },
+  "luckyNumber": "Lucky Number",
+  "@luckyNumber": {
+    "description": "Label of the lucky-number tile in the Home Dashboard's 'Today at a glance' grid."
+  },
+  "luckyColor": "Lucky Color",
+  "@luckyColor": {
+    "description": "Label of the lucky-color tile in the Home Dashboard's 'Today at a glance' grid."
+  },
+  "direction": "Direction",
+  "@direction": {
+    "description": "Label of the favourable-direction tile in the Home Dashboard's 'Today at a glance' grid."
+  },
+  "todaysPlanet": "Today's Planet",
+  "@todaysPlanet": {
+    "description": "Label of the ruling-planet tile in the Home Dashboard's 'Today at a glance' grid."
+  },
+  "moonPhase": "Moon Phase",
+  "@moonPhase": {
+    "description": "Label of the moon-phase tile in the Home Dashboard's 'Today at a glance' grid."
+  },
+  "muhurat": "Muhurat",
+  "@muhurat": {
+    "description": "Label of the auspicious-time tile in the Home Dashboard's 'Today at a glance' grid."
+  },
+  "todaysRemedy": "TODAY'S REMEDY",
+  "@todaysRemedy": {
+    "description": "Uppercased label above today's remedy text on the Home Dashboard."
+  },
+  "todaysMantra": "TODAY'S MANTRA",
+  "@todaysMantra": {
+    "description": "Uppercased label above today's mantra text on the Home Dashboard."
+  },
+  "festivalOfTheDay": "FESTIVAL OF THE DAY",
+  "@festivalOfTheDay": {
+    "description": "Uppercased label above the festival name on the Home Dashboard's festival strip."
+  },
+  "rituals": "Rituals",
+  "@rituals": {
+    "description": "Trailing link label on the Home Dashboard's festival strip, leading to festival ritual details."
+  },
+  "explore": "Explore",
+  "@explore": {
+    "description": "Section heading on the Home Dashboard above the Kundli/Match/Reports/Ask AI shortcut tiles."
+  },
+  "navKundli": "Kundli",
+  "@navKundli": {
+    "description": "Label of the Kundli shortcut tile/nav item (birth chart feature)."
+  },
+  "navMatch": "Match",
+  "@navMatch": {
+    "description": "Label of the Match shortcut tile (Gun Milan compatibility matching feature)."
+  },
+  "navReports": "Reports",
+  "@navReports": {
+    "description": "Label of the Reports shortcut tile (premium astrology reports)."
+  },
+  "navAskAi": "Ask AI",
+  "@navAskAi": {
+    "description": "Label of the Ask AI shortcut tile/nav item (AI Astrologer chat feature)."
+  },
+  "todaysHoroscope": "Today's Horoscope",
+  "@todaysHoroscope": {
+    "description": "Section heading on the Home Dashboard above the daily horoscope teaser card."
+  },
+  "allSigns": "All signs",
+  "@allSigns": {
+    "description": "Action link next to 'Today's Horoscope' on the Home Dashboard, leading to the full horoscope grid."
+  },
+  "wisdomForYou": "Wisdom for you",
+  "@wisdomForYou": {
+    "description": "Section heading on the Home Dashboard above the recommended-articles cards."
+  },
+  "seeAll": "See all",
+  "@seeAll": {
+    "description": "Action link next to 'Wisdom for you' on the Home Dashboard, leading to the full articles list."
+  },
+  "continueWithRishiAi": "Continue with Rishi AI",
+  "@continueWithRishiAi": {
+    "description": "Title of the Home Dashboard's card inviting the user to resume their AI Astrologer conversation."
+  },
+  "continueAction": "Continue",
+  "@continueAction": {
+    "description": "Label of the CTA pill on the Home Dashboard's Rishi AI card."
+  },
+  "recentReports": "Recent reports",
+  "@recentReports": {
+    "description": "Section heading on the Home Dashboard above the recently viewed/generated report cards."
+  },
+  "myReports": "My reports",
+  "@myReports": {
+    "description": "Action link next to 'Recent reports' on the Home Dashboard, leading to the full reports list."
+  },
+  "navHome": "Home",
+  "@navHome": {
+    "description": "Label of the Home tab in the bottom navigation bar."
+  },
+  "navPanchang": "Panchang",
+  "@navPanchang": {
+    "description": "Label of the Panchang tab in the bottom navigation bar."
+  },
+  "navProfile": "Profile",
+  "@navProfile": {
+    "description": "Label of the Profile tab in the bottom navigation bar."
   }
 }

@@ -125,4 +125,165 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get authErrorUnknown => 'कुछ गलत हो गया। कृपया पुनः प्रयास करें।';
+
+  @override
+  String get birthTitle => 'आपका जन्म विवरण';
+
+  @override
+  String get birthSubtitle =>
+      'ये आपकी कुंडली, राशिफल और व्यक्तिगत रिपोर्ट को सटीक बनाते हैं। सटीकता मायने रखती है ✨';
+
+  @override
+  String get birthFullNameLabel => 'पूरा नाम';
+
+  @override
+  String get birthNameHint => 'अपना पूरा नाम दर्ज करें';
+
+  @override
+  String get birthGenderLabel => 'लिंग';
+
+  @override
+  String get genderMale => 'पुरुष';
+
+  @override
+  String get genderFemale => 'महिला';
+
+  @override
+  String get genderOther => 'अन्य';
+
+  @override
+  String get birthDobLabel => 'जन्म तिथि';
+
+  @override
+  String get birthDateHint => 'तारीख चुनें';
+
+  @override
+  String get birthTobLabel => 'जन्म समय';
+
+  @override
+  String get birthTimeHint => 'समय चुनें';
+
+  @override
+  String get birthTimeUnknownValue => 'दोपहर 12:00 बजे';
+
+  @override
+  String get birthPlaceLabel => 'जन्म स्थान';
+
+  @override
+  String get birthPlaceHint => 'अपना जन्म शहर खोजें';
+
+  @override
+  String birthGeoDetected(String lat, String lon, String offset, String zone) {
+    return '✓ स्वतः पहचाना गया: $lat, $lon · $offset ($zone)';
+  }
+
+  @override
+  String get birthTimeUnknown => 'मुझे अपना सटीक जन्म समय नहीं पता';
+
+  @override
+  String get birthSave => 'मेरी प्रोफ़ाइल बनाएं ✨';
+
+  @override
+  String get birthFooter =>
+      'आप बाद में परिवार और दोस्तों की प्रोफ़ाइल जोड़ सकते हैं';
+
+  @override
+  String get placeResolveFailed =>
+      'वह स्थान लोड नहीं हो सका। कृपया कोई और चुनें।';
+
+  @override
+  String get todaysPanchang => 'आज का पंचांग';
+
+  @override
+  String get nakshatra => 'नक्षत्र';
+
+  @override
+  String get yoga => 'योग';
+
+  @override
+  String get karana => 'करण';
+
+  @override
+  String get fullPanchang => 'पूर्ण पंचांग';
+
+  @override
+  String get todayAtAGlance => 'आज एक नज़र में';
+
+  @override
+  String get luckyNumber => 'शुभ अंक';
+
+  @override
+  String get luckyColor => 'शुभ रंग';
+
+  @override
+  String get direction => 'दिशा';
+
+  @override
+  String get todaysPlanet => 'आज का ग्रह';
+
+  @override
+  String get moonPhase => 'चंद्र कला';
+
+  @override
+  String get muhurat => 'मुहूर्त';
+
+  @override
+  String get todaysRemedy => 'आज का उपाय';
+
+  @override
+  String get todaysMantra => 'आज का मंत्र';
+
+  @override
+  String get festivalOfTheDay => 'आज का त्योहार';
+
+  @override
+  String get rituals => 'अनुष्ठान';
+
+  @override
+  String get explore => 'अन्वेषण करें';
+
+  @override
+  String get navKundli => 'कुंडली';
+
+  @override
+  String get navMatch => 'मिलान';
+
+  @override
+  String get navReports => 'रिपोर्ट';
+
+  @override
+  String get navAskAi => 'AI से पूछें';
+
+  @override
+  String get todaysHoroscope => 'आज का राशिफल';
+
+  @override
+  String get allSigns => 'सभी राशियाँ';
+
+  @override
+  String get wisdomForYou => 'आपके लिए ज्ञान';
+
+  @override
+  String get seeAll => 'सभी देखें';
+
+  @override
+  String get continueWithRishiAi => 'ऋषि AI के साथ जारी रखें';
+
+  @override
+  String get continueAction => 'जारी रखें';
+
+  @override
+  String get recentReports => 'हाल की रिपोर्ट';
+
+  @override
+  String get myReports => 'मेरी रिपोर्ट';
+
+  @override
+  String get navHome => 'होम';
+
+  @override
+  String get navPanchang => 'पंचांग';
+
+  @override
+  String get navProfile => 'प्रोफ़ाइल';
 }

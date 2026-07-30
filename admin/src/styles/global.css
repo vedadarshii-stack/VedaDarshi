@@ -1,0 +1,79 @@
+@import './tokens.css';
+@import './tone.css';
+@import './card.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--vd-canvas);
+  color: var(--vd-ink);
+  font-family: var(--vd-font-ui);
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Emoji / symbol glyphs used as placeholder icons in the Figma concept.
+   Replace with a real icon set during implementation (see CLAUDE.md). */
+.vd-glyph {
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', var(--vd-font-ui);
+  line-height: 1;
+}
+
+.vd-om {
+  font-family: var(--vd-font-deva);
+  line-height: 1;
+}
+
+/* Shared scrollbar treatment so long tables do not disturb the layout */
+.vd-scroll {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--vd-border) transparent;
+}

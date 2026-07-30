@@ -1,0 +1,319 @@
+.login {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+  background: var(--vd-surface);
+}
+
+/* ---- Left brand panel (Figma 30:4) ---- */
+.login__brand {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 620px;
+  flex-shrink: 0;
+  padding: 80px 64px;
+  background: var(--vd-grad-brand);
+}
+
+.login__logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.login__logoMark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border: 1.5px solid var(--vd-gold);
+  border-radius: var(--vd-r-pill);
+  background: rgba(212, 175, 55, 0.1);
+  color: var(--vd-gold);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.login__logoText {
+  display: flex;
+  flex-direction: column;
+}
+
+.login__wordmark {
+  font-family: var(--vd-font-heading);
+  font-weight: 700;
+  font-size: 26px;
+  color: #fff;
+}
+
+.login__kicker {
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--vd-gold);
+}
+
+.login__pitch {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 492px;
+}
+
+.login__headline {
+  font-family: var(--vd-font-heading);
+  font-weight: 600;
+  font-size: 40px;
+  line-height: 1.32;
+  color: #fff;
+}
+
+.login__blurb {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--vd-nav-icon);
+}
+
+.login__legal {
+  font-size: 11px;
+  color: #687190;
+}
+
+/* ---- Right form panel (Figma 30:15) ---- */
+.login__panel {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.login__form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 400px;
+  max-width: 100%;
+}
+
+.login__title {
+  font-family: var(--vd-font-heading);
+  font-weight: 600;
+  font-size: 30px;
+  color: var(--vd-ink);
+}
+
+.login__subtitle {
+  margin-top: -8px;
+  font-size: 13.5px;
+  color: var(--vd-muted);
+}
+
+.login__field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.login__label {
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.46px;
+  color: var(--vd-muted);
+}
+
+.login__input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--vd-border);
+  border-radius: var(--vd-r-lg);
+  background: var(--vd-field);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.login__input:focus-within {
+  border-color: var(--vd-saffron);
+  box-shadow: 0 0 0 3px rgba(232, 114, 12, 0.12);
+}
+
+.login__input input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--vd-ink);
+}
+
+.login__reveal {
+  font-size: 13px;
+  color: var(--vd-placeholder);
+}
+
+.login__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.login__remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--vd-muted);
+  cursor: pointer;
+}
+
+.login__remember input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.login__checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border: 1px solid var(--vd-border);
+  border-radius: 5px;
+  background: var(--vd-surface);
+}
+
+.login__remember input:checked + .login__checkbox {
+  border-color: var(--vd-saffron);
+  background: var(--vd-saffron);
+}
+
+.login__remember input:checked + .login__checkbox::after {
+  content: '✓';
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.login__forgot {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--vd-saffron);
+}
+
+.login__error {
+  padding: 10px 12px;
+  border-radius: var(--vd-r-md);
+  background: var(--vd-rose-bg);
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--vd-rose);
+}
+
+.login__submit {
+  padding: 15px;
+  border-radius: var(--vd-r-lg);
+  background: var(--vd-grad-saffron);
+  box-shadow: var(--vd-shadow-cta);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #fff;
+  transition:
+    transform 0.12s ease,
+    filter 0.15s ease;
+}
+
+.login__submit:hover {
+  filter: brightness(1.05);
+}
+
+.login__submit:active {
+  transform: scale(0.985);
+}
+
+.login__submit:disabled,
+.login__google:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* "or" rule between the password form and the Google button. */
+.login__divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--vd-placeholder);
+}
+
+.login__divider::before,
+.login__divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--vd-border);
+}
+
+.login__google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 13px;
+  border: 1px solid var(--vd-border);
+  border-radius: var(--vd-r-lg);
+  background: var(--vd-surface);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--vd-ink);
+}
+
+.login__googleMark {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+
+.login__google:hover:not(:disabled) {
+  border-color: var(--vd-saffron);
+  color: var(--vd-saffron-text);
+}
+
+.login__note {
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--vd-placeholder);
+}
+
+/* Temporary escape hatch while the console is still a design-review artefact. */
+.login__concept {
+  text-align: center;
+  font-size: 11px;
+  color: var(--vd-placeholder);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.login__concept:hover {
+  color: var(--vd-muted);
+}
+
+@media (max-width: 1080px) {
+  .login__brand {
+    width: 45%;
+    padding: 48px 40px;
+  }
+
+  .login__headline {
+    font-size: 32px;
+  }
+}

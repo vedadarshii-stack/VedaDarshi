@@ -1,0 +1,42 @@
+/* Tinted-circle palette shared by stat-card icons and user avatars.
+   Set on a container; children inherit via currentColor. */
+
+.tone {
+  background: var(--tone-bg);
+  color: var(--tone-fg);
+}
+
+.tone--saffron {
+  --tone-bg: var(--vd-saffron-tint);
+  --tone-fg: var(--vd-saffron-text);
+}
+
+.tone--gold {
+  --tone-bg: var(--vd-gold-tint);
+  --tone-fg: var(--vd-gold-text);
+}
+
+.tone--purple {
+  --tone-bg: var(--vd-purple-bg);
+  --tone-fg: var(--vd-purple);
+}
+
+.tone--green {
+  --tone-bg: var(--vd-green-bg);
+  --tone-fg: var(--vd-green);
+}
+
+.tone--blue {
+  --tone-bg: var(--vd-blue-bg);
+  --tone-fg: var(--vd-blue);
+}
+
+.tone--rose {
+  --tone-bg: var(--vd-rose-bg);
+  --tone-fg: var(--vd-rose);
+}
+
+.tone--neutral {
+  --tone-bg: var(--vd-neutral-bg);
+  --tone-fg: var(--vd-muted);
+}
