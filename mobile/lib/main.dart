@@ -95,11 +95,46 @@ void main() async {
   );
 }
 
-class MainApp extends ConsumerWidget {
+class MainApp extends ConsumerStatefulWidget {
   const MainApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends ConsumerState<MainApp> {
+  /// The brightness the tree was last BUILT with, so [build] can detect an
+  /// actual light↔dark flip (as opposed to any other rebuild) and force the
+  /// repaint described in [_markEntireTreeDirty].
+  Brightness? _builtBrightness;
+
+  /// Marks every element below this one as needing rebuild.
+  ///
+  /// **Why this is necessary:** `AppColors` is process-global mutable state
+  /// (see its doc comment) — a widget picks up the new palette only when its
+  /// own `build()` re-runs. Flipping `themeMode` rebuilds `MaterialApp` and
+  /// everything that depends on `Theme.of(context)`, but almost nothing in
+  /// this app does; screens read `AppColors.*` directly. So the widgets that
+  /// happened to be listening to `themeControllerProvider` repainted in the
+  /// new palette while every other card/label/background kept the colors it
+  /// was last painted with, producing a half-light/half-dark screen (the
+  /// Profile "Appearance" row rendered its label in light-mode ink on a
+  /// still-dark card).
+  ///
+  /// `markNeedsBuild` only re-runs `build()`; `State` objects, scroll
+  /// positions and the whole navigation stack are preserved — which is why
+  /// this is used instead of re-keying the subtree.
+  void _markEntireTreeDirty() {
+    void mark(Element element) {
+      element.markNeedsBuild();
+      element.visitChildren(mark);
+    }
+
+    (context as Element).visitChildren(mark);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final locale = ref.watch(localeControllerProvider);
     final themeMode = ref.watch(themeControllerProvider);
 
@@ -115,6 +150,17 @@ class MainApp extends ConsumerWidget {
       ThemeMode.system => MediaQuery.platformBrightnessOf(context),
     };
     AppColors.applyBrightness(effectiveBrightness);
+
+    if (_builtBrightness != null && _builtBrightness != effectiveBrightness) {
+      // Deferred to a post-frame callback because the element tree is being
+      // rebuilt right now and marking descendants dirty mid-build is not
+      // allowed. The one intermediate frame this costs is the frame
+      // MaterialApp's own AnimatedTheme is already cross-fading through.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _markEntireTreeDirty();
+      });
+    }
+    _builtBrightness = effectiveBrightness;
 
     return MaterialApp(
       // Lets a notification tap push a route from outside the widget tree

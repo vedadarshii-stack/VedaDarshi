@@ -833,7 +833,23 @@ class _AppearanceRow extends ConsumerWidget {
       subtitle: subtitle,
       locale: locale,
       onTap: () => toggle(!isDarkActive),
-      trailing: Switch(value: isDarkActive, onChanged: toggle),
+      // Colors are set explicitly rather than left to the Material 3
+      // defaults, which derive from the saffron-seeded ColorScheme and came
+      // out as a washed cream track with a grey-brown thumb — off-brand in
+      // both themes, and near-invisible against a dark card.
+      trailing: Switch(
+        value: isDarkActive,
+        onChanged: toggle,
+        activeThumbColor: AppColors.surface,
+        activeTrackColor: AppColors.saffron,
+        inactiveThumbColor: AppColors.muted,
+        inactiveTrackColor: AppColors.cream,
+        trackOutlineColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? AppColors.saffron
+              : AppColors.cardBorder,
+        ),
+      ),
     );
   }
 }
