@@ -40,9 +40,7 @@ class _NorthIndianChartPainter extends CustomPainter {
   final List<ChartPlanet> planets;
   final Map<int, List<ChartPlanet>> _byHouse;
 
-  static Map<int, List<ChartPlanet>> _groupByHouse(
-    List<ChartPlanet> planets,
-  ) {
+  static Map<int, List<ChartPlanet>> _groupByHouse(List<ChartPlanet> planets) {
     final map = <int, List<ChartPlanet>>{};
     for (final planet in planets) {
       map.putIfAbsent(planet.house, () => []).add(planet);
@@ -169,12 +167,17 @@ class _NorthIndianChartPainter extends CustomPainter {
 
     for (var i = 0; i < housePlanets.length; i++) {
       if (i != 0) {
-        spans.add(TextSpan(text: ' ', style: _planetStyle(fontSize, AppColors.ink)));
+        spans.add(
+          TextSpan(text: ' ', style: _planetStyle(fontSize, AppColors.ink)),
+        );
       }
       final planet = housePlanets[i];
       final color = planet.code.chartColor;
       spans.add(
-        TextSpan(text: planet.code.shortLabel, style: _planetStyle(fontSize, color)),
+        TextSpan(
+          text: planet.code.shortLabel,
+          style: _planetStyle(fontSize, color),
+        ),
       );
       if (planet.isExalted) {
         spans.add(_exaltedMarkerSpan(fontSize, color));
@@ -190,11 +193,10 @@ class _NorthIndianChartPainter extends CustomPainter {
     )..layout();
 
     final verticalOffset = size.width * 0.13;
-    final dy = _upperHalfHouses.contains(house) ? -verticalOffset : verticalOffset;
-    final center = Offset(
-      anchor.dx * size.width,
-      anchor.dy * size.height + dy,
-    );
+    final dy = _upperHalfHouses.contains(house)
+        ? -verticalOffset
+        : verticalOffset;
+    final center = Offset(anchor.dx * size.width, anchor.dy * size.height + dy);
     painter.paint(
       canvas,
       center - Offset(painter.width / 2, painter.height / 2),
@@ -248,9 +250,10 @@ class _NorthIndianChartPainter extends CustomPainter {
   InlineSpan _retrogradeMarkerSpan(double fontSize, Color color) {
     return TextSpan(
       text: 'R',
-      style: _planetStyle(fontSize * 0.72, color).copyWith(
-        fontStyle: FontStyle.italic,
-      ),
+      style: _planetStyle(
+        fontSize * 0.72,
+        color,
+      ).copyWith(fontStyle: FontStyle.italic),
     );
   }
 

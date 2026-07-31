@@ -869,8 +869,13 @@ class AppLocalizationsTa extends AppLocalizations {
   String get profileAppearance => 'தோற்றம்';
 
   @override
-  String get profileDarkModeComingSoon =>
-      'இருண்ட பயன்முறை எதிர்கால புதுப்பிப்பில் வரும்';
+  String get profileAppearanceSystem => 'கணினி · சாதனத்தைப் பின்பற்றும்';
+
+  @override
+  String get profileAppearanceLight => 'வெளிச்சம்';
+
+  @override
+  String get profileAppearanceDark => 'இருள்';
 
   @override
   String get profileNotifications => 'அறிவிப்புகள்';

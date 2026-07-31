@@ -10,9 +10,20 @@ import 'package:timezone/data/latest.dart' as tz_data;
 import 'core/locale/locale_controller.dart';
 import 'core/notifications/push_notification_service.dart';
 import 'core/theme/app_colors.dart';
+import 'core/theme/app_palette.dart';
+import 'core/theme/theme_controller.dart';
 import 'features/startup/root_gate.dart';
 import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
+
+/// Elevated dark-mode surface (Card/Dialog/BottomSheet defaults) — the
+/// "card/white surfaces ≈ #161C2A" reference value from
+/// `app_palette.dart`'s doc comment. Not an [AppColors]/[AppPalette] member
+/// itself (none of the app's 81 brand tokens represent a generic "card
+/// surface" — most screens style their own cards explicitly), so it's kept
+/// local to the one place ([MainApp]'s `darkTheme`) that needs it for
+/// Flutter's own Material widget defaults.
+const Color _darkElevatedSurface = Color(0xFF161C2A);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,9 +39,7 @@ void main() async {
     debugPrint('main: .env not loaded ($e) — continuing without it');
   }
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // Offline persistence is what lets a birth-profile Firestore write survive
   // a bad connection at save time — it lands in Firestore's local cache
   // immediately and is replayed to the server automatically once
@@ -53,7 +62,9 @@ void main() async {
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
     await PushNotificationService.instance.initialize();
   } catch (e) {
-    debugPrint('main: push notification setup failed ($e) — continuing without it');
+    debugPrint(
+      'main: push notification setup failed ($e) — continuing without it',
+    );
   }
 
   // All brand/UI fonts are bundled in assets/google_fonts/ (see AppFonts).
@@ -72,6 +83,11 @@ void main() async {
   // language while SharedPreferences loads asynchronously later.
   final savedLocale = await loadSavedLocale();
 
+  // Same idea for the theme (light/dark/system) — read before the first
+  // frame so a returning user never sees a flash of the wrong theme while
+  // SharedPreferences loads asynchronously later (see theme_controller.dart).
+  final savedThemeMode = await loadSavedThemeMode();
+
   runApp(
     ProviderScope(
       overrides: [
@@ -79,6 +95,9 @@ void main() async {
           localeControllerProvider.overrideWith(
             () => LocaleController(savedLocale),
           ),
+        themeControllerProvider.overrideWith(
+          () => ThemeController(savedThemeMode),
+        ),
       ],
       child: const MainApp(),
     ),
@@ -91,6 +110,21 @@ class MainApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final locale = ref.watch(localeControllerProvider);
+    final themeMode = ref.watch(themeControllerProvider);
+
+    // Resolve which brightness is ACTUALLY about to render (ThemeMode.system
+    // depends on the platform) and point AppColors at the matching palette
+    // BEFORE this build's widget tree is constructed. Every AppColors.*
+    // getter reads from that palette, so this is what keeps ~639 existing
+    // call sites in sync with `theme`/`darkTheme` below without threading
+    // a BuildContext through any of them — see AppColors' doc comment.
+    final effectiveBrightness = switch (themeMode) {
+      ThemeMode.light => Brightness.light,
+      ThemeMode.dark => Brightness.dark,
+      ThemeMode.system => MediaQuery.platformBrightnessOf(context),
+    };
+    AppColors.applyBrightness(effectiveBrightness);
+
     return MaterialApp(
       // Lets a notification tap push a route from outside the widget tree
       // (see PushNotificationService._navigateFromData) — there is no
@@ -104,8 +138,25 @@ class MainApp extends ConsumerWidget {
       locale: locale,
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.saffron),
+        brightness: Brightness.light,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppPalette.light.saffron,
+          brightness: Brightness.light,
+        ),
+        scaffoldBackgroundColor: AppPalette.light.cream,
       ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppPalette.dark.saffron,
+          brightness: Brightness.dark,
+        ).copyWith(surface: _darkElevatedSurface),
+        scaffoldBackgroundColor: AppPalette.dark.cream,
+        cardColor: _darkElevatedSurface,
+        dividerColor: AppPalette.dark.cardBorder,
+      ),
+      themeMode: themeMode,
       // RootGate — not SplashScreen — so a returning user resumes straight
       // into the app instead of replaying onboarding on every launch.
       home: const RootGate(),

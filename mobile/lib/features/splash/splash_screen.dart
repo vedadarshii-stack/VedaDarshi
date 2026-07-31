@@ -111,7 +111,7 @@ class _SplashScreenState extends State<SplashScreen>
     final locale = Localizations.localeOf(context);
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.navyGradient),
+        decoration: BoxDecoration(gradient: AppColors.navyGradient),
         child: FadeTransition(
           opacity: _fadeAnimation,
           child: SlideTransition(
@@ -175,9 +175,7 @@ class _Dot extends StatelessWidget {
       width: isActive ? 20 : 8,
       height: 8,
       decoration: BoxDecoration(
-        color: isActive
-            ? AppColors.gold
-            : Colors.white.withValues(alpha: 0.3),
+        color: isActive ? AppColors.gold : Colors.white.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(4),
       ),
     );
@@ -366,7 +364,7 @@ class _GetStartedButton extends StatelessWidget {
         onTap: onTap,
         child: Ink(
           padding: const EdgeInsets.symmetric(horizontal: 44, vertical: 14),
-          decoration: const BoxDecoration(gradient: AppColors.saffronGradient),
+          decoration: BoxDecoration(gradient: AppColors.saffronGradient),
           child: Text(
             label,
             style: AppFonts.body(

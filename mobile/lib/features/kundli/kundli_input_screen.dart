@@ -146,11 +146,7 @@ class _Header extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.cardBorder),
               ),
-              child: const Icon(
-                Icons.arrow_back,
-                size: 18,
-                color: AppColors.ink,
-              ),
+              child: Icon(Icons.arrow_back, size: 18, color: AppColors.ink),
             ),
           ),
         ),
@@ -213,7 +209,11 @@ class _ProfileList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _ProfileCard(name: profileName, summary: profileSummary, locale: locale),
+        _ProfileCard(
+          name: profileName,
+          summary: profileSummary,
+          locale: locale,
+        ),
         const SizedBox(height: 10),
         _AddFamilyFriendButton(l10n: l10n, locale: locale),
       ],
@@ -258,7 +258,7 @@ class _ProfileCard extends StatelessWidget {
             width: 44,
             height: 44,
             alignment: Alignment.center,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: AppColors.navyHeroGradient,
             ),
@@ -331,7 +331,7 @@ class _AddFamilyFriendButton extends StatelessWidget {
         // rationale (why this screen doesn't fabricate a second profile).
         onTap: () {},
         child: CustomPaint(
-          painter: const _DashedBorderPainter(color: AppColors.otpBorderFilled),
+          painter: _DashedBorderPainter(color: AppColors.otpBorderFilled),
           child: Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 13),
@@ -339,7 +339,7 @@ class _AddFamilyFriendButton extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.add, size: 16, color: AppColors.saffron),
+                Icon(Icons.add, size: 16, color: AppColors.saffron),
                 const SizedBox(width: 6),
                 Text(
                   l10n.addFamilyFriend,
@@ -513,7 +513,9 @@ class _ChartStyleCard extends StatelessWidget {
               Icon(
                 icon,
                 size: 22,
-                color: isSelected ? AppColors.genderSelectedText : AppColors.navInactive,
+                color: isSelected
+                    ? AppColors.genderSelectedText
+                    : AppColors.navInactive,
               ),
               const SizedBox(height: 4),
               Padding(
@@ -539,7 +541,11 @@ class _ChartStyleCard extends StatelessWidget {
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: AppFonts.body(locale, fontSize: 10.5, color: AppColors.hint),
+                  style: AppFonts.body(
+                    locale,
+                    fontSize: 10.5,
+                    color: AppColors.hint,
+                  ),
                 ),
               ),
             ],
@@ -569,12 +575,16 @@ class _InfoNote extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.info_outline, size: 14, color: AppColors.tileBlueFg),
+          Icon(Icons.info_outline, size: 14, color: AppColors.tileBlueFg),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               l10n.kundliCalcNote,
-              style: AppFonts.body(locale, fontSize: 11, color: AppColors.tileBlueFg),
+              style: AppFonts.body(
+                locale,
+                fontSize: 11,
+                color: AppColors.tileBlueFg,
+              ),
             ),
           ),
         ],
@@ -629,7 +639,7 @@ class _GenerateKundliButton extends StatelessWidget {
           },
           child: Ink(
             padding: const EdgeInsets.symmetric(vertical: 17),
-            decoration: const BoxDecoration(gradient: AppColors.saffronGradient),
+            decoration: BoxDecoration(gradient: AppColors.saffronGradient),
             child: Center(
               child: Text(
                 '${l10n.generateKundli} 🪔',

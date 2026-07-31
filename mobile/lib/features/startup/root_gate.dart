@@ -63,7 +63,7 @@ class _StartupScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: DecoratedBox(
         decoration: BoxDecoration(gradient: AppColors.navyGradient),
         child: Center(child: AppLogo(size: 148)),

@@ -95,8 +95,17 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
   }
 
   Future<void> _loadPermissionStatus() async {
-    final service = ref.read(pushNotificationServiceProvider);
-    final status = await service.currentAuthorizationStatus();
+    // Also guarded — see _requestPermissionIfNeeded. This runs on app resume
+    // too, so an unavailable Firebase must not crash a screen the user is
+    // already looking at.
+    final AuthorizationStatus status;
+    try {
+      final service = ref.read(pushNotificationServiceProvider);
+      status = await service.currentAuthorizationStatus();
+    } catch (e) {
+      debugPrint('NotificationsScreen: permission status unavailable: $e');
+      return;
+    }
     if (!mounted) return;
     final enabled =
         status == AuthorizationStatus.authorized ||
@@ -110,16 +119,25 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
   }
 
   Future<void> _requestPermissionIfNeeded() async {
-    final service = ref.read(pushNotificationServiceProvider);
-    final status = await service.currentAuthorizationStatus();
-    if (status != AuthorizationStatus.notDetermined) {
-      await _loadPermissionStatus();
-      return;
+    // Guarded: reading the push service touches FirebaseMessaging, which
+    // throws if Firebase isn't initialised (its setup in main() is itself
+    // try/catch'd, so that IS reachable on a device with a bad config). A
+    // missing permission prompt is a degraded state, never a reason to take
+    // the whole screen down — the list itself doesn't need Firebase.
+    try {
+      final service = ref.read(pushNotificationServiceProvider);
+      final status = await service.currentAuthorizationStatus();
+      if (status != AuthorizationStatus.notDetermined) {
+        await _loadPermissionStatus();
+        return;
+      }
+      final granted = await service.requestPermission();
+      if (!mounted) return;
+      setState(() => _notificationsEnabled = granted);
+      if (!granted) await _refreshPermanentlyDeniedFlag();
+    } catch (e) {
+      debugPrint('NotificationsScreen: permission check unavailable: $e');
     }
-    final granted = await service.requestPermission();
-    if (!mounted) return;
-    setState(() => _notificationsEnabled = granted);
-    if (!granted) await _refreshPermanentlyDeniedFlag();
   }
 
   Future<void> _refreshPermanentlyDeniedFlag() async {
@@ -251,11 +269,7 @@ class _Header extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.cardBorder),
               ),
-              child: const Icon(
-                Icons.arrow_back,
-                size: 18,
-                color: AppColors.ink,
-              ),
+              child: Icon(Icons.arrow_back, size: 18, color: AppColors.ink),
             ),
           ),
         ),
@@ -407,7 +421,7 @@ class _NotificationCard extends StatelessWidget {
                           Container(
                             width: 8,
                             height: 8,
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: AppColors.saffron,
                             ),

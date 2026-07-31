@@ -88,9 +88,7 @@ class GooglePlacesSearch implements PlaceSearch {
     try {
       final response = await http
           .post(
-            Uri.parse(
-              'https://places.googleapis.com/v1/places:autocomplete',
-            ),
+            Uri.parse('https://places.googleapis.com/v1/places:autocomplete'),
             headers: {
               'Content-Type': 'application/json',
               'X-Goog-Api-Key': _apiKey,

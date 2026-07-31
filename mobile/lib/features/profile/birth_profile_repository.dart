@@ -194,9 +194,7 @@ class BirthProfileRepository {
   }
 }
 
-final birthProfileRepositoryProvider = Provider<BirthProfileRepository>((
-  ref,
-) {
+final birthProfileRepositoryProvider = Provider<BirthProfileRepository>((ref) {
   return BirthProfileRepository(
     firestore: () => FirebaseFirestore.instance,
     userRepository: ref.watch(userRepositoryProvider),

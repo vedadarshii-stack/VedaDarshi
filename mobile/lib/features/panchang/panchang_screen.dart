@@ -160,7 +160,7 @@ class _PanchangHeader extends StatelessWidget {
       width: double.infinity,
       height: isCompact ? 170 : 190,
       padding: EdgeInsets.fromLTRB(20, topPadding, 20, 0),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: AppColors.navyHeroGradient,
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
       ),
@@ -736,7 +736,7 @@ class _FestivalCard extends StatelessWidget {
           onTap: () {},
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
@@ -796,7 +796,7 @@ class _FestivalCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Icon(
+                      Icon(
                         Icons.arrow_forward_ios,
                         size: 10,
                         color: AppColors.gold,
@@ -911,11 +911,7 @@ class _ViewAllMuhuratLink extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 4),
-              const Icon(
-                Icons.arrow_forward_ios,
-                size: 10,
-                color: AppColors.saffron,
-              ),
+              Icon(Icons.arrow_forward_ios, size: 10, color: AppColors.saffron),
             ],
           ),
         ),
@@ -942,7 +938,7 @@ class _OfflineBadge extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
+          Icon(
             Icons.cloud_done_outlined,
             size: 12,
             color: AppColors.tileGoldFg,

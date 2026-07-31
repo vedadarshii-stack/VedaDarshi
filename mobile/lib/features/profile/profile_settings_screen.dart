@@ -8,6 +8,7 @@ import '../../core/motion/app_motion.dart';
 import '../../core/notifications/push_notification_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
+import '../../core/theme/theme_controller.dart';
 import '../../core/widgets/app_bottom_nav.dart';
 import '../../l10n/app_localizations.dart';
 import '../kundli/kundli_static_data.dart';
@@ -77,9 +78,11 @@ const List<_LanguageOption> _languageOptions = [
 ///    clear+invalidate step is the exact bug `projects/CLAUDE.md` warns
 ///    about — a signed-out user routed straight back to Home off the stale
 ///    cached profile.
-///  - The dark-mode switch is a genuine NO-OP (see [_AppearanceRow]) — the
-///    app has no dark theme yet (a documented V1 requirement, still
-///    outstanding); it never pretends to toggle anything.
+///  - The dark-mode switch is REAL (see [_AppearanceRow]) — it reflects
+///    whether dark is currently active (resolving [ThemeMode.system] via the
+///    platform brightness) and toggling it sets an explicit
+///    [ThemeMode.light]/[ThemeMode.dark] via `themeControllerProvider`,
+///    exactly like the language pills call `localeControllerProvider`.
 ///  - "My Reports" routes to [PremiumReportsScreen], "Restore Purchases"
 ///    routes to [SubscriptionPaywallScreen] (which has its own real restore
 ///    action in its top bar), and "Notifications" routes to
@@ -573,7 +576,7 @@ class _BirthProfilesRow extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 4),
-              const Icon(
+              Icon(
                 Icons.arrow_forward_ios,
                 size: 12,
                 color: AppColors.otpBorderFilled,
@@ -775,7 +778,7 @@ class _MenuRow extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   trailing ??
-                      const Icon(
+                      Icon(
                         Icons.arrow_forward_ios,
                         size: 14,
                         color: AppColors.otpBorderFilled,
@@ -791,33 +794,46 @@ class _MenuRow extends StatelessWidget {
   }
 }
 
-/// "Appearance" (dark mode) row (Figma node 29:30). The app has NO dark
-/// theme yet — a documented V1 requirement (see `projects/CLAUDE.md`'s
-/// UI/UX direction section) that's still outstanding. Both the row tap and
-/// the switch are genuine no-ops: the switch always renders "off" and never
-/// flips, and tapping either just explains why via a snackbar, rather than
-/// silently pretending to toggle a theme that doesn't exist.
-class _AppearanceRow extends StatelessWidget {
+/// "Appearance" (dark mode) row (Figma node 29:30). Genuinely functional:
+/// the switch reflects whether dark is currently ACTIVE (resolving
+/// [ThemeMode.system] via the platform brightness, since "system" itself
+/// isn't an on/off state) and both the switch and tapping the row set an
+/// explicit [ThemeMode.light]/[ThemeMode.dark] via `themeControllerProvider`
+/// — mirroring how the language pills elsewhere on this screen call
+/// `localeControllerProvider.notifier.setLocale`.
+class _AppearanceRow extends ConsumerWidget {
   const _AppearanceRow({required this.l10n, required this.locale});
 
   final AppLocalizations l10n;
   final Locale locale;
 
-  void _showComingSoon(BuildContext context) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(l10n.profileDarkModeComingSoon)));
-  }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeControllerProvider);
+    final isDarkActive = switch (themeMode) {
+      ThemeMode.dark => true,
+      ThemeMode.light => false,
+      ThemeMode.system =>
+        MediaQuery.platformBrightnessOf(context) == Brightness.dark,
+    };
+    final subtitle = switch (themeMode) {
+      ThemeMode.system => l10n.profileAppearanceSystem,
+      ThemeMode.light => l10n.profileAppearanceLight,
+      ThemeMode.dark => l10n.profileAppearanceDark,
+    };
+    void toggle(bool wantsDark) {
+      ref
+          .read(themeControllerProvider.notifier)
+          .setThemeMode(wantsDark ? ThemeMode.dark : ThemeMode.light);
+    }
+
     return _MenuRow(
       emoji: '🌗',
       title: l10n.profileAppearance,
-      subtitle: ProfileSettingsStaticData.appearanceSummary,
+      subtitle: subtitle,
       locale: locale,
-      onTap: () => _showComingSoon(context),
-      trailing: const Switch(value: false, onChanged: null),
+      onTap: () => toggle(!isDarkActive),
+      trailing: Switch(value: isDarkActive, onChanged: toggle),
     );
   }
 }

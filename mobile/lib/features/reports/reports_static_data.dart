@@ -43,7 +43,7 @@ class AstrologyReport {
 abstract final class ReportsStaticData {
   /// The 7 reports shown in the design, in the exact order approved in
   /// Figma node 22:14.
-  static const List<AstrologyReport> reports = [
+  static final List<AstrologyReport> reports = [
     AstrologyReport(
       id: 'career',
       emoji: '💼',

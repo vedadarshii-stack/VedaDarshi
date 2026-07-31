@@ -77,10 +77,6 @@ abstract final class SubscriptionStaticData {
       badge: 'MOST POPULAR · SAVE 44%',
       isRecommended: true,
     ),
-    SubscriptionPlan(
-      id: PlanId.lifetime,
-      price: '₹4,999',
-      ctaPrice: '₹4,999',
-    ),
+    SubscriptionPlan(id: PlanId.lifetime, price: '₹4,999', ctaPrice: '₹4,999'),
   ];
 }

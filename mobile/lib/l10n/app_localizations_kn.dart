@@ -867,8 +867,13 @@ class AppLocalizationsKn extends AppLocalizations {
   String get profileAppearance => 'ಗೋಚರತೆ';
 
   @override
-  String get profileDarkModeComingSoon =>
-      'ಡಾರ್ಕ್ ಮೋಡ್ ಮುಂಬರುವ ಅಪ್‌ಡೇಟ್‌ನಲ್ಲಿ ಬರಲಿದೆ';
+  String get profileAppearanceSystem => 'ಸಿಸ್ಟಂ · ಸಾಧನವನ್ನು ಅನುಸರಿಸುತ್ತದೆ';
+
+  @override
+  String get profileAppearanceLight => 'ಬೆಳಕು';
+
+  @override
+  String get profileAppearanceDark => 'ಕತ್ತಲು';
 
   @override
   String get profileNotifications => 'ಅಧಿಸೂಚನೆಗಳು';

@@ -155,11 +155,7 @@ class _Header extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.cardBorder),
               ),
-              child: const Icon(
-                Icons.arrow_back,
-                size: 18,
-                color: AppColors.ink,
-              ),
+              child: Icon(Icons.arrow_back, size: 18, color: AppColors.ink),
             ),
           ),
         ),
@@ -185,7 +181,11 @@ class _Header extends StatelessWidget {
                 '${l10n.lagnaKundli} · $styleLabel',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: AppFonts.body(locale, fontSize: 11, color: AppColors.muted),
+                style: AppFonts.body(
+                  locale,
+                  fontSize: 11,
+                  color: AppColors.muted,
+                ),
               ),
             ],
           ),
@@ -222,11 +222,7 @@ class _PdfPill extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
-                Icons.download_rounded,
-                size: 12,
-                color: Colors.white,
-              ),
+              const Icon(Icons.download_rounded, size: 12, color: Colors.white),
               const SizedBox(width: 5),
               Text(
                 l10n.pdf,
@@ -286,9 +282,9 @@ class _SectionTabs extends StatelessWidget {
             isSelected: false,
             // Premium-gated: opens the paywall. The Dasha view itself still
             // doesn't exist, so this is the paywall rather than a tab switch.
-            onTap: () => Navigator.of(context).push(
-              fadeThroughRoute(const SubscriptionPaywallScreen()),
-            ),
+            onTap: () => Navigator.of(
+              context,
+            ).push(fadeThroughRoute(const SubscriptionPaywallScreen())),
           ),
         ),
         const SizedBox(width: 8),
@@ -298,9 +294,9 @@ class _SectionTabs extends StatelessWidget {
             locale: locale,
             isSelected: false,
             // Same premium gating as Dasha above.
-            onTap: () => Navigator.of(context).push(
-              fadeThroughRoute(const SubscriptionPaywallScreen()),
-            ),
+            onTap: () => Navigator.of(
+              context,
+            ).push(fadeThroughRoute(const SubscriptionPaywallScreen())),
           ),
         ),
       ],
@@ -335,9 +331,7 @@ class _TabPill extends StatelessWidget {
           decoration: BoxDecoration(
             color: isSelected ? AppColors.saffron : Colors.white,
             borderRadius: BorderRadius.circular(999),
-            border: isSelected
-                ? null
-                : Border.all(color: AppColors.cardBorder),
+            border: isSelected ? null : Border.all(color: AppColors.cardBorder),
           ),
           child: Text(
             label,
@@ -418,7 +412,9 @@ class _StyleTogglePill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final contentColor = isSelected ? AppColors.genderSelectedText : AppColors.muted;
+    final contentColor = isSelected
+        ? AppColors.genderSelectedText
+        : AppColors.muted;
 
     return Semantics(
       button: true,
@@ -588,7 +584,9 @@ class _KeyPlanetsLegend extends StatelessWidget {
             children: [
               for (var i = 0; i < codes.length; i++) ...[
                 if (i != 0) const SizedBox(width: 6),
-                Expanded(child: _LegendChip(code: codes[i], locale: locale)),
+                Expanded(
+                  child: _LegendChip(code: codes[i], locale: locale),
+                ),
               ],
             ],
           ),
@@ -749,11 +747,7 @@ class _DoshaBanner extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
-            Icons.check_rounded,
-            size: 14,
-            color: AppColors.tileGreenFg,
-          ),
+          Icon(Icons.check_rounded, size: 14, color: AppColors.tileGreenFg),
           const SizedBox(width: 10),
           Expanded(
             child: Text(

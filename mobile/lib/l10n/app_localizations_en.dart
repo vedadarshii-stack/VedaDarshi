@@ -861,8 +861,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileAppearance => 'Appearance';
 
   @override
-  String get profileDarkModeComingSoon =>
-      'Dark mode is coming in a future update';
+  String get profileAppearanceSystem => 'System · follows device';
+
+  @override
+  String get profileAppearanceLight => 'Light';
+
+  @override
+  String get profileAppearanceDark => 'Dark';
 
   @override
   String get profileNotifications => 'Notifications';

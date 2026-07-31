@@ -229,7 +229,7 @@ class _AuthorRow extends StatelessWidget {
           width: 36,
           height: 36,
           alignment: Alignment.center,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: AppColors.genderSelectedBg,
           ),
@@ -286,10 +286,7 @@ class _AuthorRow extends StatelessWidget {
             // (see projects/CLAUDE.md).
             onTap: () {},
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 7,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
               decoration: BoxDecoration(
                 color: AppColors.tileBlueBg,
                 borderRadius: BorderRadius.circular(999),
@@ -300,7 +297,7 @@ class _AuthorRow extends StatelessWidget {
                   // The design's "▶" is a bare typographic symbol with no
                   // glyph in our bundled fonts — replaced with a Material
                   // icon per the project's ICON RULE.
-                  const Icon(
+                  Icon(
                     Icons.play_arrow_rounded,
                     size: 14,
                     color: AppColors.tileBlueFg,
@@ -359,9 +356,7 @@ class _ArticleBlockView extends StatelessWidget {
         children: [
           for (var i = 0; i < items.length; i++)
             Padding(
-              padding: EdgeInsets.only(
-                bottom: i == items.length - 1 ? 0 : 6,
-              ),
+              padding: EdgeInsets.only(bottom: i == items.length - 1 ? 0 : 6),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -418,13 +413,12 @@ class _ArticleBlockView extends StatelessWidget {
               Expanded(
                 child: Text(
                   text,
-                  style:
-                      AppFonts.body(
-                        isDevanagari ? const Locale('hi') : locale,
-                        fontSize: 12.5,
-                        color: AppColors.mantraBody,
-                        height: 1.6,
-                      ).copyWith(fontStyle: FontStyle.italic),
+                  style: AppFonts.body(
+                    isDevanagari ? const Locale('hi') : locale,
+                    fontSize: 12.5,
+                    color: AppColors.mantraBody,
+                    height: 1.6,
+                  ).copyWith(fontStyle: FontStyle.italic),
                 ),
               ),
             ],

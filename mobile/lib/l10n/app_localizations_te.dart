@@ -868,8 +868,13 @@ class AppLocalizationsTe extends AppLocalizations {
   String get profileAppearance => 'రూపం';
 
   @override
-  String get profileDarkModeComingSoon =>
-      'డార్క్ మోడ్ భవిష్యత్తు అప్‌డేట్‌లో వస్తుంది';
+  String get profileAppearanceSystem => 'సిస్టమ్ · పరికరాన్ని అనుసరిస్తుంది';
+
+  @override
+  String get profileAppearanceLight => 'లైట్';
+
+  @override
+  String get profileAppearanceDark => 'డార్క్';
 
   @override
   String get profileNotifications => 'నోటిఫికేషన్‌లు';

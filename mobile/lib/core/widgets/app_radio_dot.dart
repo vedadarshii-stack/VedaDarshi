@@ -37,7 +37,7 @@ class AppRadioDot extends StatelessWidget {
               child: Container(
                 width: dotSize,
                 height: dotSize,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: AppColors.saffron,
                 ),

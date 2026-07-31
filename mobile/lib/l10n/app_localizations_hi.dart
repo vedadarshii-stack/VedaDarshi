@@ -859,8 +859,13 @@ class AppLocalizationsHi extends AppLocalizations {
   String get profileAppearance => 'दिखावट';
 
   @override
-  String get profileDarkModeComingSoon =>
-      'डार्क मोड आने वाले अपडेट में उपलब्ध होगा';
+  String get profileAppearanceSystem => 'सिस्टम · डिवाइस के अनुसार';
+
+  @override
+  String get profileAppearanceLight => 'लाइट';
+
+  @override
+  String get profileAppearanceDark => 'डार्क';
 
   @override
   String get profileNotifications => 'सूचनाएं';

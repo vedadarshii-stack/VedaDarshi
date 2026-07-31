@@ -66,7 +66,7 @@ class NotificationItem {
 abstract final class NotificationsStaticData {
   /// The 6 notification cards from "D4 · Notifications" (Figma node 28:2),
   /// in the exact TODAY-then-YESTERDAY order shown in the design.
-  static const List<NotificationItem> items = [
+  static final List<NotificationItem> items = [
     NotificationItem(
       id: 'daily-horoscope',
       category: NotificationCategory.horoscope,

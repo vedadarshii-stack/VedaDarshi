@@ -153,8 +153,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
     if (_filter != _SearchFilter.reports) {
       for (final article in ArticlesStaticData.all) {
-        final category = ArticlesStaticData.categoryLabels[article
-            .categoryId]!;
+        final category = ArticlesStaticData.categoryLabels[article.categoryId]!;
         final haystack = '${article.title} ${article.author} $category'
             .toLowerCase();
         if (haystack.contains(q)) hits.add(_ArticleHit(article));
@@ -281,11 +280,7 @@ class _SearchHeader extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.cardBorder),
               ),
-              child: const Icon(
-                Icons.arrow_back,
-                size: 18,
-                color: AppColors.ink,
-              ),
+              child: Icon(Icons.arrow_back, size: 18, color: AppColors.ink),
             ),
           ),
         ),
@@ -360,7 +355,7 @@ class _SearchHeader extends StatelessWidget {
                       // The design's ✕ has no glyph in our bundled fonts
                       // (ICON RULE) — Icons.close is the safe equivalent.
                       onTap: onClear,
-                      child: const Padding(
+                      child: Padding(
                         padding: EdgeInsets.all(4),
                         child: Icon(
                           Icons.close,
@@ -449,9 +444,7 @@ class _FilterChip extends StatelessWidget {
           decoration: BoxDecoration(
             color: isSelected ? AppColors.saffron : Colors.white,
             borderRadius: BorderRadius.circular(999),
-            border: isSelected
-                ? null
-                : Border.all(color: AppColors.cardBorder),
+            border: isSelected ? null : Border.all(color: AppColors.cardBorder),
           ),
           child: Text(
             label,
@@ -665,7 +658,11 @@ class _TermChip extends StatelessWidget {
 /// One RESULTS row — routes to the article- or report-flavoured tile/
 /// subtitle/destination depending on the underlying [_SearchHit].
 class _ResultRow extends StatelessWidget {
-  const _ResultRow({required this.hit, required this.l10n, required this.locale});
+  const _ResultRow({
+    required this.hit,
+    required this.l10n,
+    required this.locale,
+  });
 
   final _SearchHit hit;
   final AppLocalizations l10n;
@@ -774,7 +771,7 @@ class _ResultRow extends StatelessWidget {
               // (ICON RULE) — Icons.arrow_forward_ios is the same icon
               // already used for this purpose elsewhere (e.g. Home's
               // "Full Panchang"/"Rituals" trailing chevrons).
-              const Icon(
+              Icon(
                 Icons.arrow_forward_ios,
                 size: 12,
                 color: AppColors.otpBorderFilled,

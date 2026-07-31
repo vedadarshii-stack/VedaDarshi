@@ -99,7 +99,7 @@ class _Header extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(20, topPadding, 20, 22),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: AppColors.horoscopeHeaderGradient,
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
       ),
@@ -793,9 +793,9 @@ class _PremiumTeaser extends StatelessWidget {
         button: true,
         child: PressableScale(
           borderRadius: BorderRadius.circular(16),
-          onTap: () => Navigator.of(context).push(
-            fadeThroughRoute(const SubscriptionPaywallScreen()),
-          ),
+          onTap: () => Navigator.of(
+            context,
+          ).push(fadeThroughRoute(const SubscriptionPaywallScreen())),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
@@ -832,11 +832,7 @@ class _PremiumTeaser extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    const Icon(
-                      Icons.arrow_forward,
-                      size: 11,
-                      color: AppColors.gold,
-                    ),
+                    Icon(Icons.arrow_forward, size: 11, color: AppColors.gold),
                   ],
                 ),
               ],

@@ -330,7 +330,7 @@ class _ContinueButton extends StatelessWidget {
           onTap: onTap,
           child: Ink(
             padding: const EdgeInsets.symmetric(vertical: 17),
-            decoration: const BoxDecoration(gradient: AppColors.saffronGradient),
+            decoration: BoxDecoration(gradient: AppColors.saffronGradient),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
@@ -345,11 +345,7 @@ class _ContinueButton extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Icon(
-                  Icons.arrow_forward,
-                  size: 18,
-                  color: Colors.white,
-                ),
+                const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
               ],
             ),
           ),

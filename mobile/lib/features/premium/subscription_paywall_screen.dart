@@ -55,7 +55,7 @@ class _SubscriptionPaywallScreenState
       // run under the status bar, matching the design's full-bleed sheet.
       // Only the content padding respects the safe area (topInset below).
       body: DecoratedBox(
-        decoration: const BoxDecoration(gradient: AppColors.paywallGradient),
+        decoration: BoxDecoration(gradient: AppColors.paywallGradient),
         child: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(22, topInset, 22, 26),
           child: Column(
@@ -126,10 +126,7 @@ class _TopBar extends StatelessWidget {
             // RevenueCat is wired up.
             onTap: () {},
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 4,
-                vertical: 6,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
               child: Text(
                 l10n.restorePurchase,
                 style: AppFonts.body(
@@ -189,7 +186,11 @@ class _Hero extends StatelessWidget {
         Text(
           l10n.premiumTagline,
           textAlign: TextAlign.center,
-          style: AppFonts.body(locale, fontSize: 13, color: AppColors.mutedOnNavy),
+          style: AppFonts.body(
+            locale,
+            fontSize: 13,
+            color: AppColors.mutedOnNavy,
+          ),
         ),
       ],
     );
@@ -243,13 +244,17 @@ class _BenefitRow extends StatelessWidget {
             color: AppColors.gold.withValues(alpha: 0.18),
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.check_rounded, size: 11, color: AppColors.gold),
+          child: Icon(Icons.check_rounded, size: 11, color: AppColors.gold),
         ),
         const SizedBox(width: 10),
         Expanded(
           child: Text(
             text,
-            style: AppFonts.body(locale, fontSize: 12.5, color: AppColors.headerSubtle),
+            style: AppFonts.body(
+              locale,
+              fontSize: 12.5,
+              color: AppColors.headerSubtle,
+            ),
           ),
         ),
       ],
@@ -502,7 +507,10 @@ class _Cta extends StatelessWidget {
 
     // Motion spec item 5 explicitly calls for the gold glow pulse on the
     // Upgrade CTA, in addition to its own static drop shadow above.
-    return GoldGlowPulse(borderRadius: BorderRadius.circular(999), child: button);
+    return GoldGlowPulse(
+      borderRadius: BorderRadius.circular(999),
+      child: button,
+    );
   }
 }
 
@@ -518,7 +526,11 @@ class _FinePrint extends StatelessWidget {
     return Text(
       l10n.billingFinePrint,
       textAlign: TextAlign.center,
-      style: AppFonts.body(locale, fontSize: 10.5, color: AppColors.paywallFinePrint),
+      style: AppFonts.body(
+        locale,
+        fontSize: 10.5,
+        color: AppColors.paywallFinePrint,
+      ),
     );
   }
 }

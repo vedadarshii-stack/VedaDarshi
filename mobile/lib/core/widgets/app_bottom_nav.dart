@@ -46,7 +46,7 @@ class AppBottomNav extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white,
-        border: const Border(top: BorderSide(color: AppColors.cardBorder)),
+        border: Border(top: BorderSide(color: AppColors.cardBorder)),
         boxShadow: [
           BoxShadow(
             color: AppColors.ink.withValues(alpha: 0.06),

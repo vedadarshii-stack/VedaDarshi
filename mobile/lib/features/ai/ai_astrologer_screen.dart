@@ -27,8 +27,7 @@ class AiAstrologerScreen extends ConsumerStatefulWidget {
   const AiAstrologerScreen({super.key});
 
   @override
-  ConsumerState<AiAstrologerScreen> createState() =>
-      _AiAstrologerScreenState();
+  ConsumerState<AiAstrologerScreen> createState() => _AiAstrologerScreenState();
 }
 
 class _AiAstrologerScreenState extends ConsumerState<AiAstrologerScreen> {
@@ -180,7 +179,7 @@ class _Header extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(16, topPadding, 16, 14),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Colors.white,
         border: Border(bottom: BorderSide(color: AppColors.cardBorder)),
       ),
@@ -195,15 +194,11 @@ class _Header extends StatelessWidget {
                 width: 40,
                 height: 40,
                 alignment: Alignment.center,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppColors.cream,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.arrow_back,
-                  size: 16,
-                  color: AppColors.ink,
-                ),
+                child: Icon(Icons.arrow_back, size: 16, color: AppColors.ink),
               ),
             ),
           ),
@@ -242,7 +237,7 @@ class _Header extends StatelessWidget {
                     Container(
                       width: 7,
                       height: 7,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: AppColors.tileGreenFg,
                         shape: BoxShape.circle,
                       ),
@@ -277,7 +272,7 @@ class _Header extends StatelessWidget {
                 width: 38,
                 height: 38,
                 alignment: Alignment.center,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppColors.cream,
                   shape: BoxShape.circle,
                 ),
@@ -288,10 +283,7 @@ class _Header extends StatelessWidget {
           const SizedBox(width: 6),
           Flexible(
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 5,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
                 color: AppColors.genderSelectedBg,
                 borderRadius: BorderRadius.circular(999),
@@ -436,7 +428,12 @@ class _TopicsBlock extends StatelessWidget {
         for (var i = 0; i < rowTopics.length; i++) ...[
           if (i != 0) const SizedBox(width: 6),
           Expanded(
-            child: _TopicTile(topic: rowTopics[i], locale: locale, l10n: l10n, onTap: onTap),
+            child: _TopicTile(
+              topic: rowTopics[i],
+              locale: locale,
+              l10n: l10n,
+              onTap: onTap,
+            ),
           ),
         ],
       ],
@@ -467,12 +464,7 @@ class _TopicTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         onTap: () => onTap(label),
         child: Container(
-          padding: const EdgeInsets.only(
-            top: 9,
-            bottom: 8,
-            left: 2,
-            right: 2,
-          ),
+          padding: const EdgeInsets.only(top: 9, bottom: 8, left: 2, right: 2),
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border.all(color: AppColors.cardBorder),
@@ -710,7 +702,7 @@ class _TypingDot extends StatelessWidget {
       opacity: 0.4 + 0.6 * pulse,
       child: Transform.scale(
         scale: 0.6 + 0.4 * pulse,
-        child: const DecoratedBox(
+        child: DecoratedBox(
           decoration: BoxDecoration(
             color: AppColors.tilePurpleFg,
             shape: BoxShape.circle,
@@ -744,7 +736,7 @@ class _InputBar extends StatelessWidget {
     final hasText = controller.text.trim().isNotEmpty;
 
     return DecoratedBox(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Colors.white,
         border: Border(top: BorderSide(color: AppColors.cardBorder)),
       ),
@@ -847,9 +839,9 @@ class _InputBar extends StatelessWidget {
                 button: true,
                 child: PressableScale(
                   borderRadius: BorderRadius.circular(999),
-                  onTap: () => Navigator.of(context).push(
-                    fadeThroughRoute(const SubscriptionPaywallScreen()),
-                  ),
+                  onTap: () => Navigator.of(
+                    context,
+                  ).push(fadeThroughRoute(const SubscriptionPaywallScreen())),
                   child: Text(
                     '✨ ${l10n.upgradeUnlimited}',
                     textAlign: TextAlign.center,

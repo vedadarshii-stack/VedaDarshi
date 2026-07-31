@@ -1188,9 +1188,17 @@
   "@profileAppearance": {
     "description": "Title of the Appearance (dark mode) menu row on the Profile & Settings screen."
   },
-  "profileDarkModeComingSoon": "Dark mode is coming in a future update",
-  "@profileDarkModeComingSoon": {
-    "description": "Snackbar shown when tapping the Appearance row/switch on the Profile & Settings screen, since dark mode isn't implemented yet."
+  "profileAppearanceSystem": "System · follows device",
+  "@profileAppearanceSystem": {
+    "description": "Appearance row subtitle on the Profile & Settings screen when the theme mode is set to follow the system/device setting."
+  },
+  "profileAppearanceLight": "Light",
+  "@profileAppearanceLight": {
+    "description": "Appearance row subtitle on the Profile & Settings screen when the theme mode is explicitly set to light."
+  },
+  "profileAppearanceDark": "Dark",
+  "@profileAppearanceDark": {
+    "description": "Appearance row subtitle on the Profile & Settings screen when the theme mode is explicitly set to dark."
   },
   "profileNotifications": "Notifications",
   "@profileNotifications": {

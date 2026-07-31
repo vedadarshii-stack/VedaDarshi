@@ -519,11 +519,11 @@ class _BackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.white,
-      shape: const CircleBorder(side: BorderSide(color: AppColors.cardBorder)),
+      shape: CircleBorder(side: BorderSide(color: AppColors.cardBorder)),
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),
-        child: const SizedBox(
+        child: SizedBox(
           width: 44,
           height: 44,
           child: Icon(Icons.arrow_back, size: 18, color: AppColors.ink),

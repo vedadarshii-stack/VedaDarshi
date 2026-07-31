@@ -160,10 +160,7 @@ class AuthService {
   /// once [verificationCompleted] has already signed the user in, in which
   /// case [PhoneCodeSent.autoVerified] is `true` and the caller should skip
   /// the OTP entry screen.
-  Future<PhoneCodeSent> sendOtp({
-    required String phoneE164,
-    int? resendToken,
-  }) {
+  Future<PhoneCodeSent> sendOtp({required String phoneE164, int? resendToken}) {
     final completer = Completer<PhoneCodeSent>();
 
     void completeError(AuthException exception) {

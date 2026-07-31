@@ -136,11 +136,7 @@ class _Header extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.cardBorder),
               ),
-              child: const Icon(
-                Icons.arrow_back,
-                size: 18,
-                color: AppColors.ink,
-              ),
+              child: Icon(Icons.arrow_back, size: 18, color: AppColors.ink),
             ),
           ),
         ),
@@ -252,9 +248,7 @@ class _CategoryChip extends StatelessWidget {
           decoration: BoxDecoration(
             color: isSelected ? AppColors.saffron : Colors.white,
             borderRadius: BorderRadius.circular(999),
-            border: isSelected
-                ? null
-                : Border.all(color: AppColors.cardBorder),
+            border: isSelected ? null : Border.all(color: AppColors.cardBorder),
           ),
           child: Text(
             label,

@@ -1688,11 +1688,23 @@ abstract class AppLocalizations {
   /// **'Appearance'**
   String get profileAppearance;
 
-  /// Snackbar shown when tapping the Appearance row/switch on the Profile & Settings screen, since dark mode isn't implemented yet.
+  /// Appearance row subtitle on the Profile & Settings screen when the theme mode is set to follow the system/device setting.
   ///
   /// In en, this message translates to:
-  /// **'Dark mode is coming in a future update'**
-  String get profileDarkModeComingSoon;
+  /// **'System · follows device'**
+  String get profileAppearanceSystem;
+
+  /// Appearance row subtitle on the Profile & Settings screen when the theme mode is explicitly set to light.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get profileAppearanceLight;
+
+  /// Appearance row subtitle on the Profile & Settings screen when the theme mode is explicitly set to dark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get profileAppearanceDark;
 
   /// Title of the Notifications menu row on the Profile & Settings screen, leading to the Notifications screen.
   ///

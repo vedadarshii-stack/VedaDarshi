@@ -134,7 +134,7 @@ class _SectionHeader extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 3),
-                    const Icon(
+                    Icon(
                       Icons.arrow_forward_ios,
                       size: 10,
                       color: AppColors.saffron,
@@ -244,8 +244,9 @@ class _TopBar extends StatelessWidget {
         _TopBarIconButton(
           emoji: '🔍',
           locale: locale,
-          onTap: () =>
-              Navigator.of(context).push(fadeThroughRoute(const SearchScreen())),
+          onTap: () => Navigator.of(
+            context,
+          ).push(fadeThroughRoute(const SearchScreen())),
         ),
         const SizedBox(width: 8),
         _TopBarIconButton(
@@ -460,7 +461,7 @@ class _PanchangHeroCard extends StatelessWidget {
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.wb_sunny_outlined,
                       size: 14,
                       color: AppColors.creamTextSoft,
@@ -476,7 +477,7 @@ class _PanchangHeroCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Icon(
+                    Icon(
                       Icons.nightlight_round,
                       size: 14,
                       color: AppColors.creamTextSoft,
@@ -837,7 +838,7 @@ class _FestivalCard extends StatelessWidget {
           onTap: () {},
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
@@ -897,7 +898,7 @@ class _FestivalCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Icon(
+                      Icon(
                         Icons.arrow_forward_ios,
                         size: 10,
                         color: AppColors.gold,
@@ -916,12 +917,7 @@ class _FestivalCard extends StatelessWidget {
 
 /// Presentation metadata for one Explore shortcut tile.
 class _ExploreTileMeta {
-  const _ExploreTileMeta(
-    this.label,
-    this.emoji,
-    this.background, {
-    this.onTap,
-  });
+  const _ExploreTileMeta(this.label, this.emoji, this.background, {this.onTap});
 
   final String label;
   final String emoji;
@@ -1134,7 +1130,7 @@ class _HoroscopeSection extends StatelessWidget {
                       width: 58,
                       height: 58,
                       alignment: Alignment.center,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: AppColors.navyGradient,
                       ),
@@ -1185,7 +1181,7 @@ class _HoroscopeSection extends StatelessWidget {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Icon(
+                                    Icon(
                                       Icons.star_rounded,
                                       size: 10,
                                       color: AppColors.tileGoldFg,
@@ -1289,7 +1285,7 @@ class _WisdomSection extends StatelessWidget {
               child: _ArticleCard(
                 article: articles[1],
                 locale: locale,
-                headerGradient: const LinearGradient(
+                headerGradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [Color(0xFF7A3E12), AppColors.navyBottom],
@@ -1340,7 +1336,7 @@ class _ArticleCard extends StatelessWidget {
                   height: 62,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(gradient: headerGradient),
-                  child: const Icon(
+                  child: Icon(
                     Icons.auto_awesome,
                     size: 20,
                     color: AppColors.gold,
@@ -1441,7 +1437,7 @@ class _ContinueAiCard extends StatelessWidget {
                   width: 44,
                   height: 44,
                   alignment: Alignment.center,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: AppColors.aiAvatarGradient,
                   ),
@@ -1501,7 +1497,7 @@ class _ContinueAiCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 3),
-                      const Icon(
+                      Icon(
                         Icons.arrow_forward,
                         size: 11,
                         color: AppColors.tilePurpleFg,
@@ -1528,7 +1524,7 @@ class _RecentReportsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final reports = HomeStaticData.reports;
-    const backgrounds = [AppColors.tileBlueBg, AppColors.tilePinkBg];
+    final backgrounds = [AppColors.tileBlueBg, AppColors.tilePinkBg];
     const emojis = ['💼', '💍'];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1677,11 +1673,7 @@ class _DailyQuoteCard extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
-            Icons.format_quote_rounded,
-            size: 22,
-            color: AppColors.gold,
-          ),
+          Icon(Icons.format_quote_rounded, size: 22, color: AppColors.gold),
           const SizedBox(height: 8),
           Text(
             quote.text,
@@ -1714,11 +1706,7 @@ class _DailyQuoteCard extends StatelessWidget {
               ),
               if (hasArrow) ...[
                 const SizedBox(width: 3),
-                const Icon(
-                  Icons.north_east,
-                  size: 11,
-                  color: AppColors.quoteMuted,
-                ),
+                Icon(Icons.north_east, size: 11, color: AppColors.quoteMuted),
               ],
             ],
           ),

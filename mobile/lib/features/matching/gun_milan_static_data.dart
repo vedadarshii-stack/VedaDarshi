@@ -17,5 +17,6 @@
 /// honest gap). This file does NOT invent a bride profile.
 abstract final class GunMilanStaticData {
   static const String fallbackGroomName = 'Nagarjuna';
-  static const String fallbackGroomSummary = '14 Aug 1990 · 06:45 AM · Hyderabad';
+  static const String fallbackGroomSummary =
+      '14 Aug 1990 · 06:45 AM · Hyderabad';
 }

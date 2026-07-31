@@ -24,11 +24,7 @@ abstract final class PanchangStaticData {
   static const String moonset = '11:52 PM';
 
   static const List<PanchangElement> elements = [
-    PanchangElement(
-      PanchangElementId.tithi,
-      'Shukla Ashtami',
-      'till 04:32 PM',
-    ),
+    PanchangElement(PanchangElementId.tithi, 'Shukla Ashtami', 'till 04:32 PM'),
     PanchangElement(PanchangElementId.nakshatra, 'Rohini', 'till 09:12 PM'),
     PanchangElement(PanchangElementId.yoga, 'Siddhi', 'till 02:18 PM'),
     PanchangElement(PanchangElementId.karana, 'Bava', 'till 04:32 PM'),

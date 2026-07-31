@@ -89,7 +89,7 @@ class _Header extends StatelessWidget {
             clipBehavior: Clip.antiAlias,
             child: InkWell(
               onTap: () => Navigator.of(context).pop(),
-              child: const SizedBox(
+              child: SizedBox(
                 width: 42,
                 height: 42,
                 child: Center(
@@ -326,7 +326,7 @@ class _SignCard extends StatelessWidget {
                 width: 46,
                 height: 46,
                 alignment: Alignment.center,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: AppColors.navyHeroGradient,
                 ),

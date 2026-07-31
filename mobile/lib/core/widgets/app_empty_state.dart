@@ -100,7 +100,11 @@ class AppEmptyState extends StatelessWidget {
             textAlign: TextAlign.center,
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
-            style: AppFonts.body(locale, fontSize: 11.5, color: AppColors.muted),
+            style: AppFonts.body(
+              locale,
+              fontSize: 11.5,
+              color: AppColors.muted,
+            ),
           ),
           if (hasAction) ...[
             const SizedBox(height: 12),

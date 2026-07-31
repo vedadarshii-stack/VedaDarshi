@@ -110,7 +110,7 @@ class _Header extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(20, topPadding, 20, 24),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: AppColors.navyHeroGradient,
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
       ),
@@ -181,7 +181,9 @@ class _Header extends StatelessWidget {
           _ScoreRing(locale: locale, l10n: l10n),
           const SizedBox(height: 16),
           Text(
-            l10n.percentCompatible(GunMilanResultStaticData.compatibilityPercent),
+            l10n.percentCompatible(
+              GunMilanResultStaticData.compatibilityPercent,
+            ),
             style: AppFonts.body(
               locale,
               fontSize: 12,
@@ -232,8 +234,8 @@ class _VerdictPill extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 1),
+          Padding(
+            padding: const EdgeInsets.only(top: 1),
             child: Icon(
               Icons.check_rounded,
               size: 13,
@@ -510,7 +512,9 @@ class _GunaGrid extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(child: _GunaCard(guna: gunas[i], l10n: l10n, locale: locale)),
+            Expanded(
+              child: _GunaCard(guna: gunas[i], l10n: l10n, locale: locale),
+            ),
             const SizedBox(width: 8),
             Expanded(
               child: second != null
@@ -526,7 +530,11 @@ class _GunaGrid extends StatelessWidget {
 }
 
 class _GunaCard extends StatelessWidget {
-  const _GunaCard({required this.guna, required this.l10n, required this.locale});
+  const _GunaCard({
+    required this.guna,
+    required this.l10n,
+    required this.locale,
+  });
 
   final GunaScore guna;
   final AppLocalizations l10n;
@@ -675,7 +683,7 @@ class _NadiWarning extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
+          Icon(
             Icons.warning_amber_rounded,
             size: 14,
             color: AppColors.tileGoldFg,
@@ -684,7 +692,11 @@ class _NadiWarning extends StatelessWidget {
           Expanded(
             child: Text(
               GunMilanResultStaticData.nadiWarning,
-              style: AppFonts.body(locale, fontSize: 11.5, color: AppColors.tileGoldFg),
+              style: AppFonts.body(
+                locale,
+                fontSize: 11.5,
+                color: AppColors.tileGoldFg,
+              ),
             ),
           ),
         ],
@@ -708,9 +720,9 @@ class _ReportCta extends StatelessWidget {
       child: PressableScale(
         borderRadius: BorderRadius.circular(999),
         // Detailed compatibility is a premium report — opens the paywall.
-        onTap: () => Navigator.of(context).push(
-          fadeThroughRoute(const SubscriptionPaywallScreen()),
-        ),
+        onTap: () => Navigator.of(
+          context,
+        ).push(fadeThroughRoute(const SubscriptionPaywallScreen())),
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 15),
@@ -758,8 +770,8 @@ class _FooterHint extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(top: 1),
+        Padding(
+          padding: const EdgeInsets.only(top: 1),
           child: Icon(Icons.info_outline, size: 11, color: AppColors.hint),
         ),
         const SizedBox(width: 6),

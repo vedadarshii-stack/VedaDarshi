@@ -269,7 +269,11 @@ class _WelcomeLoginScreenState extends ConsumerState<WelcomeLoginScreen> {
 /// Section 1 — navy hero with the ॐ mark, wordmark and tagline. Deliberately
 /// not wrapped in `SafeArea` so the navy gradient runs under the status bar.
 class _Hero extends StatelessWidget {
-  const _Hero({required this.l10n, required this.locale, required this.heroHeight});
+  const _Hero({
+    required this.l10n,
+    required this.locale,
+    required this.heroHeight,
+  });
 
   final AppLocalizations l10n;
   final Locale locale;
@@ -283,7 +287,7 @@ class _Hero extends StatelessWidget {
     return Container(
       height: heroHeight,
       width: double.infinity,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: AppColors.navyHeroGradient,
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
       ),
@@ -582,7 +586,7 @@ class _GoogleButton extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: loading
-                  ? const [
+                  ? [
                       SizedBox(
                         width: 20,
                         height: 20,
@@ -684,7 +688,7 @@ class _GuestLink extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 if (loading)
-                  const SizedBox(
+                  SizedBox(
                     width: 14,
                     height: 14,
                     child: CircularProgressIndicator(
@@ -695,11 +699,7 @@ class _GuestLink extends StatelessWidget {
                     ),
                   )
                 else
-                  const Icon(
-                    Icons.arrow_forward,
-                    size: 16,
-                    color: AppColors.saffron,
-                  ),
+                  Icon(Icons.arrow_forward, size: 16, color: AppColors.saffron),
               ],
             ),
           ),

@@ -96,11 +96,7 @@ class _Header extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.cardBorder),
               ),
-              child: const Icon(
-                Icons.arrow_back,
-                size: 18,
-                color: AppColors.ink,
-              ),
+              child: Icon(Icons.arrow_back, size: 18, color: AppColors.ink),
             ),
           ),
         ),
@@ -137,9 +133,9 @@ class _GoPremiumBanner extends StatelessWidget {
       button: true,
       child: PressableScale(
         borderRadius: BorderRadius.circular(18),
-        onTap: () => Navigator.of(context).push(
-          fadeThroughRoute(const SubscriptionPaywallScreen()),
-        ),
+        onTap: () => Navigator.of(
+          context,
+        ).push(fadeThroughRoute(const SubscriptionPaywallScreen())),
         child: GoldGlowPulse(
           borderRadius: BorderRadius.circular(18),
           child: Container(
@@ -196,9 +192,9 @@ class _GoPremiumBanner extends StatelessWidget {
                   child: PressableScale(
                     borderRadius: BorderRadius.circular(999),
                     // Same destination as the banner tap above.
-                    onTap: () => Navigator.of(context).push(
-                      fadeThroughRoute(const SubscriptionPaywallScreen()),
-                    ),
+                    onTap: () => Navigator.of(
+                      context,
+                    ).push(fadeThroughRoute(const SubscriptionPaywallScreen())),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 14,
@@ -297,9 +293,9 @@ class _ReportCard extends StatelessWidget {
         // Premium reports open the paywall. Free reports are still a no-op:
         // the report viewer itself doesn't exist yet.
         onTap: report.access == ReportAccess.premium
-            ? () => Navigator.of(context).push(
-                fadeThroughRoute(const SubscriptionPaywallScreen()),
-              )
+            ? () => Navigator.of(
+                context,
+              ).push(fadeThroughRoute(const SubscriptionPaywallScreen()))
             : () {},
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -471,11 +467,7 @@ class _AccessBadge extends StatelessWidget {
           ? Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.lock,
-                  size: 9,
-                  color: AppColors.genderSelectedText,
-                ),
+                Icon(Icons.lock, size: 9, color: AppColors.genderSelectedText),
                 const SizedBox(width: 3),
                 Text(
                   l10n.premium,
@@ -527,8 +519,8 @@ class _Footer extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 4),
-        const Padding(
-          padding: EdgeInsets.only(top: 1),
+        Padding(
+          padding: const EdgeInsets.only(top: 1),
           child: Icon(Icons.download_rounded, size: 12, color: AppColors.hint),
         ),
       ],

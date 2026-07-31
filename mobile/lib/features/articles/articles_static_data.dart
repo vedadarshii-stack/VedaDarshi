@@ -137,7 +137,7 @@ abstract final class ArticlesStaticData {
 
   /// The featured article (Figma node 25:19). Also the article whose full
   /// body (Figma "D2 · Article Detail", node 26:2) is modelled exactly.
-  static const Article featured = Article(
+  static final Article featured = Article(
     id: 'sawan-somvar-fasting',
     title: 'Sawan Somvar: fasting rules, rituals & significance',
     author: 'Pandit R. Sharma',
@@ -174,7 +174,7 @@ abstract final class ArticlesStaticData {
   /// approved in Figma. Each gets a short placeholder body of its own so
   /// its detail page is never blank — only [featured]'s body is modelled
   /// to the full Figma D2 structure.
-  static const List<Article> listArticles = [
+  static final List<Article> listArticles = [
     Article(
       id: 'rahu-kaal-new-beginnings',
       title: 'Why Rahu Kaal matters for new beginnings',
@@ -266,5 +266,5 @@ abstract final class ArticlesStaticData {
   /// [featured] followed by [listArticles] — the full catalogue in display
   /// order, used to resolve an article by id from anywhere in the app
   /// (e.g. Home's "Wisdom for you" cards).
-  static const List<Article> all = [featured, ...listArticles];
+  static final List<Article> all = [featured, ...listArticles];
 }

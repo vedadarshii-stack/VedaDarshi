@@ -317,7 +317,7 @@ class _BirthDetailsScreenState extends ConsumerState<BirthDetailsScreen> {
               _FieldLabel(text: l10n.birthDobLabel, locale: locale),
               _FieldBox(
                 onTap: _pickDate,
-                trailing: const Icon(
+                trailing: Icon(
                   Icons.calendar_today_outlined,
                   size: 18,
                   color: AppColors.hint,
@@ -342,7 +342,7 @@ class _BirthDetailsScreenState extends ConsumerState<BirthDetailsScreen> {
                 opacity: _isBirthTimeUnknown ? 0.55 : 1,
                 child: _FieldBox(
                   onTap: _isBirthTimeUnknown ? null : _pickTime,
-                  trailing: const Icon(
+                  trailing: Icon(
                     Icons.schedule_outlined,
                     size: 18,
                     color: AppColors.hint,
@@ -369,7 +369,7 @@ class _BirthDetailsScreenState extends ConsumerState<BirthDetailsScreen> {
               _FieldBox(
                 isActive: _placeFocusNode.hasFocus,
                 trailing: _isResolvingPlace
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 16,
                         height: 16,
                         child: CircularProgressIndicator(
@@ -379,7 +379,7 @@ class _BirthDetailsScreenState extends ConsumerState<BirthDetailsScreen> {
                           ),
                         ),
                       )
-                    : const Icon(
+                    : Icon(
                         Icons.place_outlined,
                         size: 18,
                         color: AppColors.hint,
@@ -731,7 +731,7 @@ class _PlaceResultRow extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
           child: Row(
             children: [
-              const Icon(Icons.place, size: 14, color: AppColors.hint),
+              Icon(Icons.place, size: 14, color: AppColors.hint),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(

@@ -125,11 +125,7 @@ class _Header extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.cardBorder),
               ),
-              child: const Icon(
-                Icons.arrow_back,
-                size: 18,
-                color: AppColors.ink,
-              ),
+              child: Icon(Icons.arrow_back, size: 18, color: AppColors.ink),
             ),
           ),
         ),
@@ -265,7 +261,7 @@ class _GroomCard extends StatelessWidget {
                 width: 46,
                 height: 46,
                 alignment: Alignment.center,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: AppColors.tileBlueBg,
                 ),
@@ -407,7 +403,7 @@ class _BrideCard extends StatelessWidget {
                     width: 46,
                     height: 46,
                     alignment: Alignment.center,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: AppColors.tilePinkBg,
                     ),
@@ -497,11 +493,7 @@ class _PrivacyNote extends StatelessWidget {
           // The design's 🔒 is a colour emoji; using the Material lock icon
           // instead lets it take the gold tint and sit on the text baseline,
           // per this project's ICON RULE.
-          const Icon(
-            Icons.lock_outline,
-            size: 13,
-            color: AppColors.tileGoldFg,
-          ),
+          Icon(Icons.lock_outline, size: 13, color: AppColors.tileGoldFg),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -554,7 +546,7 @@ class _MatchKundlisButton extends StatelessWidget {
           ).push(fadeThroughRoute(const GunMilanResultScreen())),
           child: Ink(
             padding: const EdgeInsets.symmetric(vertical: 17),
-            decoration: const BoxDecoration(gradient: AppColors.saffronGradient),
+            decoration: BoxDecoration(gradient: AppColors.saffronGradient),
             child: Center(
               child: Text(
                 '${l10n.matchKundlis} 💞',
