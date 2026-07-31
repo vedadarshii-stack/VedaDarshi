@@ -53,6 +53,60 @@ service cloud.firestore {
       return isAdmin() && adminDoc().roleId == 'super_admin';
     }
 
+    // ---- Invite claiming -------------------------------------------------
+    //
+    // An admin document is keyed by uid, but a person you want to invite has no
+    // uid until they sign in for the first time. So a super admin drops a doc in
+    // /adminInvites/{lowercased-email}, and the invitee converts it into their
+    // own /adminUsers/{uid} on first sign-in.
+    //
+    // This is the ONLY path by which a user may create their own admin document,
+    // so every clause below matters:
+    //   - the uid being written must be the caller's own;
+    //   - the email must be VERIFIED (Google sign-in always is) — otherwise
+    //     anyone could claim an invite by asserting someone else's address;
+    //   - the role comes from the invite, never from the request body, so a
+    //     claimer cannot promote themselves;
+    //   - status is pinned to 'active' and the stored email is pinned to the
+    //     token's email.
+    // `create` only applies when the document does not exist, so this can never
+    // overwrite or escalate an existing admin.
+    function callerEmail() {
+      return request.auth.token.email.lower();
+    }
+
+    function invite() {
+      return get(/databases/$(database)/documents/adminInvites/$(callerEmail())).data;
+    }
+
+    function hasValidInvite(adminUid) {
+      return isSignedIn()
+             && request.auth.uid == adminUid
+             && request.auth.token.email_verified == true
+             && exists(/databases/$(database)/documents/adminInvites/$(callerEmail()))
+             && request.resource.data.uid == adminUid
+             && request.resource.data.email == callerEmail()
+             && request.resource.data.status == 'active'
+             && request.resource.data.roleId == invite().roleId;
+    }
+
+    // Pending invites: /adminInvites/{lowercased-email}
+    match /adminInvites/{inviteEmail} {
+      // The invitee must be able to read their own invite in order to claim it.
+      allow get: if isAdmin()
+                 || (isSignedIn()
+                     && request.auth.token.email_verified == true
+                     && callerEmail() == inviteEmail);
+      allow list: if isAdmin();
+      allow create, update: if isSuperAdmin();
+      // The invitee deletes their own invite as the last step of claiming it.
+      // Leaving spent invites around would let a REVOKED admin re-claim access.
+      allow delete: if isSuperAdmin()
+                    || (isSignedIn()
+                        && request.auth.token.email_verified == true
+                        && callerEmail() == inviteEmail);
+    }
+
     // Console operators: /adminUsers/{uid}
     // NOT app end-users — those live in /users/{uid} below. Keep the two
     // straight; conflating them would hand console access to every app user.
@@ -63,8 +117,11 @@ service cloud.firestore {
       // row requires already being an admin.
       allow get: if isAdmin() || isOwner(adminUid);
       allow list: if isAdmin();
-      // Granting, editing and revoking console access is super-admin only.
-      allow create, update, delete: if isSuperAdmin();
+      // Granting access is super-admin only, OR a first-time invitee claiming
+      // the invite left for their verified email (see hasValidInvite above).
+      allow create: if isSuperAdmin() || hasValidInvite(adminUid);
+      // Editing and revoking stay super-admin only — no self-service here.
+      allow update, delete: if isSuperAdmin();
     }
 
     // Role definitions: /adminRoles/{roleId}

@@ -4,6 +4,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { useAuth } from './authContext';
 import { isConceptMode } from './conceptMode';
+import { claimPendingInvite } from './claimInvite';
 import { AdminProfileContext } from './adminProfileContext';
 import type { AdminProfileState } from './adminProfileContext';
 
@@ -32,7 +33,13 @@ export function AdminProfileProvider({ children }: { children: ReactNode }) {
     setState({ status: 'loading' });
 
     (async () => {
-      const membership = await getDoc(doc(db, 'adminUsers', user.uid));
+      let membership = await getDoc(doc(db, 'adminUsers', user.uid));
+
+      // First sign-in after being invited: convert the invite into a real
+      // membership, then re-read it rather than trusting what we just wrote.
+      if (!membership.exists() && (await claimPendingInvite(user))) {
+        membership = await getDoc(doc(db, 'adminUsers', user.uid));
+      }
 
       if (!membership.exists() || membership.data().status !== 'active') {
         if (!cancelled) setState({ status: 'not-admin', email: user.email });
