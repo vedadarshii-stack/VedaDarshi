@@ -276,7 +276,7 @@ class _SearchHeader extends StatelessWidget {
               height: 42,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.cardBorder),
               ),
@@ -289,7 +289,7 @@ class _SearchHeader extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               border: Border.all(color: AppColors.saffron, width: 1.5),
               borderRadius: BorderRadius.circular(999),
               boxShadow: [
@@ -442,7 +442,7 @@ class _FilterChip extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.saffron : Colors.white,
+            color: isSelected ? AppColors.saffron : AppColors.surface,
             borderRadius: BorderRadius.circular(999),
             border: isSelected ? null : Border.all(color: AppColors.cardBorder),
           ),
@@ -625,7 +625,7 @@ class _TermChip extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             border: Border.all(color: AppColors.cardBorder),
             borderRadius: BorderRadius.circular(999),
           ),
@@ -719,7 +719,7 @@ class _ResultRow extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             border: Border.all(color: AppColors.cardBorder),
             borderRadius: BorderRadius.circular(16),
           ),

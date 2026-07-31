@@ -554,7 +554,7 @@ class _GunaCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             border: Border.all(color: AppColors.cardBorder),
             borderRadius: BorderRadius.circular(14),
           ),

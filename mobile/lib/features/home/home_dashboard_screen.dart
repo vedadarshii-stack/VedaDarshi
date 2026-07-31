@@ -287,7 +287,7 @@ class _TopBarIconButton extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Material(
-            color: Colors.white,
+            color: AppColors.surface,
             shape: CircleBorder(side: BorderSide(color: AppColors.cardBorder)),
             clipBehavior: Clip.antiAlias,
             child: InkWell(
@@ -314,7 +314,7 @@ class _TopBarIconButton extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: AppColors.saffron,
-                  border: Border.all(color: Colors.white, width: 1.5),
+                  border: Border.all(color: AppColors.surface, width: 1.5),
                 ),
               ),
             ),
@@ -665,12 +665,12 @@ class _GlanceTileCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.glanceBorder),
         boxShadow: [
           BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.05),
+            color: AppColors.shadow.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -1026,7 +1026,7 @@ class _ExploreTile extends StatelessWidget {
               right: 6,
             ),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(18),
               border: Border.all(color: AppColors.cardBorder),
             ),
@@ -1119,7 +1119,7 @@ class _HoroscopeSection extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: AppColors.cardBorder),
                 ),
@@ -1323,7 +1323,7 @@ class _ArticleCard extends StatelessWidget {
           onTap: () => _openArticleDetail(context, article),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(18),
               border: Border.all(color: AppColors.cardBorder),
             ),
@@ -1427,7 +1427,7 @@ class _ContinueAiCard extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(18),
               border: Border.all(color: AppColors.glanceBorder),
             ),
@@ -1583,7 +1583,7 @@ class _ReportCard extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: AppColors.cardBorder),
             ),

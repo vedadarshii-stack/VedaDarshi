@@ -543,7 +543,7 @@ class _BirthProfilesRow extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             border: Border.all(color: AppColors.cardBorder),
             borderRadius: BorderRadius.circular(16),
           ),
@@ -644,7 +644,7 @@ class _LanguagePill extends StatelessWidget {
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 9),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.saffron : Colors.white,
+            color: isSelected ? AppColors.saffron : AppColors.surface,
             borderRadius: BorderRadius.circular(12),
             border: isSelected ? null : Border.all(color: AppColors.cardBorder),
           ),
@@ -682,7 +682,7 @@ class _MenuCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         border: Border.all(color: AppColors.cardBorder),
         borderRadius: BorderRadius.circular(18),
       ),

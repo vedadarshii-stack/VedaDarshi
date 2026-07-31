@@ -265,7 +265,7 @@ class _Header extends StatelessWidget {
               height: 42,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.cardBorder),
               ),
@@ -364,7 +364,7 @@ class _NotificationCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
           decoration: BoxDecoration(
-            color: isUnread ? Colors.white : AppColors.cream,
+            color: isUnread ? AppColors.surface : AppColors.cream,
             border: Border.all(
               color: isUnread
                   ? AppColors.notificationUnreadBorder

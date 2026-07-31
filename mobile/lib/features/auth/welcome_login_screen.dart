@@ -368,7 +368,7 @@ class _PhoneField extends StatelessWidget {
       curve: Curves.easeInOut,
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isFocused ? AppColors.saffron : AppColors.cardBorder,
@@ -570,7 +570,7 @@ class _GoogleButton extends StatelessWidget {
       enabled: enabled,
       label: l10n.continueWithGoogle,
       child: Material(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(999),
         clipBehavior: Clip.antiAlias,
         child: InkWell(

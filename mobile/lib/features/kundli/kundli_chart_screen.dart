@@ -151,7 +151,7 @@ class _Header extends StatelessWidget {
               height: 42,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.cardBorder),
               ),
@@ -329,7 +329,7 @@ class _TabPill extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.saffron : Colors.white,
+            color: isSelected ? AppColors.saffron : AppColors.surface,
             borderRadius: BorderRadius.circular(999),
             border: isSelected ? null : Border.all(color: AppColors.cardBorder),
           ),
@@ -428,7 +428,7 @@ class _StyleTogglePill extends StatelessWidget {
           curve: Curves.easeInOut,
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.genderSelectedBg : Colors.white,
+            color: isSelected ? AppColors.genderSelectedBg : AppColors.surface,
             borderRadius: BorderRadius.circular(999),
             border: Border.all(
               color: isSelected ? AppColors.saffron : AppColors.cardBorder,
@@ -481,7 +481,7 @@ class _ChartCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.cardBorder),
       ),
@@ -562,7 +562,7 @@ class _KeyPlanetsLegend extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         border: Border.all(color: AppColors.cardBorder),
         borderRadius: BorderRadius.circular(16),
       ),
@@ -699,7 +699,7 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         border: Border.all(color: AppColors.cardBorder),
         borderRadius: BorderRadius.circular(14),
       ),

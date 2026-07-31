@@ -84,7 +84,7 @@ class _Header extends StatelessWidget {
         Semantics(
           button: true,
           child: Material(
-            color: Colors.white,
+            color: AppColors.surface,
             shape: CircleBorder(side: BorderSide(color: AppColors.cardBorder)),
             clipBehavior: Clip.antiAlias,
             child: InkWell(
@@ -188,7 +188,7 @@ class _PeriodChip extends StatelessWidget {
           curve: Curves.easeInOut,
           padding: const EdgeInsets.symmetric(vertical: 9),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.saffron : Colors.white,
+            color: isSelected ? AppColors.saffron : AppColors.surface,
             borderRadius: BorderRadius.circular(999),
             border: isSelected ? null : Border.all(color: AppColors.cardBorder),
           ),
@@ -311,7 +311,7 @@ class _SignCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.only(top: 16, bottom: 14),
           decoration: BoxDecoration(
-            color: isUserSign ? AppColors.genderSelectedBg : Colors.white,
+            color: isUserSign ? AppColors.genderSelectedBg : AppColors.surface,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: isUserSign ? AppColors.saffron : AppColors.cardBorder,

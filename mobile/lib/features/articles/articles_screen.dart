@@ -132,7 +132,7 @@ class _Header extends StatelessWidget {
               height: 42,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.cardBorder),
               ),
@@ -169,7 +169,7 @@ class _Header extends StatelessWidget {
               height: 42,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.cardBorder),
               ),
@@ -246,7 +246,7 @@ class _CategoryChip extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.saffron : Colors.white,
+            color: isSelected ? AppColors.saffron : AppColors.surface,
             borderRadius: BorderRadius.circular(999),
             border: isSelected ? null : Border.all(color: AppColors.cardBorder),
           ),
@@ -488,7 +488,7 @@ class _ArticleRow extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.fromLTRB(10, 10, 14, 10),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             border: Border.all(color: AppColors.cardBorder),
             borderRadius: BorderRadius.circular(16),
           ),

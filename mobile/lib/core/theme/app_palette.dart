@@ -23,9 +23,11 @@ import 'package:flutter/material.dart';
 ///    move, so there's nothing to re-derive (verified below).
 ///  - **Surfaces invert into the brand's own navy family** — never pure
 ///    black/grey. [cream] (the app-wide Scaffold background) becomes
-///    `#0B0F19`; [chartPaper] (the one other "paper" surface) becomes the
-///    slightly-lighter elevated-card tone `#161C2A`; borders
-///    ([cardBorder]) become `#2A3346`.
+///    `#0B0F19`; [surface] — the raised card/tile/chip/field/nav-bar tone
+///    that sits on top of it, and which [chartPaper] and Flutter's own
+///    Material defaults also resolve to — becomes `#161C2A`; [surfaceAlt]
+///    (one step further raised) `#222B3D`; borders ([cardBorder]) become
+///    `#2A3346`. [shadow] becomes true black.
 ///  - **Text inverts**: [ink] → `#F0F2F7` (near-white), [muted] → `#9BA3B8`,
 ///    [hint] → `#7A8296`.
 ///  - **Pale tinted tile backgrounds** (`tileXxxBg`, [mantraBg]/[warnBg]/
@@ -57,7 +59,12 @@ import 'package:flutter/material.dart';
 /// margin, so nothing needed lightening beyond the values already baked in
 /// here):
 ///  - ink-on-background 17.10 · muted-on-background 7.59 ·
-///    hint-on-background 4.98 · ink-on-card 15.20
+///    hint-on-background 6.15
+///  - ink-on-[surface] 15.20 · muted-on-[surface] 6.75 ·
+///    hint-on-[surface] 5.47 · saffron-on-[surface] 5.55 ·
+///    gold-on-[surface] 8.10
+///  - ink-on-[surfaceAlt] 12.66 · muted-on-[surfaceAlt] 5.62 ·
+///    hint-on-[surfaceAlt] 4.55
 ///  - tileBlueFg/Bg 6.03 · tileGoldFg/Bg 7.89 · tileGreenFg/Bg 8.41 ·
 ///    tilePurpleFg/Bg 6.40 · tileCyanFg/Bg 7.87 · tilePinkFg/Bg 6.31 ·
 ///    ashubhFg/Bg 6.05 · terracottaFg/Bg 6.92 · genderSelectedText/Bg 7.36
@@ -87,6 +94,9 @@ abstract final class AppPalette {
     cream: Color(0xFFFDF8F1),
     ink: Color(0xFF1E2433),
     muted: Color(0xFF6E7385),
+    surface: Color(0xFFFFFFFF),
+    surfaceAlt: Color(0xFFFDF8F1),
+    shadow: Color(0xFF1E2433),
     cardBorder: Color(0xFFEFE7DB),
     navyHeroBottom: _lightNavyHeroBottom,
     mutedOnNavy: Color(0xFF8E97B5),
@@ -224,6 +234,12 @@ abstract final class AppPalette {
   static const Color _darkNavyHeroBottom = Color(0xFF1B2A54);
   static const Color _darkPaywallMid = Color(0xFF1E2C52);
 
+  /// The elevated card/tile/nav-bar surface that sits on top of the near-black
+  /// `#0B0F19` page background — also what `chartPaper` (the kundli chart's
+  /// "paper") and Flutter's own Material `Card`/`Dialog`/`BottomSheet`
+  /// defaults resolve to in dark mode (see `MainApp.darkTheme`).
+  static const Color _darkSurface = Color(0xFF161C2A);
+
   // Brand oranges stay identical to light — see doc comment.
   static const Color _darkPanchangOrange1 = _lightPanchangOrange1;
   static const Color _darkPanchangOrange3 = _lightPanchangOrange3;
@@ -242,10 +258,18 @@ abstract final class AppPalette {
     cream: Color(0xFF0B0F19),
     ink: Color(0xFFF0F2F7),
     muted: Color(0xFF9BA3B8),
+    surface: _darkSurface,
+    surfaceAlt: Color(0xFF222B3D),
+    shadow: Color(0xFF000000),
     cardBorder: Color(0xFF2A3346),
     navyHeroBottom: _darkNavyHeroBottom,
     mutedOnNavy: Color(0xFFC1C6D7),
-    hint: Color(0xFF7A8296),
+    // Lightened from the first dark pass's #7A8296, which only cleared AA
+    // against the near-black PAGE background (4.98) — hint text is mostly
+    // rendered inside cards, and on `surface` #161C2A that value fell to
+    // 4.43, just under the 4.5 bar. #8A92A6 clears it on all three dark
+    // backgrounds: page 6.15 · surface 5.47 · surfaceAlt 4.55.
+    hint: Color(0xFF8A92A6),
     divider: Color(0xFF242C40),
     googleBlue: Color(0xFF4285F4),
     otpBorderFilled: Color(0xFF3A445C),
@@ -286,7 +310,7 @@ abstract final class AppPalette {
     warnBg: Color(0xFF3B2F11),
     rowDivider: Color(0xFF202838),
     avoidText: Color(0xFFDC9393),
-    chartPaper: Color(0xFF161C2A),
+    chartPaper: _darkSurface,
     chartLine: Color(0xFFE3C259),
     chartHouseNumber: Color(0xFFD2C293),
     planetKetu: Color(0xFFB4BCCB),
@@ -382,6 +406,9 @@ class AppColorSet {
     required this.cream,
     required this.ink,
     required this.muted,
+    required this.surface,
+    required this.surfaceAlt,
+    required this.shadow,
     required this.cardBorder,
     required this.navyHeroBottom,
     required this.mutedOnNavy,
@@ -465,6 +492,9 @@ class AppColorSet {
   final Color cream;
   final Color ink;
   final Color muted;
+  final Color surface;
+  final Color surfaceAlt;
+  final Color shadow;
   final Color cardBorder;
   final Color navyHeroBottom;
   final Color mutedOnNavy;

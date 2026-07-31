@@ -180,7 +180,7 @@ class _Header extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(16, topPadding, 16, 14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         border: Border(bottom: BorderSide(color: AppColors.cardBorder)),
       ),
       child: Row(
@@ -466,7 +466,7 @@ class _TopicTile extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.only(top: 9, bottom: 8, left: 2, right: 2),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             border: Border.all(color: AppColors.cardBorder),
             borderRadius: BorderRadius.circular(12),
           ),
@@ -513,7 +513,7 @@ class _MessageBubble extends StatelessWidget {
         constraints: BoxConstraints(maxWidth: maxWidth),
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
         decoration: BoxDecoration(
-          color: isAssistant ? Colors.white : null,
+          color: isAssistant ? AppColors.surface : null,
           gradient: isAssistant ? null : AppColors.saffronGradient,
           border: isAssistant ? Border.all(color: AppColors.cardBorder) : null,
           borderRadius: isAssistant
@@ -577,7 +577,7 @@ class _SuggestionChips extends StatelessWidget {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   border: Border.all(color: AppColors.chipBorderWarm),
                   borderRadius: BorderRadius.circular(999),
                 ),
@@ -648,7 +648,7 @@ class _TypingIndicatorState extends State<_TypingIndicator>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           border: Border.all(color: AppColors.cardBorder),
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(18),
@@ -737,7 +737,7 @@ class _InputBar extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         border: Border(top: BorderSide(color: AppColors.cardBorder)),
       ),
       child: SafeArea(

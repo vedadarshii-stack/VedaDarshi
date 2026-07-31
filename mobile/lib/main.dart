@@ -16,15 +16,6 @@ import 'features/startup/root_gate.dart';
 import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
 
-/// Elevated dark-mode surface (Card/Dialog/BottomSheet defaults) — the
-/// "card/white surfaces ≈ #161C2A" reference value from
-/// `app_palette.dart`'s doc comment. Not an [AppColors]/[AppPalette] member
-/// itself (none of the app's 81 brand tokens represent a generic "card
-/// surface" — most screens style their own cards explicitly), so it's kept
-/// local to the one place ([MainApp]'s `darkTheme`) that needs it for
-/// Flutter's own Material widget defaults.
-const Color _darkElevatedSurface = Color(0xFF161C2A);
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -142,8 +133,10 @@ class MainApp extends ConsumerWidget {
         colorScheme: ColorScheme.fromSeed(
           seedColor: AppPalette.light.saffron,
           brightness: Brightness.light,
-        ),
+        ).copyWith(surface: AppPalette.light.surface),
         scaffoldBackgroundColor: AppPalette.light.cream,
+        cardColor: AppPalette.light.surface,
+        dividerColor: AppPalette.light.cardBorder,
       ),
       darkTheme: ThemeData(
         useMaterial3: true,
@@ -151,9 +144,9 @@ class MainApp extends ConsumerWidget {
         colorScheme: ColorScheme.fromSeed(
           seedColor: AppPalette.dark.saffron,
           brightness: Brightness.dark,
-        ).copyWith(surface: _darkElevatedSurface),
+        ).copyWith(surface: AppPalette.dark.surface),
         scaffoldBackgroundColor: AppPalette.dark.cream,
-        cardColor: _darkElevatedSurface,
+        cardColor: AppPalette.dark.surface,
         dividerColor: AppPalette.dark.cardBorder,
       ),
       themeMode: themeMode,

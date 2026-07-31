@@ -469,7 +469,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   borderRadius: BorderRadius.circular(14),
                   border: border,
                   boxShadow: shadow,
@@ -518,7 +518,7 @@ class _BackButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: AppColors.surface,
       shape: CircleBorder(side: BorderSide(color: AppColors.cardBorder)),
       child: InkWell(
         onTap: onTap,

@@ -62,7 +62,7 @@ class AppEmptyState extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(18, 30, 18, 26),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         border: Border.all(color: AppColors.cardBorder),
         borderRadius: BorderRadius.circular(20),
       ),

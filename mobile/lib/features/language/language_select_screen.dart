@@ -235,7 +235,7 @@ class _LanguageCard extends StatelessWidget {
             width: double.infinity,
             padding: EdgeInsets.all(isCompact ? 14 : 18),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isSelected ? AppColors.saffron : AppColors.cardBorder,

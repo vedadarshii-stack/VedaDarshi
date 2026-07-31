@@ -142,7 +142,7 @@ class _Header extends StatelessWidget {
               height: 42,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.cardBorder),
               ),
@@ -241,7 +241,7 @@ class _ProfileCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.saffron, width: 1.5),
         boxShadow: [
@@ -500,7 +500,7 @@ class _ChartStyleCard extends StatelessWidget {
           curve: Curves.easeInOut,
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.genderSelectedBg : Colors.white,
+            color: isSelected ? AppColors.genderSelectedBg : AppColors.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isSelected ? AppColors.saffron : AppColors.cardBorder,

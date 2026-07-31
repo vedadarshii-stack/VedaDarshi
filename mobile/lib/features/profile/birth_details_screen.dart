@@ -512,7 +512,7 @@ class _FieldBox extends StatelessWidget {
       duration: const Duration(milliseconds: 150),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: isActive ? AppColors.saffron : AppColors.cardBorder,
@@ -606,7 +606,7 @@ class _GenderPill extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 12),
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: isSelected ? AppColors.genderSelectedBg : Colors.white,
+              color: isSelected ? AppColors.genderSelectedBg : AppColors.surface,
               borderRadius: BorderRadius.circular(999),
               border: Border.all(
                 color: isSelected ? AppColors.saffron : AppColors.cardBorder,
@@ -662,12 +662,12 @@ class _PlaceResultsDropdown extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(top: 6),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.cardBorder),
         boxShadow: [
           BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.10),
+            color: AppColors.shadow.withValues(alpha: 0.10),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),
@@ -724,7 +724,7 @@ class _PlaceResultRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: highlighted ? AppColors.cream : Colors.white,
+      color: highlighted ? AppColors.surfaceAlt : AppColors.surface,
       child: InkWell(
         onTap: onTap,
         child: Padding(
@@ -829,7 +829,7 @@ class _UnknownTimeCheckbox extends StatelessWidget {
                   width: 20,
                   height: 20,
                   decoration: BoxDecoration(
-                    color: checked ? AppColors.saffron : Colors.white,
+                    color: checked ? AppColors.saffron : AppColors.surface,
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
                       color: AppColors.otpBorderFilled,

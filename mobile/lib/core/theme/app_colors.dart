@@ -48,6 +48,33 @@ abstract final class AppColors {
   static Color get ink => _active.ink;
   static Color get muted => _active.muted;
 
+  /// Background of every raised element that sits ON TOP of the [cream] page
+  /// background: cards, tiles, chips, input fields, sheets, the bottom nav
+  /// bar and the circular top-bar icon buttons.
+  ///
+  /// This used to be a hardcoded `Colors.white` at ~55 call sites, which is
+  /// exactly why the first dark-mode pass looked broken — the page went dark
+  /// and the text inverted to near-white, but every card stayed pure white,
+  /// leaving near-white text on a white card. It MUST be a palette token so
+  /// it flips with everything else.
+  static Color get surface => _active.surface;
+
+  /// A slightly *raised* variant of [surface], used where one row/card has
+  /// to read as emphasized against its neighbours (currently just the
+  /// highlighted city suggestion in the Place-of-Birth autocomplete).
+  ///
+  /// Note the direction flips with the theme, on purpose: in light mode
+  /// emphasis reads as "slightly darker/warmer than white", in dark mode as
+  /// "slightly lighter than the card". Hardcoding [cream] for the highlight
+  /// (as the autocomplete originally did) inverts wrongly in dark mode,
+  /// where [cream] is the near-black PAGE background.
+  static Color get surfaceAlt => _active.surfaceAlt;
+
+  /// Base color for drop shadows. Light mode casts the brand ink; dark mode
+  /// casts true black — using [ink] here (as three call sites originally
+  /// did) paints a near-WHITE glow around every card once [ink] inverts.
+  static Color get shadow => _active.shadow;
+
   /// Border color for unselected cards (e.g. the language-select cards).
   static Color get cardBorder => _active.cardBorder;
 
