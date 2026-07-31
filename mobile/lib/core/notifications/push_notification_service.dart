@@ -221,6 +221,45 @@ class PushNotificationService {
     }
   }
 
+  /// Removes THIS device's token from the signed-in user's Firestore
+  /// subcollection and invalidates it with FCM. Call it on sign-out.
+  ///
+  /// MUST run BEFORE `FirebaseAuth.signOut()`: the deployed Firestore rules
+  /// only allow writes under `/users/{uid}` when `request.auth.uid == uid`,
+  /// so once the user is signed out the delete is denied and the token is
+  /// orphaned — leaving the previous account still receiving push
+  /// notifications on a phone it no longer owns.
+  ///
+  /// Never throws; a failure here must not block sign-out.
+  Future<void> removeTokenForCurrentUser() async {
+    try {
+      final User? user;
+      try {
+        user = _firebaseAuth.currentUser;
+      } catch (_) {
+        return;
+      }
+      if (user == null) return;
+
+      final token = await _messaging.getToken();
+      if (token != null) {
+        await _firestore
+            .collection(usersCollection)
+            .doc(user.uid)
+            .collection(fcmTokensCollection)
+            .doc(token)
+            .delete();
+      }
+
+      // Also invalidate the registration token itself, so the old token
+      // can't be used to reach this device at all. FCM mints a fresh one
+      // automatically on the next getToken() (i.e. the next sign-in).
+      await _messaging.deleteToken();
+    } catch (e) {
+      debugPrint('PushNotificationService.removeTokenForCurrentUser: $e');
+    }
+  }
+
   Future<void> _onTokenRefresh(String token) async {
     // Tokens rotate — FCM can mint a new one at any time (app data cleared,
     // token expiry, etc.). A stale token left in Firestore silently stops

@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/auth/auth_providers.dart';
+import '../../core/auth/auth_service.dart';
 import '../../core/locale/locale_controller.dart';
 import '../../core/motion/app_motion.dart';
+import '../../core/notifications/push_notification_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../core/widgets/app_bottom_nav.dart';
 import '../../l10n/app_localizations.dart';
 import '../kundli/kundli_static_data.dart';
+import '../auth/auth_error_messages.dart';
 import '../notifications/notifications_screen.dart';
 import '../panchang/panchang_static_data.dart';
 import '../premium/subscription_paywall_screen.dart';
@@ -100,8 +103,10 @@ class ProfileSettingsScreen extends ConsumerStatefulWidget {
       _ProfileSettingsScreenState();
 }
 
-class _ProfileSettingsScreenState
-    extends ConsumerState<ProfileSettingsScreen> {
+class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
+  /// Guards against a double-tap firing two concurrent sign-outs.
+  bool _isSigningOut = false;
+
   Future<void> _confirmSignOut(AppLocalizations l10n, Locale locale) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -152,20 +157,50 @@ class _ProfileSettingsScreenState
     await _signOut();
   }
 
-  /// See this class's doc comment — every one of these four steps is
-  /// required, or a signed-out user gets routed straight back to Home off
-  /// the stale cached profile (the exact bug `projects/CLAUDE.md` warns
-  /// about).
+  /// See this class's doc comment — every one of these steps is required, or
+  /// a signed-out user gets routed straight back to Home off the stale
+  /// cached profile (the exact bug `projects/CLAUDE.md` warns about).
+  ///
+  /// ORDER MATTERS: the push token is removed FIRST, while the user is still
+  /// authenticated. The Firestore rules only permit writes under
+  /// `/users/{uid}` for that uid, so deleting it after `signOut()` would be
+  /// denied and this phone would keep receiving the previous account's push
+  /// notifications.
   Future<void> _signOut() async {
-    await ref.read(authServiceProvider).signOut();
-    await ref.read(birthProfileRepositoryProvider).clearLocal();
-    ref.invalidate(birthProfileProvider);
-    ref.invalidate(hasBirthProfileProvider);
-    if (!mounted) return;
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute<void>(builder: (_) => const RootGate()),
-      (route) => false,
-    );
+    if (_isSigningOut) return;
+    setState(() => _isSigningOut = true);
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      await ref
+          .read(pushNotificationServiceProvider)
+          .removeTokenForCurrentUser();
+      await ref.read(authServiceProvider).signOut();
+      await ref.read(birthProfileRepositoryProvider).clearLocal();
+      ref.invalidate(birthProfileProvider);
+      ref.invalidate(hasBirthProfileProvider);
+      if (!mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute<void>(builder: (_) => const RootGate()),
+        (route) => false,
+      );
+    } on AuthException catch (e) {
+      // Sign-out can genuinely fail (no network). Surface it instead of
+      // leaving the user tapping a button that appears to do nothing.
+      if (!mounted) return;
+      setState(() => _isSigningOut = false);
+      final message = authErrorMessage(l10n, e.code);
+      if (message != null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
+      }
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isSigningOut = false);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.authErrorUnknown)));
+    }
   }
 
   @override
@@ -343,9 +378,9 @@ class _ProfileSettingsScreenState
                   title: l10n.profileRestorePurchases,
                   locale: locale,
                   isLast: true,
-                  onTap: () => Navigator.of(context).push(
-                    fadeThroughRoute(const SubscriptionPaywallScreen()),
-                  ),
+                  onTap: () => Navigator.of(
+                    context,
+                  ).push(fadeThroughRoute(const SubscriptionPaywallScreen())),
                 ),
               ],
             ),
@@ -608,9 +643,7 @@ class _LanguagePill extends StatelessWidget {
           decoration: BoxDecoration(
             color: isSelected ? AppColors.saffron : Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: isSelected
-                ? null
-                : Border.all(color: AppColors.cardBorder),
+            border: isSelected ? null : Border.all(color: AppColors.cardBorder),
           ),
           child: Text(
             // Each option renders in its OWN locale's face (Latin-only
@@ -693,10 +726,7 @@ class _MenuRow extends StatelessWidget {
           child: InkWell(
             onTap: onTap,
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 14,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               child: Row(
                 children: [
                   SizedBox(
