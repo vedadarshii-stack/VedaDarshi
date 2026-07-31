@@ -426,4 +426,514 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get generateKundli => 'ஜாதகம் உருவாக்கு';
+
+  @override
+  String get lagnaKundli => 'லக்ன ஜாதகம்';
+
+  @override
+  String get pdf => 'PDF';
+
+  @override
+  String get tabChart => 'விளக்கப்படம்';
+
+  @override
+  String get tabPlanetPositions => 'கிரக நிலைகள்';
+
+  @override
+  String get tabDasha => 'விம்சோத்தரி தசை';
+
+  @override
+  String get tabPredictions => 'கணிப்புகள்';
+
+  @override
+  String get keyPlanets => 'முக்கிய கிரகங்கள்';
+
+  @override
+  String get lagna => 'லக்னம்';
+
+  @override
+  String get rashi => 'ராசி';
+
+  @override
+  String get southChartComingSoon =>
+      'தென் இந்திய விளக்கப்பட வடிவமைப்பு விரைவில் வரும்.';
+
+  @override
+  String get kundliMatchingTitle => 'ஜாதக பொருத்தம்';
+
+  @override
+  String get gunMilanIntro =>
+      'அஷ்டகூட குண மிலன் திருமண பொருத்தத்திற்காக 36 குணங்களில் 8 அம்சங்களை ஒப்பிடுகிறது.';
+
+  @override
+  String get groom => 'மணமகன்';
+
+  @override
+  String get bride => 'மணமகள்';
+
+  @override
+  String get change => 'மாற்று';
+
+  @override
+  String get selectBrideProfile => 'மணமகள் சுயவிவரத்தைத் தேர்ந்தெடுக்கவும்…';
+
+  @override
+  String get selectBrideHint =>
+      'தேர்ந்தெடுக்க அல்லது பிறப்பு விவரங்களைச் சேர்க்க தட்டவும்';
+
+  @override
+  String get matchingPrivacyNote =>
+      'பொருத்த முடிவுகள் தனிப்பட்டவை மற்றும் உங்கள் கணக்கில் மட்டும் சேமிக்கப்படும்';
+
+  @override
+  String get matchKundlis => 'ஜாதகங்களைப் பொருத்தவும்';
+
+  @override
+  String get matchResult => 'பொருத்த முடிவு';
+
+  @override
+  String outOfMax(int max) {
+    return '$max இல்';
+  }
+
+  @override
+  String percentCompatible(int percent) {
+    return '$percent% பொருத்தம்';
+  }
+
+  @override
+  String get ashtakootaBreakdown => 'அஷ்டகூட விவரம்';
+
+  @override
+  String get bandStrong => 'சிறந்தது (75%+)';
+
+  @override
+  String get bandModerate => 'நடுத்தரம் (40–74%)';
+
+  @override
+  String get bandWeak => 'பலவீனம் (<40%)';
+
+  @override
+  String get gunaVarna => 'வர்ணம்';
+
+  @override
+  String get gunaVashya => 'வஷ்யம்';
+
+  @override
+  String get gunaTara => 'தாரா';
+
+  @override
+  String get gunaYoni => 'யோனி';
+
+  @override
+  String get gunaGrahaMaitri => 'கிரக மைத்ரி';
+
+  @override
+  String get gunaGana => 'கணம்';
+
+  @override
+  String get gunaBhakoot => 'பகூட்';
+
+  @override
+  String get gunaNadi => 'நாடி';
+
+  @override
+  String get rishiAiSummary => 'ரிஷி AI சுருக்கம்';
+
+  @override
+  String get aiBadge => 'AI';
+
+  @override
+  String get detailedCompatibilityReport =>
+      'விரிவான பொருத்த அறிக்கையைப் பெறவும்';
+
+  @override
+  String get tapGunaHint =>
+      'ஒவ்வொரு குணமும் எதை அளக்கிறது, ஏன் முக்கியம் என்பதைப் பார்க்க தட்டவும்';
+
+  @override
+  String get rishiAi => 'ரிஷி AI';
+
+  @override
+  String get onlineKnowsChart => 'ஆன்லைன் · உங்கள் ஜாதகம் தெரியும்';
+
+  @override
+  String freeQuota(String used, String total) {
+    return '$used/$total இலவசம்';
+  }
+
+  @override
+  String get today => 'இன்று';
+
+  @override
+  String get askAbout => 'இவற்றைப் பற்றி கேளுங்கள்';
+
+  @override
+  String get topicCareer => 'தொழில்';
+
+  @override
+  String get topicMarriage => 'திருமணம்';
+
+  @override
+  String get topicHealth => 'ஆரோக்கியம்';
+
+  @override
+  String get topicBusiness => 'வணிகம்';
+
+  @override
+  String get topicFinance => 'நிதி';
+
+  @override
+  String get topicEducation => 'கல்வி';
+
+  @override
+  String get topicTravel => 'பயணம்';
+
+  @override
+  String get topicGemstones => 'ரத்தினங்கள்';
+
+  @override
+  String get topicRemedies => 'பரிகாரங்கள்';
+
+  @override
+  String get topicNumerology => 'எண் கணிதம்';
+
+  @override
+  String get rishiTyping => 'ரிஷி தட்டச்சு செய்கிறார்…';
+
+  @override
+  String get askAboutYourStars => 'உங்கள் நட்சத்திரங்களைப் பற்றி கேளுங்கள்…';
+
+  @override
+  String get upgradeUnlimited => 'வரம்பற்ற கேள்விகளுக்கு அப்கிரேட் செய்யவும்';
+
+  @override
+  String get aiNotConnected =>
+      'AI சேவை இணைக்கப்பட்டதும் பதில்கள் இங்கே தோன்றும்.';
+
+  @override
+  String get premiumReportsTitle => 'பிரீமியம் அறிக்கைகள்';
+
+  @override
+  String get goPremium => 'பிரீமியம் பெறவும்';
+
+  @override
+  String goPremiumSubtitle(String total) {
+    return 'அனைத்து $total அறிக்கைகள் + வரம்பற்ற AI கேள்விகளை திறக்கவும்';
+  }
+
+  @override
+  String get upgrade => 'மேம்படுத்தவும்';
+
+  @override
+  String readMinutes(String minutes) {
+    return '$minutes நிமிடம்';
+  }
+
+  @override
+  String get aiSummary => 'AI சுருக்கம்';
+
+  @override
+  String get premium => 'பிரீமியம்';
+
+  @override
+  String get free => 'இலவசம்';
+
+  @override
+  String moreReportsFooter(String remaining) {
+    return '+ $remaining மேலும் அறிக்கைகள் · அனைத்திலும் PDF பதிவிறக்கம் உள்ளது';
+  }
+
+  @override
+  String get reportCareer => 'தொழில் அறிக்கை';
+
+  @override
+  String get reportCareerDesc => 'தொழில், பதவி உயர்வுகள் & வணிக நேரம்';
+
+  @override
+  String get reportMarriage => 'திருமண அறிக்கை';
+
+  @override
+  String get reportMarriageDesc => 'நேரம், துணையின் பண்புகள் & பொருத்தம்';
+
+  @override
+  String get reportWealth => 'செல்வம் & நிதி';
+
+  @override
+  String get reportWealthDesc => 'வருமான ஆதாரங்கள், முதலீடுகள் & யோகங்கள்';
+
+  @override
+  String get reportHealth => 'உடல்நல அறிக்கை';
+
+  @override
+  String get reportHealthDesc =>
+      'பாதிப்படையக்கூடிய காலங்கள் & தடுப்பு வழிமுறைகள்';
+
+  @override
+  String get reportSadeSati => 'சாடே சாதி அறிக்கை';
+
+  @override
+  String get reportSadeSatiDesc => 'சனி கட்டங்கள் & தாக்க பகுப்பாய்வு';
+
+  @override
+  String get reportGemstone => 'ரத்தின அறிக்கை';
+
+  @override
+  String get reportGemstoneDesc => 'பரிந்துரைக்கப்பட்ட கற்கள் & அணியும் முறை';
+
+  @override
+  String get reportNumerology => 'எண் கணித அறிக்கை';
+
+  @override
+  String get reportNumerologyDesc => 'வாழ்க்கைப் பாதை, விதி & பெயர் எண்கள்';
+
+  @override
+  String get restorePurchase => 'வாங்குதலை மீட்டமைக்கவும்';
+
+  @override
+  String get vedadarshiPremium => 'Vedadarshi பிரீமியம்';
+
+  @override
+  String get premiumTagline =>
+      'வரம்பற்ற பிரபஞ்ச வழிகாட்டுதல், ஒரே எளிய திட்டம்';
+
+  @override
+  String benefitReports(String total) {
+    return 'PDF ஏற்றுமதியுடன் அனைத்து $total பிரீமியம் அறிக்கைகள்';
+  }
+
+  @override
+  String get benefitUnlimitedAi => 'வரம்பற்ற AI ஜோதிடர் கேள்விகள்';
+
+  @override
+  String get benefitAdvancedKundli =>
+      'மேம்பட்ட ஜாதகம்: தசை, தோஷம் & பரிகாரங்கள்';
+
+  @override
+  String get benefitAdFree => 'ஆப் முழுவதும் விளம்பரமற்ற அனுபவம்';
+
+  @override
+  String get planMonthly => 'மாதாந்திர';
+
+  @override
+  String get planYearly => 'வருடாந்திர';
+
+  @override
+  String get planLifetime => 'வாழ்நாள்';
+
+  @override
+  String get perMonth => 'மாதத்திற்கு';
+
+  @override
+  String get oneTimePayment => 'ஒரு முறை கட்டணம்';
+
+  @override
+  String startPremium(String price) {
+    return 'பிரீமியத்தைத் தொடங்கவும் — $price';
+  }
+
+  @override
+  String get billingFinePrint =>
+      'Google Play வழியாக பில் செய்யப்படுகிறது · எப்போது வேண்டுமானாலும் ரத்து செய்யலாம் · RevenueCat மூலம் பாதுகாப்பானது';
+
+  @override
+  String get articlesTitle => 'ஞானம் & கட்டுரைகள்';
+
+  @override
+  String get savedArticlesLabel => 'சேமிக்கப்பட்ட கட்டுரைகள்';
+
+  @override
+  String get articleCategoryAll => 'அனைத்தும்';
+
+  @override
+  String articleFeaturedBadge(String tag) {
+    return 'சிறப்பு · $tag';
+  }
+
+  @override
+  String get articleSave => 'சேமி';
+
+  @override
+  String get articleShare => 'பகிர்';
+
+  @override
+  String get articleListen => 'கேளுங்கள்';
+
+  @override
+  String articleByline(String author, String minutes) {
+    return '$author எழுதியது · $minutes நிமிட வாசிப்பு';
+  }
+
+  @override
+  String articleReadMinutes(String minutes) {
+    return '$minutes நிமி';
+  }
+
+  @override
+  String articleMetaLine(String date, String minutes) {
+    return '$date · $minutes நிமிட வாசிப்பு';
+  }
+
+  @override
+  String get searchHint => 'கட்டுரைகள், அறிக்கைகள் மற்றும் மேலும் தேடுங்கள்';
+
+  @override
+  String get searchFilterArticles => 'கட்டுரைகள்';
+
+  @override
+  String get searchRecentLabel => 'சமீபத்தியவை';
+
+  @override
+  String get searchClearRecent => 'அழி';
+
+  @override
+  String get searchClearQuery => 'தேடலை அழி';
+
+  @override
+  String get searchTrendingLabel => 'டிரெண்டிங்';
+
+  @override
+  String get searchResultsLabel => 'முடிவுகள்';
+
+  @override
+  String searchNoResultsTitle(String query) {
+    return '\"$query\" க்கு முடிவுகள் இல்லை';
+  }
+
+  @override
+  String get searchNoResultsHint =>
+      'வேறு வார்த்தைகளை முயற்சிக்கவும் அல்லது எழுத்துப்பிழையை சரிபார்க்கவும்';
+
+  @override
+  String get notificationsTitle => 'அறிவிப்புகள்';
+
+  @override
+  String get notificationsMarkAllRead => 'அனைத்தையும் படித்ததாக குறி';
+
+  @override
+  String get notificationsToday => 'இன்று';
+
+  @override
+  String get notificationsYesterday => 'நேற்று';
+
+  @override
+  String get notificationsEmptyState => 'இதுவரை அறிவிப்புகள் இல்லை';
+
+  @override
+  String get notificationsEmptyMessage =>
+      'இங்கே உங்களுக்கு தினசரி ராசிபலன், திருவிழா மற்றும் பொருத்த விழிப்பூட்டல்கள் தெரியும்.';
+
+  @override
+  String get notificationsPermissionDeniedTitle => 'அறிவிப்புகளை இயக்கவும்';
+
+  @override
+  String get notificationsPermissionDeniedMessage =>
+      'உங்கள் தினசரி ராசிபலன், திருவிழா விழிப்பூட்டல்கள் மற்றும் AI பதில்களைப் பெற அறிவிப்புகளை இயக்கவும்.';
+
+  @override
+  String get notificationsPermissionEnableAction => 'அறிவிப்புகளை இயக்கு';
+
+  @override
+  String get notificationsPermissionOpenSettingsAction => 'அமைப்புகளைத் திற';
+
+  @override
+  String get profileBirthProfiles => 'பிறப்பு சுயவிவரங்கள்';
+
+  @override
+  String profileProfileCount(String count) {
+    return '$count சுயவிவரம்';
+  }
+
+  @override
+  String get profileAppLanguageLabel => 'ஆப் மொழி';
+
+  @override
+  String get profileMyActivityLabel => 'எனது செயல்பாடு';
+
+  @override
+  String get profileMyReports => 'எனது அறிக்கைகள்';
+
+  @override
+  String get profileDownloadedPdfs => 'பதிவிறக்கிய PDFகள்';
+
+  @override
+  String get profileAiChatHistory => 'AI அரட்டை வரலாறு';
+
+  @override
+  String get profilePaymentHistory => 'பணம் செலுத்திய வரலாறு';
+
+  @override
+  String get profilePreferencesLabel => 'விருப்பத்தேர்வுகள்';
+
+  @override
+  String get profileAppearance => 'தோற்றம்';
+
+  @override
+  String get profileDarkModeComingSoon =>
+      'இருண்ட பயன்முறை எதிர்கால புதுப்பிப்பில் வரும்';
+
+  @override
+  String get profileNotifications => 'அறிவிப்புகள்';
+
+  @override
+  String get profileNotificationsSubtitle => 'தினசரி ராசிபலன், திருவிழாக்கள்';
+
+  @override
+  String get profilePanchangLocation => 'பஞ்சாங்க இடம்';
+
+  @override
+  String get profileManageSubscription => 'சந்தாவை நிர்வகிக்கவும்';
+
+  @override
+  String get profilePrivacySecurity => 'தனியுரிமை & பாதுகாப்பு';
+
+  @override
+  String get profileHelpSupport => 'உதவி & ஆதரவு';
+
+  @override
+  String get profileRewardsLabel => 'வெகுமதிகள்';
+
+  @override
+  String get profileReferEarn => 'பரிந்துரைத்து சம்பாதிக்கவும்';
+
+  @override
+  String get profileReferEarnSubtitle =>
+      'ஒவ்வொரு பரிந்துரைக்கும் 1 மாதம் இலவசம் பெறுங்கள்';
+
+  @override
+  String get profileInviteFriends => 'நண்பர்களை அழைக்கவும்';
+
+  @override
+  String get profileInviteFriendsSubtitle => 'வேததர்ஷியை பகிரவும்';
+
+  @override
+  String get profileMoreLabel => 'மேலும்';
+
+  @override
+  String get profileRateApp => 'வேததர்ஷியை மதிப்பிடவும்';
+
+  @override
+  String get profileSendFeedback => 'கருத்து அனுப்பவும்';
+
+  @override
+  String get profileRestorePurchases => 'கொள்முதல்களை மீட்டமைக்கவும்';
+
+  @override
+  String get profileLogOut => 'வெளியேறு';
+
+  @override
+  String get profileDeleteAccount => 'கணக்கை நீக்கு';
+
+  @override
+  String get profileSignOutConfirmTitle => 'வெளியேறவா?';
+
+  @override
+  String get profileSignOutConfirmMessage =>
+      'உங்கள் சேமித்த சுயவிவரங்கள் மற்றும் அறிக்கைகளை அணுக நீங்கள் மீண்டும் உள்நுழைய வேண்டும்.';
+
+  @override
+  String get profileSignOutConfirmAction => 'வெளியேறு';
+
+  @override
+  String get profileCancel => 'ரத்து செய்';
 }

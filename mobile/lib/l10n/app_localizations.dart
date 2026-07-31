@@ -889,6 +889,936 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Generate Kundli'**
   String get generateKundli;
+
+  /// Subtitle prefix on the Kundli Chart screen header, e.g. "Lagna Kundli · North Indian".
+  ///
+  /// In en, this message translates to:
+  /// **'Lagna Kundli'**
+  String get lagnaKundli;
+
+  /// Label of the PDF export pill on the Kundli Chart screen header.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF'**
+  String get pdf;
+
+  /// Label of the (selected) Chart section tab on the Kundli Chart screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Chart'**
+  String get tabChart;
+
+  /// Label of the Planet Positions section tab on the Kundli Chart screen — inert until the Vedika API is wired up.
+  ///
+  /// In en, this message translates to:
+  /// **'Planet Positions'**
+  String get tabPlanetPositions;
+
+  /// Label of the Vimshottari Dasha section tab on the Kundli Chart screen — premium-gated, a 👑 emoji suffix is appended in code.
+  ///
+  /// In en, this message translates to:
+  /// **'Vimshottari Dasha'**
+  String get tabDasha;
+
+  /// Label of the Predictions section tab on the Kundli Chart screen — premium-gated, a 👑 emoji suffix is appended in code.
+  ///
+  /// In en, this message translates to:
+  /// **'Predictions'**
+  String get tabPredictions;
+
+  /// Uppercased eyebrow label above the planet-color legend row on the Kundli Chart screen.
+  ///
+  /// In en, this message translates to:
+  /// **'KEY PLANETS'**
+  String get keyPlanets;
+
+  /// Label of the Lagna stat card on the Kundli Chart screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Lagna'**
+  String get lagna;
+
+  /// Label of the Rashi stat card on the Kundli Chart screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Rashi'**
+  String get rashi;
+
+  /// Note shown inside the chart card on the Kundli Chart screen when the South Indian layout toggle is selected — only the North Indian layout is implemented so far.
+  ///
+  /// In en, this message translates to:
+  /// **'South Indian chart layout is coming soon.'**
+  String get southChartComingSoon;
+
+  /// Heading of the Gun Milan — Select screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Kundli Matching'**
+  String get kundliMatchingTitle;
+
+  /// Explainer copy under the heading on the Gun Milan — Select screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Ashtakoota Gun Milan compares 8 aspects across 36 gunas for marriage compatibility.'**
+  String get gunMilanIntro;
+
+  /// Uppercased badge label on the groom profile card on the Gun Milan — Select screen.
+  ///
+  /// In en, this message translates to:
+  /// **'GROOM'**
+  String get groom;
+
+  /// Uppercased badge label on the bride profile card on the Gun Milan — Select screen.
+  ///
+  /// In en, this message translates to:
+  /// **'BRIDE'**
+  String get bride;
+
+  /// Label of the inline text button on a profile card that lets the user switch to a different saved profile — currently a no-op pending multi-profile support.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get change;
+
+  /// Title of the bride card's empty state on the Gun Milan — Select screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Select bride profile…'**
+  String get selectBrideProfile;
+
+  /// Subtitle of the bride card's empty state on the Gun Milan — Select screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to choose or add birth details'**
+  String get selectBrideHint;
+
+  /// Privacy reassurance note near the bottom of the Gun Milan — Select screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Matching results are private and saved to your account only'**
+  String get matchingPrivacyNote;
+
+  /// Label of the CTA button on the Gun Milan — Select screen that runs the Gun Milan calculation. The 💞 emoji suffix is appended in code, not stored in this string.
+  ///
+  /// In en, this message translates to:
+  /// **'Match Kundlis'**
+  String get matchKundlis;
+
+  /// Header title of the Gun Milan — Result screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Match Result'**
+  String get matchResult;
+
+  /// Small caption under the compatibility ring's total score on the Gun Milan — Result screen, naming the maximum possible score.
+  ///
+  /// In en, this message translates to:
+  /// **'out of {max}'**
+  String outOfMax(int max);
+
+  /// Caption under the compatibility ring on the Gun Milan — Result screen.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% Compatible'**
+  String percentCompatible(int percent);
+
+  /// Section heading above the guna score grid on the Gun Milan — Result screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Ashtakoota breakdown'**
+  String get ashtakootaBreakdown;
+
+  /// Legend chip label for the strong-band guna colour on the Gun Milan — Result screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong (75%+)'**
+  String get bandStrong;
+
+  /// Legend chip label for the moderate-band guna colour on the Gun Milan — Result screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate (40–74%)'**
+  String get bandModerate;
+
+  /// Legend chip label for the weak-band guna colour on the Gun Milan — Result screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Weak (<40%)'**
+  String get bandWeak;
+
+  /// Name of the Varna guna in the Ashtakoota breakdown grid.
+  ///
+  /// In en, this message translates to:
+  /// **'Varna'**
+  String get gunaVarna;
+
+  /// Name of the Vashya guna in the Ashtakoota breakdown grid.
+  ///
+  /// In en, this message translates to:
+  /// **'Vashya'**
+  String get gunaVashya;
+
+  /// Name of the Tara guna in the Ashtakoota breakdown grid.
+  ///
+  /// In en, this message translates to:
+  /// **'Tara'**
+  String get gunaTara;
+
+  /// Name of the Yoni guna in the Ashtakoota breakdown grid.
+  ///
+  /// In en, this message translates to:
+  /// **'Yoni'**
+  String get gunaYoni;
+
+  /// Name of the Graha Maitri guna in the Ashtakoota breakdown grid.
+  ///
+  /// In en, this message translates to:
+  /// **'Graha Maitri'**
+  String get gunaGrahaMaitri;
+
+  /// Name of the Gana guna in the Ashtakoota breakdown grid.
+  ///
+  /// In en, this message translates to:
+  /// **'Gana'**
+  String get gunaGana;
+
+  /// Name of the Bhakoot guna in the Ashtakoota breakdown grid.
+  ///
+  /// In en, this message translates to:
+  /// **'Bhakoot'**
+  String get gunaBhakoot;
+
+  /// Name of the Nadi guna in the Ashtakoota breakdown grid.
+  ///
+  /// In en, this message translates to:
+  /// **'Nadi'**
+  String get gunaNadi;
+
+  /// Title of the AI summary card on the Gun Milan — Result screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Rishi AI Summary'**
+  String get rishiAiSummary;
+
+  /// Short badge label on the Rishi AI summary card. A ✨ emoji prefix is appended in code, not stored in this string.
+  ///
+  /// In en, this message translates to:
+  /// **'AI'**
+  String get aiBadge;
+
+  /// Label of the CTA button at the bottom of the Gun Milan — Result screen, leading to the (not yet built) Premium Reports flow.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Detailed Compatibility Report'**
+  String get detailedCompatibilityReport;
+
+  /// Footer hint at the bottom of the Gun Milan — Result screen, under the CTA.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap any guna to see what it measures & why it matters'**
+  String get tapGunaHint;
+
+  /// Header title of the AI Astrologer chat screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Rishi AI'**
+  String get rishiAi;
+
+  /// Header subtitle of the AI Astrologer chat screen, confirming the assistant has the user's birth chart.
+  ///
+  /// In en, this message translates to:
+  /// **'Online · knows your chart'**
+  String get onlineKnowsChart;
+
+  /// Header pill on the AI Astrologer chat screen showing how many free questions have been used today.
+  ///
+  /// In en, this message translates to:
+  /// **'{used}/{total} free'**
+  String freeQuota(String used, String total);
+
+  /// Centred date divider above today's messages on the AI Astrologer chat screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// Uppercased label above the topic chips on the AI Astrologer chat screen.
+  ///
+  /// In en, this message translates to:
+  /// **'ASK ABOUT'**
+  String get askAbout;
+
+  /// Label of the Career topic chip on the AI Astrologer chat screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Career'**
+  String get topicCareer;
+
+  /// Label of the Marriage topic chip on the AI Astrologer chat screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Marriage'**
+  String get topicMarriage;
+
+  /// Label of the Health topic chip on the AI Astrologer chat screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Health'**
+  String get topicHealth;
+
+  /// Label of the Business topic chip on the AI Astrologer chat screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Business'**
+  String get topicBusiness;
+
+  /// Label of the Finance topic chip on the AI Astrologer chat screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Finance'**
+  String get topicFinance;
+
+  /// Label of the Education topic chip on the AI Astrologer chat screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Education'**
+  String get topicEducation;
+
+  /// Label of the Travel topic chip on the AI Astrologer chat screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel'**
+  String get topicTravel;
+
+  /// Label of the Gemstones topic chip on the AI Astrologer chat screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Gemstones'**
+  String get topicGemstones;
+
+  /// Label of the Remedies topic chip on the AI Astrologer chat screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Remedies'**
+  String get topicRemedies;
+
+  /// Label of the Numerology topic chip on the AI Astrologer chat screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Numerology'**
+  String get topicNumerology;
+
+  /// Label next to the animated typing-indicator dots on the AI Astrologer chat screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Rishi is typing…'**
+  String get rishiTyping;
+
+  /// Placeholder hint text in the message input field on the AI Astrologer chat screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask about your stars…'**
+  String get askAboutYourStars;
+
+  /// Label of the upgrade link under the input bar on the AI Astrologer chat screen. A ✨ emoji prefix is appended in code, not stored in this string.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade for unlimited questions'**
+  String get upgradeUnlimited;
+
+  /// Snackbar shown after sending a chat message, since no AI backend is wired up yet (provider decision still open per CLAUDE.md).
+  ///
+  /// In en, this message translates to:
+  /// **'AI replies will appear here once the AI service is connected.'**
+  String get aiNotConnected;
+
+  /// Header title on the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Reports'**
+  String get premiumReportsTitle;
+
+  /// Bold headline inside the Go Premium banner on the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Go Premium'**
+  String get goPremium;
+
+  /// Subtitle inside the Go Premium banner on the Premium Reports screen, naming the total number of reports in the full catalogue.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock all {total} reports + unlimited AI questions'**
+  String goPremiumSubtitle(String total);
+
+  /// Label of the pill CTA inside the Go Premium banner on the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade'**
+  String get upgrade;
+
+  /// Reading-time meta chip on a report card on the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String readMinutes(String minutes);
+
+  /// AI-summary meta chip label on a report card on the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Summary'**
+  String get aiSummary;
+
+  /// Access badge label on a locked report card on the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium'**
+  String get premium;
+
+  /// Access badge label on an unlocked report card on the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get free;
+
+  /// Footer note under the report list on the Premium Reports screen, naming how many additional reports are not yet listed.
+  ///
+  /// In en, this message translates to:
+  /// **'+ {remaining} more reports · All include PDF download'**
+  String moreReportsFooter(String remaining);
+
+  /// Title of the Career report on the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Career Report'**
+  String get reportCareer;
+
+  /// Description of the Career report on the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Profession, promotions & business timing'**
+  String get reportCareerDesc;
+
+  /// Title of the Marriage report on the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Marriage Report'**
+  String get reportMarriage;
+
+  /// Description of the Marriage report on the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Timing, spouse traits & compatibility'**
+  String get reportMarriageDesc;
+
+  /// Title of the Wealth & Finance report on the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Wealth & Finance'**
+  String get reportWealth;
+
+  /// Description of the Wealth & Finance report on the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Income sources, investments & yogas'**
+  String get reportWealthDesc;
+
+  /// Title of the Health report on the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Health Report'**
+  String get reportHealth;
+
+  /// Description of the Health report on the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Vulnerable periods & preventive remedies'**
+  String get reportHealthDesc;
+
+  /// Title of the Sade Sati report on the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Sade Sati Report'**
+  String get reportSadeSati;
+
+  /// Description of the Sade Sati report on the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturn phases & impact analysis'**
+  String get reportSadeSatiDesc;
+
+  /// Title of the Gemstone report on the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Gemstone Report'**
+  String get reportGemstone;
+
+  /// Description of the Gemstone report on the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended stones & wearing method'**
+  String get reportGemstoneDesc;
+
+  /// Title of the Numerology report on the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Numerology Report'**
+  String get reportNumerology;
+
+  /// Description of the Numerology report on the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Life path, destiny & name numbers'**
+  String get reportNumerologyDesc;
+
+  /// Label of the tappable 'restore purchase' link in the Subscription Paywall's top bar.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore purchase'**
+  String get restorePurchase;
+
+  /// Heading of the Subscription Paywall's hero section, naming the premium product.
+  ///
+  /// In en, this message translates to:
+  /// **'Vedadarshi Premium'**
+  String get vedadarshiPremium;
+
+  /// Subtitle under the heading in the Subscription Paywall's hero section.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited cosmic guidance, one simple plan'**
+  String get premiumTagline;
+
+  /// First benefit line item on the Subscription Paywall, naming the total number of reports in the full catalogue.
+  ///
+  /// In en, this message translates to:
+  /// **'All {total} premium reports with PDF export'**
+  String benefitReports(String total);
+
+  /// Second benefit line item on the Subscription Paywall.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited AI Astrologer questions'**
+  String get benefitUnlimitedAi;
+
+  /// Third benefit line item on the Subscription Paywall.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced Kundli: dasha, dosha & remedies'**
+  String get benefitAdvancedKundli;
+
+  /// Fourth benefit line item on the Subscription Paywall.
+  ///
+  /// In en, this message translates to:
+  /// **'Ad-free experience across the app'**
+  String get benefitAdFree;
+
+  /// Name of the monthly subscription plan card on the Subscription Paywall.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get planMonthly;
+
+  /// Name of the yearly subscription plan card on the Subscription Paywall.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly'**
+  String get planYearly;
+
+  /// Name of the lifetime subscription plan card on the Subscription Paywall.
+  ///
+  /// In en, this message translates to:
+  /// **'Lifetime'**
+  String get planLifetime;
+
+  /// Subtitle on the monthly plan card on the Subscription Paywall.
+  ///
+  /// In en, this message translates to:
+  /// **'per month'**
+  String get perMonth;
+
+  /// Subtitle on the lifetime plan card on the Subscription Paywall.
+  ///
+  /// In en, this message translates to:
+  /// **'one-time payment'**
+  String get oneTimePayment;
+
+  /// Label of the main CTA button on the Subscription Paywall, naming the price of the currently selected plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Premium — {price}'**
+  String startPremium(String price);
+
+  /// Fine-print notice at the bottom of the Subscription Paywall.
+  ///
+  /// In en, this message translates to:
+  /// **'Billed via Google Play · Cancel anytime · Secure with RevenueCat'**
+  String get billingFinePrint;
+
+  /// Header title on the Articles screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Wisdom & Articles'**
+  String get articlesTitle;
+
+  /// Accessibility label of the bookmark icon button in the Articles screen's title row, leading to the (not yet built) saved-articles list.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved articles'**
+  String get savedArticlesLabel;
+
+  /// Label of the 'All' filter chip on the Articles screen, which clears the category filter. Unlike the other category chip labels, this one is UI chrome rather than CMS content.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get articleCategoryAll;
+
+  /// Badge label on the featured article card on the Articles screen, naming the featured article's special tag.
+  ///
+  /// In en, this message translates to:
+  /// **'FEATURED · {tag}'**
+  String articleFeaturedBadge(String tag);
+
+  /// Label/accessibility label of the bookmark save action on an article (featured card action pill, list row bookmark icon, and Article Detail header icon).
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get articleSave;
+
+  /// Label/accessibility label of the share action on an article (featured card action pill and Article Detail header icon) — not yet wired to real sharing/deeplinks.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get articleShare;
+
+  /// Label of the listen-to-article (text-to-speech) action on an article (featured card action pill and Article Detail's Listen pill) — not yet wired to a real TTS service.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen'**
+  String get articleListen;
+
+  /// Byline under the featured article's title on the Articles screen, naming the author and reading time.
+  ///
+  /// In en, this message translates to:
+  /// **'By {author} · {minutes} min read'**
+  String articleByline(String author, String minutes);
+
+  /// Short reading-time meta text on an article list row on the Articles screen.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String articleReadMinutes(String minutes);
+
+  /// Meta line under the author name on the Article Detail screen, naming the publish date and reading time.
+  ///
+  /// In en, this message translates to:
+  /// **'{date} · {minutes} min read'**
+  String articleMetaLine(String date, String minutes);
+
+  /// Placeholder text in the empty search field on the Search screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Search articles, reports & more'**
+  String get searchHint;
+
+  /// Label of the Articles filter chip on the Search screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Articles'**
+  String get searchFilterArticles;
+
+  /// Section label above the recent-searches chip row on the Search screen.
+  ///
+  /// In en, this message translates to:
+  /// **'RECENT'**
+  String get searchRecentLabel;
+
+  /// Action label that clears the recent-searches list on the Search screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get searchClearRecent;
+
+  /// Accessibility label of the ✕ icon button that clears the typed text in the Search screen's search field.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get searchClearQuery;
+
+  /// Section label above the trending-searches chip row on the Search screen.
+  ///
+  /// In en, this message translates to:
+  /// **'TRENDING'**
+  String get searchTrendingLabel;
+
+  /// Section label above the search results list on the Search screen.
+  ///
+  /// In en, this message translates to:
+  /// **'RESULTS'**
+  String get searchResultsLabel;
+
+  /// Empty-state title shown when a search query on the Search screen matches nothing, naming the query.
+  ///
+  /// In en, this message translates to:
+  /// **'No results for \"{query}\"'**
+  String searchNoResultsTitle(String query);
+
+  /// Empty-state hint shown under searchNoResultsTitle on the Search screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Try different keywords or check the spelling'**
+  String get searchNoResultsHint;
+
+  /// Title of the Notifications screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notificationsTitle;
+
+  /// Action label on the Notifications screen that marks every notification as read.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all read'**
+  String get notificationsMarkAllRead;
+
+  /// Section label above today's notifications on the Notifications screen.
+  ///
+  /// In en, this message translates to:
+  /// **'TODAY'**
+  String get notificationsToday;
+
+  /// Section label above yesterday's notifications on the Notifications screen.
+  ///
+  /// In en, this message translates to:
+  /// **'YESTERDAY'**
+  String get notificationsYesterday;
+
+  /// Empty-state message shown on the Notifications screen when there are no notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications yet'**
+  String get notificationsEmptyState;
+
+  /// Empty-state supporting message under notificationsEmptyState on the Notifications screen.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ll see daily horoscope, festival and match alerts here.'**
+  String get notificationsEmptyMessage;
+
+  /// Title of the prompt shown on the Notifications screen when push notification permission has not been granted.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on notifications'**
+  String get notificationsPermissionDeniedTitle;
+
+  /// Supporting message under notificationsPermissionDeniedTitle explaining why to enable notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable notifications to get your daily horoscope, festival alerts and AI replies.'**
+  String get notificationsPermissionDeniedMessage;
+
+  /// Action button label that requests notification permission, shown when it hasn't been permanently denied.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable notifications'**
+  String get notificationsPermissionEnableAction;
+
+  /// Action button label that opens the OS app-settings page, shown when notification permission was permanently denied (a further in-app request would no longer show a system prompt).
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get notificationsPermissionOpenSettingsAction;
+
+  /// Title of the birth-profiles menu row on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Birth profiles'**
+  String get profileBirthProfiles;
+
+  /// Subtitle of the birth-profiles menu row on the Profile & Settings screen, naming how many saved profiles exist.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} profile'**
+  String profileProfileCount(String count);
+
+  /// Uppercased section label above the language chip row on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'APP LANGUAGE'**
+  String get profileAppLanguageLabel;
+
+  /// Uppercased section label above the activity menu card on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'MY ACTIVITY'**
+  String get profileMyActivityLabel;
+
+  /// Title of the My Reports menu row on the Profile & Settings screen, leading to the Premium Reports screen.
+  ///
+  /// In en, this message translates to:
+  /// **'My Reports'**
+  String get profileMyReports;
+
+  /// Title of the Downloaded PDFs menu row on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded PDFs'**
+  String get profileDownloadedPdfs;
+
+  /// Title of the AI Chat History menu row on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Chat History'**
+  String get profileAiChatHistory;
+
+  /// Title of the Payment History menu row on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment History'**
+  String get profilePaymentHistory;
+
+  /// Uppercased section label above the preferences menu card on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'PREFERENCES'**
+  String get profilePreferencesLabel;
+
+  /// Title of the Appearance (dark mode) menu row on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get profileAppearance;
+
+  /// Snackbar shown when tapping the Appearance row/switch on the Profile & Settings screen, since dark mode isn't implemented yet.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark mode is coming in a future update'**
+  String get profileDarkModeComingSoon;
+
+  /// Title of the Notifications menu row on the Profile & Settings screen, leading to the Notifications screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get profileNotifications;
+
+  /// Subtitle of the Notifications menu row on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily horoscope, festivals'**
+  String get profileNotificationsSubtitle;
+
+  /// Title of the Panchang location menu row on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Panchang location'**
+  String get profilePanchangLocation;
+
+  /// Title of the Manage subscription menu row on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage subscription'**
+  String get profileManageSubscription;
+
+  /// Title of the Privacy & security menu row on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy & security'**
+  String get profilePrivacySecurity;
+
+  /// Title of the Help & support menu row on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Help & support'**
+  String get profileHelpSupport;
+
+  /// Uppercased section label above the rewards menu card on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'REWARDS'**
+  String get profileRewardsLabel;
+
+  /// Title of the Refer & Earn menu row on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Refer & Earn'**
+  String get profileReferEarn;
+
+  /// Subtitle of the Refer & Earn menu row on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Get 1 month free per referral'**
+  String get profileReferEarnSubtitle;
+
+  /// Title of the Invite Friends menu row on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite Friends'**
+  String get profileInviteFriends;
+
+  /// Subtitle of the Invite Friends menu row on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Vedadarshi'**
+  String get profileInviteFriendsSubtitle;
+
+  /// Uppercased section label above the More menu card on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'MORE'**
+  String get profileMoreLabel;
+
+  /// Title of the Rate Vedadarshi menu row on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate Vedadarshi'**
+  String get profileRateApp;
+
+  /// Title of the Send Feedback menu row on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Feedback'**
+  String get profileSendFeedback;
+
+  /// Title of the Restore Purchases menu row on the Profile & Settings screen, leading to the Subscription Paywall screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Purchases'**
+  String get profileRestorePurchases;
+
+  /// Label of the Log out action at the bottom of the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out'**
+  String get profileLogOut;
+
+  /// Label of the Delete account action at the bottom of the Profile & Settings screen — not yet wired up (must go through a Cloud Function per projects/CLAUDE.md).
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get profileDeleteAccount;
+
+  /// Title of the confirmation dialog shown before signing out from the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out?'**
+  String get profileSignOutConfirmTitle;
+
+  /// Body message of the confirmation dialog shown before signing out from the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ll need to sign in again to access your saved profiles and reports.'**
+  String get profileSignOutConfirmMessage;
+
+  /// Label of the confirming action button in the sign-out confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out'**
+  String get profileSignOutConfirmAction;
+
+  /// Label of the dismissing action button in the sign-out confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get profileCancel;
 }
 
 class _AppLocalizationsDelegate

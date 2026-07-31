@@ -7,6 +7,7 @@ import '../../core/theme/app_fonts.dart';
 import '../../core/widgets/app_radio_dot.dart';
 import '../../l10n/app_localizations.dart';
 import '../profile/birth_profile_repository.dart';
+import 'kundli_chart_screen.dart';
 import 'kundli_static_data.dart';
 
 /// Which chart layout style is selected — see the "CHART STYLE" cards
@@ -104,7 +105,11 @@ class _KundliInputScreenState extends ConsumerState<KundliInputScreen> {
                     const Spacer(),
                     _InfoNote(l10n: l10n, locale: locale),
                     const SizedBox(height: 12),
-                    _GenerateKundliButton(l10n: l10n, locale: locale),
+                    _GenerateKundliButton(
+                      l10n: l10n,
+                      locale: locale,
+                      chartStyle: _chartStyle,
+                    ),
                   ],
                 ),
               ),
@@ -582,10 +587,15 @@ class _InfoNote extends StatelessWidget {
 /// saffron-gradient pill recipe of the Welcome/Login screen's
 /// `_GetOtpButton`.
 class _GenerateKundliButton extends StatelessWidget {
-  const _GenerateKundliButton({required this.l10n, required this.locale});
+  const _GenerateKundliButton({
+    required this.l10n,
+    required this.locale,
+    required this.chartStyle,
+  });
 
   final AppLocalizations l10n;
   final Locale locale;
+  final _ChartStyle chartStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -606,9 +616,17 @@ class _GenerateKundliButton extends StatelessWidget {
         ),
         child: PressableScale(
           borderRadius: BorderRadius.circular(999),
-          // Will generate the chart and navigate to "B6 · Kundli Chart"
-          // (Figma node 18:2) once that screen exists — not implemented yet.
-          onTap: () {},
+          onTap: () {
+            Navigator.of(context).push(
+              fadeThroughRoute(
+                KundliChartScreen(
+                  initialStyle: chartStyle == _ChartStyle.northIndian
+                      ? KundliChartStyle.northIndian
+                      : KundliChartStyle.southIndian,
+                ),
+              ),
+            );
+          },
           child: Ink(
             padding: const EdgeInsets.symmetric(vertical: 17),
             decoration: const BoxDecoration(gradient: AppColors.saffronGradient),

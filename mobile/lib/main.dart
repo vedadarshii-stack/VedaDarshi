@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
 
 import 'core/locale/locale_controller.dart';
+import 'core/notifications/push_notification_service.dart';
 import 'core/theme/app_colors.dart';
 import 'features/startup/root_gate.dart';
 import 'firebase_options.dart';
@@ -37,6 +39,22 @@ void main() async {
   FirebaseFirestore.instance.settings = const Settings(
     persistenceEnabled: true,
   );
+
+  // Push notifications (Firebase Cloud Messaging). The background handler
+  // MUST be registered before runApp so FCM can deliver to it even if the
+  // app process was launched solely to handle the message; `initialize()`
+  // sets up the local-notifications channel/listeners for the foreground and
+  // tap-to-open paths (see PushNotificationService's doc comment for the
+  // full breakdown). Wrapped in try/catch on purpose, same as the
+  // `dotenv.load()` guard above — a push-setup failure (missing Google
+  // Play services on an emulator, a plugin hiccup, anything) must never stop
+  // the app from booting.
+  try {
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    await PushNotificationService.instance.initialize();
+  } catch (e) {
+    debugPrint('main: push notification setup failed ($e) — continuing without it');
+  }
 
   // All brand/UI fonts are bundled in assets/google_fonts/ (see AppFonts).
   // Disabling runtime fetching means a missing font throws immediately in
@@ -74,6 +92,11 @@ class MainApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final locale = ref.watch(localeControllerProvider);
     return MaterialApp(
+      // Lets a notification tap push a route from outside the widget tree
+      // (see PushNotificationService._navigateFromData) — there is no
+      // BuildContext available when that fires from a background isolate or
+      // before the first frame.
+      navigatorKey: rootNavigatorKey,
       onGenerateTitle: (context) => AppLocalizations.of(context)!.appName,
       debugShowCheckedModeBanner: false,
       localizationsDelegates: AppLocalizations.localizationsDelegates,

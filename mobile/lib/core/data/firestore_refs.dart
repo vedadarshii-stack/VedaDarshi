@@ -18,3 +18,12 @@ const String birthProfilesCollection = 'birthProfiles';
 /// profile belonging to the account owner themselves (as opposed to a future
 /// family/friend profile, which would get its own generated id).
 const String primaryProfileId = 'primary';
+
+/// SUBCOLLECTION of `/users/{uid}` (i.e. `/users/{uid}/fcmTokens/{token}`)
+/// holding one document per FCM registration token — deliberately NOT a
+/// single field on the user document, because one signed-in account can have
+/// several devices (phone + tablet, or a reinstall that mints a new token
+/// before the old one expires), and each needs its own token entry so a push
+/// can be delivered to all of them rather than only the most recent. See
+/// `lib/core/notifications/push_notification_service.dart`.
+const String fcmTokensCollection = 'fcmTokens';

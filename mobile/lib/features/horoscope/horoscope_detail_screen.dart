@@ -5,6 +5,7 @@ import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../l10n/app_localizations.dart';
+import '../premium/subscription_paywall_screen.dart';
 import 'horoscope_detail_static_data.dart';
 import 'zodiac_sign.dart';
 
@@ -792,9 +793,9 @@ class _PremiumTeaser extends StatelessWidget {
         button: true,
         child: PressableScale(
           borderRadius: BorderRadius.circular(16),
-          // No-op for now: opens the Subscription Paywall (section C),
-          // which isn't built yet.
-          onTap: () {},
+          onTap: () => Navigator.of(context).push(
+            fadeThroughRoute(const SubscriptionPaywallScreen()),
+          ),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(

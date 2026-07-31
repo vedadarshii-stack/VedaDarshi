@@ -68,10 +68,20 @@ abstract final class HomeStaticData {
     ArticleTeaser(
       title: 'Understanding your Moon sign',
       readTime: '5 min read',
+      // No article in ArticlesStaticData covers this exact topic yet (this
+      // teaser and the Articles catalogue are independently-authored
+      // placeholder copy) — linked to a thematically-close article so the
+      // card still opens a real Article Detail page rather than a
+      // fallback. Once both surfaces read from the same Firestore CMS
+      // catalogue, this id will point at the article this teaser is
+      // actually promoting.
+      articleId: 'mantras-peaceful-sleep',
     ),
     ArticleTeaser(
       title: 'Sawan month: rituals & significance',
       readTime: '7 min read',
+      // This one DOES match: same topic as ArticlesStaticData.featured.
+      articleId: 'sawan-somvar-fasting',
     ),
   ];
 
@@ -151,10 +161,18 @@ class HoroscopeData {
 /// One article teaser card in the "Wisdom for you" section.
 @immutable
 class ArticleTeaser {
-  const ArticleTeaser({required this.title, required this.readTime});
+  const ArticleTeaser({
+    required this.title,
+    required this.readTime,
+    required this.articleId,
+  });
 
   final String title;
   final String readTime;
+
+  /// Id of the matching [Article] in `ArticlesStaticData.all`, used to open
+  /// the real Article Detail screen when this card is tapped.
+  final String articleId;
 }
 
 /// One report teaser card in the "Recent reports" section.

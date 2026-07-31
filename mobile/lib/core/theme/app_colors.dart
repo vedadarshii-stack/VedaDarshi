@@ -113,6 +113,10 @@ abstract final class AppColors {
   static const Color tilePinkBg = Color(0xFFFBE9EE);
   static const Color tilePinkFg = Color(0xFFB0355C);
 
+  /// Border color of the bride-side heart divider circle on the Gun Milan
+  /// select screen — see "C1 · Gun Milan — Select" (Figma node 19:3).
+  static const Color bridePinkBorder = Color(0xFFF3D3DD);
+
   /// Bottom nav colors.
   static const Color navInactive = Color(0xFF8A8FA0);
   static const Color navActiveText = Color(0xFFC2570A);
@@ -160,4 +164,171 @@ abstract final class AppColors {
     colors: [panchangOrange1, panchangOrange3],
     stops: [0.0, 0.714],
   );
+
+  // --- Kundli Chart — see "B6 · Kundli Chart" (Figma node 18:2) ---
+  //
+  // NOTE: most planet colors on the chart REUSE existing tokens rather than
+  // duplicating them — [genderSelectedText] (Ascendant), [tileBlueFg]
+  // (Sun/Mercury/Moon/Venus + the header's PDF pill), [tileGreenFg]
+  // (Jupiter), [ashubhFg] (Mars), [tilePurpleFg] (Saturn), [muted] (Rahu),
+  // and [mantraLabel] (Sun's swatch specifically in the KEY PLANETS legend
+  // — see `PlanetCode.legendColor`'s doc comment for why that one differs
+  // from the chart's own Sun color). Only the 4 below are genuinely new.
+
+  /// Fill color of the North Indian chart's square background.
+  static const Color chartPaper = Color(0xFFFFFDF8);
+
+  /// Stroke color of the chart's square border, diagonals and diamond.
+  static const Color chartLine = Color(0xFFC9A227);
+
+  /// Color of the house-number labels (1–12) inside the chart.
+  static const Color chartHouseNumber = Color(0xFFB8A15C);
+
+  /// Ketu's planet-label/legend color — the only planet with no existing
+  /// tinted-token match among the reused colors above.
+  static const Color planetKetu = Color(0xFF4A5568);
+
+  // --- Gun Milan Result — see "C2 · Gun Milan — Result" (Figma node 20:2) ---
+  //
+  // NOTE: several of the design's tinted pairs are already covered by
+  // existing tokens rather than duplicated here — [tileGreenFg] (strong
+  // gunas + the verdict pill), [warnBg]/[mantraLabel] (moderate gunas, incl.
+  // the Nadi card, and the Nadi warning banner), [ashubhBg]/[ashubhFg] (weak
+  // gunas), [tileBlueFg] (the CTA fill), [tilePurpleBg] (the AI summary
+  // card), [tileGoldFg], [cardBorder], [cream], [ink], [hint] and
+  // [mutedOnNavy]. Only the 5 below are genuinely new.
+
+  /// Border color of the Rishi AI summary card.
+  static const Color aiCardBorder = Color(0xFFDCCBF0);
+
+  /// Title text color inside the Rishi AI summary card.
+  static const Color aiTitle = Color(0xFF4A2B73);
+
+  /// Body text color inside the Rishi AI summary card.
+  static const Color aiBody = Color(0xFF4A3B60);
+
+  /// Verdict-pill check icon/text color on the navy header (brighter than
+  /// [tileGreenFg] so it reads clearly on the dark background).
+  static const Color matchSuccessText = Color(0xFF7BE0AE);
+
+  /// Muted couple-names line on the navy header.
+  static const Color headerSubtle = Color(0xFFC7CEE4);
+
+  // --- AI Astrologer — see "C3 · AI Astrologer" (Figma node 21:2) ---
+
+  /// Warm border color of the suggestion chips on the AI Astrologer chat.
+  static const Color chipBorderWarm = Color(0xFFE8D9C0);
+
+  /// Assistant chat-bubble body text color.
+  static const Color bubbleText = Color(0xFF3A4155);
+
+  /// 135° purple→navy gradient behind the Rishi AI avatar — reused by both
+  /// Home's "Continue with Rishi AI" card icon and the AI Astrologer header
+  /// avatar, so it's defined once here rather than duplicated per screen.
+  static const LinearGradient aiAvatarGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [tilePurpleFg, navyTop],
+  );
+
+  // --- Premium Reports — see "C4 · Premium Reports" (Figma node 22:2) ---
+  //
+  // NOTE: most of this screen reuses existing tokens rather than duplicating
+  // them — [gold], [quoteGold], [quoteMuted], [rowDivider], [tileBlueBg]/
+  // [tileBlueFg], [tilePurpleBg]/[tilePurpleFg], [tilePinkBg]/[tilePinkFg],
+  // [geoChipBg]/[tileGreenFg], [mantraBg]/[tileGoldFg], [tileCyanBg]/
+  // [tileCyanFg], [genderSelectedText], [cardBorder], [cream], [ink],
+  // [muted], [hint] and [saffron]. Only the 3 below are genuinely new.
+
+  /// Text color for content rendered ON TOP OF a solid [gold] fill (e.g. the
+  /// "Upgrade" pill label) — [gold] is too light for white text to read
+  /// well against it.
+  static const Color onGold = Color(0xFF241C06);
+
+  /// Terracotta tinted background/foreground pair for the Numerology report
+  /// tile — the one report tile color pairing not already covered by an
+  /// existing tile* token.
+  static const Color terracottaBg = Color(0xFFFBEFEA);
+  static const Color terracottaFg = Color(0xFFB05A35);
+
+  /// Left→right variant of [navyGradient] for the Go Premium banner — same
+  /// navy stops, different axis, so it's a small addition rather than an
+  /// inlined literal gradient.
+  static const LinearGradient navyGradientHorizontal = LinearGradient(
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    colors: [navyTop, navyBottom],
+  );
+
+  // --- Subscription Paywall — see "C5 · Subscription Paywall" (Figma node 23:2) ---
+  //
+  // NOTE: most of this screen reuses existing tokens rather than duplicating
+  // them — [gold], [quoteGold], [onGold], [mutedOnNavy], [headerSubtle],
+  // [navyTop] and [navyBottom]. Only the 4 below are genuinely new.
+
+  /// 3-stop navy gradient behind the whole paywall screen — distinct from
+  /// [navyGradient] (2-stop) because the design calls for a mid-tone stop at
+  /// 50% rather than a straight top→bottom blend.
+  static const LinearGradient paywallGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [navyTop, Color(0xFF141F42), navyBottom],
+    stops: [0.0, 0.5, 1.0],
+  );
+
+  /// Gold CTA gradient for the paywall's "Start Premium" button.
+  static const LinearGradient goldCtaGradient = LinearGradient(
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    colors: [Color(0xFFE8C766), Color(0xFFC9A227)],
+  );
+
+  /// Brighter gold used for the selected plan card's 2px border — [gold] on
+  /// its own reads too muted against the [paywallGradient] backdrop.
+  static const Color goldBright = Color(0xFFF2C94C);
+
+  /// Fine-print text color at the bottom of the paywall (billing terms).
+  static const Color paywallFinePrint = Color(0xFF687190);
+
+  // --- Articles — see "D1 · Articles" (Figma node 25:3) + "D2 · Article
+  // Detail" (Figma node 26:2) ---
+  //
+  // NOTE: most of this screen reuses existing tokens rather than duplicating
+  // them — [gold], [onGold], [cardBorder], [cream], [ink], [muted], [hint],
+  // [saffron], [mutedOnNavy], [tileBlueBg]/[tileBlueFg], [tilePurpleBg]/
+  // [tilePurpleFg], [tileGreenBg]/[tileGreenFg], [tileCyanBg]/[tileCyanFg],
+  // [terracottaBg]/[terracottaFg], [genderSelectedBg]/[genderSelectedText],
+  // [mantraBg], [mantraBody], [chartLine], [bubbleText] and
+  // [otpBorderFilled]. Only the 2 below are genuinely new.
+
+  /// Icon/foreground color for the Remedies category accent tile, paired
+  /// with [genderSelectedBg] — close to but distinct from
+  /// [genderSelectedText] (#C25705 vs this #7A3E12), so it isn't a reuse.
+  static const Color remedyFg = Color(0xFF7A3E12);
+
+  /// Diagonal (top-left → bottom-right) navy gradient for the Articles
+  /// featured card and the Article Detail hero — same stops as
+  /// [navyGradient] but on a diagonal axis, matching the approved Figma
+  /// angle (~145°/150°), so it's a small addition rather than an inlined
+  /// literal gradient.
+  static const LinearGradient navyGradientDiagonal = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [navyTop, navyBottom],
+  );
+
+  // --- Search & Notifications — see "D3 · Search" (Figma node 27:2) + "D4 ·
+  // Notifications" (Figma node 28:2) ---
+  //
+  // NOTE: both screens reuse existing tokens rather than duplicating them —
+  // [cardBorder], [cream], [ink], [muted], [hint], [saffron],
+  // [otpBorderFilled] (Search's result-row chevron), [genderSelectedBg]/
+  // [genderSelectedText], [mantraBg]/[mantraIcon], [tilePinkBg]/[tilePinkFg],
+  // [tileBlueBg]/[tileBlueFg] and [ashubhBg]/[ashubhFg] (Notifications' tinted
+  // icon tiles). Only the 1 below is genuinely new.
+
+  /// Border color of an UNREAD notification card. Distinct from
+  /// [mantraBorder] (#EBDCB2) and [glanceBorder] (#EFD9B4) — close but not an
+  /// exact match to either, so it isn't a reuse.
+  static const Color notificationUnreadBorder = Color(0xFFF3DCC3);
 }

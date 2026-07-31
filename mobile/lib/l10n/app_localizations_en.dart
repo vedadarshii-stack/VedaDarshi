@@ -422,4 +422,509 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get generateKundli => 'Generate Kundli';
+
+  @override
+  String get lagnaKundli => 'Lagna Kundli';
+
+  @override
+  String get pdf => 'PDF';
+
+  @override
+  String get tabChart => 'Chart';
+
+  @override
+  String get tabPlanetPositions => 'Planet Positions';
+
+  @override
+  String get tabDasha => 'Vimshottari Dasha';
+
+  @override
+  String get tabPredictions => 'Predictions';
+
+  @override
+  String get keyPlanets => 'KEY PLANETS';
+
+  @override
+  String get lagna => 'Lagna';
+
+  @override
+  String get rashi => 'Rashi';
+
+  @override
+  String get southChartComingSoon =>
+      'South Indian chart layout is coming soon.';
+
+  @override
+  String get kundliMatchingTitle => 'Kundli Matching';
+
+  @override
+  String get gunMilanIntro =>
+      'Ashtakoota Gun Milan compares 8 aspects across 36 gunas for marriage compatibility.';
+
+  @override
+  String get groom => 'GROOM';
+
+  @override
+  String get bride => 'BRIDE';
+
+  @override
+  String get change => 'Change';
+
+  @override
+  String get selectBrideProfile => 'Select bride profile…';
+
+  @override
+  String get selectBrideHint => 'Tap to choose or add birth details';
+
+  @override
+  String get matchingPrivacyNote =>
+      'Matching results are private and saved to your account only';
+
+  @override
+  String get matchKundlis => 'Match Kundlis';
+
+  @override
+  String get matchResult => 'Match Result';
+
+  @override
+  String outOfMax(int max) {
+    return 'out of $max';
+  }
+
+  @override
+  String percentCompatible(int percent) {
+    return '$percent% Compatible';
+  }
+
+  @override
+  String get ashtakootaBreakdown => 'Ashtakoota breakdown';
+
+  @override
+  String get bandStrong => 'Strong (75%+)';
+
+  @override
+  String get bandModerate => 'Moderate (40–74%)';
+
+  @override
+  String get bandWeak => 'Weak (<40%)';
+
+  @override
+  String get gunaVarna => 'Varna';
+
+  @override
+  String get gunaVashya => 'Vashya';
+
+  @override
+  String get gunaTara => 'Tara';
+
+  @override
+  String get gunaYoni => 'Yoni';
+
+  @override
+  String get gunaGrahaMaitri => 'Graha Maitri';
+
+  @override
+  String get gunaGana => 'Gana';
+
+  @override
+  String get gunaBhakoot => 'Bhakoot';
+
+  @override
+  String get gunaNadi => 'Nadi';
+
+  @override
+  String get rishiAiSummary => 'Rishi AI Summary';
+
+  @override
+  String get aiBadge => 'AI';
+
+  @override
+  String get detailedCompatibilityReport => 'Get Detailed Compatibility Report';
+
+  @override
+  String get tapGunaHint =>
+      'Tap any guna to see what it measures & why it matters';
+
+  @override
+  String get rishiAi => 'Rishi AI';
+
+  @override
+  String get onlineKnowsChart => 'Online · knows your chart';
+
+  @override
+  String freeQuota(String used, String total) {
+    return '$used/$total free';
+  }
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get askAbout => 'ASK ABOUT';
+
+  @override
+  String get topicCareer => 'Career';
+
+  @override
+  String get topicMarriage => 'Marriage';
+
+  @override
+  String get topicHealth => 'Health';
+
+  @override
+  String get topicBusiness => 'Business';
+
+  @override
+  String get topicFinance => 'Finance';
+
+  @override
+  String get topicEducation => 'Education';
+
+  @override
+  String get topicTravel => 'Travel';
+
+  @override
+  String get topicGemstones => 'Gemstones';
+
+  @override
+  String get topicRemedies => 'Remedies';
+
+  @override
+  String get topicNumerology => 'Numerology';
+
+  @override
+  String get rishiTyping => 'Rishi is typing…';
+
+  @override
+  String get askAboutYourStars => 'Ask about your stars…';
+
+  @override
+  String get upgradeUnlimited => 'Upgrade for unlimited questions';
+
+  @override
+  String get aiNotConnected =>
+      'AI replies will appear here once the AI service is connected.';
+
+  @override
+  String get premiumReportsTitle => 'Premium Reports';
+
+  @override
+  String get goPremium => 'Go Premium';
+
+  @override
+  String goPremiumSubtitle(String total) {
+    return 'Unlock all $total reports + unlimited AI questions';
+  }
+
+  @override
+  String get upgrade => 'Upgrade';
+
+  @override
+  String readMinutes(String minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get aiSummary => 'AI Summary';
+
+  @override
+  String get premium => 'Premium';
+
+  @override
+  String get free => 'Free';
+
+  @override
+  String moreReportsFooter(String remaining) {
+    return '+ $remaining more reports · All include PDF download';
+  }
+
+  @override
+  String get reportCareer => 'Career Report';
+
+  @override
+  String get reportCareerDesc => 'Profession, promotions & business timing';
+
+  @override
+  String get reportMarriage => 'Marriage Report';
+
+  @override
+  String get reportMarriageDesc => 'Timing, spouse traits & compatibility';
+
+  @override
+  String get reportWealth => 'Wealth & Finance';
+
+  @override
+  String get reportWealthDesc => 'Income sources, investments & yogas';
+
+  @override
+  String get reportHealth => 'Health Report';
+
+  @override
+  String get reportHealthDesc => 'Vulnerable periods & preventive remedies';
+
+  @override
+  String get reportSadeSati => 'Sade Sati Report';
+
+  @override
+  String get reportSadeSatiDesc => 'Saturn phases & impact analysis';
+
+  @override
+  String get reportGemstone => 'Gemstone Report';
+
+  @override
+  String get reportGemstoneDesc => 'Recommended stones & wearing method';
+
+  @override
+  String get reportNumerology => 'Numerology Report';
+
+  @override
+  String get reportNumerologyDesc => 'Life path, destiny & name numbers';
+
+  @override
+  String get restorePurchase => 'Restore purchase';
+
+  @override
+  String get vedadarshiPremium => 'Vedadarshi Premium';
+
+  @override
+  String get premiumTagline => 'Unlimited cosmic guidance, one simple plan';
+
+  @override
+  String benefitReports(String total) {
+    return 'All $total premium reports with PDF export';
+  }
+
+  @override
+  String get benefitUnlimitedAi => 'Unlimited AI Astrologer questions';
+
+  @override
+  String get benefitAdvancedKundli =>
+      'Advanced Kundli: dasha, dosha & remedies';
+
+  @override
+  String get benefitAdFree => 'Ad-free experience across the app';
+
+  @override
+  String get planMonthly => 'Monthly';
+
+  @override
+  String get planYearly => 'Yearly';
+
+  @override
+  String get planLifetime => 'Lifetime';
+
+  @override
+  String get perMonth => 'per month';
+
+  @override
+  String get oneTimePayment => 'one-time payment';
+
+  @override
+  String startPremium(String price) {
+    return 'Start Premium — $price';
+  }
+
+  @override
+  String get billingFinePrint =>
+      'Billed via Google Play · Cancel anytime · Secure with RevenueCat';
+
+  @override
+  String get articlesTitle => 'Wisdom & Articles';
+
+  @override
+  String get savedArticlesLabel => 'Saved articles';
+
+  @override
+  String get articleCategoryAll => 'All';
+
+  @override
+  String articleFeaturedBadge(String tag) {
+    return 'FEATURED · $tag';
+  }
+
+  @override
+  String get articleSave => 'Save';
+
+  @override
+  String get articleShare => 'Share';
+
+  @override
+  String get articleListen => 'Listen';
+
+  @override
+  String articleByline(String author, String minutes) {
+    return 'By $author · $minutes min read';
+  }
+
+  @override
+  String articleReadMinutes(String minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String articleMetaLine(String date, String minutes) {
+    return '$date · $minutes min read';
+  }
+
+  @override
+  String get searchHint => 'Search articles, reports & more';
+
+  @override
+  String get searchFilterArticles => 'Articles';
+
+  @override
+  String get searchRecentLabel => 'RECENT';
+
+  @override
+  String get searchClearRecent => 'Clear';
+
+  @override
+  String get searchClearQuery => 'Clear search';
+
+  @override
+  String get searchTrendingLabel => 'TRENDING';
+
+  @override
+  String get searchResultsLabel => 'RESULTS';
+
+  @override
+  String searchNoResultsTitle(String query) {
+    return 'No results for \"$query\"';
+  }
+
+  @override
+  String get searchNoResultsHint =>
+      'Try different keywords or check the spelling';
+
+  @override
+  String get notificationsTitle => 'Notifications';
+
+  @override
+  String get notificationsMarkAllRead => 'Mark all read';
+
+  @override
+  String get notificationsToday => 'TODAY';
+
+  @override
+  String get notificationsYesterday => 'YESTERDAY';
+
+  @override
+  String get notificationsEmptyState => 'No notifications yet';
+
+  @override
+  String get notificationsEmptyMessage =>
+      'You\'ll see daily horoscope, festival and match alerts here.';
+
+  @override
+  String get notificationsPermissionDeniedTitle => 'Turn on notifications';
+
+  @override
+  String get notificationsPermissionDeniedMessage =>
+      'Enable notifications to get your daily horoscope, festival alerts and AI replies.';
+
+  @override
+  String get notificationsPermissionEnableAction => 'Enable notifications';
+
+  @override
+  String get notificationsPermissionOpenSettingsAction => 'Open settings';
+
+  @override
+  String get profileBirthProfiles => 'Birth profiles';
+
+  @override
+  String profileProfileCount(String count) {
+    return '$count profile';
+  }
+
+  @override
+  String get profileAppLanguageLabel => 'APP LANGUAGE';
+
+  @override
+  String get profileMyActivityLabel => 'MY ACTIVITY';
+
+  @override
+  String get profileMyReports => 'My Reports';
+
+  @override
+  String get profileDownloadedPdfs => 'Downloaded PDFs';
+
+  @override
+  String get profileAiChatHistory => 'AI Chat History';
+
+  @override
+  String get profilePaymentHistory => 'Payment History';
+
+  @override
+  String get profilePreferencesLabel => 'PREFERENCES';
+
+  @override
+  String get profileAppearance => 'Appearance';
+
+  @override
+  String get profileDarkModeComingSoon =>
+      'Dark mode is coming in a future update';
+
+  @override
+  String get profileNotifications => 'Notifications';
+
+  @override
+  String get profileNotificationsSubtitle => 'Daily horoscope, festivals';
+
+  @override
+  String get profilePanchangLocation => 'Panchang location';
+
+  @override
+  String get profileManageSubscription => 'Manage subscription';
+
+  @override
+  String get profilePrivacySecurity => 'Privacy & security';
+
+  @override
+  String get profileHelpSupport => 'Help & support';
+
+  @override
+  String get profileRewardsLabel => 'REWARDS';
+
+  @override
+  String get profileReferEarn => 'Refer & Earn';
+
+  @override
+  String get profileReferEarnSubtitle => 'Get 1 month free per referral';
+
+  @override
+  String get profileInviteFriends => 'Invite Friends';
+
+  @override
+  String get profileInviteFriendsSubtitle => 'Share Vedadarshi';
+
+  @override
+  String get profileMoreLabel => 'MORE';
+
+  @override
+  String get profileRateApp => 'Rate Vedadarshi';
+
+  @override
+  String get profileSendFeedback => 'Send Feedback';
+
+  @override
+  String get profileRestorePurchases => 'Restore Purchases';
+
+  @override
+  String get profileLogOut => 'Log out';
+
+  @override
+  String get profileDeleteAccount => 'Delete account';
+
+  @override
+  String get profileSignOutConfirmTitle => 'Log out?';
+
+  @override
+  String get profileSignOutConfirmMessage =>
+      'You\'ll need to sign in again to access your saved profiles and reports.';
+
+  @override
+  String get profileSignOutConfirmAction => 'Log out';
+
+  @override
+  String get profileCancel => 'Cancel';
 }

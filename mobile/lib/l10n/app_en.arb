@@ -559,5 +559,721 @@
   "generateKundli": "Generate Kundli",
   "@generateKundli": {
     "description": "Label of the CTA button on the Kundli — New Chart screen that generates the chart. The 🪔 emoji suffix is appended in code, not stored in this string."
+  },
+  "lagnaKundli": "Lagna Kundli",
+  "@lagnaKundli": {
+    "description": "Subtitle prefix on the Kundli Chart screen header, e.g. \"Lagna Kundli · North Indian\"."
+  },
+  "pdf": "PDF",
+  "@pdf": {
+    "description": "Label of the PDF export pill on the Kundli Chart screen header."
+  },
+  "tabChart": "Chart",
+  "@tabChart": {
+    "description": "Label of the (selected) Chart section tab on the Kundli Chart screen."
+  },
+  "tabPlanetPositions": "Planet Positions",
+  "@tabPlanetPositions": {
+    "description": "Label of the Planet Positions section tab on the Kundli Chart screen — inert until the Vedika API is wired up."
+  },
+  "tabDasha": "Vimshottari Dasha",
+  "@tabDasha": {
+    "description": "Label of the Vimshottari Dasha section tab on the Kundli Chart screen — premium-gated, a 👑 emoji suffix is appended in code."
+  },
+  "tabPredictions": "Predictions",
+  "@tabPredictions": {
+    "description": "Label of the Predictions section tab on the Kundli Chart screen — premium-gated, a 👑 emoji suffix is appended in code."
+  },
+  "keyPlanets": "KEY PLANETS",
+  "@keyPlanets": {
+    "description": "Uppercased eyebrow label above the planet-color legend row on the Kundli Chart screen."
+  },
+  "lagna": "Lagna",
+  "@lagna": {
+    "description": "Label of the Lagna stat card on the Kundli Chart screen."
+  },
+  "rashi": "Rashi",
+  "@rashi": {
+    "description": "Label of the Rashi stat card on the Kundli Chart screen."
+  },
+  "southChartComingSoon": "South Indian chart layout is coming soon.",
+  "@southChartComingSoon": {
+    "description": "Note shown inside the chart card on the Kundli Chart screen when the South Indian layout toggle is selected — only the North Indian layout is implemented so far."
+  },
+  "kundliMatchingTitle": "Kundli Matching",
+  "@kundliMatchingTitle": {
+    "description": "Heading of the Gun Milan — Select screen."
+  },
+  "gunMilanIntro": "Ashtakoota Gun Milan compares 8 aspects across 36 gunas for marriage compatibility.",
+  "@gunMilanIntro": {
+    "description": "Explainer copy under the heading on the Gun Milan — Select screen."
+  },
+  "groom": "GROOM",
+  "@groom": {
+    "description": "Uppercased badge label on the groom profile card on the Gun Milan — Select screen."
+  },
+  "bride": "BRIDE",
+  "@bride": {
+    "description": "Uppercased badge label on the bride profile card on the Gun Milan — Select screen."
+  },
+  "change": "Change",
+  "@change": {
+    "description": "Label of the inline text button on a profile card that lets the user switch to a different saved profile — currently a no-op pending multi-profile support."
+  },
+  "selectBrideProfile": "Select bride profile…",
+  "@selectBrideProfile": {
+    "description": "Title of the bride card's empty state on the Gun Milan — Select screen."
+  },
+  "selectBrideHint": "Tap to choose or add birth details",
+  "@selectBrideHint": {
+    "description": "Subtitle of the bride card's empty state on the Gun Milan — Select screen."
+  },
+  "matchingPrivacyNote": "Matching results are private and saved to your account only",
+  "@matchingPrivacyNote": {
+    "description": "Privacy reassurance note near the bottom of the Gun Milan — Select screen."
+  },
+  "matchKundlis": "Match Kundlis",
+  "@matchKundlis": {
+    "description": "Label of the CTA button on the Gun Milan — Select screen that runs the Gun Milan calculation. The 💞 emoji suffix is appended in code, not stored in this string."
+  },
+  "matchResult": "Match Result",
+  "@matchResult": {
+    "description": "Header title of the Gun Milan — Result screen."
+  },
+  "outOfMax": "out of {max}",
+  "@outOfMax": {
+    "description": "Small caption under the compatibility ring's total score on the Gun Milan — Result screen, naming the maximum possible score.",
+    "placeholders": {
+      "max": {
+        "type": "int",
+        "example": "36"
+      }
+    }
+  },
+  "percentCompatible": "{percent}% Compatible",
+  "@percentCompatible": {
+    "description": "Caption under the compatibility ring on the Gun Milan — Result screen.",
+    "placeholders": {
+      "percent": {
+        "type": "int",
+        "example": "76"
+      }
+    }
+  },
+  "ashtakootaBreakdown": "Ashtakoota breakdown",
+  "@ashtakootaBreakdown": {
+    "description": "Section heading above the guna score grid on the Gun Milan — Result screen."
+  },
+  "bandStrong": "Strong (75%+)",
+  "@bandStrong": {
+    "description": "Legend chip label for the strong-band guna colour on the Gun Milan — Result screen."
+  },
+  "bandModerate": "Moderate (40–74%)",
+  "@bandModerate": {
+    "description": "Legend chip label for the moderate-band guna colour on the Gun Milan — Result screen."
+  },
+  "bandWeak": "Weak (<40%)",
+  "@bandWeak": {
+    "description": "Legend chip label for the weak-band guna colour on the Gun Milan — Result screen."
+  },
+  "gunaVarna": "Varna",
+  "@gunaVarna": {
+    "description": "Name of the Varna guna in the Ashtakoota breakdown grid."
+  },
+  "gunaVashya": "Vashya",
+  "@gunaVashya": {
+    "description": "Name of the Vashya guna in the Ashtakoota breakdown grid."
+  },
+  "gunaTara": "Tara",
+  "@gunaTara": {
+    "description": "Name of the Tara guna in the Ashtakoota breakdown grid."
+  },
+  "gunaYoni": "Yoni",
+  "@gunaYoni": {
+    "description": "Name of the Yoni guna in the Ashtakoota breakdown grid."
+  },
+  "gunaGrahaMaitri": "Graha Maitri",
+  "@gunaGrahaMaitri": {
+    "description": "Name of the Graha Maitri guna in the Ashtakoota breakdown grid."
+  },
+  "gunaGana": "Gana",
+  "@gunaGana": {
+    "description": "Name of the Gana guna in the Ashtakoota breakdown grid."
+  },
+  "gunaBhakoot": "Bhakoot",
+  "@gunaBhakoot": {
+    "description": "Name of the Bhakoot guna in the Ashtakoota breakdown grid."
+  },
+  "gunaNadi": "Nadi",
+  "@gunaNadi": {
+    "description": "Name of the Nadi guna in the Ashtakoota breakdown grid."
+  },
+  "rishiAiSummary": "Rishi AI Summary",
+  "@rishiAiSummary": {
+    "description": "Title of the AI summary card on the Gun Milan — Result screen."
+  },
+  "aiBadge": "AI",
+  "@aiBadge": {
+    "description": "Short badge label on the Rishi AI summary card. A ✨ emoji prefix is appended in code, not stored in this string."
+  },
+  "detailedCompatibilityReport": "Get Detailed Compatibility Report",
+  "@detailedCompatibilityReport": {
+    "description": "Label of the CTA button at the bottom of the Gun Milan — Result screen, leading to the (not yet built) Premium Reports flow."
+  },
+  "tapGunaHint": "Tap any guna to see what it measures & why it matters",
+  "@tapGunaHint": {
+    "description": "Footer hint at the bottom of the Gun Milan — Result screen, under the CTA."
+  },
+  "rishiAi": "Rishi AI",
+  "@rishiAi": {
+    "description": "Header title of the AI Astrologer chat screen."
+  },
+  "onlineKnowsChart": "Online · knows your chart",
+  "@onlineKnowsChart": {
+    "description": "Header subtitle of the AI Astrologer chat screen, confirming the assistant has the user's birth chart."
+  },
+  "freeQuota": "{used}/{total} free",
+  "@freeQuota": {
+    "description": "Header pill on the AI Astrologer chat screen showing how many free questions have been used today.",
+    "placeholders": {
+      "used": {
+        "type": "String",
+        "example": "2"
+      },
+      "total": {
+        "type": "String",
+        "example": "3"
+      }
+    }
+  },
+  "today": "Today",
+  "@today": {
+    "description": "Centred date divider above today's messages on the AI Astrologer chat screen."
+  },
+  "askAbout": "ASK ABOUT",
+  "@askAbout": {
+    "description": "Uppercased label above the topic chips on the AI Astrologer chat screen."
+  },
+  "topicCareer": "Career",
+  "@topicCareer": {
+    "description": "Label of the Career topic chip on the AI Astrologer chat screen."
+  },
+  "topicMarriage": "Marriage",
+  "@topicMarriage": {
+    "description": "Label of the Marriage topic chip on the AI Astrologer chat screen."
+  },
+  "topicHealth": "Health",
+  "@topicHealth": {
+    "description": "Label of the Health topic chip on the AI Astrologer chat screen."
+  },
+  "topicBusiness": "Business",
+  "@topicBusiness": {
+    "description": "Label of the Business topic chip on the AI Astrologer chat screen."
+  },
+  "topicFinance": "Finance",
+  "@topicFinance": {
+    "description": "Label of the Finance topic chip on the AI Astrologer chat screen."
+  },
+  "topicEducation": "Education",
+  "@topicEducation": {
+    "description": "Label of the Education topic chip on the AI Astrologer chat screen."
+  },
+  "topicTravel": "Travel",
+  "@topicTravel": {
+    "description": "Label of the Travel topic chip on the AI Astrologer chat screen."
+  },
+  "topicGemstones": "Gemstones",
+  "@topicGemstones": {
+    "description": "Label of the Gemstones topic chip on the AI Astrologer chat screen."
+  },
+  "topicRemedies": "Remedies",
+  "@topicRemedies": {
+    "description": "Label of the Remedies topic chip on the AI Astrologer chat screen."
+  },
+  "topicNumerology": "Numerology",
+  "@topicNumerology": {
+    "description": "Label of the Numerology topic chip on the AI Astrologer chat screen."
+  },
+  "rishiTyping": "Rishi is typing…",
+  "@rishiTyping": {
+    "description": "Label next to the animated typing-indicator dots on the AI Astrologer chat screen."
+  },
+  "askAboutYourStars": "Ask about your stars…",
+  "@askAboutYourStars": {
+    "description": "Placeholder hint text in the message input field on the AI Astrologer chat screen."
+  },
+  "upgradeUnlimited": "Upgrade for unlimited questions",
+  "@upgradeUnlimited": {
+    "description": "Label of the upgrade link under the input bar on the AI Astrologer chat screen. A ✨ emoji prefix is appended in code, not stored in this string."
+  },
+  "aiNotConnected": "AI replies will appear here once the AI service is connected.",
+  "@aiNotConnected": {
+    "description": "Snackbar shown after sending a chat message, since no AI backend is wired up yet (provider decision still open per CLAUDE.md)."
+  },
+  "premiumReportsTitle": "Premium Reports",
+  "@premiumReportsTitle": {
+    "description": "Header title on the Premium Reports screen."
+  },
+  "goPremium": "Go Premium",
+  "@goPremium": {
+    "description": "Bold headline inside the Go Premium banner on the Premium Reports screen."
+  },
+  "goPremiumSubtitle": "Unlock all {total} reports + unlimited AI questions",
+  "@goPremiumSubtitle": {
+    "description": "Subtitle inside the Go Premium banner on the Premium Reports screen, naming the total number of reports in the full catalogue.",
+    "placeholders": {
+      "total": {
+        "type": "String",
+        "example": "9"
+      }
+    }
+  },
+  "upgrade": "Upgrade",
+  "@upgrade": {
+    "description": "Label of the pill CTA inside the Go Premium banner on the Premium Reports screen."
+  },
+  "readMinutes": "{minutes} min",
+  "@readMinutes": {
+    "description": "Reading-time meta chip on a report card on the Premium Reports screen.",
+    "placeholders": {
+      "minutes": {
+        "type": "String",
+        "example": "12"
+      }
+    }
+  },
+  "aiSummary": "AI Summary",
+  "@aiSummary": {
+    "description": "AI-summary meta chip label on a report card on the Premium Reports screen."
+  },
+  "premium": "Premium",
+  "@premium": {
+    "description": "Access badge label on a locked report card on the Premium Reports screen."
+  },
+  "free": "Free",
+  "@free": {
+    "description": "Access badge label on an unlocked report card on the Premium Reports screen."
+  },
+  "moreReportsFooter": "+ {remaining} more reports · All include PDF download",
+  "@moreReportsFooter": {
+    "description": "Footer note under the report list on the Premium Reports screen, naming how many additional reports are not yet listed.",
+    "placeholders": {
+      "remaining": {
+        "type": "String",
+        "example": "2"
+      }
+    }
+  },
+  "reportCareer": "Career Report",
+  "@reportCareer": {
+    "description": "Title of the Career report on the Premium Reports screen."
+  },
+  "reportCareerDesc": "Profession, promotions & business timing",
+  "@reportCareerDesc": {
+    "description": "Description of the Career report on the Premium Reports screen."
+  },
+  "reportMarriage": "Marriage Report",
+  "@reportMarriage": {
+    "description": "Title of the Marriage report on the Premium Reports screen."
+  },
+  "reportMarriageDesc": "Timing, spouse traits & compatibility",
+  "@reportMarriageDesc": {
+    "description": "Description of the Marriage report on the Premium Reports screen."
+  },
+  "reportWealth": "Wealth & Finance",
+  "@reportWealth": {
+    "description": "Title of the Wealth & Finance report on the Premium Reports screen."
+  },
+  "reportWealthDesc": "Income sources, investments & yogas",
+  "@reportWealthDesc": {
+    "description": "Description of the Wealth & Finance report on the Premium Reports screen."
+  },
+  "reportHealth": "Health Report",
+  "@reportHealth": {
+    "description": "Title of the Health report on the Premium Reports screen."
+  },
+  "reportHealthDesc": "Vulnerable periods & preventive remedies",
+  "@reportHealthDesc": {
+    "description": "Description of the Health report on the Premium Reports screen."
+  },
+  "reportSadeSati": "Sade Sati Report",
+  "@reportSadeSati": {
+    "description": "Title of the Sade Sati report on the Premium Reports screen."
+  },
+  "reportSadeSatiDesc": "Saturn phases & impact analysis",
+  "@reportSadeSatiDesc": {
+    "description": "Description of the Sade Sati report on the Premium Reports screen."
+  },
+  "reportGemstone": "Gemstone Report",
+  "@reportGemstone": {
+    "description": "Title of the Gemstone report on the Premium Reports screen."
+  },
+  "reportGemstoneDesc": "Recommended stones & wearing method",
+  "@reportGemstoneDesc": {
+    "description": "Description of the Gemstone report on the Premium Reports screen."
+  },
+  "reportNumerology": "Numerology Report",
+  "@reportNumerology": {
+    "description": "Title of the Numerology report on the Premium Reports screen."
+  },
+  "reportNumerologyDesc": "Life path, destiny & name numbers",
+  "@reportNumerologyDesc": {
+    "description": "Description of the Numerology report on the Premium Reports screen."
+  },
+  "restorePurchase": "Restore purchase",
+  "@restorePurchase": {
+    "description": "Label of the tappable 'restore purchase' link in the Subscription Paywall's top bar."
+  },
+  "vedadarshiPremium": "Vedadarshi Premium",
+  "@vedadarshiPremium": {
+    "description": "Heading of the Subscription Paywall's hero section, naming the premium product."
+  },
+  "premiumTagline": "Unlimited cosmic guidance, one simple plan",
+  "@premiumTagline": {
+    "description": "Subtitle under the heading in the Subscription Paywall's hero section."
+  },
+  "benefitReports": "All {total} premium reports with PDF export",
+  "@benefitReports": {
+    "description": "First benefit line item on the Subscription Paywall, naming the total number of reports in the full catalogue.",
+    "placeholders": {
+      "total": {
+        "type": "String",
+        "example": "9"
+      }
+    }
+  },
+  "benefitUnlimitedAi": "Unlimited AI Astrologer questions",
+  "@benefitUnlimitedAi": {
+    "description": "Second benefit line item on the Subscription Paywall."
+  },
+  "benefitAdvancedKundli": "Advanced Kundli: dasha, dosha & remedies",
+  "@benefitAdvancedKundli": {
+    "description": "Third benefit line item on the Subscription Paywall."
+  },
+  "benefitAdFree": "Ad-free experience across the app",
+  "@benefitAdFree": {
+    "description": "Fourth benefit line item on the Subscription Paywall."
+  },
+  "planMonthly": "Monthly",
+  "@planMonthly": {
+    "description": "Name of the monthly subscription plan card on the Subscription Paywall."
+  },
+  "planYearly": "Yearly",
+  "@planYearly": {
+    "description": "Name of the yearly subscription plan card on the Subscription Paywall."
+  },
+  "planLifetime": "Lifetime",
+  "@planLifetime": {
+    "description": "Name of the lifetime subscription plan card on the Subscription Paywall."
+  },
+  "perMonth": "per month",
+  "@perMonth": {
+    "description": "Subtitle on the monthly plan card on the Subscription Paywall."
+  },
+  "oneTimePayment": "one-time payment",
+  "@oneTimePayment": {
+    "description": "Subtitle on the lifetime plan card on the Subscription Paywall."
+  },
+  "startPremium": "Start Premium — {price}",
+  "@startPremium": {
+    "description": "Label of the main CTA button on the Subscription Paywall, naming the price of the currently selected plan.",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "₹1,999/year"
+      }
+    }
+  },
+  "billingFinePrint": "Billed via Google Play · Cancel anytime · Secure with RevenueCat",
+  "@billingFinePrint": {
+    "description": "Fine-print notice at the bottom of the Subscription Paywall."
+  },
+  "articlesTitle": "Wisdom & Articles",
+  "@articlesTitle": {
+    "description": "Header title on the Articles screen."
+  },
+  "savedArticlesLabel": "Saved articles",
+  "@savedArticlesLabel": {
+    "description": "Accessibility label of the bookmark icon button in the Articles screen's title row, leading to the (not yet built) saved-articles list."
+  },
+  "articleCategoryAll": "All",
+  "@articleCategoryAll": {
+    "description": "Label of the 'All' filter chip on the Articles screen, which clears the category filter. Unlike the other category chip labels, this one is UI chrome rather than CMS content."
+  },
+  "articleFeaturedBadge": "FEATURED · {tag}",
+  "@articleFeaturedBadge": {
+    "description": "Badge label on the featured article card on the Articles screen, naming the featured article's special tag.",
+    "placeholders": {
+      "tag": {
+        "type": "String",
+        "example": "SHRAVANA SPECIAL"
+      }
+    }
+  },
+  "articleSave": "Save",
+  "@articleSave": {
+    "description": "Label/accessibility label of the bookmark save action on an article (featured card action pill, list row bookmark icon, and Article Detail header icon)."
+  },
+  "articleShare": "Share",
+  "@articleShare": {
+    "description": "Label/accessibility label of the share action on an article (featured card action pill and Article Detail header icon) — not yet wired to real sharing/deeplinks."
+  },
+  "articleListen": "Listen",
+  "@articleListen": {
+    "description": "Label of the listen-to-article (text-to-speech) action on an article (featured card action pill and Article Detail's Listen pill) — not yet wired to a real TTS service."
+  },
+  "articleByline": "By {author} · {minutes} min read",
+  "@articleByline": {
+    "description": "Byline under the featured article's title on the Articles screen, naming the author and reading time.",
+    "placeholders": {
+      "author": {
+        "type": "String",
+        "example": "Pandit R. Sharma"
+      },
+      "minutes": {
+        "type": "String",
+        "example": "8"
+      }
+    }
+  },
+  "articleReadMinutes": "{minutes} min",
+  "@articleReadMinutes": {
+    "description": "Short reading-time meta text on an article list row on the Articles screen.",
+    "placeholders": {
+      "minutes": {
+        "type": "String",
+        "example": "4"
+      }
+    }
+  },
+  "articleMetaLine": "{date} · {minutes} min read",
+  "@articleMetaLine": {
+    "description": "Meta line under the author name on the Article Detail screen, naming the publish date and reading time.",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "10 July 2026"
+      },
+      "minutes": {
+        "type": "String",
+        "example": "8"
+      }
+    }
+  },
+  "searchHint": "Search articles, reports & more",
+  "@searchHint": {
+    "description": "Placeholder text in the empty search field on the Search screen."
+  },
+  "searchFilterArticles": "Articles",
+  "@searchFilterArticles": {
+    "description": "Label of the Articles filter chip on the Search screen."
+  },
+  "searchRecentLabel": "RECENT",
+  "@searchRecentLabel": {
+    "description": "Section label above the recent-searches chip row on the Search screen."
+  },
+  "searchClearRecent": "Clear",
+  "@searchClearRecent": {
+    "description": "Action label that clears the recent-searches list on the Search screen."
+  },
+  "searchClearQuery": "Clear search",
+  "@searchClearQuery": {
+    "description": "Accessibility label of the ✕ icon button that clears the typed text in the Search screen's search field."
+  },
+  "searchTrendingLabel": "TRENDING",
+  "@searchTrendingLabel": {
+    "description": "Section label above the trending-searches chip row on the Search screen."
+  },
+  "searchResultsLabel": "RESULTS",
+  "@searchResultsLabel": {
+    "description": "Section label above the search results list on the Search screen."
+  },
+  "searchNoResultsTitle": "No results for \"{query}\"",
+  "@searchNoResultsTitle": {
+    "description": "Empty-state title shown when a search query on the Search screen matches nothing, naming the query.",
+    "placeholders": {
+      "query": {
+        "type": "String",
+        "example": "rahu kaal"
+      }
+    }
+  },
+  "searchNoResultsHint": "Try different keywords or check the spelling",
+  "@searchNoResultsHint": {
+    "description": "Empty-state hint shown under searchNoResultsTitle on the Search screen."
+  },
+  "notificationsTitle": "Notifications",
+  "@notificationsTitle": {
+    "description": "Title of the Notifications screen."
+  },
+  "notificationsMarkAllRead": "Mark all read",
+  "@notificationsMarkAllRead": {
+    "description": "Action label on the Notifications screen that marks every notification as read."
+  },
+  "notificationsToday": "TODAY",
+  "@notificationsToday": {
+    "description": "Section label above today's notifications on the Notifications screen."
+  },
+  "notificationsYesterday": "YESTERDAY",
+  "@notificationsYesterday": {
+    "description": "Section label above yesterday's notifications on the Notifications screen."
+  },
+  "notificationsEmptyState": "No notifications yet",
+  "@notificationsEmptyState": {
+    "description": "Empty-state message shown on the Notifications screen when there are no notifications."
+  },
+  "notificationsEmptyMessage": "You'll see daily horoscope, festival and match alerts here.",
+  "@notificationsEmptyMessage": {
+    "description": "Empty-state supporting message under notificationsEmptyState on the Notifications screen."
+  },
+  "notificationsPermissionDeniedTitle": "Turn on notifications",
+  "@notificationsPermissionDeniedTitle": {
+    "description": "Title of the prompt shown on the Notifications screen when push notification permission has not been granted."
+  },
+  "notificationsPermissionDeniedMessage": "Enable notifications to get your daily horoscope, festival alerts and AI replies.",
+  "@notificationsPermissionDeniedMessage": {
+    "description": "Supporting message under notificationsPermissionDeniedTitle explaining why to enable notifications."
+  },
+  "notificationsPermissionEnableAction": "Enable notifications",
+  "@notificationsPermissionEnableAction": {
+    "description": "Action button label that requests notification permission, shown when it hasn't been permanently denied."
+  },
+  "notificationsPermissionOpenSettingsAction": "Open settings",
+  "@notificationsPermissionOpenSettingsAction": {
+    "description": "Action button label that opens the OS app-settings page, shown when notification permission was permanently denied (a further in-app request would no longer show a system prompt)."
+  },
+  "profileBirthProfiles": "Birth profiles",
+  "@profileBirthProfiles": {
+    "description": "Title of the birth-profiles menu row on the Profile & Settings screen."
+  },
+  "profileProfileCount": "{count} profile",
+  "@profileProfileCount": {
+    "description": "Subtitle of the birth-profiles menu row on the Profile & Settings screen, naming how many saved profiles exist.",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "1"
+      }
+    }
+  },
+  "profileAppLanguageLabel": "APP LANGUAGE",
+  "@profileAppLanguageLabel": {
+    "description": "Uppercased section label above the language chip row on the Profile & Settings screen."
+  },
+  "profileMyActivityLabel": "MY ACTIVITY",
+  "@profileMyActivityLabel": {
+    "description": "Uppercased section label above the activity menu card on the Profile & Settings screen."
+  },
+  "profileMyReports": "My Reports",
+  "@profileMyReports": {
+    "description": "Title of the My Reports menu row on the Profile & Settings screen, leading to the Premium Reports screen."
+  },
+  "profileDownloadedPdfs": "Downloaded PDFs",
+  "@profileDownloadedPdfs": {
+    "description": "Title of the Downloaded PDFs menu row on the Profile & Settings screen."
+  },
+  "profileAiChatHistory": "AI Chat History",
+  "@profileAiChatHistory": {
+    "description": "Title of the AI Chat History menu row on the Profile & Settings screen."
+  },
+  "profilePaymentHistory": "Payment History",
+  "@profilePaymentHistory": {
+    "description": "Title of the Payment History menu row on the Profile & Settings screen."
+  },
+  "profilePreferencesLabel": "PREFERENCES",
+  "@profilePreferencesLabel": {
+    "description": "Uppercased section label above the preferences menu card on the Profile & Settings screen."
+  },
+  "profileAppearance": "Appearance",
+  "@profileAppearance": {
+    "description": "Title of the Appearance (dark mode) menu row on the Profile & Settings screen."
+  },
+  "profileDarkModeComingSoon": "Dark mode is coming in a future update",
+  "@profileDarkModeComingSoon": {
+    "description": "Snackbar shown when tapping the Appearance row/switch on the Profile & Settings screen, since dark mode isn't implemented yet."
+  },
+  "profileNotifications": "Notifications",
+  "@profileNotifications": {
+    "description": "Title of the Notifications menu row on the Profile & Settings screen, leading to the Notifications screen."
+  },
+  "profileNotificationsSubtitle": "Daily horoscope, festivals",
+  "@profileNotificationsSubtitle": {
+    "description": "Subtitle of the Notifications menu row on the Profile & Settings screen."
+  },
+  "profilePanchangLocation": "Panchang location",
+  "@profilePanchangLocation": {
+    "description": "Title of the Panchang location menu row on the Profile & Settings screen."
+  },
+  "profileManageSubscription": "Manage subscription",
+  "@profileManageSubscription": {
+    "description": "Title of the Manage subscription menu row on the Profile & Settings screen."
+  },
+  "profilePrivacySecurity": "Privacy & security",
+  "@profilePrivacySecurity": {
+    "description": "Title of the Privacy & security menu row on the Profile & Settings screen."
+  },
+  "profileHelpSupport": "Help & support",
+  "@profileHelpSupport": {
+    "description": "Title of the Help & support menu row on the Profile & Settings screen."
+  },
+  "profileRewardsLabel": "REWARDS",
+  "@profileRewardsLabel": {
+    "description": "Uppercased section label above the rewards menu card on the Profile & Settings screen."
+  },
+  "profileReferEarn": "Refer & Earn",
+  "@profileReferEarn": {
+    "description": "Title of the Refer & Earn menu row on the Profile & Settings screen."
+  },
+  "profileReferEarnSubtitle": "Get 1 month free per referral",
+  "@profileReferEarnSubtitle": {
+    "description": "Subtitle of the Refer & Earn menu row on the Profile & Settings screen."
+  },
+  "profileInviteFriends": "Invite Friends",
+  "@profileInviteFriends": {
+    "description": "Title of the Invite Friends menu row on the Profile & Settings screen."
+  },
+  "profileInviteFriendsSubtitle": "Share Vedadarshi",
+  "@profileInviteFriendsSubtitle": {
+    "description": "Subtitle of the Invite Friends menu row on the Profile & Settings screen."
+  },
+  "profileMoreLabel": "MORE",
+  "@profileMoreLabel": {
+    "description": "Uppercased section label above the More menu card on the Profile & Settings screen."
+  },
+  "profileRateApp": "Rate Vedadarshi",
+  "@profileRateApp": {
+    "description": "Title of the Rate Vedadarshi menu row on the Profile & Settings screen."
+  },
+  "profileSendFeedback": "Send Feedback",
+  "@profileSendFeedback": {
+    "description": "Title of the Send Feedback menu row on the Profile & Settings screen."
+  },
+  "profileRestorePurchases": "Restore Purchases",
+  "@profileRestorePurchases": {
+    "description": "Title of the Restore Purchases menu row on the Profile & Settings screen, leading to the Subscription Paywall screen."
+  },
+  "profileLogOut": "Log out",
+  "@profileLogOut": {
+    "description": "Label of the Log out action at the bottom of the Profile & Settings screen."
+  },
+  "profileDeleteAccount": "Delete account",
+  "@profileDeleteAccount": {
+    "description": "Label of the Delete account action at the bottom of the Profile & Settings screen — not yet wired up (must go through a Cloud Function per projects/CLAUDE.md)."
+  },
+  "profileSignOutConfirmTitle": "Log out?",
+  "@profileSignOutConfirmTitle": {
+    "description": "Title of the confirmation dialog shown before signing out from the Profile & Settings screen."
+  },
+  "profileSignOutConfirmMessage": "You'll need to sign in again to access your saved profiles and reports.",
+  "@profileSignOutConfirmMessage": {
+    "description": "Body message of the confirmation dialog shown before signing out from the Profile & Settings screen."
+  },
+  "profileSignOutConfirmAction": "Log out",
+  "@profileSignOutConfirmAction": {
+    "description": "Label of the confirming action button in the sign-out confirmation dialog."
+  },
+  "profileCancel": "Cancel",
+  "@profileCancel": {
+    "description": "Label of the dismissing action button in the sign-out confirmation dialog."
   }
 }

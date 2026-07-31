@@ -15,6 +15,11 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // flutter_local_notifications requires core library desugaring
+        // (its Android implementation uses java.time APIs backported to
+        // older API levels) — without this the build fails at
+        // :app:checkDebugAarMetadata.
+        isCoreLibraryDesugaringEnabled = true
     }
 
     defaultConfig {
@@ -28,6 +33,10 @@ android {
         // Flutter's Gradle tooling rewrites this file to the template form
         // on every build and discards it — if a future Flutter SDK ever
         // lowers the default below 23, pin it explicitly here instead.)
+        // Also comfortably covers firebase_messaging/flutter_local_notifications
+        // (minSdk 21) and the POST_NOTIFICATIONS runtime permission, which the
+        // manifest declares but which is only enforced by the OS on API 33+ —
+        // nothing extra needed here for that either.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -51,4 +60,9 @@ kotlin {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // Required by compileOptions.isCoreLibraryDesugaringEnabled above.
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }

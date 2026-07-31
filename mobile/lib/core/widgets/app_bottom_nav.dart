@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../features/ai/ai_astrologer_screen.dart';
 import '../../features/home/home_dashboard_screen.dart';
 import '../../features/kundli/kundli_input_screen.dart';
 import '../../features/panchang/panchang_screen.dart';
+import '../../features/profile/profile_settings_screen.dart';
 import '../../l10n/app_localizations.dart';
 import '../motion/app_motion.dart';
 import '../theme/app_colors.dart';
@@ -16,8 +18,8 @@ enum AppTab { home, panchang, kundli, askAi, profile }
 /// Profile — used by every screen that has a bottom nav.
 ///
 /// This is deliberately ROUTE-BASED rather than an `IndexedStack` shell:
-/// only 2 of the 5 tabs have a real screen behind them today (Home,
-/// Panchang), so there is no shell content yet for Kundli/Ask AI/Profile to
+/// only 3 of the 5 tabs have a real screen behind them today (Home,
+/// Panchang, Profile), so there is no shell content yet for Kundli/Ask AI to
 /// keep alive. When all five tab screens exist, replace this with a shell
 /// widget that keeps each tab's scroll position — route-based switching (as
 /// done here) discards it on every tab change.
@@ -156,9 +158,17 @@ class AppBottomNav extends StatelessWidget {
           context,
         ).push<void>(fadeThroughRoute(const KundliInputScreen()));
       case AppTab.askAi:
+        // Same push convention as Kundli above — this screen has no bottom
+        // nav of its own in the Figma design either.
+        Navigator.of(
+          context,
+        ).push<void>(fadeThroughRoute(const AiAstrologerScreen()));
       case AppTab.profile:
-        // These screens don't exist yet — no-op until they're built.
-        break;
+        // Same tab-root convention as Home/Panchang above: instant switch,
+        // no growing back stack.
+        Navigator.of(
+          context,
+        ).pushReplacement(_instantRoute(const ProfileSettingsScreen()));
     }
   }
 

@@ -425,4 +425,513 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get generateKundli => 'ಕುಂಡಲಿ ರಚಿಸಿ';
+
+  @override
+  String get lagnaKundli => 'ಲಗ್ನ ಕುಂಡಲಿ';
+
+  @override
+  String get pdf => 'PDF';
+
+  @override
+  String get tabChart => 'ಚಾರ್ಟ್';
+
+  @override
+  String get tabPlanetPositions => 'ಗ್ರಹ ಸ್ಥಾನಗಳು';
+
+  @override
+  String get tabDasha => 'ವಿಂಶೋತ್ತರಿ ದಶಾ';
+
+  @override
+  String get tabPredictions => 'ಭವಿಷ್ಯವಾಣಿಗಳು';
+
+  @override
+  String get keyPlanets => 'ಪ್ರಮುಖ ಗ್ರಹಗಳು';
+
+  @override
+  String get lagna => 'ಲಗ್ನ';
+
+  @override
+  String get rashi => 'ರಾಶಿ';
+
+  @override
+  String get southChartComingSoon =>
+      'ದಕ್ಷಿಣ ಭಾರತೀಯ ಚಾರ್ಟ್ ವಿನ್ಯಾಸ ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ.';
+
+  @override
+  String get kundliMatchingTitle => 'ಕುಂಡಲಿ ಮ್ಯಾಚಿಂಗ್';
+
+  @override
+  String get gunMilanIntro =>
+      'ಅಷ್ಟಕೂಟ ಗುಣ ಮಿಲನ್ ವಿವಾಹ ಹೊಂದಾಣಿಕೆಗಾಗಿ 36 ಗುಣಗಳಲ್ಲಿ 8 ಅಂಶಗಳನ್ನು ಹೋಲಿಸುತ್ತದೆ.';
+
+  @override
+  String get groom => 'ವರ';
+
+  @override
+  String get bride => 'ವಧು';
+
+  @override
+  String get change => 'ಬದಲಿಸಿ';
+
+  @override
+  String get selectBrideProfile => 'ವಧುವಿನ ಪ್ರೊಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ…';
+
+  @override
+  String get selectBrideHint =>
+      'ಆಯ್ಕೆ ಮಾಡಲು ಅಥವಾ ಜನನ ವಿವರಗಳನ್ನು ಸೇರಿಸಲು ಟ್ಯಾಪ್ ಮಾಡಿ';
+
+  @override
+  String get matchingPrivacyNote =>
+      'ಹೊಂದಾಣಿಕೆ ಫಲಿತಾಂಶಗಳು ಖಾಸಗಿಯಾಗಿದ್ದು ನಿಮ್ಮ ಖಾತೆಯಲ್ಲಿ ಮಾತ್ರ ಉಳಿಸಲಾಗುತ್ತದೆ';
+
+  @override
+  String get matchKundlis => 'ಕುಂಡಲಿಗಳನ್ನು ಹೊಂದಿಸಿ';
+
+  @override
+  String get matchResult => 'ಹೊಂದಾಣಿಕೆ ಫಲಿತಾಂಶ';
+
+  @override
+  String outOfMax(int max) {
+    return '$max ರಲ್ಲಿ';
+  }
+
+  @override
+  String percentCompatible(int percent) {
+    return '$percent% ಹೊಂದಾಣಿಕೆ';
+  }
+
+  @override
+  String get ashtakootaBreakdown => 'ಅಷ್ಟಕೂಟ ವಿವರಣೆ';
+
+  @override
+  String get bandStrong => 'ಬಲಶಾಲಿ (75%+)';
+
+  @override
+  String get bandModerate => 'ಮಧ್ಯಮ (40–74%)';
+
+  @override
+  String get bandWeak => 'ದುರ್ಬಲ (<40%)';
+
+  @override
+  String get gunaVarna => 'ವರ್ಣ';
+
+  @override
+  String get gunaVashya => 'ವಶ್ಯ';
+
+  @override
+  String get gunaTara => 'ತಾರಾ';
+
+  @override
+  String get gunaYoni => 'ಯೋನಿ';
+
+  @override
+  String get gunaGrahaMaitri => 'ಗ್ರಹ ಮೈತ್ರಿ';
+
+  @override
+  String get gunaGana => 'ಗಣ';
+
+  @override
+  String get gunaBhakoot => 'ಭಕೂಟ';
+
+  @override
+  String get gunaNadi => 'ನಾಡಿ';
+
+  @override
+  String get rishiAiSummary => 'ಋಷಿ AI ಸಾರಾಂಶ';
+
+  @override
+  String get aiBadge => 'AI';
+
+  @override
+  String get detailedCompatibilityReport => 'ವಿವರವಾದ ಹೊಂದಾಣಿಕೆ ವರದಿ ಪಡೆಯಿರಿ';
+
+  @override
+  String get tapGunaHint =>
+      'ಪ್ರತಿ ಗುಣ ಏನನ್ನು ಅಳೆಯುತ್ತದೆ ಮತ್ತು ಏಕೆ ಮುಖ್ಯ ಎಂದು ನೋಡಲು ಟ್ಯಾಪ್ ಮಾಡಿ';
+
+  @override
+  String get rishiAi => 'ಋಷಿ AI';
+
+  @override
+  String get onlineKnowsChart => 'ಆನ್‌ಲೈನ್ · ನಿಮ್ಮ ಜಾತಕ ತಿಳಿದಿದೆ';
+
+  @override
+  String freeQuota(String used, String total) {
+    return '$used/$total ಉಚಿತ';
+  }
+
+  @override
+  String get today => 'ಇಂದು';
+
+  @override
+  String get askAbout => 'ಇವುಗಳ ಬಗ್ಗೆ ಕೇಳಿ';
+
+  @override
+  String get topicCareer => 'ವೃತ್ತಿ';
+
+  @override
+  String get topicMarriage => 'ವಿವಾಹ';
+
+  @override
+  String get topicHealth => 'ಆರೋಗ್ಯ';
+
+  @override
+  String get topicBusiness => 'ವ್ಯಾಪಾರ';
+
+  @override
+  String get topicFinance => 'ಹಣಕಾಸು';
+
+  @override
+  String get topicEducation => 'ಶಿಕ್ಷಣ';
+
+  @override
+  String get topicTravel => 'ಪ್ರಯಾಣ';
+
+  @override
+  String get topicGemstones => 'ರತ್ನಗಳು';
+
+  @override
+  String get topicRemedies => 'ಪರಿಹಾರಗಳು';
+
+  @override
+  String get topicNumerology => 'ಅಂಕ ಶಾಸ್ತ್ರ';
+
+  @override
+  String get rishiTyping => 'ಋಷಿ ಟೈಪ್ ಮಾಡುತ್ತಿದ್ದಾರೆ…';
+
+  @override
+  String get askAboutYourStars => 'ನಿಮ್ಮ ನಕ್ಷತ್ರಗಳ ಬಗ್ಗೆ ಕೇಳಿ…';
+
+  @override
+  String get upgradeUnlimited => 'ಅಪರಿಮಿತ ಪ್ರಶ್ನೆಗಳಿಗಾಗಿ ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ';
+
+  @override
+  String get aiNotConnected =>
+      'AI ಸೇವೆ ಸಂಪರ್ಕಗೊಂಡ ನಂತರ ಉತ್ತರಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.';
+
+  @override
+  String get premiumReportsTitle => 'ಪ್ರೀಮಿಯಂ ವರದಿಗಳು';
+
+  @override
+  String get goPremium => 'ಪ್ರೀಮಿಯಂ ಪಡೆಯಿರಿ';
+
+  @override
+  String goPremiumSubtitle(String total) {
+    return 'ಎಲ್ಲಾ $total ವರದಿಗಳು + ಅಪರಿಮಿತ AI ಪ್ರಶ್ನೆಗಳನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಿ';
+  }
+
+  @override
+  String get upgrade => 'ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ';
+
+  @override
+  String readMinutes(String minutes) {
+    return '$minutes ನಿಮಿ';
+  }
+
+  @override
+  String get aiSummary => 'AI ಸಾರಾಂಶ';
+
+  @override
+  String get premium => 'ಪ್ರೀಮಿಯಂ';
+
+  @override
+  String get free => 'ಉಚಿತ';
+
+  @override
+  String moreReportsFooter(String remaining) {
+    return '+ $remaining ಹೆಚ್ಚಿನ ವರದಿಗಳು · ಎಲ್ಲದರಲ್ಲೂ PDF ಡೌನ್‌ಲೋಡ್ ಸೇರಿದೆ';
+  }
+
+  @override
+  String get reportCareer => 'ವೃತ್ತಿ ವರದಿ';
+
+  @override
+  String get reportCareerDesc => 'ವೃತ್ತಿ, ಬಡ್ತಿಗಳು & ವ್ಯಾಪಾರ ಸಮಯ';
+
+  @override
+  String get reportMarriage => 'ವಿವಾಹ ವರದಿ';
+
+  @override
+  String get reportMarriageDesc => 'ಸಮಯ, ಸಂಗಾತಿಯ ಗುಣಗಳು & ಹೊಂದಾಣಿಕೆ';
+
+  @override
+  String get reportWealth => 'ಸಂಪತ್ತು & ಹಣಕಾಸು';
+
+  @override
+  String get reportWealthDesc => 'ಆದಾಯ ಮೂಲಗಳು, ಹೂಡಿಕೆಗಳು & ಯೋಗಗಳು';
+
+  @override
+  String get reportHealth => 'ಆರೋಗ್ಯ ವರದಿ';
+
+  @override
+  String get reportHealthDesc => 'ದುರ್ಬಲ ಅವಧಿಗಳು & ತಡೆಗಟ್ಟುವ ಪರಿಹಾರಗಳು';
+
+  @override
+  String get reportSadeSati => 'ಸಾಡೇ ಸಾತಿ ವರದಿ';
+
+  @override
+  String get reportSadeSatiDesc => 'ಶನಿ ಹಂತಗಳು & ಪ್ರಭಾವ ವಿಶ್ಲೇಷಣೆ';
+
+  @override
+  String get reportGemstone => 'ರತ್ನ ವರದಿ';
+
+  @override
+  String get reportGemstoneDesc => 'ಶಿಫಾರಸು ಮಾಡಿದ ಕಲ್ಲುಗಳು & ಧರಿಸುವ ವಿಧಾನ';
+
+  @override
+  String get reportNumerology => 'ಅಂಕಶಾಸ್ತ್ರ ವರದಿ';
+
+  @override
+  String get reportNumerologyDesc => 'ಜೀವನ ಮಾರ್ಗ, ಹಣೆಬರಹ & ಹೆಸರು ಅಂಕೆಗಳು';
+
+  @override
+  String get restorePurchase => 'ಖರೀದಿಯನ್ನು ಮರುಸ್ಥಾಪಿಸಿ';
+
+  @override
+  String get vedadarshiPremium => 'Vedadarshi ಪ್ರೀಮಿಯಂ';
+
+  @override
+  String get premiumTagline => 'ಅಪರಿಮಿತ ವಿಶ್ವ ಮಾರ್ಗದರ್ಶನ, ಒಂದೇ ಸರಳ ಯೋಜನೆ';
+
+  @override
+  String benefitReports(String total) {
+    return 'PDF ರಫ್ತಿನೊಂದಿಗೆ ಎಲ್ಲಾ $total ಪ್ರೀಮಿಯಂ ವರದಿಗಳು';
+  }
+
+  @override
+  String get benefitUnlimitedAi => 'ಅಪರಿಮಿತ AI ಜ್ಯೋತಿಷಿ ಪ್ರಶ್ನೆಗಳು';
+
+  @override
+  String get benefitAdvancedKundli =>
+      'ಸುಧಾರಿತ ಕುಂಡಲಿ: ದಶಾ, ದೋಷ ಮತ್ತು ಪರಿಹಾರಗಳು';
+
+  @override
+  String get benefitAdFree => 'ಆ್ಯಪ್ ಉದ್ದಕ್ಕೂ ಜಾಹೀರಾತು-ಮುಕ್ತ ಅನುಭವ';
+
+  @override
+  String get planMonthly => 'ಮಾಸಿಕ';
+
+  @override
+  String get planYearly => 'ವಾರ್ಷಿಕ';
+
+  @override
+  String get planLifetime => 'ಜೀವಮಾನ';
+
+  @override
+  String get perMonth => 'ಪ್ರತಿ ತಿಂಗಳು';
+
+  @override
+  String get oneTimePayment => 'ಒಂದು ಬಾರಿ ಪಾವತಿ';
+
+  @override
+  String startPremium(String price) {
+    return 'ಪ್ರೀಮಿಯಂ ಪ್ರಾರಂಭಿಸಿ — $price';
+  }
+
+  @override
+  String get billingFinePrint =>
+      'Google Play ಮೂಲಕ ಬಿಲ್ ಮಾಡಲಾಗಿದೆ · ಯಾವಾಗ ಬೇಕಾದರೂ ರದ್ದುಮಾಡಿ · RevenueCat ನೊಂದಿಗೆ ಸುರಕ್ಷಿತ';
+
+  @override
+  String get articlesTitle => 'ಜ್ಞಾನ ಮತ್ತು ಲೇಖನಗಳು';
+
+  @override
+  String get savedArticlesLabel => 'ಉಳಿಸಿದ ಲೇಖನಗಳು';
+
+  @override
+  String get articleCategoryAll => 'ಎಲ್ಲಾ';
+
+  @override
+  String articleFeaturedBadge(String tag) {
+    return 'ವಿಶೇಷ · $tag';
+  }
+
+  @override
+  String get articleSave => 'ಉಳಿಸಿ';
+
+  @override
+  String get articleShare => 'ಹಂಚಿಕೊಳ್ಳಿ';
+
+  @override
+  String get articleListen => 'ಆಲಿಸಿ';
+
+  @override
+  String articleByline(String author, String minutes) {
+    return '$author ಬರೆದಿದ್ದಾರೆ · $minutes ನಿಮಿಷ ಓದು';
+  }
+
+  @override
+  String articleReadMinutes(String minutes) {
+    return '$minutes ನಿಮಿ';
+  }
+
+  @override
+  String articleMetaLine(String date, String minutes) {
+    return '$date · $minutes ನಿಮಿಷ ಓದು';
+  }
+
+  @override
+  String get searchHint => 'ಲೇಖನಗಳು, ವರದಿಗಳು ಮತ್ತು ಇನ್ನಷ್ಟು ಹುಡುಕಿ';
+
+  @override
+  String get searchFilterArticles => 'ಲೇಖನಗಳು';
+
+  @override
+  String get searchRecentLabel => 'ಇತ್ತೀಚಿನವು';
+
+  @override
+  String get searchClearRecent => 'ಅಳಿಸಿ';
+
+  @override
+  String get searchClearQuery => 'ಹುಡುಕಾಟ ತೆರವುಗೊಳಿಸಿ';
+
+  @override
+  String get searchTrendingLabel => 'ಟ್ರೆಂಡಿಂಗ್';
+
+  @override
+  String get searchResultsLabel => 'ಫಲಿತಾಂಶಗಳು';
+
+  @override
+  String searchNoResultsTitle(String query) {
+    return '\"$query\" ಗಾಗಿ ಫಲಿತಾಂಶಗಳಿಲ್ಲ';
+  }
+
+  @override
+  String get searchNoResultsHint =>
+      'ಬೇರೆ ಪದಗಳನ್ನು ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ಕಾಗುಣಿತ ಪರಿಶೀಲಿಸಿ';
+
+  @override
+  String get notificationsTitle => 'ಅಧಿಸೂಚನೆಗಳು';
+
+  @override
+  String get notificationsMarkAllRead => 'ಎಲ್ಲವನ್ನೂ ಓದಿದಂತೆ ಗುರುತಿಸಿ';
+
+  @override
+  String get notificationsToday => 'ಇಂದು';
+
+  @override
+  String get notificationsYesterday => 'ನಿನ್ನೆ';
+
+  @override
+  String get notificationsEmptyState => 'ಇನ್ನೂ ಯಾವುದೇ ಅಧಿಸೂಚನೆಗಳಿಲ್ಲ';
+
+  @override
+  String get notificationsEmptyMessage =>
+      'ಇಲ್ಲಿ ನಿಮಗೆ ದೈನಂದಿನ ರಾಶಿಫಲ, ಹಬ್ಬ ಮತ್ತು ಹೊಂದಾಣಿಕೆ ಎಚ್ಚರಿಕೆಗಳು ಕಾಣಿಸುತ್ತವೆ.';
+
+  @override
+  String get notificationsPermissionDeniedTitle => 'ಅಧಿಸೂಚನೆಗಳನ್ನು ಆನ್ ಮಾಡಿ';
+
+  @override
+  String get notificationsPermissionDeniedMessage =>
+      'ನಿಮ್ಮ ದೈನಂದಿನ ರಾಶಿಫಲ, ಹಬ್ಬದ ಎಚ್ಚರಿಕೆಗಳು ಮತ್ತು AI ಪ್ರತ್ಯುತ್ತರಗಳನ್ನು ಪಡೆಯಲು ಅಧಿಸೂಚನೆಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ.';
+
+  @override
+  String get notificationsPermissionEnableAction =>
+      'ಅಧಿಸೂಚನೆಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ';
+
+  @override
+  String get notificationsPermissionOpenSettingsAction =>
+      'ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ತೆರೆಯಿರಿ';
+
+  @override
+  String get profileBirthProfiles => 'ಜನ್ಮ ಪ್ರೊಫೈಲ್‌ಗಳು';
+
+  @override
+  String profileProfileCount(String count) {
+    return '$count ಪ್ರೊಫೈಲ್';
+  }
+
+  @override
+  String get profileAppLanguageLabel => 'ಆ್ಯಪ್ ಭಾಷೆ';
+
+  @override
+  String get profileMyActivityLabel => 'ನನ್ನ ಚಟುವಟಿಕೆ';
+
+  @override
+  String get profileMyReports => 'ನನ್ನ ವರದಿಗಳು';
+
+  @override
+  String get profileDownloadedPdfs => 'ಡೌನ್‌ಲೋಡ್ ಮಾಡಿದ PDFಗಳು';
+
+  @override
+  String get profileAiChatHistory => 'AI ಚಾಟ್ ಇತಿಹಾಸ';
+
+  @override
+  String get profilePaymentHistory => 'ಪಾವತಿ ಇತಿಹಾಸ';
+
+  @override
+  String get profilePreferencesLabel => 'ಆದ್ಯತೆಗಳು';
+
+  @override
+  String get profileAppearance => 'ಗೋಚರತೆ';
+
+  @override
+  String get profileDarkModeComingSoon =>
+      'ಡಾರ್ಕ್ ಮೋಡ್ ಮುಂಬರುವ ಅಪ್‌ಡೇಟ್‌ನಲ್ಲಿ ಬರಲಿದೆ';
+
+  @override
+  String get profileNotifications => 'ಅಧಿಸೂಚನೆಗಳು';
+
+  @override
+  String get profileNotificationsSubtitle => 'ದೈನಂದಿನ ರಾಶಿಫಲ, ಹಬ್ಬಗಳು';
+
+  @override
+  String get profilePanchangLocation => 'ಪಂಚಾಂಗ ಸ್ಥಳ';
+
+  @override
+  String get profileManageSubscription => 'ಚಂದಾದಾರಿಕೆ ನಿರ್ವಹಿಸಿ';
+
+  @override
+  String get profilePrivacySecurity => 'ಗೌಪ್ಯತೆ ಮತ್ತು ಭದ್ರತೆ';
+
+  @override
+  String get profileHelpSupport => 'ಸಹಾಯ ಮತ್ತು ಬೆಂಬಲ';
+
+  @override
+  String get profileRewardsLabel => 'ಬಹುಮಾನಗಳು';
+
+  @override
+  String get profileReferEarn => 'ರೆಫರ್ ಮಾಡಿ ಗಳಿಸಿ';
+
+  @override
+  String get profileReferEarnSubtitle =>
+      'ಪ್ರತಿ ರೆಫರಲ್‌ಗೆ 1 ತಿಂಗಳು ಉಚಿತವಾಗಿ ಪಡೆಯಿರಿ';
+
+  @override
+  String get profileInviteFriends => 'ಸ್ನೇಹಿತರನ್ನು ಆಹ್ವಾನಿಸಿ';
+
+  @override
+  String get profileInviteFriendsSubtitle => 'ವೇದದರ್ಶಿಯನ್ನು ಹಂಚಿಕೊಳ್ಳಿ';
+
+  @override
+  String get profileMoreLabel => 'ಇನ್ನಷ್ಟು';
+
+  @override
+  String get profileRateApp => 'ವೇದದರ್ಶಿಯನ್ನು ರೇಟ್ ಮಾಡಿ';
+
+  @override
+  String get profileSendFeedback => 'ಪ್ರತಿಕ್ರಿಯೆ ಕಳುಹಿಸಿ';
+
+  @override
+  String get profileRestorePurchases => 'ಖರೀದಿಗಳನ್ನು ಮರುಸ್ಥಾಪಿಸಿ';
+
+  @override
+  String get profileLogOut => 'ಲಾಗ್ ಔಟ್';
+
+  @override
+  String get profileDeleteAccount => 'ಖಾತೆ ಅಳಿಸಿ';
+
+  @override
+  String get profileSignOutConfirmTitle => 'ಲಾಗ್ ಔಟ್ ಮಾಡಬೇಕೆ?';
+
+  @override
+  String get profileSignOutConfirmMessage =>
+      'ನಿಮ್ಮ ಉಳಿಸಿದ ಪ್ರೊಫೈಲ್‌ಗಳು ಮತ್ತು ವರದಿಗಳನ್ನು ಪ್ರವೇಶಿಸಲು ನೀವು ಮತ್ತೆ ಸೈನ್ ಇನ್ ಮಾಡಬೇಕಾಗುತ್ತದೆ.';
+
+  @override
+  String get profileSignOutConfirmAction => 'ಲಾಗ್ ಔಟ್';
+
+  @override
+  String get profileCancel => 'ರದ್ದುಮಾಡಿ';
 }

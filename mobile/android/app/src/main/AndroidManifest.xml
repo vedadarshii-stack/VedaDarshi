@@ -1,8 +1,31 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Runtime permission on Android 13+ (API 33) — without this, FCM
+         notifications never appear on API 33+ devices even though older
+         devices behave normally. Declaring it in the manifest is necessary
+         but NOT sufficient: it must also be requested at runtime (see
+         PushNotificationService.requestPermission, called when the user
+         first reaches NotificationsScreen), or the OS blocks the prompt
+         entirely. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
         android:label="Vedadarshi"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <!-- FCM defaults applied to every notification that doesn't specify
+             its own icon/color/channel (i.e. every notification we send,
+             since the admin composer only sets title/body). MUST reference
+             the monochrome ic_notification drawable, not the launcher icon —
+             Android renders a non-monochrome icon as a solid grey blob on the
+             status bar (API 21+ requirement). -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notification" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/notification_accent" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="vedadarshi_default" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

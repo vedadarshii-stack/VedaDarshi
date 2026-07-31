@@ -422,4 +422,507 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get generateKundli => 'कुंडली बनाएं';
+
+  @override
+  String get lagnaKundli => 'लग्न कुंडली';
+
+  @override
+  String get pdf => 'PDF';
+
+  @override
+  String get tabChart => 'चार्ट';
+
+  @override
+  String get tabPlanetPositions => 'ग्रह स्थिति';
+
+  @override
+  String get tabDasha => 'विंशोत्तरी दशा';
+
+  @override
+  String get tabPredictions => 'भविष्यवाणियां';
+
+  @override
+  String get keyPlanets => 'प्रमुख ग्रह';
+
+  @override
+  String get lagna => 'लग्न';
+
+  @override
+  String get rashi => 'राशि';
+
+  @override
+  String get southChartComingSoon =>
+      'दक्षिण भारतीय चार्ट लेआउट जल्द ही आ रहा है।';
+
+  @override
+  String get kundliMatchingTitle => 'कुंडली मिलान';
+
+  @override
+  String get gunMilanIntro =>
+      'अष्टकूट गुण मिलान विवाह अनुकूलता के लिए 36 गुणों में 8 पहलुओं की तुलना करता है।';
+
+  @override
+  String get groom => 'वर';
+
+  @override
+  String get bride => 'वधू';
+
+  @override
+  String get change => 'बदलें';
+
+  @override
+  String get selectBrideProfile => 'वधू प्रोफ़ाइल चुनें…';
+
+  @override
+  String get selectBrideHint => 'चुनने या जन्म विवरण जोड़ने के लिए टैप करें';
+
+  @override
+  String get matchingPrivacyNote =>
+      'मिलान परिणाम निजी हैं और केवल आपके खाते में सहेजे जाते हैं';
+
+  @override
+  String get matchKundlis => 'कुंडली मिलाएं';
+
+  @override
+  String get matchResult => 'मिलान परिणाम';
+
+  @override
+  String outOfMax(int max) {
+    return '$max में से';
+  }
+
+  @override
+  String percentCompatible(int percent) {
+    return '$percent% अनुकूल';
+  }
+
+  @override
+  String get ashtakootaBreakdown => 'अष्टकूट विवरण';
+
+  @override
+  String get bandStrong => 'उत्तम (75%+)';
+
+  @override
+  String get bandModerate => 'मध्यम (40–74%)';
+
+  @override
+  String get bandWeak => 'कमज़ोर (<40%)';
+
+  @override
+  String get gunaVarna => 'वर्ण';
+
+  @override
+  String get gunaVashya => 'वश्य';
+
+  @override
+  String get gunaTara => 'तारा';
+
+  @override
+  String get gunaYoni => 'योनि';
+
+  @override
+  String get gunaGrahaMaitri => 'ग्रह मैत्री';
+
+  @override
+  String get gunaGana => 'गण';
+
+  @override
+  String get gunaBhakoot => 'भकूट';
+
+  @override
+  String get gunaNadi => 'नाड़ी';
+
+  @override
+  String get rishiAiSummary => 'ऋषि AI सारांश';
+
+  @override
+  String get aiBadge => 'AI';
+
+  @override
+  String get detailedCompatibilityReport =>
+      'विस्तृत अनुकूलता रिपोर्ट प्राप्त करें';
+
+  @override
+  String get tapGunaHint =>
+      'प्रत्येक गुण को टैप करके देखें कि वह क्या मापता है और क्यों महत्वपूर्ण है';
+
+  @override
+  String get rishiAi => 'ऋषि AI';
+
+  @override
+  String get onlineKnowsChart => 'ऑनलाइन · आपकी कुंडली जानता है';
+
+  @override
+  String freeQuota(String used, String total) {
+    return '$used/$total मुफ़्त';
+  }
+
+  @override
+  String get today => 'आज';
+
+  @override
+  String get askAbout => 'इनके बारे में पूछें';
+
+  @override
+  String get topicCareer => 'करियर';
+
+  @override
+  String get topicMarriage => 'विवाह';
+
+  @override
+  String get topicHealth => 'स्वास्थ्य';
+
+  @override
+  String get topicBusiness => 'व्यवसाय';
+
+  @override
+  String get topicFinance => 'वित्त';
+
+  @override
+  String get topicEducation => 'शिक्षा';
+
+  @override
+  String get topicTravel => 'यात्रा';
+
+  @override
+  String get topicGemstones => 'रत्न';
+
+  @override
+  String get topicRemedies => 'उपाय';
+
+  @override
+  String get topicNumerology => 'अंक ज्योतिष';
+
+  @override
+  String get rishiTyping => 'ऋषि टाइप कर रहे हैं…';
+
+  @override
+  String get askAboutYourStars => 'अपने सितारों के बारे में पूछें…';
+
+  @override
+  String get upgradeUnlimited => 'असीमित प्रश्नों के लिए अपग्रेड करें';
+
+  @override
+  String get aiNotConnected => 'AI सेवा जुड़ने पर यहाँ जवाब दिखाई देंगे।';
+
+  @override
+  String get premiumReportsTitle => 'प्रीमियम रिपोर्ट';
+
+  @override
+  String get goPremium => 'प्रीमियम लें';
+
+  @override
+  String goPremiumSubtitle(String total) {
+    return 'सभी $total रिपोर्ट + असीमित AI प्रश्न अनलॉक करें';
+  }
+
+  @override
+  String get upgrade => 'अपग्रेड करें';
+
+  @override
+  String readMinutes(String minutes) {
+    return '$minutes मिनट';
+  }
+
+  @override
+  String get aiSummary => 'AI सारांश';
+
+  @override
+  String get premium => 'प्रीमियम';
+
+  @override
+  String get free => 'मुफ़्त';
+
+  @override
+  String moreReportsFooter(String remaining) {
+    return '+ $remaining और रिपोर्ट · सभी में PDF डाउनलोड शामिल';
+  }
+
+  @override
+  String get reportCareer => 'करियर रिपोर्ट';
+
+  @override
+  String get reportCareerDesc => 'व्यवसाय, पदोन्नति और कार्य का समय';
+
+  @override
+  String get reportMarriage => 'विवाह रिपोर्ट';
+
+  @override
+  String get reportMarriageDesc => 'समय, जीवनसाथी के गुण और अनुकूलता';
+
+  @override
+  String get reportWealth => 'धन और वित्त';
+
+  @override
+  String get reportWealthDesc => 'आय स्रोत, निवेश और योग';
+
+  @override
+  String get reportHealth => 'स्वास्थ्य रिपोर्ट';
+
+  @override
+  String get reportHealthDesc => 'संवेदनशील अवधि और निवारक उपाय';
+
+  @override
+  String get reportSadeSati => 'साढ़े साती रिपोर्ट';
+
+  @override
+  String get reportSadeSatiDesc => 'शनि के चरण और प्रभाव विश्लेषण';
+
+  @override
+  String get reportGemstone => 'रत्न रिपोर्ट';
+
+  @override
+  String get reportGemstoneDesc => 'अनुशंसित रत्न और पहनने की विधि';
+
+  @override
+  String get reportNumerology => 'अंक ज्योतिष रिपोर्ट';
+
+  @override
+  String get reportNumerologyDesc => 'जीवन पथ, भाग्य और नाम अंक';
+
+  @override
+  String get restorePurchase => 'खरीदारी पुनर्स्थापित करें';
+
+  @override
+  String get vedadarshiPremium => 'Vedadarshi प्रीमियम';
+
+  @override
+  String get premiumTagline => 'असीमित ब्रह्मांडीय मार्गदर्शन, एक सरल योजना';
+
+  @override
+  String benefitReports(String total) {
+    return 'PDF एक्सपोर्ट के साथ सभी $total प्रीमियम रिपोर्ट';
+  }
+
+  @override
+  String get benefitUnlimitedAi => 'असीमित AI ज्योतिषी प्रश्न';
+
+  @override
+  String get benefitAdvancedKundli => 'उन्नत कुंडली: दशा, दोष और उपाय';
+
+  @override
+  String get benefitAdFree => 'पूरे ऐप में विज्ञापन-मुक्त अनुभव';
+
+  @override
+  String get planMonthly => 'मासिक';
+
+  @override
+  String get planYearly => 'वार्षिक';
+
+  @override
+  String get planLifetime => 'आजीवन';
+
+  @override
+  String get perMonth => 'प्रति माह';
+
+  @override
+  String get oneTimePayment => 'एकमुश्त भुगतान';
+
+  @override
+  String startPremium(String price) {
+    return 'प्रीमियम शुरू करें — $price';
+  }
+
+  @override
+  String get billingFinePrint =>
+      'Google Play के माध्यम से बिल किया गया · कभी भी रद्द करें · RevenueCat के साथ सुरक्षित';
+
+  @override
+  String get articlesTitle => 'ज्ञान और लेख';
+
+  @override
+  String get savedArticlesLabel => 'सहेजे गए लेख';
+
+  @override
+  String get articleCategoryAll => 'सभी';
+
+  @override
+  String articleFeaturedBadge(String tag) {
+    return 'विशेष रुप से प्रदर्शित · $tag';
+  }
+
+  @override
+  String get articleSave => 'सहेजें';
+
+  @override
+  String get articleShare => 'शेयर करें';
+
+  @override
+  String get articleListen => 'सुनें';
+
+  @override
+  String articleByline(String author, String minutes) {
+    return '$author द्वारा · $minutes मिनट पढ़ें';
+  }
+
+  @override
+  String articleReadMinutes(String minutes) {
+    return '$minutes मिनट';
+  }
+
+  @override
+  String articleMetaLine(String date, String minutes) {
+    return '$date · $minutes मिनट पढ़ें';
+  }
+
+  @override
+  String get searchHint => 'लेख, रिपोर्ट और अधिक खोजें';
+
+  @override
+  String get searchFilterArticles => 'लेख';
+
+  @override
+  String get searchRecentLabel => 'हाल की खोजें';
+
+  @override
+  String get searchClearRecent => 'साफ़ करें';
+
+  @override
+  String get searchClearQuery => 'खोज साफ़ करें';
+
+  @override
+  String get searchTrendingLabel => 'ट्रेंडिंग';
+
+  @override
+  String get searchResultsLabel => 'परिणाम';
+
+  @override
+  String searchNoResultsTitle(String query) {
+    return '\"$query\" के लिए कोई परिणाम नहीं';
+  }
+
+  @override
+  String get searchNoResultsHint => 'अलग कीवर्ड आज़माएं या वर्तनी जांचें';
+
+  @override
+  String get notificationsTitle => 'सूचनाएं';
+
+  @override
+  String get notificationsMarkAllRead => 'सभी को पढ़ा हुआ चिह्नित करें';
+
+  @override
+  String get notificationsToday => 'आज';
+
+  @override
+  String get notificationsYesterday => 'कल';
+
+  @override
+  String get notificationsEmptyState => 'अभी कोई सूचना नहीं';
+
+  @override
+  String get notificationsEmptyMessage =>
+      'यहां आपको दैनिक राशिफल, त्योहार और मिलान अलर्ट दिखाई देंगे।';
+
+  @override
+  String get notificationsPermissionDeniedTitle => 'सूचनाएं चालू करें';
+
+  @override
+  String get notificationsPermissionDeniedMessage =>
+      'अपना दैनिक राशिफल, त्योहार अलर्ट और AI उत्तर पाने के लिए सूचनाएं सक्षम करें।';
+
+  @override
+  String get notificationsPermissionEnableAction => 'सूचनाएं सक्षम करें';
+
+  @override
+  String get notificationsPermissionOpenSettingsAction => 'सेटिंग्स खोलें';
+
+  @override
+  String get profileBirthProfiles => 'जन्म प्रोफ़ाइल';
+
+  @override
+  String profileProfileCount(String count) {
+    return '$count प्रोफ़ाइल';
+  }
+
+  @override
+  String get profileAppLanguageLabel => 'ऐप की भाषा';
+
+  @override
+  String get profileMyActivityLabel => 'मेरी गतिविधि';
+
+  @override
+  String get profileMyReports => 'मेरी रिपोर्ट्स';
+
+  @override
+  String get profileDownloadedPdfs => 'डाउनलोड की गई PDF';
+
+  @override
+  String get profileAiChatHistory => 'AI चैट इतिहास';
+
+  @override
+  String get profilePaymentHistory => 'भुगतान इतिहास';
+
+  @override
+  String get profilePreferencesLabel => 'प्राथमिकताएं';
+
+  @override
+  String get profileAppearance => 'दिखावट';
+
+  @override
+  String get profileDarkModeComingSoon =>
+      'डार्क मोड आने वाले अपडेट में उपलब्ध होगा';
+
+  @override
+  String get profileNotifications => 'सूचनाएं';
+
+  @override
+  String get profileNotificationsSubtitle => 'दैनिक राशिफल, त्योहार';
+
+  @override
+  String get profilePanchangLocation => 'पंचांग स्थान';
+
+  @override
+  String get profileManageSubscription => 'सदस्यता प्रबंधित करें';
+
+  @override
+  String get profilePrivacySecurity => 'गोपनीयता और सुरक्षा';
+
+  @override
+  String get profileHelpSupport => 'सहायता और समर्थन';
+
+  @override
+  String get profileRewardsLabel => 'पुरस्कार';
+
+  @override
+  String get profileReferEarn => 'रेफ़र करें और कमाएं';
+
+  @override
+  String get profileReferEarnSubtitle => 'हर रेफ़रल पर 1 महीना मुफ्त पाएं';
+
+  @override
+  String get profileInviteFriends => 'मित्रों को आमंत्रित करें';
+
+  @override
+  String get profileInviteFriendsSubtitle => 'वेददर्शी साझा करें';
+
+  @override
+  String get profileMoreLabel => 'अधिक';
+
+  @override
+  String get profileRateApp => 'वेददर्शी को रेट करें';
+
+  @override
+  String get profileSendFeedback => 'प्रतिक्रिया भेजें';
+
+  @override
+  String get profileRestorePurchases => 'खरीदारी पुनर्स्थापित करें';
+
+  @override
+  String get profileLogOut => 'लॉग आउट करें';
+
+  @override
+  String get profileDeleteAccount => 'खाता हटाएं';
+
+  @override
+  String get profileSignOutConfirmTitle => 'लॉग आउट करें?';
+
+  @override
+  String get profileSignOutConfirmMessage =>
+      'अपनी सहेजी गई प्रोफ़ाइल और रिपोर्ट्स तक पहुंचने के लिए आपको फिर से साइन इन करना होगा।';
+
+  @override
+  String get profileSignOutConfirmAction => 'लॉग आउट करें';
+
+  @override
+  String get profileCancel => 'रद्द करें';
 }

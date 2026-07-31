@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#172144</color>
+    <!-- Brand saffron — tints the small monochrome status-bar/notification icon
+         (see drawable-*/ic_notification.png) on Android 5-7, and is used by
+         Android 8+ as the notification's accent color (title/app-name text,
+         action buttons). Referenced from AndroidManifest.xml's
+         com.google.firebase.messaging.default_notification_color meta-data.
+         Keep in sync with AppColors.saffron in lib/core/theme/app_colors.dart. -->
+    <color name="notification_accent">#E8720C</color>
 </resources>

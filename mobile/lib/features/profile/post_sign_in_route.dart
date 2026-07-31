@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/data/user_repository.dart';
 import '../../core/locale/locale_controller.dart';
+import '../../core/notifications/push_notification_service.dart';
 import '../home/home_dashboard_screen.dart';
 import 'birth_details_screen.dart';
 import 'birth_profile_repository.dart';
@@ -41,6 +42,22 @@ Future<void> navigateAfterSignIn(BuildContext context, WidgetRef ref) async {
     ref
         .read(userRepositoryProvider)
         .upsertCurrentUser(
+          locale: ref.read(localeControllerProvider)?.languageCode,
+        )
+        .catchError((_) {}),
+  );
+
+  // Register this device's FCM token against the now-known uid so a push can
+  // actually be delivered to it (see PushNotificationService's Firestore
+  // schema doc). Also fire-and-forget and never allowed to block navigation
+  // — notification permission may not even be granted yet at this point
+  // (that's requested later, on first reaching NotificationsScreen), and
+  // getToken() still succeeds without it; only delivery to a denied device
+  // is affected, not this sync.
+  unawaited(
+    ref
+        .read(pushNotificationServiceProvider)
+        .syncTokenForCurrentUser(
           locale: ref.read(localeControllerProvider)?.languageCode,
         )
         .catchError((_) {}),

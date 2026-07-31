@@ -6,12 +6,21 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../core/widgets/app_bottom_nav.dart';
 import '../../l10n/app_localizations.dart';
+import '../ai/ai_astrologer_screen.dart';
+import '../articles/article_detail_screen.dart';
+import '../articles/articles_screen.dart';
+import '../articles/articles_static_data.dart';
 import '../horoscope/horoscope_detail_screen.dart';
 import '../horoscope/horoscope_signs_screen.dart';
 import '../horoscope/horoscope_static_data.dart';
 import '../horoscope/zodiac_sign.dart';
 import '../kundli/kundli_input_screen.dart';
+import '../matching/gun_milan_select_screen.dart';
+import '../notifications/notifications_screen.dart';
+import '../notifications/notifications_static_data.dart';
 import '../profile/birth_profile_repository.dart';
+import '../reports/premium_reports_screen.dart';
+import '../search/search_screen.dart';
 import 'home_static_data.dart';
 
 /// Home Dashboard — the app's real post-onboarding home screen, per the
@@ -232,38 +241,83 @@ class _TopBar extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        _TopBarIconButton(emoji: '🔍', locale: locale),
+        _TopBarIconButton(
+          emoji: '🔍',
+          locale: locale,
+          onTap: () =>
+              Navigator.of(context).push(fadeThroughRoute(const SearchScreen())),
+        ),
         const SizedBox(width: 8),
-        _TopBarIconButton(emoji: '🔔', locale: locale),
+        _TopBarIconButton(
+          emoji: '🔔',
+          locale: locale,
+          onTap: () => Navigator.of(
+            context,
+          ).push(fadeThroughRoute(const NotificationsScreen())),
+          // Reflects the static seed's unread count only — there's no
+          // shared state/provider with NotificationsScreen's local
+          // read-state yet (same limitation as the Articles bookmark
+          // toggles being screen-local). NEVER hardcode this number.
+          showBadge: NotificationsStaticData.unreadCount > 0,
+        ),
       ],
     );
   }
 }
 
 class _TopBarIconButton extends StatelessWidget {
-  const _TopBarIconButton({required this.emoji, required this.locale});
+  const _TopBarIconButton({
+    required this.emoji,
+    required this.locale,
+    required this.onTap,
+    this.showBadge = false,
+  });
 
   final String emoji;
   final Locale locale;
+  final VoidCallback onTap;
+  final bool showBadge;
 
   @override
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      child: Material(
-        color: Colors.white,
-        shape: CircleBorder(side: BorderSide(color: AppColors.cardBorder)),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: () {},
-          child: SizedBox(
-            width: 42,
-            height: 42,
-            child: Center(
-              child: Text(emoji, style: AppFonts.body(locale, fontSize: 16)),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Material(
+            color: Colors.white,
+            shape: CircleBorder(side: BorderSide(color: AppColors.cardBorder)),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: onTap,
+              child: SizedBox(
+                width: 42,
+                height: 42,
+                child: Center(
+                  child: Text(
+                    emoji,
+                    style: AppFonts.body(locale, fontSize: 16),
+                  ),
+                ),
+              ),
             ),
           ),
-        ),
+          if (showBadge)
+            Positioned(
+              top: 1,
+              right: 1,
+              child: Container(
+                width: 9,
+                height: 9,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.saffron,
+                  border: Border.all(color: Colors.white, width: 1.5),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -901,9 +955,35 @@ class _ExploreSection extends StatelessWidget {
           context,
         ).push<void>(fadeThroughRoute(const KundliInputScreen())),
       ),
-      _ExploreTileMeta(l10n.navMatch, '💍', AppColors.tilePinkBg),
-      _ExploreTileMeta(l10n.navReports, '📜', AppColors.tileBlueBg),
-      _ExploreTileMeta(l10n.navAskAi, '🔮', AppColors.tilePurpleBg),
+      _ExploreTileMeta(
+        l10n.navMatch,
+        '💍',
+        AppColors.tilePinkBg,
+        // Same fadeThroughRoute push pattern as the Kundli tile above — this
+        // screen has no bottom nav of its own in the Figma design, so it's
+        // pushed as a destination rather than switched to as a tab root.
+        onTap: () => Navigator.of(
+          context,
+        ).push<void>(fadeThroughRoute(const GunMilanSelectScreen())),
+      ),
+      _ExploreTileMeta(
+        l10n.navReports,
+        '📜',
+        AppColors.tileBlueBg,
+        // Same fadeThroughRoute push pattern as the Kundli/Match tiles
+        // above — Premium Reports has no bottom nav of its own in the
+        // Figma design, so it's pushed as a destination rather than
+        // switched to as a tab root.
+        onTap: () => _openPremiumReports(context),
+      ),
+      _ExploreTileMeta(
+        l10n.navAskAi,
+        '🔮',
+        AppColors.tilePurpleBg,
+        // Same fadeThroughRoute push pattern as the Kundli/Match tiles
+        // above.
+        onTap: () => _openAiAstrologer(context),
+      ),
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1150,6 +1230,31 @@ class _HoroscopeSection extends StatelessWidget {
   }
 }
 
+/// Resolves the [Article] a Home "Wisdom for you" [ArticleTeaser] links to,
+/// from the real Articles catalogue (see "D1 · Articles", Figma node 25:3).
+/// Falls back to the featured article rather than throwing if the id is
+/// ever missing — see [ArticleTeaser.articleId]'s doc comment for why the
+/// two surfaces' copy doesn't always match exactly yet.
+Article _resolveArticle(String articleId) {
+  return ArticlesStaticData.all.firstWhere(
+    (article) => article.id == articleId,
+    orElse: () => ArticlesStaticData.featured,
+  );
+}
+
+/// Opens the full Articles list (see "D1 · Articles", Figma node 25:3).
+void _openArticles(BuildContext context) {
+  Navigator.of(context).push<void>(fadeThroughRoute(const ArticlesScreen()));
+}
+
+/// Opens "D2 · Article Detail" for the [Article] linked to [teaser].
+void _openArticleDetail(BuildContext context, ArticleTeaser teaser) {
+  final article = _resolveArticle(teaser.articleId);
+  Navigator.of(
+    context,
+  ).push<void>(fadeThroughRoute(ArticleDetailScreen(article: article)));
+}
+
 /// "Wisdom for you" — two recommended-article cards.
 class _WisdomSection extends StatelessWidget {
   const _WisdomSection({required this.l10n, required this.locale});
@@ -1167,7 +1272,7 @@ class _WisdomSection extends StatelessWidget {
           l10n.wisdomForYou,
           locale: locale,
           actionLabel: l10n.seeAll,
-          onAction: () {},
+          onAction: () => _openArticles(context),
         ),
         const SizedBox(height: 10),
         Row(
@@ -1219,7 +1324,7 @@ class _ArticleCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: () {},
+          onTap: () => _openArticleDetail(context, article),
           child: Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -1279,6 +1384,33 @@ class _ArticleCard extends StatelessWidget {
   }
 }
 
+/// Opens the AI Astrologer chat (see "C3 · AI Astrologer", Figma node 21:2).
+///
+/// Shared by both Home entry points ([_ExploreSection]'s "Ask AI" tile and
+/// [_ContinueAiCard]'s "Continue" action) and the bottom nav's Ask AI tab
+/// (`app_bottom_nav.dart`). Like the Kundli/Match tiles above, this screen
+/// has no bottom nav of its own in the Figma design, so it's pushed as a
+/// destination rather than switched to as a tab root.
+void _openAiAstrologer(BuildContext context) {
+  Navigator.of(
+    context,
+  ).push<void>(fadeThroughRoute(const AiAstrologerScreen()));
+}
+
+/// Opens the Premium Reports screen (see "C4 · Premium Reports", Figma node
+/// 22:2).
+///
+/// Shared by both Home entry points ([_ExploreSection]'s "Reports" tile and
+/// [_RecentReportsSection]'s "My reports" action). Like the Kundli/Match/AI
+/// tiles above, this screen has no bottom nav of its own in the Figma
+/// design, so it's pushed as a destination rather than switched to as a tab
+/// root.
+void _openPremiumReports(BuildContext context) {
+  Navigator.of(
+    context,
+  ).push<void>(fadeThroughRoute(const PremiumReportsScreen()));
+}
+
 /// "Continue with Rishi AI" teaser card.
 class _ContinueAiCard extends StatelessWidget {
   const _ContinueAiCard({required this.l10n, required this.locale});
@@ -1295,7 +1427,7 @@ class _ContinueAiCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: () {},
+          onTap: () => _openAiAstrologer(context),
           child: Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
@@ -1311,9 +1443,7 @@ class _ContinueAiCard extends StatelessWidget {
                   alignment: Alignment.center,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [AppColors.tilePurpleFg, AppColors.navyTop],
-                    ),
+                    gradient: AppColors.aiAvatarGradient,
                   ),
                   child: Text('🔮', style: AppFonts.body(locale, fontSize: 17)),
                 ),
@@ -1407,7 +1537,7 @@ class _RecentReportsSection extends StatelessWidget {
           l10n.recentReports,
           locale: locale,
           actionLabel: l10n.myReports,
-          onAction: () {},
+          onAction: () => _openPremiumReports(context),
         ),
         const SizedBox(height: 10),
         Row(
