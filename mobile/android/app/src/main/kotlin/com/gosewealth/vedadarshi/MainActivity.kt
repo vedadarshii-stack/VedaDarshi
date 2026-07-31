@@ -1,4 +1,4 @@
-package com.vedadarshi.vedadarshi
+package com.gosewealth.vedadarshi
 
 import io.flutter.embedding.android.FlutterActivity
 

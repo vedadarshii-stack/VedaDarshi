@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDg1BmMyypsSHdPY9SbM73ktUABUB3viFU',
-    appId: '1:1029956122:android:85e2848efaa8b15e0327a3',
+    appId: '1:1029956122:android:1a09a9c22db0fa720327a3',
     messagingSenderId: '1029956122',
     projectId: 'vedadarshi-20989',
     storageBucket: 'vedadarshi-20989.firebasestorage.app',
@@ -59,10 +59,10 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDtG2YVJdie03NmrOG8FrmIWwPXQeHeoMM',
-    appId: '1:1029956122:ios:a17c9f03a54ad90b0327a3',
+    appId: '1:1029956122:ios:4b73a342238d7f510327a3',
     messagingSenderId: '1029956122',
     projectId: 'vedadarshi-20989',
     storageBucket: 'vedadarshi-20989.firebasestorage.app',
-    iosBundleId: 'com.vedadarshi.vedadarshi',
+    iosBundleId: 'com.gosewealth.vedadarshi',
   );
 }

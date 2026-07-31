@@ -7,6 +7,50 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:1029956122:android:1a09a9c22db0fa720327a3",
+        "android_client_info": {
+          "package_name": "com.gosewealth.vedadarshi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1029956122-340tuem09sr1ed874nt401srfdeottif.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gosewealth.vedadarshi",
+            "certificate_hash": "beafb637efe51baad9c1e397598cb7234570921c"
+          }
+        },
+        {
+          "client_id": "1029956122-p8j1kq5kj6li995h81t69tspv6e2vvtn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDg1BmMyypsSHdPY9SbM73ktUABUB3viFU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1029956122-p8j1kq5kj6li995h81t69tspv6e2vvtn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1029956122-3odl3dgutit02vf0g0hql0cevieg675i.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.gosewealth.vedadarshi"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:1029956122:android:85e2848efaa8b15e0327a3",
         "android_client_info": {
           "package_name": "com.vedadarshi.vedadarshi"
@@ -39,10 +83,10 @@
               "client_type": 3
             },
             {
-              "client_id": "1029956122-eknbbi4ldc1a37pscj1aiq07motqd7kl.apps.googleusercontent.com",
+              "client_id": "1029956122-3odl3dgutit02vf0g0hql0cevieg675i.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.vedadarshi.vedadarshi"
+                "bundle_id": "com.gosewealth.vedadarshi"
               }
             }
           ]
