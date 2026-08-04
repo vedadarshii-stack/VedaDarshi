@@ -16,6 +16,14 @@ import 'package:flutter/foundation.dart' show immutable;
 /// those real data sources later is a matter of replacing the providers that
 /// supply these values — it should never require touching the widgets
 /// themselves.
+///
+/// **Vedika panchang IS wired now (1 Aug 2026)** — see
+/// [HomeDashboardScreen]'s class doc in `home_dashboard_screen.dart` for
+/// exactly which fields that made live. [panchang] and [glanceTiles] remain
+/// here as the FALLBACK those live fields degrade to (loading, error, no
+/// profile yet) and as the permanent value for the fields Vedika has no
+/// equivalent for (sunrise/sunset; 5 of the 6 glance tiles) — they are not
+/// dead code waiting to be deleted.
 abstract final class HomeStaticData {
   static const String greeting = 'Shubh Prabhat 🌅';
 
@@ -25,7 +33,7 @@ abstract final class HomeStaticData {
   /// ever see.
   static const String fallbackUserName = 'Nagarjuna';
 
-  static const PanchangData panchang = PanchangData(
+  static const HomePanchangData panchang = HomePanchangData(
     date: 'Saturday, 12 July 2026',
     tithi: 'Shukla Ashtami',
     nakshatra: 'Rohini',
@@ -102,9 +110,14 @@ abstract final class HomeStaticData {
 }
 
 /// Today's panchang summary shown in the Home hero card.
+///
+/// Named `HomePanchangData` (not `PanchangData`) specifically to avoid
+/// colliding with the live Vedika response model of the same short name in
+/// `panchang_data.dart` — both are imported into `home_dashboard_screen.dart`
+/// side by side, one as the fallback shape, one as the live one.
 @immutable
-class PanchangData {
-  const PanchangData({
+class HomePanchangData {
+  const HomePanchangData({
     required this.date,
     required this.tithi,
     required this.nakshatra,

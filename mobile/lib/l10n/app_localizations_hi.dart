@@ -335,6 +335,32 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
+  String get panchangLoading => 'आज का पंचांग लोड हो रहा है…';
+
+  @override
+  String get panchangLoadErrorTitle => 'पंचांग लोड नहीं हो सका';
+
+  @override
+  String get panchangLoadErrorMessage =>
+      'अपना कनेक्शन जांचें और पुनः प्रयास करें।';
+
+  @override
+  String get panchangRetry => 'पुनः प्रयास करें';
+
+  @override
+  String get panchangSandboxBanner => 'नमूना डेटा — आपका स्थान नहीं';
+
+  @override
+  String panchangPercentRemaining(int percent) {
+    return '$percent% शेष';
+  }
+
+  @override
+  String panchangPada(int number) {
+    return 'पद $number';
+  }
+
+  @override
   String get horoscopeTitle => 'राशिफल';
 
   @override
@@ -391,6 +417,42 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get premiumCta => 'प्रीमियम';
+
+  @override
+  String get horoscopeSandboxBanner => 'सैंपल डेटा — वेदिका सैंडबॉक्स मोड';
+
+  @override
+  String get horoscopeErrorTitle => 'राशिफल लोड नहीं हो सका';
+
+  @override
+  String get horoscopeErrorMessage =>
+      'वेदिका से जुड़ने में समस्या हुई। कृपया अपना कनेक्शन जांचें और फिर से प्रयास करें।';
+
+  @override
+  String get horoscopeRetryAction => 'पुनः प्रयास करें';
+
+  @override
+  String get weeklyAdviceTitle => 'इस सप्ताह की सलाह';
+
+  @override
+  String get weeklyOutlookTitle => '7-दिन का पूर्वानुमान';
+
+  @override
+  String get weeklyBestDayBadge => 'सर्वश्रेष्ठ दिन';
+
+  @override
+  String get monthlyThemeTitle => 'इस माह का विषय';
+
+  @override
+  String get monthlyScoresTitle => 'इस माह के स्कोर';
+
+  @override
+  String monthlyOverallRating(int percent) {
+    return 'कुल $percent%';
+  }
+
+  @override
+  String get monthlyKeyDatesTitle => 'इस माह की महत्वपूर्ण तिथियां';
 
   @override
   String get generateKundliTitle => 'कुंडली बनाएं';
@@ -545,6 +607,26 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get tapGunaHint =>
       'प्रत्येक गुण को टैप करके देखें कि वह क्या मापता है और क्यों महत्वपूर्ण है';
+
+  @override
+  String get matchLoading => 'आपकी अनुकूलता की गणना की जा रही है…';
+
+  @override
+  String get matchErrorTitle => 'अनुकूलता की गणना नहीं हो सकी';
+
+  @override
+  String get matchErrorMessage =>
+      'कुछ गड़बड़ हो गई। कृपया अपना कनेक्शन जांचें और फिर से प्रयास करें।';
+
+  @override
+  String get retry => 'पुनः प्रयास करें';
+
+  @override
+  String get sandboxResultBanner =>
+      'नमूना परिणाम — दर्ज की गई जन्म तिथि से गणना नहीं किया गया';
+
+  @override
+  String get matchNoGunaData => 'इस मिलान के लिए गुण विवरण उपलब्ध नहीं है।';
 
   @override
   String get rishiAi => 'ऋषि AI';
@@ -930,4 +1012,96 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get profileCancel => 'रद्द करें';
+
+  @override
+  String get kundliSandboxBanner =>
+      'सैंपल कुंडली — आपके जन्म विवरण से गणना नहीं की गई है';
+
+  @override
+  String get kundliLoadErrorTitle => 'आपकी कुंडली लोड नहीं हो सकी';
+
+  @override
+  String get kundliLoadErrorMessage =>
+      'आपकी कुंडली प्राप्त करने में कुछ गड़बड़ हुई। कृपया पुनः प्रयास करें।';
+
+  @override
+  String get kundliRetry => 'पुनः प्रयास करें';
+
+  @override
+  String get kundliLoadingChart => 'आपकी कुंडली लोड हो रही है…';
+
+  @override
+  String get kundliValueUnavailable => '—';
+
+  @override
+  String get kundliDoshaMangalPresent => 'मंगल दोष मौजूद है';
+
+  @override
+  String get kundliDoshaMangalAbsent => 'कोई मंगल दोष नहीं पाया गया';
+
+  @override
+  String get kundliDoshaKaalSarpPresent => 'काल सर्प दोष पाया गया';
+
+  @override
+  String kundliDoshaKaalSarpPresentType(String type) {
+    return 'काल सर्प दोष पाया गया ($type)';
+  }
+
+  @override
+  String get kundliDoshaKaalSarpAbsent => 'कोई काल सर्प दोष नहीं';
+
+  @override
+  String kundliPlanetPositionsAyanamsa(String name) {
+    return 'अयनांश: $name';
+  }
+
+  @override
+  String kundliHouseNumber(int house) {
+    return 'भाव $house';
+  }
+
+  @override
+  String get kundliRetrograde => 'वक्री';
+
+  @override
+  String get kundliDashaLoadErrorTitle => 'आपकी दशा लोड नहीं हो सकी';
+
+  @override
+  String get kundliDashaLoadErrorMessage =>
+      'आपकी विंशोत्तरी दशा लाते समय कुछ गड़बड़ हो गई। कृपया पुनः प्रयास करें।';
+
+  @override
+  String get kundliDashaLoading => 'आपकी दशा लोड हो रही है…';
+
+  @override
+  String get kundliDashaCurrentTitle => 'वर्तमान महादशा';
+
+  @override
+  String get kundliDashaBalanceTitle => 'जन्म के समय दशा शेष';
+
+  @override
+  String kundliDashaBalanceValue(int years, int months, int days) {
+    return '$years वर्ष, $months माह, $days दिन';
+  }
+
+  @override
+  String get kundliDashaTimelineTitle => 'दशा समयरेखा';
+
+  @override
+  String get kundliDashaCurrentBadge => 'वर्तमान';
+
+  @override
+  String get kundliPlanetPositionsEmpty =>
+      'इस कुंडली के लिए ग्रह स्थिति अभी उपलब्ध नहीं है।';
+
+  @override
+  String get kundliDashaTimelineEmpty => 'अभी कोई दशा अवधि उपलब्ध नहीं है।';
+
+  @override
+  String kundliNakshatraPada(int pada) {
+    return 'पद $pada';
+  }
+
+  @override
+  String get kundliDoshaPitruPresent => 'पितृ दोष मौजूद है';
 }

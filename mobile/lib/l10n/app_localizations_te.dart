@@ -339,6 +339,32 @@ class AppLocalizationsTe extends AppLocalizations {
   }
 
   @override
+  String get panchangLoading => 'ఈరోజు పంచాంగం లోడ్ అవుతోంది…';
+
+  @override
+  String get panchangLoadErrorTitle => 'పంచాంగం లోడ్ కాలేదు';
+
+  @override
+  String get panchangLoadErrorMessage =>
+      'మీ కనెక్షన్‌ని తనిఖీ చేసి మళ్లీ ప్రయత్నించండి.';
+
+  @override
+  String get panchangRetry => 'మళ్లీ ప్రయత్నించండి';
+
+  @override
+  String get panchangSandboxBanner => 'నమూనా డేటా — మీ స్థానం కాదు';
+
+  @override
+  String panchangPercentRemaining(int percent) {
+    return '$percent% మిగిలింది';
+  }
+
+  @override
+  String panchangPada(int number) {
+    return 'పాదం $number';
+  }
+
+  @override
   String get horoscopeTitle => 'రాశిఫలం';
 
   @override
@@ -395,6 +421,42 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get premiumCta => 'ప్రీమియం';
+
+  @override
+  String get horoscopeSandboxBanner => 'నమూనా డేటా — వేదిక సాండ్‌బాక్స్ మోడ్';
+
+  @override
+  String get horoscopeErrorTitle => 'జాతకం లోడ్ కాలేదు';
+
+  @override
+  String get horoscopeErrorMessage =>
+      'వేదికను చేరుకోవడంలో సమస్య వచ్చింది. దయచేసి మీ కనెక్షన్‌ను తనిఖీ చేసి మళ్లీ ప్రయత్నించండి.';
+
+  @override
+  String get horoscopeRetryAction => 'మళ్లీ ప్రయత్నించండి';
+
+  @override
+  String get weeklyAdviceTitle => 'ఈ వారం సలహా';
+
+  @override
+  String get weeklyOutlookTitle => '7-రోజుల అంచనా';
+
+  @override
+  String get weeklyBestDayBadge => 'ఉత్తమ రోజు';
+
+  @override
+  String get monthlyThemeTitle => 'ఈ నెల థీమ్';
+
+  @override
+  String get monthlyScoresTitle => 'ఈ నెల స్కోర్‌లు';
+
+  @override
+  String monthlyOverallRating(int percent) {
+    return 'మొత్తం $percent%';
+  }
+
+  @override
+  String get monthlyKeyDatesTitle => 'ఈ నెలలో ముఖ్యమైన తేదీలు';
 
   @override
   String get generateKundliTitle => 'కుండలి తయారు చేయండి';
@@ -550,6 +612,26 @@ class AppLocalizationsTe extends AppLocalizations {
   @override
   String get tapGunaHint =>
       'ప్రతి గుణం ఏమి కొలుస్తుందో మరియు ఎందుకు ముఖ్యమో చూడటానికి నొక్కండి';
+
+  @override
+  String get matchLoading => 'మీ అనుకూలతను గణిస్తోంది…';
+
+  @override
+  String get matchErrorTitle => 'అనుకూలతను గణించలేకపోయాము';
+
+  @override
+  String get matchErrorMessage =>
+      'ఏదో తప్పు జరిగింది. దయచేసి మీ కనెక్షన్‌ని తనిఖీ చేసి మళ్లీ ప్రయత్నించండి.';
+
+  @override
+  String get retry => 'మళ్లీ ప్రయత్నించండి';
+
+  @override
+  String get sandboxResultBanner =>
+      'నమూనా ఫలితం — నమోదు చేసిన జనన వివరాల నుండి లెక్కించబడలేదు';
+
+  @override
+  String get matchNoGunaData => 'ఈ మ్యాచ్‌కి గుణ వివరాలు అందుబాటులో లేవు.';
 
   @override
   String get rishiAi => 'ఋషి AI';
@@ -940,4 +1022,96 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get profileCancel => 'రద్దు చేయండి';
+
+  @override
+  String get kundliSandboxBanner =>
+      'నమూనా జాతకం — మీ జనన వివరాల నుండి లెక్కించబడలేదు';
+
+  @override
+  String get kundliLoadErrorTitle => 'మీ జాతకం లోడ్ కాలేదు';
+
+  @override
+  String get kundliLoadErrorMessage =>
+      'మీ కుండలిని పొందడంలో ఏదో తప్పు జరిగింది. దయచేసి మళ్లీ ప్రయత్నించండి.';
+
+  @override
+  String get kundliRetry => 'మళ్లీ ప్రయత్నించండి';
+
+  @override
+  String get kundliLoadingChart => 'మీ జాతకం లోడ్ అవుతోంది…';
+
+  @override
+  String get kundliValueUnavailable => '—';
+
+  @override
+  String get kundliDoshaMangalPresent => 'మంగళ దోషం ఉంది';
+
+  @override
+  String get kundliDoshaMangalAbsent => 'మంగళ దోషం కనుగొనబడలేదు';
+
+  @override
+  String get kundliDoshaKaalSarpPresent => 'కాల సర్ప దోషం కనుగొనబడింది';
+
+  @override
+  String kundliDoshaKaalSarpPresentType(String type) {
+    return 'కాల సర్ప దోషం కనుగొనబడింది ($type)';
+  }
+
+  @override
+  String get kundliDoshaKaalSarpAbsent => 'కాల సర్ప దోషం లేదు';
+
+  @override
+  String kundliPlanetPositionsAyanamsa(String name) {
+    return 'అయనాంశ: $name';
+  }
+
+  @override
+  String kundliHouseNumber(int house) {
+    return 'భావం $house';
+  }
+
+  @override
+  String get kundliRetrograde => 'వక్రగతి';
+
+  @override
+  String get kundliDashaLoadErrorTitle => 'మీ దశ లోడ్ కాలేదు';
+
+  @override
+  String get kundliDashaLoadErrorMessage =>
+      'మీ విమ్శోత్తరి దశను పొందడంలో సమస్య వచ్చింది. దయచేసి మళ్లీ ప్రయత్నించండి.';
+
+  @override
+  String get kundliDashaLoading => 'మీ దశ లోడ్ అవుతోంది…';
+
+  @override
+  String get kundliDashaCurrentTitle => 'ప్రస్తుత మహాదశ';
+
+  @override
+  String get kundliDashaBalanceTitle => 'జననం వద్ద దశ శేషం';
+
+  @override
+  String kundliDashaBalanceValue(int years, int months, int days) {
+    return '$years సంవత్సరాలు, $months నెలలు, $days రోజులు';
+  }
+
+  @override
+  String get kundliDashaTimelineTitle => 'దశ కాలరేఖ';
+
+  @override
+  String get kundliDashaCurrentBadge => 'ప్రస్తుతం';
+
+  @override
+  String get kundliPlanetPositionsEmpty =>
+      'ఈ జాతకానికి గ్రహ స్థానాలు ఇంకా అందుబాటులో లేవు.';
+
+  @override
+  String get kundliDashaTimelineEmpty => 'ఇంకా దశ కాలాలు అందుబాటులో లేవు.';
+
+  @override
+  String kundliNakshatraPada(int pada) {
+    return 'పాద $pada';
+  }
+
+  @override
+  String get kundliDoshaPitruPresent => 'పితృ దోషం ఉంది';
 }

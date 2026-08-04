@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
+import '../../core/vedika/vedika_config.dart';
 import '../../core/widgets/app_bottom_nav.dart';
 import '../../l10n/app_localizations.dart';
 import '../ai/ai_astrologer_screen.dart';
@@ -18,19 +19,120 @@ import '../kundli/kundli_input_screen.dart';
 import '../matching/gun_milan_select_screen.dart';
 import '../notifications/notifications_screen.dart';
 import '../notifications/notifications_static_data.dart';
+import '../panchang/panchang_data.dart';
+import '../panchang/panchang_repository.dart';
 import '../profile/birth_profile_repository.dart';
 import '../reports/premium_reports_screen.dart';
 import '../search/search_screen.dart';
 import 'home_static_data.dart';
+
+/// Fallback coordinates used until a saved [BirthProfile] is available (a
+/// guest, or the profile still loading) — byte-identical to
+/// `panchang_screen.dart`'s own fallback (Hyderabad) so Home's hero card and
+/// the Panchang tab never visibly disagree about whose "today" they're
+/// showing sample data for. Not shared code (that constant is private to its
+/// own library) — kept in sync deliberately if either ever changes.
+const double _fallbackLatitude = 17.3850;
+const double _fallbackLongitude = 78.4867;
+const String _fallbackTimezoneId = 'Asia/Kolkata';
+
+const List<String> _weekdayNames = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+];
+
+const List<String> _monthNames = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
+
+/// Formats [date] as "Saturday, 12 July 2026" — same recipe as
+/// `panchang_screen.dart`'s private `_formatPanchangDate` (duplicated, not
+/// shared, since that helper is private to its own library; no `intl`
+/// dependency needed for this one fixed format).
+String _formatHomeDate(DateTime date) {
+  final weekday = _weekdayNames[date.weekday - 1];
+  final month = _monthNames[date.month - 1];
+  return '$weekday, ${date.day} $month ${date.year}';
+}
+
+/// Today, truncated to the calendar day (no time component) — this feeds
+/// `panchangDataProvider.family`'s request record, and records compare
+/// structurally, so a `DateTime.now()` carrying milliseconds would produce a
+/// different cache key (and a new billed Vedika call) on every rebuild.
+/// Same rationale as `panchang_screen.dart`'s `_PanchangScreenState._today`.
+DateTime _today() {
+  final now = DateTime.now();
+  return DateTime(now.year, now.month, now.day);
+}
+
+/// Builds the 6 "Today at a glance" tiles, swapping in a live value
+/// wherever one exists. Only [GlanceTileId.muhurat] has a matching field in
+/// `/v2/daily/muhurta` (Rahu Kaal — same limitation as
+/// `panchang_screen.dart`'s `_muhuratsFrom`); Lucky Number, Lucky Color,
+/// Direction, Today's Planet and Moon Phase have NO Vedika equivalent at
+/// all — verified against the endpoint's response shape in
+/// `panchang_data.dart` — so those 5 stay on [HomeStaticData] permanently,
+/// not just until the API "gets around to" wiring them.
+List<GlanceTile> _glanceTilesFrom(MuhurtaData? muhurta) {
+  final rahuRange = muhurta?.rahuKaal?.formattedRange;
+  if (rahuRange == null) return HomeStaticData.glanceTiles;
+  return [
+    for (final tile in HomeStaticData.glanceTiles)
+      if (tile.id == GlanceTileId.muhurat)
+        GlanceTile(GlanceTileId.muhurat, rahuRange)
+      else
+        tile,
+  ];
+}
 
 /// Home Dashboard — the app's real post-onboarding home screen, per the
 /// approved Figma "B1 · Home Dashboard" (node 10:3) concept.
 ///
 /// Reached once a [BirthProfile] exists (see `RootGate` and
 /// `post_sign_in_route.dart`) — replaces the temporary
-/// `HomePlaceholderScreen`. Every astrology/content value shown below is
-/// STATIC PLACEHOLDER DATA from [HomeStaticData]; see that file's doc
-/// comment for what eventually replaces it (the Vedika API + Firestore CMS).
+/// `HomePlaceholderScreen`.
+///
+/// **What's LIVE (wired 1 Aug 2026), sourced from the same
+/// `panchangDataProvider` / `muhurtaDataProvider` the Panchang tab uses
+/// (see `panchang_repository.dart`) — deliberately reused rather than a
+/// second repository/HTTP call, so Home and the Panchang tab share one
+/// cached, one-billed fetch per day:**
+///  - the Panchang hero card's Tithi, Nakshatra, Yoga and Karana, and its
+///    date line (always today's real date, not a frozen mock date);
+///  - the "Today at a glance" Muhurat tile (Rahu Kaal time only).
+///
+/// **What's still STATIC PLACEHOLDER DATA from [HomeStaticData], and why:**
+/// sunrise/sunset on the hero card, and 5 of the 6 glance tiles (Lucky
+/// Number, Lucky Color, Direction, Today's Planet, Moon Phase) — no Vedika
+/// endpoint this app calls returns any of them (verified against
+/// `panchang_data.dart`'s response models, same limitation documented on
+/// `panchang_screen.dart`). The remedy/mantra card, festival strip,
+/// horoscope teaser, articles, AI teaser, reports and daily quote are all
+/// still 100% static; see [HomeStaticData]'s doc comment.
+///
+/// Every live field degrades to its static counterpart — silently, with NO
+/// error UI — while loading, on a fetch error, or before a birth profile
+/// resolves: Home is the app's landing screen and must never show a
+/// full-screen failure over one card's data. A small sandbox banner
+/// (matching the Panchang tab's wording/styling) appears instead whenever
+/// [VedikaConfig.isSandbox] is true, since the sandbox always returns one
+/// fixed sample location rather than the user's own.
 class HomeDashboardScreen extends ConsumerWidget {
   const HomeDashboardScreen({super.key});
 
@@ -48,6 +150,29 @@ class HomeDashboardScreen extends ConsumerWidget {
         ? savedName
         : HomeStaticData.fallbackUserName;
 
+    // Same location-resolution pattern as `panchang_screen.dart`: prefer
+    // the signed-in user's saved birth profile, fall back to a fixed
+    // default (documented above) while it's still loading or doesn't exist
+    // (guest browsing) — `valueOrNull` degrades loading/error to `null`
+    // exactly as needed. Home has no date stepper, so the date is always
+    // TODAY.
+    final city = savedProfile?.city;
+    final panchangRequest = (
+      date: _today(),
+      lat: city?.latitude ?? _fallbackLatitude,
+      lon: city?.longitude ?? _fallbackLongitude,
+      tz: city?.timezoneId ?? _fallbackTimezoneId,
+    );
+    // `.valueOrNull` IS the graceful-degradation mechanism here: loading,
+    // an error, and "not fetched yet" all collapse to `null`, and every
+    // widget below that takes this value falls back to
+    // [HomeStaticData] when it's `null` — Home never shows a spinner or an
+    // error card over live data the way the Panchang tab does.
+    final livePanchang = ref
+        .watch(panchangDataProvider(panchangRequest))
+        .valueOrNull;
+    final liveMuhurta = ref.watch(muhurtaDataProvider).valueOrNull;
+
     return Scaffold(
       backgroundColor: AppColors.cream,
       body: SafeArea(
@@ -57,9 +182,19 @@ class HomeDashboardScreen extends ConsumerWidget {
           children: [
             _TopBar(l10n: l10n, locale: locale, userName: userName),
             const SizedBox(height: 14),
-            _PanchangHeroCard(l10n: l10n, locale: locale),
+            // Sandbox always returns the same fixed sample location
+            // regardless of the coordinates sent to it (see
+            // VedikaConfig.isSandbox's doc comment) — same banner
+            // wording/styling as `panchang_screen.dart`'s
+            // `_SandboxDataBanner`, flagged here too since the hero card
+            // below can show the same sandbox-sourced values.
+            if (VedikaConfig.isSandbox) ...[
+              _SandboxDataBanner(l10n: l10n, locale: locale),
+              const SizedBox(height: 14),
+            ],
+            _PanchangHeroCard(l10n: l10n, locale: locale, live: livePanchang),
             const SizedBox(height: 14),
-            _GlanceSection(l10n: l10n, locale: locale),
+            _GlanceSection(l10n: l10n, locale: locale, muhurta: liveMuhurta),
             const SizedBox(height: 14),
             _RemedyMantraCard(l10n: l10n, locale: locale),
             const SizedBox(height: 14),
@@ -324,16 +459,88 @@ class _TopBarIconButton extends StatelessWidget {
   }
 }
 
-/// Full-width gradient card summarising today's panchang.
-class _PanchangHeroCard extends StatelessWidget {
-  const _PanchangHeroCard({required this.l10n, required this.locale});
+/// Small, non-intrusive strip flagging that the panchang values below came
+/// from Vedika's sandbox — which ignores the coordinates it's sent and
+/// always returns the same fixed sample location (see
+/// [VedikaConfig.isSandbox]). Byte-identical recipe (and the same l10n
+/// string) as `panchang_screen.dart`'s `_SandboxDataBanner`, duplicated
+/// rather than shared since that widget is private to its own library.
+class _SandboxDataBanner extends StatelessWidget {
+  const _SandboxDataBanner({required this.l10n, required this.locale});
 
   final AppLocalizations l10n;
   final Locale locale;
 
   @override
   Widget build(BuildContext context) {
-    final panchang = HomeStaticData.panchang;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
+      decoration: BoxDecoration(
+        color: AppColors.warnBg,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.science_outlined, size: 12, color: AppColors.mantraLabel),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              l10n.panchangSandboxBanner,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: AppFonts.body(
+                locale,
+                fontSize: 10.5,
+                fontWeight: FontWeight.w600,
+                color: AppColors.mantraLabel,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Full-width gradient card summarising today's panchang.
+class _PanchangHeroCard extends StatelessWidget {
+  const _PanchangHeroCard({
+    required this.l10n,
+    required this.locale,
+    required this.live,
+  });
+
+  final AppLocalizations l10n;
+  final Locale locale;
+
+  /// Live panchang for today, from the shared `panchangDataProvider` — see
+  /// [HomeDashboardScreen]'s class doc for what's live vs static here.
+  /// `null` while loading, on error, or before a birth profile resolves.
+  final PanchangData? live;
+
+  @override
+  Widget build(BuildContext context) {
+    final fallback = HomeStaticData.panchang;
+
+    // Field-by-field fallback, same "a partially-populated response never
+    // blanks a whole row" rule as `panchang_screen.dart`'s `_elementsFrom`.
+    final tithiName = live?.tithi?.name;
+    final tithiPaksha = live?.tithi?.paksha;
+    final tithi = tithiName == null
+        ? fallback.tithi
+        : (tithiPaksha == null ? tithiName : '$tithiPaksha $tithiName');
+    final nakshatra = live?.nakshatra?.name ?? fallback.nakshatra;
+    final yoga = live?.yoga?.name ?? fallback.yoga;
+    final karana = live?.karana?.name ?? fallback.karana;
+
+    // The date line is always today's real date — unlike the other fields
+    // above, this one never falls back to the frozen mock date in
+    // [HomeStaticData], live or not.
+    final date = _formatHomeDate(DateTime.now());
+
     return Semantics(
       button: true,
       child: Material(
@@ -382,7 +589,7 @@ class _PanchangHeroCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 3),
                           Text(
-                            panchang.date,
+                            date,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: AppFonts.body(
@@ -420,7 +627,7 @@ class _PanchangHeroCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  panchang.tithi,
+                  tithi,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppFonts.heading(
@@ -436,7 +643,7 @@ class _PanchangHeroCard extends StatelessWidget {
                     Expanded(
                       child: _PanchangStatChip(
                         label: l10n.nakshatra,
-                        value: panchang.nakshatra,
+                        value: nakshatra,
                         locale: locale,
                       ),
                     ),
@@ -444,7 +651,7 @@ class _PanchangHeroCard extends StatelessWidget {
                     Expanded(
                       child: _PanchangStatChip(
                         label: l10n.yoga,
-                        value: panchang.yoga,
+                        value: yoga,
                         locale: locale,
                       ),
                     ),
@@ -452,7 +659,7 @@ class _PanchangHeroCard extends StatelessWidget {
                     Expanded(
                       child: _PanchangStatChip(
                         label: l10n.karana,
-                        value: panchang.karana,
+                        value: karana,
                         locale: locale,
                       ),
                     ),
@@ -468,7 +675,10 @@ class _PanchangHeroCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      panchang.sunrise,
+                      // Sunrise/sunset stay on the static placeholder — no
+                      // Vedika endpoint this app calls returns them (see
+                      // this widget's class doc and `panchang_data.dart`).
+                      fallback.sunrise,
                       style: AppFonts.body(
                         locale,
                         fontSize: 12,
@@ -484,7 +694,7 @@ class _PanchangHeroCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      panchang.sunset,
+                      fallback.sunset,
                       style: AppFonts.body(
                         locale,
                         fontSize: 12,
@@ -610,14 +820,22 @@ _GlanceTileMeta _glanceMeta(GlanceTileId id, AppLocalizations l10n) {
 
 /// "Today at a glance" — two rows of three quick-fact tiles.
 class _GlanceSection extends StatelessWidget {
-  const _GlanceSection({required this.l10n, required this.locale});
+  const _GlanceSection({
+    required this.l10n,
+    required this.locale,
+    required this.muhurta,
+  });
 
   final AppLocalizations l10n;
   final Locale locale;
 
+  /// Today's live muhurta, from the shared `muhurtaDataProvider` — see
+  /// [_glanceTilesFrom] for which single tile this can ever change.
+  final MuhurtaData? muhurta;
+
   @override
   Widget build(BuildContext context) {
-    final tiles = HomeStaticData.glanceTiles;
+    final tiles = _glanceTilesFrom(muhurta);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

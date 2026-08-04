@@ -3,9 +3,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
+import '../../core/vedika/vedika_config.dart';
 import '../../core/widgets/app_bottom_nav.dart';
+import '../../core/widgets/app_empty_state.dart';
 import '../../l10n/app_localizations.dart';
+import '../profile/birth_profile_repository.dart';
+import 'panchang_data.dart';
+import 'panchang_repository.dart';
 import 'panchang_static_data.dart';
+
+/// Fallback coordinates used until a saved [BirthProfile] is available (a
+/// guest, or the profile still loading) — Hyderabad, matching the location
+/// chip's static placeholder text (see [PanchangStaticData.location]) so the
+/// two never visibly disagree.
+const double _fallbackLatitude = 17.3850;
+const double _fallbackLongitude = 78.4867;
+const String _fallbackTimezoneId = 'Asia/Kolkata';
 
 const List<String> _weekdayNames = [
   'Monday',
@@ -40,13 +53,108 @@ String _formatPanchangDate(DateTime date) {
   return '$weekday, ${date.day} $month ${date.year}';
 }
 
+/// Builds the "Shravana Masa · Shukla Paksha"-style subtitle under the date
+/// stepper from live [data], falling back to
+/// [PanchangStaticData.masaPaksha] whenever either half is missing —
+/// matching the same "don't show a value the API didn't actually give us"
+/// rule the rest of this screen follows.
+String _masaPakshaLine(PanchangData? data) {
+  final masa = data?.masa?.name;
+  final paksha = data?.tithi?.paksha;
+  if (masa == null || paksha == null) return PanchangStaticData.masaPaksha;
+  return '$masa Masa · $paksha Paksha';
+}
+
+/// Builds the 5 Panchang-elements rows (Tithi/Nakshatra/Yoga/Karana/Vaar)
+/// from live [data], falling back to [PanchangStaticData.elements]
+/// ROW-BY-ROW wherever the API didn't return that specific value — so a
+/// partially-populated response never blanks a whole row, and a wholly
+/// missing response never crashes the card.
+///
+/// Neither this endpoint nor any other gives an exact "till HH:mm" expiry
+/// time for Tithi/Yoga/Karana, so those rows simply have no trailing
+/// qualifier when built from real data (showing a fabricated time would be
+/// worse than showing none). Tithi does carry a real
+/// `percentageRemaining`, and Nakshatra a real `pada`, so those two use
+/// that instead.
+List<PanchangElement> _elementsFrom(PanchangData? data, AppLocalizations l10n) {
+  final fallback = PanchangStaticData.elements;
+  if (data == null) return fallback;
+
+  final tithiName = data.tithi?.name;
+  final tithiPaksha = data.tithi?.paksha;
+  final String tithiValue;
+  if (tithiName == null) {
+    tithiValue = fallback[0].value;
+  } else {
+    tithiValue = tithiPaksha == null ? tithiName : '$tithiPaksha $tithiName';
+  }
+  final percentRemaining = data.tithi?.percentageRemaining;
+  final tithiTill = percentRemaining == null
+      ? null
+      : l10n.panchangPercentRemaining(percentRemaining.round());
+
+  final pada = data.nakshatra?.pada;
+
+  return [
+    PanchangElement(PanchangElementId.tithi, tithiValue, tithiTill),
+    PanchangElement(
+      PanchangElementId.nakshatra,
+      data.nakshatra?.name ?? fallback[1].value,
+      pada == null ? null : l10n.panchangPada(pada),
+    ),
+    PanchangElement(
+      PanchangElementId.yoga,
+      data.yoga?.name ?? fallback[2].value,
+      null,
+    ),
+    PanchangElement(
+      PanchangElementId.karana,
+      data.karana?.name ?? fallback[3].value,
+      null,
+    ),
+    PanchangElement(
+      PanchangElementId.vaar,
+      data.vara?.name ?? fallback[4].value,
+      null,
+    ),
+  ];
+}
+
+/// Builds the Muhurat grid's 4 cards from live [muhurta], falling back to
+/// [PanchangStaticData.muhurats] card-by-card.
+///
+/// Only Rahu Kaal has a matching field in `/v2/daily/muhurta` — Abhijit
+/// Muhurat, Yamaganda and Gulika Kaal have no equivalent in that response
+/// at all, so those three ALWAYS stay on their static placeholder (per the
+/// "keep the placeholder rather than show a wrong value" rule), and only
+/// the Rahu Kaal card's time is ever replaced with a real value. The
+/// returned list always has the same 4 entries in the same order as
+/// [PanchangStaticData.muhurats] — callers (`_MuhuratGrid`) index into it
+/// positionally.
+List<Muhurat> _muhuratsFrom(MuhurtaData? muhurta) {
+  final fallback = PanchangStaticData.muhurats;
+  final rahuRange = muhurta?.rahuKaal?.formattedRange;
+  if (rahuRange == null) return fallback;
+  return [
+    fallback[0],
+    Muhurat(fallback[1].name, rahuRange, fallback[1].kind),
+    fallback[2],
+    fallback[3],
+  ];
+}
+
 /// Panchang — daily Vedic almanac, per the approved Figma "B2 · Panchang"
 /// (node 14:2) concept.
 ///
-/// Reached from the bottom nav's Panchang tab (see [AppBottomNav]). Every
-/// astrology value shown below is STATIC PLACEHOLDER DATA from
-/// [PanchangStaticData]; see that file's doc comment for what eventually
-/// replaces it (the Vedika API panchang endpoint).
+/// Reached from the bottom nav's Panchang tab (see [AppBottomNav]). The 5
+/// elements (Tithi/Nakshatra/Yoga/Karana/Vaar) and the Rahu Kaal muhurat
+/// card are LIVE, sourced from the Vedika API via [panchangDataProvider] /
+/// [muhurtaDataProvider]. Sunrise/sunset/moonrise/moonset, the festival
+/// card, the spiritual-advice card and 3 of the 4 muhurat cards
+/// (Abhijit/Yamaganda/Gulika Kaal) stay on [PanchangStaticData] because no
+/// Vedika endpoint used here returns them — see `_elementsFrom` /
+/// `_muhuratsFrom` above for exactly which fields fall back and why.
 class PanchangScreen extends ConsumerStatefulWidget {
   const PanchangScreen({super.key});
 
@@ -55,14 +163,23 @@ class PanchangScreen extends ConsumerStatefulWidget {
 }
 
 class _PanchangScreenState extends ConsumerState<PanchangScreen> {
-  // Seeded from PanchangStaticData.date (Saturday, 12 July 2026). The date
-  // stepper arrows below are fully functional and update this field, but
-  // every panchang VALUE on this screen (elements, muhurats, festival,
-  // advice) stays static regardless of the selected date — those values
-  // will start following the selected date once the Vedika API panchang
-  // endpoint is wired up in place of PanchangStaticData; today they
-  // intentionally don't change when the arrows are tapped.
-  DateTime _selectedDate = DateTime(2026, 7, 12);
+  // TODAY, not the design mock's date — this screen shows live panchang now,
+  // and a returning user opening the Panchang tab expects today's almanac,
+  // not 12 July 2026 (which is what PanchangStaticData was frozen at while
+  // the screen was static).
+  //
+  // Deliberately date-ONLY (`DateTime(y, m, d)`, no time component): this
+  // value is part of the `PanchangRequest` record that keys
+  // `panchangDataProvider.family`, and records compare structurally. A
+  // `DateTime.now()` carrying milliseconds would produce a different key on
+  // every single rebuild, so the provider would re-fetch — and re-BILL —
+  // forever. Truncating to the calendar day makes the key stable.
+  DateTime _selectedDate = _today();
+
+  static DateTime _today() {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, now.day);
+  }
 
   void _goToPreviousDay() {
     setState(() {
@@ -82,6 +199,22 @@ class _PanchangScreenState extends ConsumerState<PanchangScreen> {
     final locale = Localizations.localeOf(context);
     final isCompact = MediaQuery.sizeOf(context).height < 840;
 
+    // The panchang endpoint needs a location. Prefer the signed-in user's
+    // saved birth profile; fall back to a fixed default (documented above)
+    // while it's still loading or doesn't exist (guest browsing) rather
+    // than blocking the whole screen on it — `valueOrNull` degrades
+    // loading/error states to `null` exactly as needed here.
+    final city = ref.watch(birthProfileProvider).valueOrNull?.city;
+    final request = (
+      date: _selectedDate,
+      lat: city?.latitude ?? _fallbackLatitude,
+      lon: city?.longitude ?? _fallbackLongitude,
+      tz: city?.timezoneId ?? _fallbackTimezoneId,
+    );
+
+    final panchangAsync = ref.watch(panchangDataProvider(request));
+    final muhurtaAsync = ref.watch(muhurtaDataProvider);
+
     return Scaffold(
       backgroundColor: AppColors.cream,
       body: Column(
@@ -91,42 +224,209 @@ class _PanchangScreenState extends ConsumerState<PanchangScreen> {
             locale: locale,
             isCompact: isCompact,
             selectedDate: _selectedDate,
+            masaPaksha: _masaPakshaLine(panchangAsync.valueOrNull),
             onPrevious: _goToPreviousDay,
             onNext: _goToNextDay,
           ),
+          // Sandbox always returns the same fixed sample location
+          // regardless of the coordinates sent to it (see
+          // VedikaConfig.isSandbox's doc comment) — flag that honestly
+          // rather than letting the screen imply this is the user's own
+          // panchang.
+          if (VedikaConfig.isSandbox)
+            _SandboxDataBanner(l10n: l10n, locale: locale),
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-              children: [
-                _SunMoonCard(l10n: l10n, locale: locale),
-                const SizedBox(height: 14),
-                _ElementsCard(l10n: l10n, locale: locale),
-                const SizedBox(height: 14),
-                Text(
-                  l10n.muhuratToday,
-                  style: AppFonts.heading(
-                    locale,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.ink,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                _MuhuratGrid(l10n: l10n, locale: locale),
-                const SizedBox(height: 14),
-                _FestivalCard(l10n: l10n, locale: locale),
-                const SizedBox(height: 14),
-                _AdviceCard(l10n: l10n, locale: locale),
-                const SizedBox(height: 14),
-                _ViewAllMuhuratLink(l10n: l10n, locale: locale),
-                const SizedBox(height: 14),
-                _OfflineBadge(l10n: l10n, locale: locale),
-              ],
+            child: panchangAsync.when(
+              data: (data) => _PanchangBody(
+                l10n: l10n,
+                locale: locale,
+                elements: _elementsFrom(data, l10n),
+                muhurats: _muhuratsFrom(muhurtaAsync.valueOrNull),
+              ),
+              loading: () => _PanchangLoadingView(l10n: l10n, locale: locale),
+              error: (error, stackTrace) => _PanchangErrorView(
+                l10n: l10n,
+                locale: locale,
+                onRetry: () => ref.invalidate(panchangDataProvider(request)),
+              ),
             ),
           ),
         ],
       ),
       bottomNavigationBar: const AppBottomNav(currentTab: AppTab.panchang),
+    );
+  }
+}
+
+/// The scrollable content below the header/banner — identical widget tree
+/// to what this screen originally built inline, just parameterized by
+/// [elements]/[muhurats] instead of reading [PanchangStaticData] directly,
+/// so the panchang-fetch loading/error states above can swap this whole
+/// slot out without touching a single card's design.
+class _PanchangBody extends StatelessWidget {
+  const _PanchangBody({
+    required this.l10n,
+    required this.locale,
+    required this.elements,
+    required this.muhurats,
+  });
+
+  final AppLocalizations l10n;
+  final Locale locale;
+  final List<PanchangElement> elements;
+  final List<Muhurat> muhurats;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+      children: [
+        _SunMoonCard(l10n: l10n, locale: locale),
+        const SizedBox(height: 14),
+        _ElementsCard(l10n: l10n, locale: locale, elements: elements),
+        const SizedBox(height: 14),
+        Text(
+          l10n.muhuratToday,
+          style: AppFonts.heading(
+            locale,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: AppColors.ink,
+          ),
+        ),
+        const SizedBox(height: 10),
+        _MuhuratGrid(l10n: l10n, locale: locale, muhurats: muhurats),
+        const SizedBox(height: 14),
+        _FestivalCard(l10n: l10n, locale: locale),
+        const SizedBox(height: 14),
+        _AdviceCard(l10n: l10n, locale: locale),
+        const SizedBox(height: 14),
+        _ViewAllMuhuratLink(l10n: l10n, locale: locale),
+        const SizedBox(height: 14),
+        _OfflineBadge(l10n: l10n, locale: locale),
+      ],
+    );
+  }
+}
+
+/// Centered loading state shown in the [_PanchangScreenState] body's slot
+/// while the panchang fetch is in flight. The rest of the app's motion spec
+/// calls for shimmer skeletons rather than a spinner on content screens
+/// (see the project's CLAUDE.md motion-spec table, item 3) — that's a
+/// larger investment across every card here and is left PENDING like the
+/// rest of that item; this is a deliberately small, styled-not-default
+/// stand-in rather than a bare [CircularProgressIndicator].
+class _PanchangLoadingView extends StatelessWidget {
+  const _PanchangLoadingView({required this.l10n, required this.locale});
+
+  final AppLocalizations l10n;
+  final Locale locale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: 28,
+            height: 28,
+            child: CircularProgressIndicator(
+              strokeWidth: 2.5,
+              color: AppColors.saffron,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            l10n.panchangLoading,
+            style: AppFonts.body(
+              locale,
+              fontSize: 12.5,
+              color: AppColors.muted,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Error state shown in the [_PanchangScreenState] body's slot when the
+/// panchang fetch fails (network error, timeout, or a Vedika-side failure —
+/// see [VedikaException]). Reuses the app's one shared [AppEmptyState]
+/// widget rather than a bespoke error card.
+class _PanchangErrorView extends StatelessWidget {
+  const _PanchangErrorView({
+    required this.l10n,
+    required this.locale,
+    required this.onRetry,
+  });
+
+  final AppLocalizations l10n;
+  final Locale locale;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: AppEmptyState(
+          icon: Icons.cloud_off_rounded,
+          iconBackgroundColor: AppColors.ashubhBg,
+          iconForegroundColor: AppColors.ashubhFg,
+          title: l10n.panchangLoadErrorTitle,
+          message: l10n.panchangLoadErrorMessage,
+          actionLabel: l10n.panchangRetry,
+          onAction: onRetry,
+        ),
+      ),
+    );
+  }
+}
+
+/// Small, non-intrusive strip flagging that every value below came from
+/// Vedika's sandbox — which ignores the coordinates it's sent and always
+/// returns the same fixed sample location (see [VedikaConfig.isSandbox]).
+/// Styled after [_OfflineBadge] (same rounded-strip recipe) rather than the
+/// louder [AppEmptyState]/error treatment, since this isn't a failure.
+class _SandboxDataBanner extends StatelessWidget {
+  const _SandboxDataBanner({required this.l10n, required this.locale});
+
+  final AppLocalizations l10n;
+  final Locale locale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+      padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
+      decoration: BoxDecoration(
+        color: AppColors.warnBg,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.science_outlined, size: 12, color: AppColors.mantraLabel),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              l10n.panchangSandboxBanner,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: AppFonts.body(
+                locale,
+                fontSize: 10.5,
+                fontWeight: FontWeight.w600,
+                color: AppColors.mantraLabel,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -140,6 +440,7 @@ class _PanchangHeader extends StatelessWidget {
     required this.locale,
     required this.isCompact,
     required this.selectedDate,
+    required this.masaPaksha,
     required this.onPrevious,
     required this.onNext,
   });
@@ -148,6 +449,11 @@ class _PanchangHeader extends StatelessWidget {
   final Locale locale;
   final bool isCompact;
   final DateTime selectedDate;
+
+  /// "Shravana Masa · Shukla Paksha"-style subtitle — live once the
+  /// panchang fetch resolves, [PanchangStaticData.masaPaksha] otherwise
+  /// (see `_masaPakshaLine`).
+  final String masaPaksha;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
 
@@ -158,13 +464,27 @@ class _PanchangHeader extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      height: isCompact ? 170 : 190,
-      padding: EdgeInsets.fromLTRB(20, topPadding, 20, 0),
+      // MINIMUM height, not a fixed one. This used to be
+      // `height: isCompact ? 170 : 190`, which overflowed by 57px on any
+      // compact device: 170 minus the 52px `topPadding` leaves 118px for a
+      // title row + date stepper that need ~175. It only became visible
+      // once the masa/paksha subtitle started coming from the API — a live
+      // value like "Pausha Masa · Krishna Paksha" wraps where the frozen
+      // placeholder happened not to — but the header was one long string
+      // away from clipping regardless of where the text came from.
+      //
+      // A minimum keeps the roomy look of the design on normal phones while
+      // letting the gradient grow rather than silently clip content (the
+      // yellow overflow stripes only appear in debug; in release the text
+      // is just cut off).
+      constraints: BoxConstraints(minHeight: isCompact ? 170 : 190),
+      padding: EdgeInsets.fromLTRB(20, topPadding, 20, 16),
       decoration: BoxDecoration(
         gradient: AppColors.navyHeroGradient,
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             children: [
@@ -211,6 +531,7 @@ class _PanchangHeader extends StatelessWidget {
           _DateStepper(
             locale: locale,
             selectedDate: selectedDate,
+            masaPaksha: masaPaksha,
             onPrevious: onPrevious,
             onNext: onNext,
           ),
@@ -224,12 +545,14 @@ class _DateStepper extends StatelessWidget {
   const _DateStepper({
     required this.locale,
     required this.selectedDate,
+    required this.masaPaksha,
     required this.onPrevious,
     required this.onNext,
   });
 
   final Locale locale;
   final DateTime selectedDate;
+  final String masaPaksha;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
 
@@ -261,7 +584,7 @@ class _DateStepper extends StatelessWidget {
                 ),
                 const SizedBox(height: 1),
                 Text(
-                  PanchangStaticData.masaPaksha,
+                  masaPaksha,
                   textAlign: TextAlign.center,
                   style: AppFonts.body(
                     locale,
@@ -444,14 +767,18 @@ String _elementLabel(PanchangElementId id, AppLocalizations l10n) {
 
 /// Tithi / Nakshatra / Yoga / Karana / Vaar card.
 class _ElementsCard extends StatelessWidget {
-  const _ElementsCard({required this.l10n, required this.locale});
+  const _ElementsCard({
+    required this.l10n,
+    required this.locale,
+    required this.elements,
+  });
 
   final AppLocalizations l10n;
   final Locale locale;
+  final List<PanchangElement> elements;
 
   @override
   Widget build(BuildContext context) {
-    final elements = PanchangStaticData.elements;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 6),
       decoration: BoxDecoration(
@@ -595,14 +922,21 @@ _MuhuratKindMeta _muhuratKindMeta(MuhuratKind kind, AppLocalizations l10n) {
 /// Two rows of two Muhurat cards (Abhijit / Rahu Kaal / Yamaganda / Gulika
 /// Kaal).
 class _MuhuratGrid extends StatelessWidget {
-  const _MuhuratGrid({required this.l10n, required this.locale});
+  const _MuhuratGrid({
+    required this.l10n,
+    required this.locale,
+    required this.muhurats,
+  });
 
   final AppLocalizations l10n;
   final Locale locale;
 
+  /// Always 4 entries, same order as [PanchangStaticData.muhurats] — see
+  /// `_muhuratsFrom` for how this is built.
+  final List<Muhurat> muhurats;
+
   @override
   Widget build(BuildContext context) {
-    final muhurats = PanchangStaticData.muhurats;
     return Column(
       children: [
         Row(

@@ -152,11 +152,67 @@ service cloud.firestore {
         allow read, write: if isOwner(userId);
       }
 
-      // Any future per-user subcollection (saved reports, AI chat history)
-      // inherits the same ownership rule instead of being open by omission.
-      match /{subcollection}/{docId} {
-        allow read, write: if isOwner(userId);
+      // AI credit ledger: /users/{uid}/aiUsage/{dateKey}
+      // ADDED 1 Aug 2026 alongside functions/src/aiCredits.ts. This tracks
+      // the reserve → call → commit-or-release transaction that protects
+      // AI credits ("deduct only after a real 200 OK from Vedika"). It
+      // MUST be read-only for the client: if the owner could write here
+      // directly, they could set `used`/`pending` to 0 (or any number)
+      // themselves and bypass the daily limit entirely — the whole point
+      // of doing the accounting server-side in a transaction. This match
+      // block has to come BEFORE the generic `{subcollection}` wildcard
+      // below AND that wildcard has to explicitly exclude 'aiUsage',
+      // because Firestore rules are a logical OR across every `match`
+      // block that matches a given path — a narrower `allow write: if
+      // false` here would NOT override a broader wildcard that still
+      // said yes.
+      match /aiUsage/{dateKey} {
+        allow read: if isOwner(userId);
+        allow write: if false;
       }
+
+      // Any future per-user subcollection (saved reports, AI chat history)
+      // inherits the same ownership rule instead of being open by
+      // omission — EXCEPT 'aiUsage', carved out above for the reason
+      // explained there.
+      match /{subcollection}/{docId} {
+        allow read, write: if isOwner(userId) && subcollection != 'aiUsage';
+      }
+    }
+
+    // ---- Server-pre-warmed public cache (Cloud Functions writes only) ----
+    //
+    // ADDED 1 Aug 2026 alongside functions/src/dailyPrewarm.ts. Panchang
+    // and horoscopes are identical for every user who shares a city/sign
+    // on a given day, so a scheduled function fetches them ONCE from
+    // Vedika at 12:01 AM IST and every signed-in user reads Firestore
+    // instead of triggering their own paid Vedika call. That is the
+    // entire point of these two collections existing, which is also why
+    // they must never be client-writable: a client write here would let
+    // anyone plant fabricated "official" horoscope/panchang content that
+    // every OTHER user then reads as if Vedika had said it. Only the
+    // Admin SDK (Cloud Functions, which bypasses these rules) writes to
+    // either collection — no `allow write` appears below on purpose.
+    match /dailyHoroscopes/{docId} {
+      allow read: if isSignedIn();
+    }
+
+    match /dailyPanchang/{docId} {
+      allow read: if isSignedIn();
+    }
+
+    // ---- Vedika response cache (Cloud Functions only, not even readable) -
+    //
+    // Keyed by an FNV-1a hash of method+path+query+body (see
+    // functions/src/index.ts `cacheKey`), not something any client should
+    // ever address directly — the `vedika` proxy function is the only
+    // reader/writer, and it uses the Admin SDK, which bypasses these
+    // rules entirely. This block is written out explicitly (rather than
+    // relying on the implicit default-deny for an unmatched path) so the
+    // "nobody but the proxy touches this" intent is visible in the rules
+    // themselves, not just inferred from its absence.
+    match /vedikaCache/{docId} {
+      allow read, write: if false;
     }
   }
 }

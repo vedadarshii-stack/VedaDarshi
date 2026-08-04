@@ -541,6 +541,17 @@ class _MatchKundlisButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(999),
           // Kept enabled per the design rather than gated on a selected
           // bride — becomes conditional once multi-profile support lands.
+          //
+          // No profile data is threaded through this navigation call: the
+          // Result screen independently re-reads the same
+          // `birthProfileProvider` for the groom (exactly like this screen
+          // does above) and falls back to
+          // `GunMilanStaticData.placeholderBridePartnerParams` for the
+          // bride, since there is still no second saved profile to select
+          // here — see that constant's doc comment for the multi-profile
+          // gap this stands in for. Once multi-profile support exists, a
+          // real selected bride profile needs to be passed forward from
+          // here instead.
           onTap: () => Navigator.of(
             context,
           ).push(fadeThroughRoute(const GunMilanResultScreen())),

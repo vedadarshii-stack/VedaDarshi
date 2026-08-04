@@ -444,6 +444,46 @@
       }
     }
   },
+  "panchangLoading": "Loading today's panchang…",
+  "@panchangLoading": {
+    "description": "Loading-state label shown on the Panchang screen while the Vedika API request is in flight."
+  },
+  "panchangLoadErrorTitle": "Couldn't load Panchang",
+  "@panchangLoadErrorTitle": {
+    "description": "Title of the Panchang screen's error state when the Vedika API request fails."
+  },
+  "panchangLoadErrorMessage": "Check your connection and try again.",
+  "@panchangLoadErrorMessage": {
+    "description": "Message of the Panchang screen's error state when the Vedika API request fails."
+  },
+  "panchangRetry": "Retry",
+  "@panchangRetry": {
+    "description": "Action button on the Panchang screen's error state that re-attempts the failed request."
+  },
+  "panchangSandboxBanner": "Sample data — not your location",
+  "@panchangSandboxBanner": {
+    "description": "Small banner shown on the Panchang screen while the app is pointed at Vedika's sandbox, which always returns the same fixed sample location rather than the user's own."
+  },
+  "panchangPercentRemaining": "{percent}% left",
+  "@panchangPercentRemaining": {
+    "description": "Trailing qualifier on the Tithi row of the Panchang screen's elements card, showing how much of the current tithi remains.",
+    "placeholders": {
+      "percent": {
+        "type": "int",
+        "example": "21"
+      }
+    }
+  },
+  "panchangPada": "Pada {number}",
+  "@panchangPada": {
+    "description": "Trailing qualifier on the Nakshatra row of the Panchang screen's elements card, showing the current nakshatra's pada (quarter).",
+    "placeholders": {
+      "number": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
   "horoscopeTitle": "Horoscope",
   "@horoscopeTitle": {
     "description": "Heading of the Horoscope — All Signs screen."
@@ -519,6 +559,56 @@
   "premiumCta": "Premium",
   "@premiumCta": {
     "description": "Call-to-action label on the premium teaser card of the Horoscope Detail screen."
+  },
+  "horoscopeSandboxBanner": "Sample data — Vedika sandbox mode",
+  "@horoscopeSandboxBanner": {
+    "description": "Banner shown on the Horoscope Detail screen when the app is pointed at Vedika's sandbox, warning that the reading is fixed sample data, not the user's own."
+  },
+  "horoscopeErrorTitle": "Couldn't load horoscope",
+  "@horoscopeErrorTitle": {
+    "description": "Title of the error state shown on the Horoscope Detail screen when the Vedika API call fails."
+  },
+  "horoscopeErrorMessage": "Something went wrong reaching Vedika. Check your connection and try again.",
+  "@horoscopeErrorMessage": {
+    "description": "Message of the error state shown on the Horoscope Detail screen when the Vedika API call fails."
+  },
+  "horoscopeRetryAction": "Retry",
+  "@horoscopeRetryAction": {
+    "description": "Retry button label on the Horoscope Detail screen's error state."
+  },
+  "weeklyAdviceTitle": "This Week's Advice",
+  "@weeklyAdviceTitle": {
+    "description": "Title of the advice card on the Horoscope Detail screen's Weekly period, sourced from Vedika's weekly `advice` field."
+  },
+  "weeklyOutlookTitle": "7-Day Outlook",
+  "@weeklyOutlookTitle": {
+    "description": "Title of the per-day list card on the Horoscope Detail screen's Weekly period."
+  },
+  "weeklyBestDayBadge": "Best Day",
+  "@weeklyBestDayBadge": {
+    "description": "Small badge marking the week's best day in the Horoscope Detail screen's Weekly 7-day outlook."
+  },
+  "monthlyThemeTitle": "This Month's Theme",
+  "@monthlyThemeTitle": {
+    "description": "Title of the theme card on the Horoscope Detail screen's Monthly period, sourced from Vedika's monthly `monthlyTheme` field."
+  },
+  "monthlyScoresTitle": "This Month's Scores",
+  "@monthlyScoresTitle": {
+    "description": "Title of the score-bars card on the Horoscope Detail screen's Monthly period (the Daily period's equivalent card uses todaysScores instead)."
+  },
+  "monthlyOverallRating": "Overall {percent}%",
+  "@monthlyOverallRating": {
+    "description": "Badge next to the scores card title on the Horoscope Detail screen's Monthly period, showing Vedika's monthly overallRating.",
+    "placeholders": {
+      "percent": {
+        "type": "int",
+        "example": "72"
+      }
+    }
+  },
+  "monthlyKeyDatesTitle": "Key Dates This Month",
+  "@monthlyKeyDatesTitle": {
+    "description": "Title of the key-dates chip card on the Horoscope Detail screen's Monthly period, sourced from Vedika's monthly keyDates field."
   },
   "generateKundliTitle": "Generate Kundli",
   "@generateKundliTitle": {
@@ -723,6 +813,30 @@
   "tapGunaHint": "Tap any guna to see what it measures & why it matters",
   "@tapGunaHint": {
     "description": "Footer hint at the bottom of the Gun Milan — Result screen, under the CTA."
+  },
+  "matchLoading": "Calculating your compatibility…",
+  "@matchLoading": {
+    "description": "Loading message shown on the Gun Milan — Result screen while the match is being calculated."
+  },
+  "matchErrorTitle": "Couldn't calculate compatibility",
+  "@matchErrorTitle": {
+    "description": "Error state title on the Gun Milan — Result screen when the match calculation fails."
+  },
+  "matchErrorMessage": "Something went wrong. Please check your connection and try again.",
+  "@matchErrorMessage": {
+    "description": "Error state message on the Gun Milan — Result screen when the match calculation fails."
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Generic retry action label, used on the Gun Milan — Result screen's error state."
+  },
+  "sandboxResultBanner": "Sample result — not calculated from the entered birth details",
+  "@sandboxResultBanner": {
+    "description": "Banner shown on the Gun Milan — Result screen while the app is pointed at Vedika's sandbox, which always returns one fixed sample match regardless of the birth details submitted."
+  },
+  "matchNoGunaData": "Guna breakdown isn't available for this match.",
+  "@matchNoGunaData": {
+    "description": "Fallback message shown in place of the guna grid on the Gun Milan — Result screen if the API returns no guna breakdown at all."
   },
   "rishiAi": "Rishi AI",
   "@rishiAi": {
@@ -1283,5 +1397,147 @@
   "profileCancel": "Cancel",
   "@profileCancel": {
     "description": "Label of the dismissing action button in the sign-out confirmation dialog."
+  },
+  "kundliSandboxBanner": "Sample chart — not calculated from your birth details",
+  "@kundliSandboxBanner": {
+    "description": "Non-negotiable banner on the Kundli Chart screen shown whenever the app is pointed at Vedika's sandbox, which always returns one fixed sample chart regardless of the birth details sent."
+  },
+  "kundliLoadErrorTitle": "Couldn't load your chart",
+  "@kundliLoadErrorTitle": {
+    "description": "Title of the error state on the Kundli Chart screen when the Vedika API call fails."
+  },
+  "kundliLoadErrorMessage": "Something went wrong while fetching your Kundli. Please try again.",
+  "@kundliLoadErrorMessage": {
+    "description": "Fallback message of the error state on the Kundli Chart screen, used when the failure has no more specific Vedika-provided message."
+  },
+  "kundliRetry": "Retry",
+  "@kundliRetry": {
+    "description": "Label of the retry action button on the Kundli Chart screen's error state."
+  },
+  "kundliLoadingChart": "Loading your chart…",
+  "@kundliLoadingChart": {
+    "description": "Accessibility label announced while the Kundli Chart screen's shimmer loading placeholder is shown."
+  },
+  "kundliValueUnavailable": "—",
+  "@kundliValueUnavailable": {
+    "description": "Placeholder shown in a Kundli Chart stat card (Lagna/Rashi/Nakshatra) when the Vedika API response omits that specific value."
+  },
+  "kundliDoshaMangalPresent": "Mangal Dosha present",
+  "@kundliDoshaMangalPresent": {
+    "description": "Kundli Chart dosha banner: fallback verdict text for Mangal Dosha when Vedika's own personalized description sentence isn't available, and the all-doshas response says the dosha IS present."
+  },
+  "kundliDoshaMangalAbsent": "No Mangal Dosha detected",
+  "@kundliDoshaMangalAbsent": {
+    "description": "Kundli Chart dosha banner: fallback verdict text for Mangal Dosha when Vedika's own personalized description sentence isn't available, and the all-doshas response says the dosha is absent."
+  },
+  "kundliDoshaKaalSarpPresent": "Kaal Sarp Dosha detected",
+  "@kundliDoshaKaalSarpPresent": {
+    "description": "Kundli Chart dosha banner verdict for Kaal Sarp Dosha when present and Vedika didn't return a specific type name."
+  },
+  "kundliDoshaKaalSarpPresentType": "Kaal Sarp Dosha detected ({type})",
+  "@kundliDoshaKaalSarpPresentType": {
+    "description": "Kundli Chart dosha banner verdict for Kaal Sarp Dosha when present, naming Vedika's specific type (e.g. 'Ananta') — the type name itself is Vedika's own English text, rendered as-is regardless of app locale.",
+    "placeholders": {
+      "type": {
+        "type": "String",
+        "example": "Ananta"
+      }
+    }
+  },
+  "kundliDoshaKaalSarpAbsent": "No Kaal Sarp Dosha detected",
+  "@kundliDoshaKaalSarpAbsent": {
+    "description": "Kundli Chart dosha banner verdict for Kaal Sarp Dosha when absent."
+  },
+  "kundliPlanetPositionsAyanamsa": "Ayanamsa: {name}",
+  "@kundliPlanetPositionsAyanamsa": {
+    "description": "Ayanamsa (sidereal calculation system) label shown atop the Kundli Chart screen's Planet Positions tab.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Lahiri"
+      }
+    }
+  },
+  "kundliHouseNumber": "House {house}",
+  "@kundliHouseNumber": {
+    "description": "House-number chip on a planet row in the Kundli Chart screen's Planet Positions tab.",
+    "placeholders": {
+      "house": {
+        "type": "int",
+        "example": "10"
+      }
+    }
+  },
+  "kundliRetrograde": "Retrograde",
+  "@kundliRetrograde": {
+    "description": "Badge shown on a planet row in the Kundli Chart screen's Planet Positions tab when that planet is retrograde."
+  },
+  "kundliDashaLoadErrorTitle": "Couldn't load your dasha",
+  "@kundliDashaLoadErrorTitle": {
+    "description": "Error-state title on the Kundli Chart screen's Vimshottari Dasha tab."
+  },
+  "kundliDashaLoadErrorMessage": "Something went wrong while fetching your Vimshottari Dasha. Please try again.",
+  "@kundliDashaLoadErrorMessage": {
+    "description": "Error-state message on the Kundli Chart screen's Vimshottari Dasha tab."
+  },
+  "kundliDashaLoading": "Loading your dasha…",
+  "@kundliDashaLoading": {
+    "description": "Accessibility label announced while the Kundli Chart screen's Vimshottari Dasha tab is loading."
+  },
+  "kundliDashaCurrentTitle": "Current Mahadasha",
+  "@kundliDashaCurrentTitle": {
+    "description": "Heading of the 'currently running maha-dasha' card on the Vimshottari Dasha tab."
+  },
+  "kundliDashaBalanceTitle": "Dasha Balance at Birth",
+  "@kundliDashaBalanceTitle": {
+    "description": "Heading of the 'balance of the first maha-dasha remaining at birth' card on the Vimshottari Dasha tab — a standard Vimshottari concept, not 'time remaining in the CURRENT dasha now'."
+  },
+  "kundliDashaBalanceValue": "{years} years, {months} months, {days} days",
+  "@kundliDashaBalanceValue": {
+    "description": "Formatted dasha-balance duration on the Vimshottari Dasha tab.",
+    "placeholders": {
+      "years": {
+        "type": "int",
+        "example": "18"
+      },
+      "months": {
+        "type": "int",
+        "example": "11"
+      },
+      "days": {
+        "type": "int",
+        "example": "16"
+      }
+    }
+  },
+  "kundliDashaTimelineTitle": "Dasha Timeline",
+  "@kundliDashaTimelineTitle": {
+    "description": "Heading over the full list of maha-dasha periods on the Vimshottari Dasha tab."
+  },
+  "kundliDashaCurrentBadge": "Current",
+  "@kundliDashaCurrentBadge": {
+    "description": "Small badge marking the currently-running period in the Vimshottari Dasha tab's period list."
+  },
+  "kundliPlanetPositionsEmpty": "Planet positions aren't available for this chart yet.",
+  "@kundliPlanetPositionsEmpty": {
+    "description": "Shown on the Planet Positions tab when the Kundli response loaded successfully but returned an empty planets list."
+  },
+  "kundliDashaTimelineEmpty": "No dasha periods available yet.",
+  "@kundliDashaTimelineEmpty": {
+    "description": "Shown on the Vimshottari Dasha tab when the response loaded successfully but returned an empty maha_dasha list."
+  },
+  "kundliNakshatraPada": "Pada {pada}",
+  "@kundliNakshatraPada": {
+    "description": "A nakshatra's quarter/pada (1-4), shown next to a planet's nakshatra on the Planet Positions tab.",
+    "placeholders": {
+      "pada": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "kundliDoshaPitruPresent": "Pitru Dosha present",
+  "@kundliDoshaPitruPresent": {
+    "description": "Shown in the Kundli dosha banner when Vedika reports Pitru Dosha present. Its presence also forces the banner off the 'clear' checkmark."
   }
 }

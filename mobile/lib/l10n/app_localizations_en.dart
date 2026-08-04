@@ -335,6 +335,31 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get panchangLoading => 'Loading today\'s panchang…';
+
+  @override
+  String get panchangLoadErrorTitle => 'Couldn\'t load Panchang';
+
+  @override
+  String get panchangLoadErrorMessage => 'Check your connection and try again.';
+
+  @override
+  String get panchangRetry => 'Retry';
+
+  @override
+  String get panchangSandboxBanner => 'Sample data — not your location';
+
+  @override
+  String panchangPercentRemaining(int percent) {
+    return '$percent% left';
+  }
+
+  @override
+  String panchangPada(int number) {
+    return 'Pada $number';
+  }
+
+  @override
   String get horoscopeTitle => 'Horoscope';
 
   @override
@@ -391,6 +416,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumCta => 'Premium';
+
+  @override
+  String get horoscopeSandboxBanner => 'Sample data — Vedika sandbox mode';
+
+  @override
+  String get horoscopeErrorTitle => 'Couldn\'t load horoscope';
+
+  @override
+  String get horoscopeErrorMessage =>
+      'Something went wrong reaching Vedika. Check your connection and try again.';
+
+  @override
+  String get horoscopeRetryAction => 'Retry';
+
+  @override
+  String get weeklyAdviceTitle => 'This Week\'s Advice';
+
+  @override
+  String get weeklyOutlookTitle => '7-Day Outlook';
+
+  @override
+  String get weeklyBestDayBadge => 'Best Day';
+
+  @override
+  String get monthlyThemeTitle => 'This Month\'s Theme';
+
+  @override
+  String get monthlyScoresTitle => 'This Month\'s Scores';
+
+  @override
+  String monthlyOverallRating(int percent) {
+    return 'Overall $percent%';
+  }
+
+  @override
+  String get monthlyKeyDatesTitle => 'Key Dates This Month';
 
   @override
   String get generateKundliTitle => 'Generate Kundli';
@@ -544,6 +605,27 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tapGunaHint =>
       'Tap any guna to see what it measures & why it matters';
+
+  @override
+  String get matchLoading => 'Calculating your compatibility…';
+
+  @override
+  String get matchErrorTitle => 'Couldn\'t calculate compatibility';
+
+  @override
+  String get matchErrorMessage =>
+      'Something went wrong. Please check your connection and try again.';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get sandboxResultBanner =>
+      'Sample result — not calculated from the entered birth details';
+
+  @override
+  String get matchNoGunaData =>
+      'Guna breakdown isn\'t available for this match.';
 
   @override
   String get rishiAi => 'Rishi AI';
@@ -932,4 +1014,96 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileCancel => 'Cancel';
+
+  @override
+  String get kundliSandboxBanner =>
+      'Sample chart — not calculated from your birth details';
+
+  @override
+  String get kundliLoadErrorTitle => 'Couldn\'t load your chart';
+
+  @override
+  String get kundliLoadErrorMessage =>
+      'Something went wrong while fetching your Kundli. Please try again.';
+
+  @override
+  String get kundliRetry => 'Retry';
+
+  @override
+  String get kundliLoadingChart => 'Loading your chart…';
+
+  @override
+  String get kundliValueUnavailable => '—';
+
+  @override
+  String get kundliDoshaMangalPresent => 'Mangal Dosha present';
+
+  @override
+  String get kundliDoshaMangalAbsent => 'No Mangal Dosha detected';
+
+  @override
+  String get kundliDoshaKaalSarpPresent => 'Kaal Sarp Dosha detected';
+
+  @override
+  String kundliDoshaKaalSarpPresentType(String type) {
+    return 'Kaal Sarp Dosha detected ($type)';
+  }
+
+  @override
+  String get kundliDoshaKaalSarpAbsent => 'No Kaal Sarp Dosha detected';
+
+  @override
+  String kundliPlanetPositionsAyanamsa(String name) {
+    return 'Ayanamsa: $name';
+  }
+
+  @override
+  String kundliHouseNumber(int house) {
+    return 'House $house';
+  }
+
+  @override
+  String get kundliRetrograde => 'Retrograde';
+
+  @override
+  String get kundliDashaLoadErrorTitle => 'Couldn\'t load your dasha';
+
+  @override
+  String get kundliDashaLoadErrorMessage =>
+      'Something went wrong while fetching your Vimshottari Dasha. Please try again.';
+
+  @override
+  String get kundliDashaLoading => 'Loading your dasha…';
+
+  @override
+  String get kundliDashaCurrentTitle => 'Current Mahadasha';
+
+  @override
+  String get kundliDashaBalanceTitle => 'Dasha Balance at Birth';
+
+  @override
+  String kundliDashaBalanceValue(int years, int months, int days) {
+    return '$years years, $months months, $days days';
+  }
+
+  @override
+  String get kundliDashaTimelineTitle => 'Dasha Timeline';
+
+  @override
+  String get kundliDashaCurrentBadge => 'Current';
+
+  @override
+  String get kundliPlanetPositionsEmpty =>
+      'Planet positions aren\'t available for this chart yet.';
+
+  @override
+  String get kundliDashaTimelineEmpty => 'No dasha periods available yet.';
+
+  @override
+  String kundliNakshatraPada(int pada) {
+    return 'Pada $pada';
+  }
+
+  @override
+  String get kundliDoshaPitruPresent => 'Pitru Dosha present';
 }

@@ -339,6 +339,32 @@ class AppLocalizationsTa extends AppLocalizations {
   }
 
   @override
+  String get panchangLoading => 'இன்றைய பஞ்சாங்கம் ஏற்றப்படுகிறது…';
+
+  @override
+  String get panchangLoadErrorTitle => 'பஞ்சாங்கத்தை ஏற்ற முடியவில்லை';
+
+  @override
+  String get panchangLoadErrorMessage =>
+      'உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get panchangRetry => 'மீண்டும் முயற்சிக்கவும்';
+
+  @override
+  String get panchangSandboxBanner => 'மாதிரி தரவு — உங்கள் இடம் அல்ல';
+
+  @override
+  String panchangPercentRemaining(int percent) {
+    return '$percent% மீதம்';
+  }
+
+  @override
+  String panchangPada(int number) {
+    return 'பாதம் $number';
+  }
+
+  @override
   String get horoscopeTitle => 'ராசிபலன்';
 
   @override
@@ -395,6 +421,43 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get premiumCta => 'பிரீமியம்';
+
+  @override
+  String get horoscopeSandboxBanner =>
+      'மாதிரி தரவு — வேதிகா சாண்ட்பாக்ஸ் பயன்முறை';
+
+  @override
+  String get horoscopeErrorTitle => 'ராசிபலனை ஏற்ற முடியவில்லை';
+
+  @override
+  String get horoscopeErrorMessage =>
+      'வேதிகாவை அணுகுவதில் சிக்கல் ஏற்பட்டது. உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get horoscopeRetryAction => 'மீண்டும் முயற்சிக்கவும்';
+
+  @override
+  String get weeklyAdviceTitle => 'இந்த வாரத்திற்கான அறிவுரை';
+
+  @override
+  String get weeklyOutlookTitle => '7-நாள் முன்னோட்டம்';
+
+  @override
+  String get weeklyBestDayBadge => 'சிறந்த நாள்';
+
+  @override
+  String get monthlyThemeTitle => 'இந்த மாதத்தின் கருப்பொருள்';
+
+  @override
+  String get monthlyScoresTitle => 'இந்த மாதத்தின் மதிப்பெண்கள்';
+
+  @override
+  String monthlyOverallRating(int percent) {
+    return 'மொத்தம் $percent%';
+  }
+
+  @override
+  String get monthlyKeyDatesTitle => 'இந்த மாதத்தின் முக்கிய தேதிகள்';
 
   @override
   String get generateKundliTitle => 'ஜாதகம் உருவாக்கு';
@@ -550,6 +613,27 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get tapGunaHint =>
       'ஒவ்வொரு குணமும் எதை அளக்கிறது, ஏன் முக்கியம் என்பதைப் பார்க்க தட்டவும்';
+
+  @override
+  String get matchLoading => 'உங்கள் பொருத்தத்தை கணக்கிடுகிறது…';
+
+  @override
+  String get matchErrorTitle => 'பொருத்தத்தை கணக்கிட முடியவில்லை';
+
+  @override
+  String get matchErrorMessage =>
+      'ஏதோ தவறு நடந்தது. உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get retry => 'மீண்டும் முயற்சிக்கவும்';
+
+  @override
+  String get sandboxResultBanner =>
+      'மாதிரி முடிவு — உள்ளிடப்பட்ட பிறப்பு விவரங்களிலிருந்து கணக்கிடப்படவில்லை';
+
+  @override
+  String get matchNoGunaData =>
+      'இந்த பொருத்தத்திற்கு குண விவரம் கிடைக்கவில்லை.';
 
   @override
   String get rishiAi => 'ரிஷி AI';
@@ -941,4 +1025,96 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get profileCancel => 'ரத்து செய்';
+
+  @override
+  String get kundliSandboxBanner =>
+      'மாதிரி ஜாதகம் — உங்கள் பிறப்பு விவரங்களிலிருந்து கணக்கிடப்படவில்லை';
+
+  @override
+  String get kundliLoadErrorTitle => 'உங்கள் ஜாதகத்தை ஏற்ற முடியவில்லை';
+
+  @override
+  String get kundliLoadErrorMessage =>
+      'உங்கள் ஜாதகத்தைப் பெறுவதில் ஏதோ தவறு ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get kundliRetry => 'மீண்டும் முயற்சிக்கவும்';
+
+  @override
+  String get kundliLoadingChart => 'உங்கள் ஜாதகம் ஏற்றப்படுகிறது…';
+
+  @override
+  String get kundliValueUnavailable => '—';
+
+  @override
+  String get kundliDoshaMangalPresent => 'மங்கள தோஷம் உள்ளது';
+
+  @override
+  String get kundliDoshaMangalAbsent => 'மங்கள தோஷம் இல்லை';
+
+  @override
+  String get kundliDoshaKaalSarpPresent => 'காள சர்ப்ப தோஷம் கண்டறியப்பட்டது';
+
+  @override
+  String kundliDoshaKaalSarpPresentType(String type) {
+    return 'காள சர்ப்ப தோஷம் கண்டறியப்பட்டது ($type)';
+  }
+
+  @override
+  String get kundliDoshaKaalSarpAbsent => 'காள சர்ப்ப தோஷம் இல்லை';
+
+  @override
+  String kundliPlanetPositionsAyanamsa(String name) {
+    return 'அயனாம்சம்: $name';
+  }
+
+  @override
+  String kundliHouseNumber(int house) {
+    return 'பாவம் $house';
+  }
+
+  @override
+  String get kundliRetrograde => 'வக்ரம்';
+
+  @override
+  String get kundliDashaLoadErrorTitle => 'உங்கள் தசையை ஏற்ற முடியவில்லை';
+
+  @override
+  String get kundliDashaLoadErrorMessage =>
+      'உங்கள் விம்சோத்தரி தசையைப் பெறும்போது சிக்கல் ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get kundliDashaLoading => 'உங்கள் தசை ஏற்றப்படுகிறது…';
+
+  @override
+  String get kundliDashaCurrentTitle => 'தற்போதைய மகாதசை';
+
+  @override
+  String get kundliDashaBalanceTitle => 'பிறப்பின்போது தசை மீதி';
+
+  @override
+  String kundliDashaBalanceValue(int years, int months, int days) {
+    return '$years ஆண்டுகள், $months மாதங்கள், $days நாட்கள்';
+  }
+
+  @override
+  String get kundliDashaTimelineTitle => 'தசை காலவரிசை';
+
+  @override
+  String get kundliDashaCurrentBadge => 'தற்போதைய';
+
+  @override
+  String get kundliPlanetPositionsEmpty =>
+      'இந்த ஜாதகத்திற்கு கிரக நிலைகள் இன்னும் கிடைக்கவில்லை.';
+
+  @override
+  String get kundliDashaTimelineEmpty => 'இன்னும் தசை காலங்கள் இல்லை.';
+
+  @override
+  String kundliNakshatraPada(int pada) {
+    return 'பாதம் $pada';
+  }
+
+  @override
+  String get kundliDoshaPitruPresent => 'பித்ரு தோஷம் உள்ளது';
 }

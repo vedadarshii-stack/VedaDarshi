@@ -6,11 +6,9 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../l10n/app_localizations.dart';
 import 'horoscope_detail_screen.dart';
+import 'horoscope_period.dart';
 import 'horoscope_static_data.dart';
 import 'zodiac_sign.dart';
-
-/// Which period a horoscope reading is shown for.
-enum _HoroscopePeriod { daily, weekly, monthly, yearly }
 
 /// Horoscope — All Signs, per the approved Figma "B3 · Horoscope — All
 /// Signs" (node 15:2) concept.
@@ -34,9 +32,9 @@ class HoroscopeSignsScreen extends ConsumerStatefulWidget {
 }
 
 class _HoroscopeSignsScreenState extends ConsumerState<HoroscopeSignsScreen> {
-  _HoroscopePeriod _selectedPeriod = _HoroscopePeriod.daily;
+  HoroscopePeriod _selectedPeriod = HoroscopePeriod.daily;
 
-  void _selectPeriod(_HoroscopePeriod period) {
+  void _selectPeriod(HoroscopePeriod period) {
     if (period == _selectedPeriod) return;
     setState(() => _selectedPeriod = period);
   }
@@ -62,7 +60,7 @@ class _HoroscopeSignsScreenState extends ConsumerState<HoroscopeSignsScreen> {
               onSelect: _selectPeriod,
             ),
             const SizedBox(height: 18),
-            _SignGrid(l10n: l10n, locale: locale),
+            _SignGrid(l10n: l10n, locale: locale, period: _selectedPeriod),
           ],
         ),
       ),
@@ -118,10 +116,14 @@ class _Header extends StatelessWidget {
 
 /// Daily / Weekly / Monthly / Yearly period selector.
 ///
-/// Selection is fully functional local state, but the horoscope CONTENT on
-/// this screen doesn't change with it yet — the selected period will drive
-/// the Vedika API call once that data source is wired up in place of
-/// [kZodiacSigns]' static presentation.
+/// Selection is fully functional local state AND drives the horoscope
+/// CONTENT: the selected [HoroscopePeriod] is passed straight through to
+/// [HoroscopeDetailScreen] when a sign card is tapped (see [_SignCard]),
+/// which picks the matching Vedika endpoint/provider — daily, weekly and
+/// monthly are all real; yearly has no Vedika endpoint and stays static
+/// regardless of what's selected here (see `horoscope_repository.dart` and
+/// the `HoroscopePeriod.yearly` branch's doc comment in
+/// `horoscope_detail_screen.dart`).
 class _PeriodChips extends StatelessWidget {
   const _PeriodChips({
     required this.l10n,
@@ -132,16 +134,16 @@ class _PeriodChips extends StatelessWidget {
 
   final AppLocalizations l10n;
   final Locale locale;
-  final _HoroscopePeriod selectedPeriod;
-  final ValueChanged<_HoroscopePeriod> onSelect;
+  final HoroscopePeriod selectedPeriod;
+  final ValueChanged<HoroscopePeriod> onSelect;
 
   @override
   Widget build(BuildContext context) {
     final periods = [
-      (_HoroscopePeriod.daily, l10n.periodDaily),
-      (_HoroscopePeriod.weekly, l10n.periodWeekly),
-      (_HoroscopePeriod.monthly, l10n.periodMonthly),
-      (_HoroscopePeriod.yearly, l10n.periodYearly),
+      (HoroscopePeriod.daily, l10n.periodDaily),
+      (HoroscopePeriod.weekly, l10n.periodWeekly),
+      (HoroscopePeriod.monthly, l10n.periodMonthly),
+      (HoroscopePeriod.yearly, l10n.periodYearly),
     ];
 
     return Row(
@@ -228,10 +230,15 @@ class _PeriodChip extends StatelessWidget {
 /// every other card. Each row is wrapped in [IntrinsicHeight] so its three
 /// cards match height regardless.
 class _SignGrid extends StatelessWidget {
-  const _SignGrid({required this.l10n, required this.locale});
+  const _SignGrid({
+    required this.l10n,
+    required this.locale,
+    required this.period,
+  });
 
   final AppLocalizations l10n;
   final Locale locale;
+  final HoroscopePeriod period;
 
   @override
   Widget build(BuildContext context) {
@@ -244,6 +251,7 @@ class _SignGrid extends StatelessWidget {
             baseIndex: row * 3,
             l10n: l10n,
             locale: locale,
+            period: period,
           ),
         ],
       ],
@@ -257,12 +265,14 @@ class _SignRow extends StatelessWidget {
     required this.baseIndex,
     required this.l10n,
     required this.locale,
+    required this.period,
   });
 
   final List<ZodiacSign> signs;
   final int baseIndex;
   final AppLocalizations l10n;
   final Locale locale;
+  final HoroscopePeriod period;
 
   @override
   Widget build(BuildContext context) {
@@ -274,7 +284,12 @@ class _SignRow extends StatelessWidget {
             Expanded(
               child: EntranceFadeSlide(
                 index: baseIndex + i,
-                child: _SignCard(sign: signs[i], l10n: l10n, locale: locale),
+                child: _SignCard(
+                  sign: signs[i],
+                  l10n: l10n,
+                  locale: locale,
+                  period: period,
+                ),
               ),
             ),
           ],
@@ -289,11 +304,13 @@ class _SignCard extends StatelessWidget {
     required this.sign,
     required this.l10n,
     required this.locale,
+    required this.period,
   });
 
   final ZodiacSign sign;
   final AppLocalizations l10n;
   final Locale locale;
+  final HoroscopePeriod period;
 
   @override
   Widget build(BuildContext context) {
@@ -305,9 +322,9 @@ class _SignCard extends StatelessWidget {
       label: '${sign.sanskritName} ${sign.englishName}',
       child: PressableScale(
         borderRadius: BorderRadius.circular(18),
-        onTap: () => Navigator.of(
-          context,
-        ).push<void>(fadeThroughRoute(HoroscopeDetailScreen(sign: sign))),
+        onTap: () => Navigator.of(context).push<void>(
+          fadeThroughRoute(HoroscopeDetailScreen(sign: sign, period: period)),
+        ),
         child: Container(
           padding: const EdgeInsets.only(top: 16, bottom: 14),
           decoration: BoxDecoration(

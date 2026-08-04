@@ -338,6 +338,32 @@ class AppLocalizationsKn extends AppLocalizations {
   }
 
   @override
+  String get panchangLoading => 'ಇಂದಿನ ಪಂಚಾಂಗ ಲೋಡ್ ಆಗುತ್ತಿದೆ…';
+
+  @override
+  String get panchangLoadErrorTitle => 'ಪಂಚಾಂಗ ಲೋಡ್ ಆಗಲಿಲ್ಲ';
+
+  @override
+  String get panchangLoadErrorMessage =>
+      'ನಿಮ್ಮ ಸಂಪರ್ಕವನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get panchangRetry => 'ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ';
+
+  @override
+  String get panchangSandboxBanner => 'ಮಾದರಿ ಡೇಟಾ — ನಿಮ್ಮ ಸ್ಥಳ ಅಲ್ಲ';
+
+  @override
+  String panchangPercentRemaining(int percent) {
+    return '$percent% ಉಳಿದಿದೆ';
+  }
+
+  @override
+  String panchangPada(int number) {
+    return 'ಪಾದ $number';
+  }
+
+  @override
   String get horoscopeTitle => 'ರಾಶಿಫಲ';
 
   @override
@@ -394,6 +420,43 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get premiumCta => 'ಪ್ರೀಮಿಯಂ';
+
+  @override
+  String get horoscopeSandboxBanner =>
+      'ಮಾದರಿ ಡೇಟಾ — ವೇದಿಕಾ ಸ್ಯಾಂಡ್‌ಬಾಕ್ಸ್ ಮೋಡ್';
+
+  @override
+  String get horoscopeErrorTitle => 'ರಾಶಿಫಲ ಲೋಡ್ ಆಗಲಿಲ್ಲ';
+
+  @override
+  String get horoscopeErrorMessage =>
+      'ವೇದಿಕಾವನ್ನು ತಲುಪುವಲ್ಲಿ ಸಮಸ್ಯೆ ಉಂಟಾಯಿತು. ದಯವಿಟ್ಟು ನಿಮ್ಮ ಸಂಪರ್ಕವನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get horoscopeRetryAction => 'ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ';
+
+  @override
+  String get weeklyAdviceTitle => 'ಈ ವಾರದ ಸಲಹೆ';
+
+  @override
+  String get weeklyOutlookTitle => '7-ದಿನಗಳ ಮುನ್ನೋಟ';
+
+  @override
+  String get weeklyBestDayBadge => 'ಅತ್ಯುತ್ತಮ ದಿನ';
+
+  @override
+  String get monthlyThemeTitle => 'ಈ ತಿಂಗಳ ವಿಷಯ';
+
+  @override
+  String get monthlyScoresTitle => 'ಈ ತಿಂಗಳ ಸ್ಕೋರ್‌ಗಳು';
+
+  @override
+  String monthlyOverallRating(int percent) {
+    return 'ಒಟ್ಟು $percent%';
+  }
+
+  @override
+  String get monthlyKeyDatesTitle => 'ಈ ತಿಂಗಳ ಪ್ರಮುಖ ದಿನಾಂಕಗಳು';
 
   @override
   String get generateKundliTitle => 'ಕುಂಡಲಿ ರಚಿಸಿ';
@@ -548,6 +611,26 @@ class AppLocalizationsKn extends AppLocalizations {
   @override
   String get tapGunaHint =>
       'ಪ್ರತಿ ಗುಣ ಏನನ್ನು ಅಳೆಯುತ್ತದೆ ಮತ್ತು ಏಕೆ ಮುಖ್ಯ ಎಂದು ನೋಡಲು ಟ್ಯಾಪ್ ಮಾಡಿ';
+
+  @override
+  String get matchLoading => 'ನಿಮ್ಮ ಹೊಂದಾಣಿಕೆಯನ್ನು ಲೆಕ್ಕಾಚಾರ ಮಾಡಲಾಗುತ್ತಿದೆ…';
+
+  @override
+  String get matchErrorTitle => 'ಹೊಂದಾಣಿಕೆಯನ್ನು ಲೆಕ್ಕಾಚಾರ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ';
+
+  @override
+  String get matchErrorMessage =>
+      'ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ನಿಮ್ಮ ಸಂಪರ್ಕವನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get retry => 'ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ';
+
+  @override
+  String get sandboxResultBanner =>
+      'ಮಾದರಿ ಫಲಿತಾಂಶ — ನಮೂದಿಸಿದ ಜನ್ಮ ವಿವರಗಳಿಂದ ಲೆಕ್ಕಹಾಕಲಾಗಿಲ್ಲ';
+
+  @override
+  String get matchNoGunaData => 'ಈ ಹೊಂದಾಣಿಕೆಗೆ ಗುಣ ವಿವರಗಳು ಲಭ್ಯವಿಲ್ಲ.';
 
   @override
   String get rishiAi => 'ಋಷಿ AI';
@@ -939,4 +1022,96 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get profileCancel => 'ರದ್ದುಮಾಡಿ';
+
+  @override
+  String get kundliSandboxBanner =>
+      'ಮಾದರಿ ಜಾತಕ — ನಿಮ್ಮ ಜನನ ವಿವರಗಳಿಂದ ಲೆಕ್ಕಹಾಕಲಾಗಿಲ್ಲ';
+
+  @override
+  String get kundliLoadErrorTitle => 'ನಿಮ್ಮ ಜಾತಕ ಲೋಡ್ ಆಗಲಿಲ್ಲ';
+
+  @override
+  String get kundliLoadErrorMessage =>
+      'ನಿಮ್ಮ ಕುಂಡಲಿಯನ್ನು ಪಡೆಯುವಲ್ಲಿ ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get kundliRetry => 'ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ';
+
+  @override
+  String get kundliLoadingChart => 'ನಿಮ್ಮ ಜಾತಕ ಲೋಡ್ ಆಗುತ್ತಿದೆ…';
+
+  @override
+  String get kundliValueUnavailable => '—';
+
+  @override
+  String get kundliDoshaMangalPresent => 'ಮಂಗಳ ದೋಷ ಇದೆ';
+
+  @override
+  String get kundliDoshaMangalAbsent => 'ಮಂಗಳ ದೋಷ ಕಂಡುಬಂದಿಲ್ಲ';
+
+  @override
+  String get kundliDoshaKaalSarpPresent => 'ಕಾಲ ಸರ್ಪ ದೋಷ ಕಂಡುಬಂದಿದೆ';
+
+  @override
+  String kundliDoshaKaalSarpPresentType(String type) {
+    return 'ಕಾಲ ಸರ್ಪ ದೋಷ ಕಂಡುಬಂದಿದೆ ($type)';
+  }
+
+  @override
+  String get kundliDoshaKaalSarpAbsent => 'ಕಾಲ ಸರ್ಪ ದೋಷ ಇಲ್ಲ';
+
+  @override
+  String kundliPlanetPositionsAyanamsa(String name) {
+    return 'ಅಯನಾಂಶ: $name';
+  }
+
+  @override
+  String kundliHouseNumber(int house) {
+    return 'ಭಾವ $house';
+  }
+
+  @override
+  String get kundliRetrograde => 'ವಕ್ರಿ';
+
+  @override
+  String get kundliDashaLoadErrorTitle => 'ನಿಮ್ಮ ದಶೆಯನ್ನು ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ';
+
+  @override
+  String get kundliDashaLoadErrorMessage =>
+      'ನಿಮ್ಮ ವಿಂಶೋತ್ತರಿ ದಶೆಯನ್ನು ಪಡೆಯುವಾಗ ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get kundliDashaLoading => 'ನಿಮ್ಮ ದಶೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ…';
+
+  @override
+  String get kundliDashaCurrentTitle => 'ಪ್ರಸ್ತುತ ಮಹಾದಶೆ';
+
+  @override
+  String get kundliDashaBalanceTitle => 'ಜನನದ ಸಮಯದ ದಶಾ ಬಾಕಿ';
+
+  @override
+  String kundliDashaBalanceValue(int years, int months, int days) {
+    return '$years ವರ್ಷಗಳು, $months ತಿಂಗಳುಗಳು, $days ದಿನಗಳು';
+  }
+
+  @override
+  String get kundliDashaTimelineTitle => 'ದಶಾ ಕಾಲರೇಖೆ';
+
+  @override
+  String get kundliDashaCurrentBadge => 'ಪ್ರಸ್ತುತ';
+
+  @override
+  String get kundliPlanetPositionsEmpty =>
+      'ಈ ಜಾತಕಕ್ಕೆ ಗ್ರಹ ಸ್ಥಾನಗಳು ಇನ್ನೂ ಲಭ್ಯವಿಲ್ಲ.';
+
+  @override
+  String get kundliDashaTimelineEmpty => 'ಇನ್ನೂ ಯಾವುದೇ ದಶಾ ಅವಧಿಗಳು ಲಭ್ಯವಿಲ್ಲ.';
+
+  @override
+  String kundliNakshatraPada(int pada) {
+    return 'ಪಾದ $pada';
+  }
+
+  @override
+  String get kundliDoshaPitruPresent => 'ಪಿತೃ ದೋಷವಿದೆ';
 }

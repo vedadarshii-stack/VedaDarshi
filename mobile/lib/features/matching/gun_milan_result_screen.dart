@@ -6,10 +6,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
+import '../../core/vedika/vedika_config.dart';
+import '../../core/widgets/app_empty_state.dart';
 import '../../l10n/app_localizations.dart';
 import '../premium/subscription_paywall_screen.dart';
 import '../profile/birth_profile_repository.dart';
-import 'gun_milan_result_static_data.dart';
+import 'guna_milan_data.dart';
+import 'guna_milan_repository.dart';
 import 'gun_milan_static_data.dart';
 
 /// Gun Milan — Result, per the approved Figma "C2 · Gun Milan — Result"
@@ -19,9 +22,22 @@ import 'gun_milan_static_data.dart';
 /// that screen, this has NO bottom nav in the design — it's a pushed
 /// destination with its own back button.
 ///
-/// Every astrology VALUE shown below (guna scores, verdict, AI summary) is
-/// STATIC PLACEHOLDER DATA from [GunMilanResultStaticData]; see that file's
-/// doc comment for what eventually replaces it (the Vedika API).
+/// **Wired to the real Vedika Ashtakoota Gun Milan endpoint** (`POST
+/// /v2/astrology/guna-milan` — see `guna_milan_data.dart` +
+/// `guna_milan_repository.dart`). The GROOM side is the real signed-in
+/// [BirthProfile]; the BRIDE side is still a placeholder because
+/// multi-profile support isn't built — see
+/// [GunMilanStaticData.placeholderBridePartnerParams]'s doc comment for the
+/// exact gap.
+///
+/// **Known gap: API text is English-only.** `interpretation`,
+/// `recommendation`, `match_result` and `remedies` all come back in English
+/// from Vedika regardless of the app's active locale, and are rendered
+/// as-is below rather than run through [AppLocalizations] — there is
+/// nothing to translate them with client-side, and Vedika does not offer a
+/// language parameter on this endpoint. This affects the 4 Indic locales
+/// and needs a real fix (either a translation pass server-side, or asking
+/// Vedika for locale support) before this screen is fully localized.
 class GunMilanResultScreen extends ConsumerStatefulWidget {
   const GunMilanResultScreen({super.key});
 
@@ -44,39 +60,265 @@ class _GunMilanResultScreenState extends ConsumerState<GunMilanResultScreen> {
         ? trimmedName
         : GunMilanStaticData.fallbackGroomName;
 
+    final maleParams = profile != null
+        ? GunaMilanPartnerParams.fromBirthProfile(profile)
+        : GunMilanStaticData.fallbackGroomPartnerParams;
+    // BRIDE side has no real profile to read — see
+    // GunMilanStaticData.placeholderBridePartnerParams's doc comment for
+    // why this is a fixed placeholder rather than a second saved profile,
+    // and the multi-profile gap that causes it.
+    final femaleParams = GunMilanStaticData.placeholderBridePartnerParams;
+    final request = (male: maleParams, female: femaleParams);
+
+    final resultAsync = ref.watch(gunaMilanResultProvider(request));
+
     return Scaffold(
       backgroundColor: AppColors.cream,
-      body: ListView(
-        padding: EdgeInsets.zero,
+      body: resultAsync.when(
+        data: (result) => _ResultContent(
+          l10n: l10n,
+          locale: locale,
+          groomName: groomName,
+          result: result,
+        ),
+        loading: () => _LoadingBody(l10n: l10n, locale: locale),
+        error: (error, stackTrace) => _ErrorBody(
+          l10n: l10n,
+          locale: locale,
+          onRetry: () => ref.invalidate(gunaMilanResultProvider(request)),
+        ),
+      ),
+    );
+  }
+}
+
+/// Back button alone, used by both the loading and error bodies so the user
+/// is never stuck on this screen while a match is in flight or failed —
+/// neither state has an approved Figma frame, so this is a minimal,
+/// design-system-consistent stand-in rather than the full navy hero.
+class _MinimalBackBar extends StatelessWidget {
+  const _MinimalBackBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      child: Row(
         children: [
-          _Header(l10n: l10n, locale: locale, groomName: groomName),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.ashtakootaBreakdown,
-                  style: AppFonts.heading(
-                    locale,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.ink,
-                  ),
+          Semantics(
+            button: true,
+            child: PressableScale(
+              borderRadius: BorderRadius.circular(999),
+              onTap: () => Navigator.of(context).pop(),
+              child: Container(
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.cardBorder),
                 ),
+                child: Icon(Icons.arrow_back, size: 16, color: AppColors.ink),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Shown while `gunaMilanResultProvider` is in flight.
+class _LoadingBody extends StatelessWidget {
+  const _LoadingBody({required this.l10n, required this.locale});
+
+  final AppLocalizations l10n;
+  final Locale locale;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Column(
+        children: [
+          const _MinimalBackBar(),
+          Expanded(
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 28,
+                    height: 28,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                      color: AppColors.saffron,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n.matchLoading,
+                    style: AppFonts.body(
+                      locale,
+                      fontSize: 13,
+                      color: AppColors.muted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Shown when `gunaMilanResultProvider` throws — most likely a
+/// [VedikaException] (network/timeout/balance), but any error is treated
+/// the same generic way here rather than surfacing Vedika's raw error text
+/// to the user.
+class _ErrorBody extends StatelessWidget {
+  const _ErrorBody({
+    required this.l10n,
+    required this.locale,
+    required this.onRetry,
+  });
+
+  final AppLocalizations l10n;
+  final Locale locale;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Column(
+        children: [
+          const _MinimalBackBar(),
+          Expanded(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: AppEmptyState(
+                  icon: Icons.error_outline,
+                  iconBackgroundColor: AppColors.ashubhBg,
+                  iconForegroundColor: AppColors.ashubhFg,
+                  title: l10n.matchErrorTitle,
+                  message: l10n.matchErrorMessage,
+                  actionLabel: l10n.retry,
+                  onAction: onRetry,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The real "C2 · Gun Milan — Result" content, once [GunaMilanResult] has
+/// loaded — this is the previous static-data build() body, now driven by
+/// real data end to end.
+class _ResultContent extends StatelessWidget {
+  const _ResultContent({
+    required this.l10n,
+    required this.locale,
+    required this.groomName,
+    required this.result,
+  });
+
+  final AppLocalizations l10n;
+  final Locale locale;
+  final String groomName;
+  final GunaMilanResult result;
+
+  @override
+  Widget build(BuildContext context) {
+    final aiSummary = result.interpretation.displayText;
+
+    return ListView(
+      padding: EdgeInsets.zero,
+      children: [
+        _Header(l10n: l10n, locale: locale, groomName: groomName, result: result),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (VedikaConfig.isSandbox) ...[
+                _SandboxBanner(l10n: l10n, locale: locale),
                 const SizedBox(height: 10),
-                _LegendRow(l10n: l10n, locale: locale),
-                const SizedBox(height: 10),
-                _GunaGrid(l10n: l10n, locale: locale),
-                const SizedBox(height: 10),
-                _AiSummaryCard(l10n: l10n, locale: locale),
-                const SizedBox(height: 10),
-                _NadiWarning(locale: locale),
-                const SizedBox(height: 10),
-                _ReportCta(l10n: l10n, locale: locale),
-                const SizedBox(height: 10),
-                _FooterHint(l10n: l10n, locale: locale),
               ],
+              Text(
+                l10n.ashtakootaBreakdown,
+                style: AppFonts.heading(
+                  locale,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.ink,
+                ),
+              ),
+              const SizedBox(height: 10),
+              _LegendRow(l10n: l10n, locale: locale),
+              const SizedBox(height: 10),
+              _GunaGrid(gunas: result.gunas, l10n: l10n, locale: locale),
+              if (aiSummary != null) ...[
+                const SizedBox(height: 10),
+                _AiSummaryCard(
+                  l10n: l10n,
+                  locale: locale,
+                  summary: aiSummary,
+                ),
+              ],
+              if (result.remedies.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                _RemediesBanner(locale: locale, remedies: result.remedies),
+              ],
+              const SizedBox(height: 10),
+              _ReportCta(l10n: l10n, locale: locale),
+              const SizedBox(height: 10),
+              _FooterHint(l10n: l10n, locale: locale),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Informational banner shown only while pointed at Vedika's sandbox (see
+/// `VedikaConfig.isSandbox`'s doc comment) — the sandbox returns one FIXED
+/// sample match regardless of the birth details posted, so presenting it as
+/// a real reading for these two people would be actively misleading.
+class _SandboxBanner extends StatelessWidget {
+  const _SandboxBanner({required this.l10n, required this.locale});
+
+  final AppLocalizations l10n;
+  final Locale locale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.tileCyanBg,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.info_outline, size: 14, color: AppColors.tileCyanFg),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              l10n.sandboxResultBanner,
+              style: AppFonts.body(
+                locale,
+                fontSize: 11.5,
+                fontWeight: FontWeight.w500,
+                color: AppColors.tileCyanFg,
+              ),
             ),
           ),
         ],
@@ -96,16 +338,19 @@ class _Header extends StatelessWidget {
     required this.l10n,
     required this.locale,
     required this.groomName,
+    required this.result,
   });
 
   final AppLocalizations l10n;
   final Locale locale;
   final String groomName;
+  final GunaMilanResult result;
 
   @override
   Widget build(BuildContext context) {
     final statusBarInset = MediaQuery.paddingOf(context).top;
     final topPadding = statusBarInset + 16 > 52 ? statusBarInset + 16 : 52.0;
+    final verdictText = result.verdictText;
 
     return Container(
       width: double.infinity,
@@ -178,12 +423,10 @@ class _Header extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          _ScoreRing(locale: locale, l10n: l10n),
+          _ScoreRing(locale: locale, l10n: l10n, result: result),
           const SizedBox(height: 16),
           Text(
-            l10n.percentCompatible(
-              GunMilanResultStaticData.compatibilityPercent,
-            ),
+            l10n.percentCompatible(result.effectivePercent),
             style: AppFonts.body(
               locale,
               fontSize: 12,
@@ -191,11 +434,13 @@ class _Header extends StatelessWidget {
               color: AppColors.gold,
             ),
           ),
-          const SizedBox(height: 16),
-          _VerdictPill(locale: locale),
+          if (verdictText != null) ...[
+            const SizedBox(height: 16),
+            _VerdictPill(locale: locale, verdictText: verdictText),
+          ],
           const SizedBox(height: 10),
           Text(
-            '$groomName  💞  ${GunMilanResultStaticData.brideName}',
+            '$groomName  💞  ${GunMilanStaticData.placeholderBrideName}',
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -215,10 +460,18 @@ class _Header extends StatelessWidget {
 /// Green verdict pill (Figma node 20:9). The verdict copy is long and grows
 /// further in Indic locales, so it's allowed to wrap to 2 lines and stays
 /// centred rather than overflowing.
+///
+/// Kept visually IDENTICAL to the approved design (green background,
+/// checkmark icon) regardless of what [verdictText] actually says — the
+/// integration brief calls for swapping the data source, not redesigning
+/// the pill's styling to react to a poor match. See
+/// `GunaMilanResult.verdictText`'s doc comment: this is raw, non-localized
+/// API text.
 class _VerdictPill extends StatelessWidget {
-  const _VerdictPill({required this.locale});
+  const _VerdictPill({required this.locale, required this.verdictText});
 
   final Locale locale;
+  final String verdictText;
 
   @override
   Widget build(BuildContext context) {
@@ -245,7 +498,7 @@ class _VerdictPill extends StatelessWidget {
           const SizedBox(width: 6),
           Flexible(
             child: Text(
-              GunMilanResultStaticData.verdict,
+              verdictText,
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -268,10 +521,15 @@ class _VerdictPill extends StatelessWidget {
 /// its sweep or scale cleanly, whereas a [CustomPainter] can do both and
 /// derives every measurement from the canvas size it's given.
 class _ScoreRing extends StatefulWidget {
-  const _ScoreRing({required this.locale, required this.l10n});
+  const _ScoreRing({
+    required this.locale,
+    required this.l10n,
+    required this.result,
+  });
 
   final Locale locale;
   final AppLocalizations l10n;
+  final GunaMilanResult result;
 
   @override
   State<_ScoreRing> createState() => _ScoreRingState();
@@ -280,7 +538,8 @@ class _ScoreRing extends StatefulWidget {
 class _ScoreRingState extends State<_ScoreRing> {
   @override
   Widget build(BuildContext context) {
-    final target = GunMilanResultStaticData.compatibilityPercent / 100;
+    final target = widget.result.effectivePercent / 100;
+    final maxPoints = widget.result.maximumPoints;
 
     return SizedBox(
       width: 150,
@@ -303,7 +562,7 @@ class _ScoreRingState extends State<_ScoreRing> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                _formatScore(GunMilanResultStaticData.totalScore),
+                _formatNullableScore(widget.result.totalPoints),
                 style: AppFonts.heading(
                   widget.locale,
                   fontSize: 36,
@@ -311,14 +570,15 @@ class _ScoreRingState extends State<_ScoreRing> {
                   color: Colors.white,
                 ),
               ),
-              Text(
-                widget.l10n.outOfMax(GunMilanResultStaticData.maxScore),
-                style: AppFonts.body(
-                  widget.locale,
-                  fontSize: 11,
-                  color: AppColors.mutedOnNavy,
+              if (maxPoints != null)
+                Text(
+                  widget.l10n.outOfMax(maxPoints),
+                  style: AppFonts.body(
+                    widget.locale,
+                    fontSize: 11,
+                    color: AppColors.mutedOnNavy,
+                  ),
                 ),
-              ),
             ],
           ),
         ],
@@ -376,6 +636,14 @@ String _formatScore(double value) {
     return value.toInt().toString();
   }
   return value.toString();
+}
+
+/// Same as [_formatScore] but for a nullable score (the API's `total_points`
+/// / per-guna `score` may be absent) — renders an em dash rather than
+/// inventing a 0.
+String _formatNullableScore(double? value) {
+  if (value == null) return '—';
+  return _formatScore(value);
 }
 
 /// Strong / Moderate / Weak legend row (Figma node 51:3).
@@ -469,7 +737,9 @@ class _LegendChip extends StatelessWidget {
   }
 }
 
-/// Resolves the l10n label for a [GunaScore.id].
+/// Resolves the l10n label for a [GunaMilanGuna.id]. **Not** the API's own
+/// `name` field — see that field's doc comment for why the card keeps this
+/// existing short localized label as its title.
 String _gunaLabel(String id, AppLocalizations l10n) {
   switch (id) {
     case 'varna':
@@ -493,17 +763,41 @@ String _gunaLabel(String id, AppLocalizations l10n) {
   }
 }
 
-/// 4×2 guna score grid (Figma node 20:21), driven entirely by
-/// [GunMilanResultStaticData.gunas].
+/// 4×2 guna score grid (Figma node 20:21), driven by [gunas] — the API's
+/// `gunaDetails` map, parsed in the approved display order (see
+/// `guna_milan_data.dart`'s `_gunaOrder`). Renders whatever came back rather
+/// than assuming exactly 8 entries.
 class _GunaGrid extends StatelessWidget {
-  const _GunaGrid({required this.l10n, required this.locale});
+  const _GunaGrid({
+    required this.gunas,
+    required this.l10n,
+    required this.locale,
+  });
 
+  final List<GunaMilanGuna> gunas;
   final AppLocalizations l10n;
   final Locale locale;
 
   @override
   Widget build(BuildContext context) {
-    final gunas = GunMilanResultStaticData.gunas;
+    if (gunas.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          border: Border.all(color: AppColors.cardBorder),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Text(
+          l10n.matchNoGunaData,
+          textAlign: TextAlign.center,
+          style: AppFonts.body(locale, fontSize: 11.5, color: AppColors.muted),
+        ),
+      );
+    }
+
     final rows = <Widget>[];
     for (var i = 0; i < gunas.length; i += 2) {
       if (rows.isNotEmpty) rows.add(const SizedBox(height: 8));
@@ -536,15 +830,26 @@ class _GunaCard extends StatelessWidget {
     required this.locale,
   });
 
-  final GunaScore guna;
+  final GunaMilanGuna guna;
   final AppLocalizations l10n;
   final Locale locale;
 
   @override
   Widget build(BuildContext context) {
+    final band = guna.band;
+    // Neutral fallback when score/maxPoints is missing — see
+    // GunaMilanGuna.band's doc comment; never invent a band.
+    final badgeBg = band?.background ?? AppColors.surfaceAlt;
+    final badgeFg = band?.foreground ?? AppColors.muted;
+    final scoreLabel = (guna.score != null && guna.maxPoints != null)
+        ? '${_formatScore(guna.score!)}/${guna.maxPoints}'
+        : '—';
+
     // Tap is intentionally a no-op — the footer hint below promises a
     // per-guna explanation sheet, but the explanatory copy for the 8 gunas
-    // hasn't been approved by the client yet, so we don't invent it.
+    // hasn't been approved by the client yet, so we don't invent it. The
+    // API's own per-guna `interpretation`/`significance`/`tips` (see
+    // GunaMilanGuna) are exactly what that future sheet would show.
     return Semantics(
       button: true,
       label: _gunaLabel(guna.id, l10n),
@@ -577,16 +882,16 @@ class _GunaCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
                 decoration: BoxDecoration(
-                  color: guna.band.background,
+                  color: badgeBg,
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  '${_formatScore(guna.score)}/${guna.max}',
+                  scoreLabel,
                   style: AppFonts.body(
                     locale,
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: guna.band.foreground,
+                    color: badgeFg,
                   ),
                 ),
               ),
@@ -598,12 +903,19 @@ class _GunaCard extends StatelessWidget {
   }
 }
 
-/// Rishi AI summary card (Figma node 51:10).
+/// Rishi AI summary card (Figma node 51:10) — body copy is now
+/// [GunaMilanInterpretation.displayText] (real API text), shown only when
+/// non-null; the card is omitted entirely rather than showing empty space.
 class _AiSummaryCard extends StatelessWidget {
-  const _AiSummaryCard({required this.l10n, required this.locale});
+  const _AiSummaryCard({
+    required this.l10n,
+    required this.locale,
+    required this.summary,
+  });
 
   final AppLocalizations l10n;
   final Locale locale;
+  final String summary;
 
   @override
   Widget build(BuildContext context) {
@@ -652,7 +964,7 @@ class _AiSummaryCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            GunMilanResultStaticData.aiSummary,
+            summary,
             style: AppFonts.body(
               locale,
               fontSize: 11.5,
@@ -666,11 +978,17 @@ class _AiSummaryCard extends StatelessWidget {
   }
 }
 
-/// Nadi warning banner (Figma node 20:58).
-class _NadiWarning extends StatelessWidget {
-  const _NadiWarning({required this.locale});
+/// Suggested-remedies banner (Figma node 20:58's slot — previously a
+/// Nadi-specific hardcoded warning, now generic). Rendered only when
+/// [remedies] is non-empty; each remedy is already a complete sentence from
+/// the API (e.g. "Nadi Dosha: Perform Nadi Dosha Nivarana Puja"), not
+/// wrapped in any additional template copy — see `GunaMilanResult.remedies`
+/// doc comment.
+class _RemediesBanner extends StatelessWidget {
+  const _RemediesBanner({required this.locale, required this.remedies});
 
   final Locale locale;
+  final List<String> remedies;
 
   @override
   Widget build(BuildContext context) {
@@ -690,13 +1008,21 @@ class _NadiWarning extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(
-              GunMilanResultStaticData.nadiWarning,
-              style: AppFonts.body(
-                locale,
-                fontSize: 11.5,
-                color: AppColors.tileGoldFg,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (var i = 0; i < remedies.length; i++) ...[
+                  if (i > 0) const SizedBox(height: 6),
+                  Text(
+                    remedies[i],
+                    style: AppFonts.body(
+                      locale,
+                      fontSize: 11.5,
+                      color: AppColors.tileGoldFg,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
         ],

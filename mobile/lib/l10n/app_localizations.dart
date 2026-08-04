@@ -716,6 +716,48 @@ abstract class AppLocalizations {
   /// **'Available offline · Updated {time}'**
   String availableOffline(String time);
 
+  /// Loading-state label shown on the Panchang screen while the Vedika API request is in flight.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading today\'s panchang…'**
+  String get panchangLoading;
+
+  /// Title of the Panchang screen's error state when the Vedika API request fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load Panchang'**
+  String get panchangLoadErrorTitle;
+
+  /// Message of the Panchang screen's error state when the Vedika API request fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your connection and try again.'**
+  String get panchangLoadErrorMessage;
+
+  /// Action button on the Panchang screen's error state that re-attempts the failed request.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get panchangRetry;
+
+  /// Small banner shown on the Panchang screen while the app is pointed at Vedika's sandbox, which always returns the same fixed sample location rather than the user's own.
+  ///
+  /// In en, this message translates to:
+  /// **'Sample data — not your location'**
+  String get panchangSandboxBanner;
+
+  /// Trailing qualifier on the Tithi row of the Panchang screen's elements card, showing how much of the current tithi remains.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% left'**
+  String panchangPercentRemaining(int percent);
+
+  /// Trailing qualifier on the Nakshatra row of the Panchang screen's elements card, showing the current nakshatra's pada (quarter).
+  ///
+  /// In en, this message translates to:
+  /// **'Pada {number}'**
+  String panchangPada(int number);
+
   /// Heading of the Horoscope — All Signs screen.
   ///
   /// In en, this message translates to:
@@ -829,6 +871,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Premium'**
   String get premiumCta;
+
+  /// Banner shown on the Horoscope Detail screen when the app is pointed at Vedika's sandbox, warning that the reading is fixed sample data, not the user's own.
+  ///
+  /// In en, this message translates to:
+  /// **'Sample data — Vedika sandbox mode'**
+  String get horoscopeSandboxBanner;
+
+  /// Title of the error state shown on the Horoscope Detail screen when the Vedika API call fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load horoscope'**
+  String get horoscopeErrorTitle;
+
+  /// Message of the error state shown on the Horoscope Detail screen when the Vedika API call fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong reaching Vedika. Check your connection and try again.'**
+  String get horoscopeErrorMessage;
+
+  /// Retry button label on the Horoscope Detail screen's error state.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get horoscopeRetryAction;
+
+  /// Title of the advice card on the Horoscope Detail screen's Weekly period, sourced from Vedika's weekly `advice` field.
+  ///
+  /// In en, this message translates to:
+  /// **'This Week\'s Advice'**
+  String get weeklyAdviceTitle;
+
+  /// Title of the per-day list card on the Horoscope Detail screen's Weekly period.
+  ///
+  /// In en, this message translates to:
+  /// **'7-Day Outlook'**
+  String get weeklyOutlookTitle;
+
+  /// Small badge marking the week's best day in the Horoscope Detail screen's Weekly 7-day outlook.
+  ///
+  /// In en, this message translates to:
+  /// **'Best Day'**
+  String get weeklyBestDayBadge;
+
+  /// Title of the theme card on the Horoscope Detail screen's Monthly period, sourced from Vedika's monthly `monthlyTheme` field.
+  ///
+  /// In en, this message translates to:
+  /// **'This Month\'s Theme'**
+  String get monthlyThemeTitle;
+
+  /// Title of the score-bars card on the Horoscope Detail screen's Monthly period (the Daily period's equivalent card uses todaysScores instead).
+  ///
+  /// In en, this message translates to:
+  /// **'This Month\'s Scores'**
+  String get monthlyScoresTitle;
+
+  /// Badge next to the scores card title on the Horoscope Detail screen's Monthly period, showing Vedika's monthly overallRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall {percent}%'**
+  String monthlyOverallRating(int percent);
+
+  /// Title of the key-dates chip card on the Horoscope Detail screen's Monthly period, sourced from Vedika's monthly keyDates field.
+  ///
+  /// In en, this message translates to:
+  /// **'Key Dates This Month'**
+  String get monthlyKeyDatesTitle;
 
   /// Heading of the Kundli — New Chart screen.
   ///
@@ -1117,6 +1225,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap any guna to see what it measures & why it matters'**
   String get tapGunaHint;
+
+  /// Loading message shown on the Gun Milan — Result screen while the match is being calculated.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculating your compatibility…'**
+  String get matchLoading;
+
+  /// Error state title on the Gun Milan — Result screen when the match calculation fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t calculate compatibility'**
+  String get matchErrorTitle;
+
+  /// Error state message on the Gun Milan — Result screen when the match calculation fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please check your connection and try again.'**
+  String get matchErrorMessage;
+
+  /// Generic retry action label, used on the Gun Milan — Result screen's error state.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// Banner shown on the Gun Milan — Result screen while the app is pointed at Vedika's sandbox, which always returns one fixed sample match regardless of the birth details submitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Sample result — not calculated from the entered birth details'**
+  String get sandboxResultBanner;
+
+  /// Fallback message shown in place of the guna grid on the Gun Milan — Result screen if the API returns no guna breakdown at all.
+  ///
+  /// In en, this message translates to:
+  /// **'Guna breakdown isn\'t available for this match.'**
+  String get matchNoGunaData;
 
   /// Header title of the AI Astrologer chat screen.
   ///
@@ -1831,6 +1975,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancel'**
   String get profileCancel;
+
+  /// Non-negotiable banner on the Kundli Chart screen shown whenever the app is pointed at Vedika's sandbox, which always returns one fixed sample chart regardless of the birth details sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Sample chart — not calculated from your birth details'**
+  String get kundliSandboxBanner;
+
+  /// Title of the error state on the Kundli Chart screen when the Vedika API call fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load your chart'**
+  String get kundliLoadErrorTitle;
+
+  /// Fallback message of the error state on the Kundli Chart screen, used when the failure has no more specific Vedika-provided message.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong while fetching your Kundli. Please try again.'**
+  String get kundliLoadErrorMessage;
+
+  /// Label of the retry action button on the Kundli Chart screen's error state.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get kundliRetry;
+
+  /// Accessibility label announced while the Kundli Chart screen's shimmer loading placeholder is shown.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your chart…'**
+  String get kundliLoadingChart;
+
+  /// Placeholder shown in a Kundli Chart stat card (Lagna/Rashi/Nakshatra) when the Vedika API response omits that specific value.
+  ///
+  /// In en, this message translates to:
+  /// **'—'**
+  String get kundliValueUnavailable;
+
+  /// Kundli Chart dosha banner: fallback verdict text for Mangal Dosha when Vedika's own personalized description sentence isn't available, and the all-doshas response says the dosha IS present.
+  ///
+  /// In en, this message translates to:
+  /// **'Mangal Dosha present'**
+  String get kundliDoshaMangalPresent;
+
+  /// Kundli Chart dosha banner: fallback verdict text for Mangal Dosha when Vedika's own personalized description sentence isn't available, and the all-doshas response says the dosha is absent.
+  ///
+  /// In en, this message translates to:
+  /// **'No Mangal Dosha detected'**
+  String get kundliDoshaMangalAbsent;
+
+  /// Kundli Chart dosha banner verdict for Kaal Sarp Dosha when present and Vedika didn't return a specific type name.
+  ///
+  /// In en, this message translates to:
+  /// **'Kaal Sarp Dosha detected'**
+  String get kundliDoshaKaalSarpPresent;
+
+  /// Kundli Chart dosha banner verdict for Kaal Sarp Dosha when present, naming Vedika's specific type (e.g. 'Ananta') — the type name itself is Vedika's own English text, rendered as-is regardless of app locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Kaal Sarp Dosha detected ({type})'**
+  String kundliDoshaKaalSarpPresentType(String type);
+
+  /// Kundli Chart dosha banner verdict for Kaal Sarp Dosha when absent.
+  ///
+  /// In en, this message translates to:
+  /// **'No Kaal Sarp Dosha detected'**
+  String get kundliDoshaKaalSarpAbsent;
+
+  /// Ayanamsa (sidereal calculation system) label shown atop the Kundli Chart screen's Planet Positions tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Ayanamsa: {name}'**
+  String kundliPlanetPositionsAyanamsa(String name);
+
+  /// House-number chip on a planet row in the Kundli Chart screen's Planet Positions tab.
+  ///
+  /// In en, this message translates to:
+  /// **'House {house}'**
+  String kundliHouseNumber(int house);
+
+  /// Badge shown on a planet row in the Kundli Chart screen's Planet Positions tab when that planet is retrograde.
+  ///
+  /// In en, this message translates to:
+  /// **'Retrograde'**
+  String get kundliRetrograde;
+
+  /// Error-state title on the Kundli Chart screen's Vimshottari Dasha tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load your dasha'**
+  String get kundliDashaLoadErrorTitle;
+
+  /// Error-state message on the Kundli Chart screen's Vimshottari Dasha tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong while fetching your Vimshottari Dasha. Please try again.'**
+  String get kundliDashaLoadErrorMessage;
+
+  /// Accessibility label announced while the Kundli Chart screen's Vimshottari Dasha tab is loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your dasha…'**
+  String get kundliDashaLoading;
+
+  /// Heading of the 'currently running maha-dasha' card on the Vimshottari Dasha tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Mahadasha'**
+  String get kundliDashaCurrentTitle;
+
+  /// Heading of the 'balance of the first maha-dasha remaining at birth' card on the Vimshottari Dasha tab — a standard Vimshottari concept, not 'time remaining in the CURRENT dasha now'.
+  ///
+  /// In en, this message translates to:
+  /// **'Dasha Balance at Birth'**
+  String get kundliDashaBalanceTitle;
+
+  /// Formatted dasha-balance duration on the Vimshottari Dasha tab.
+  ///
+  /// In en, this message translates to:
+  /// **'{years} years, {months} months, {days} days'**
+  String kundliDashaBalanceValue(int years, int months, int days);
+
+  /// Heading over the full list of maha-dasha periods on the Vimshottari Dasha tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Dasha Timeline'**
+  String get kundliDashaTimelineTitle;
+
+  /// Small badge marking the currently-running period in the Vimshottari Dasha tab's period list.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get kundliDashaCurrentBadge;
+
+  /// Shown on the Planet Positions tab when the Kundli response loaded successfully but returned an empty planets list.
+  ///
+  /// In en, this message translates to:
+  /// **'Planet positions aren\'t available for this chart yet.'**
+  String get kundliPlanetPositionsEmpty;
+
+  /// Shown on the Vimshottari Dasha tab when the response loaded successfully but returned an empty maha_dasha list.
+  ///
+  /// In en, this message translates to:
+  /// **'No dasha periods available yet.'**
+  String get kundliDashaTimelineEmpty;
+
+  /// A nakshatra's quarter/pada (1-4), shown next to a planet's nakshatra on the Planet Positions tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Pada {pada}'**
+  String kundliNakshatraPada(int pada);
+
+  /// Shown in the Kundli dosha banner when Vedika reports Pitru Dosha present. Its presence also forces the banner off the 'clear' checkmark.
+  ///
+  /// In en, this message translates to:
+  /// **'Pitru Dosha present'**
+  String get kundliDoshaPitruPresent;
 }
 
 class _AppLocalizationsDelegate

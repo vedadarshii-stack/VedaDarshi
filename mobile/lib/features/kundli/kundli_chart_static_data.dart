@@ -2,38 +2,20 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
 
-/// STATIC PLACEHOLDER CONTENT for the "Kundli Chart" screen — see
-/// "B6 · Kundli Chart" (Figma node 18:2).
+/// Chart-rendering types and fixed UI config for the "Kundli Chart" screen
+/// — see "B6 · Kundli Chart" (Figma node 18:2).
 ///
-/// Every value here stands in for what will eventually come from the
-/// **Vedika API** (vedika.io) — kundli computed once per birth profile and
-/// cached in Firestore (see the "Astrology data" section of the project's
-/// top-level CLAUDE.md). [PlanetCode] and [ChartPlanet] are modelled so a
-/// real API response (planet → house/retrograde/exalted) drops straight
-/// into [placements] without any widget changes.
+/// [PlanetCode] and [ChartPlanet] were originally modelled here as
+/// STATIC PLACEHOLDER value holders (planet → house/retrograde/exalted);
+/// they are now the real render model the live **Vedika API** response is
+/// mapped onto — see `kundli_data.dart`'s `KundliData.toChartPlanets()` /
+/// `KundliPlanet.toChartPlanet()`. The per-birth VALUES that used to live in
+/// this file (planet placements, Lagna/Rashi/Nakshatra, dosha summary) now
+/// come from that real response instead — see `kundli_chart_screen.dart`.
+/// Only [legendOrder] remains a static constant here, because it's a fixed
+/// UI layout decision (which 6 of 10 possible planet codes get a "KEY
+/// PLANETS" legend chip), not astrology data that varies per birth.
 abstract final class KundliChartStaticData {
-  static const String lagna = 'Vrischika';
-  static const String rashi = 'Vrishabha';
-  static const String nakshatra = 'Rohini';
-
-  static const String doshaSummary =
-      'No Mangal Dosha detected · Kaal Sarp: Partial (view details)';
-
-  /// Planet placements shown on the North Indian chart, per the approved
-  /// design (Figma node 18:20).
-  static const List<ChartPlanet> placements = [
-    ChartPlanet(PlanetCode.ascendant, house: 1),
-    ChartPlanet(PlanetCode.sun, house: 12),
-    ChartPlanet(PlanetCode.mercury, house: 12),
-    ChartPlanet(PlanetCode.moon, house: 4),
-    ChartPlanet(PlanetCode.jupiter, house: 3, isExalted: true),
-    ChartPlanet(PlanetCode.mars, house: 7),
-    ChartPlanet(PlanetCode.venus, house: 9),
-    ChartPlanet(PlanetCode.saturn, house: 10, isRetrograde: true),
-    ChartPlanet(PlanetCode.rahu, house: 6),
-    ChartPlanet(PlanetCode.ketu, house: 8),
-  ];
-
   /// Order the "KEY PLANETS" legend chips render in (Figma node 50:29) — a
   /// deliberate 6-of-10 subset of [PlanetCode], matching the design (not
   /// every placed planet gets a legend chip).
@@ -123,10 +105,11 @@ enum PlanetCode {
       this == PlanetCode.sun ? AppColors.mantraLabel : chartColor;
 }
 
-/// One planet's placement on the chart — modelled to match a future Vedika
-/// API response 1:1 (planet code, house, retrograde/exalted flags) so
-/// wiring the real API later only replaces
-/// [KundliChartStaticData.placements], never the widgets that render it.
+/// One planet's placement on the chart — modelled to match the real Vedika
+/// API response 1:1 (planet code, house, retrograde/exalted flags), so
+/// `KundliData.toChartPlanets()` in `kundli_data.dart` is the only place
+/// that builds a list of these; the widgets that render them
+/// (`north_indian_chart.dart`) never needed to change.
 @immutable
 class ChartPlanet {
   const ChartPlanet(

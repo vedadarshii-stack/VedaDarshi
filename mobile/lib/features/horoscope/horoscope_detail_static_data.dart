@@ -1,18 +1,30 @@
 import 'package:flutter/foundation.dart' show immutable;
 
-/// STATIC PLACEHOLDER CONTENT for the "Horoscope Detail" screen — see
-/// "B4 · Horoscope Detail" (Figma node 16:2).
+/// STATIC CONTENT for the "Horoscope Detail" screen — see "B4 · Horoscope
+/// Detail" (Figma node 16:2).
 ///
-/// Every value in this file stands in for what will eventually come from
-/// the **Vedika API** (vedika.io), cached once per day per language in
-/// Firestore (see the "Astrology data" section of the project's top-level
-/// CLAUDE.md).
+/// **Now that the Vedika API is wired (see `horoscope_repository.dart` /
+/// `horoscope_data.dart`), this file has two different roles per field,
+/// and it matters which one applies to a given value:**
 ///
-/// Keeping every placeholder value in this one file (rather than scattered
-/// across the widget tree in `horoscope_detail_screen.dart`) means wiring up
-/// that real data source later is a matter of replacing the provider that
-/// supplies these values — it should never require touching the widgets
-/// themselves.
+/// 1. **Fallback for a real field Vedika sometimes omits** — [date],
+///    [luckyColor], [luckyNumber], [luckyTime] and the individual
+///    [predictions]' text/rating all have a genuine equivalent in
+///    `DailyHoroscope`, and [weeklyAdvice]/[monthlyTheme] likewise fall back
+///    for `WeeklyHoroscope.advice`/`MonthlyHoroscope.monthlyTheme` on the
+///    Weekly/Monthly periods. `horoscope_detail_screen.dart` prefers the
+///    live value and falls back to the constant here only when Vedika
+///    didn't return one (every field is nullable — see
+///    `horoscope_data.dart`), so the screen never renders blank.
+/// 2. **Permanent placeholder for a field Vedika has NO equivalent for at
+///    all** — [direction], [avoidTime], [remedy], [scores] (Vedika's daily
+///    endpoint returns one aggregate theme+rating for the whole day, not
+///    independent career/love/health/money/luck scores) and [mantra] stay
+///    static regardless of API state. These are real content gaps, not
+///    loading states — see the per-field comments in
+///    `horoscope_detail_screen.dart` for why each one can't be sourced from
+///    Vedika, the same way the Horoscope — All Signs screen documents why
+///    its Yearly chip has no API behind it.
 abstract final class HoroscopeDetailStaticData {
   static const String date = 'Saturday, 12 July 2026';
 
@@ -60,6 +72,17 @@ abstract final class HoroscopeDetailStaticData {
 
   static const String mantra =
       'ॐ ह्रां ह्रीं ह्रौं सः सूर्याय नमः — 108 times at sunrise';
+
+  /// Fallback for `WeeklyHoroscope.advice` when Vedika's weekly response
+  /// doesn't include one — see category 1 above.
+  static const String weeklyAdvice =
+      'Stay mindful of your priorities this week and pace yourself — '
+      'steady, consistent effort brings better results than a rushed push.';
+
+  /// Fallback for `MonthlyHoroscope.monthlyTheme` when Vedika's monthly
+  /// response doesn't include one — see category 1 above.
+  static const String monthlyTheme =
+      'A month for steady progress — focus on consistency over big leaps.';
 }
 
 /// Identifies which l10n label/colour a [HoroscopeScore] row should render
