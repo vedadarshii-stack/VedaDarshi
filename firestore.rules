@@ -171,12 +171,31 @@ service cloud.firestore {
         allow write: if false;
       }
 
-      // Any future per-user subcollection (saved reports, AI chat history)
-      // inherits the same ownership rule instead of being open by
-      // omission — EXCEPT 'aiUsage', carved out above for the reason
+      // AI chat log: /users/{uid}/aiChats/{chatId}
+      // ADDED alongside functions/src/aiCredits.ts's real Vedika AI
+      // wiring. This is the DURABLE copy of every AI Astrologer exchange —
+      // Vedika's own server-side conversation storage expires 24h after the
+      // last message, so this is the only place the history survives past
+      // a day. It MUST be read-only for the client: it is written only
+      // after a successful, already-charged Vedika call, so a client write
+      // here would let a user forge chat history that was never actually
+      // answered (or never actually paid for). Same reasoning and same
+      // carve-out mechanism as aiUsage above: this match block has to come
+      // BEFORE the generic wildcard below AND that wildcard has to
+      // explicitly exclude 'aiChats' too.
+      match /aiChats/{chatId} {
+        allow read: if isOwner(userId);
+        allow write: if false;
+      }
+
+      // Any future per-user subcollection (saved reports, ...) inherits
+      // the same ownership rule instead of being open by omission —
+      // EXCEPT 'aiUsage' and 'aiChats', carved out above for the reasons
       // explained there.
       match /{subcollection}/{docId} {
-        allow read, write: if isOwner(userId) && subcollection != 'aiUsage';
+        allow read, write: if isOwner(userId)
+                           && subcollection != 'aiUsage'
+                           && subcollection != 'aiChats';
       }
     }
 

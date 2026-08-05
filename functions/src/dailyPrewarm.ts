@@ -1,6 +1,6 @@
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
-import { VEDIKA_API_KEY, VEDIKA_BASE, todayKeyIST } from "./config";
+import { VEDIKA_API_KEY, VEDIKA_BASE_URL, vedikaHeaders, todayKeyIST } from "./config";
 
 /**
  * THE BIG COST SAVER.
@@ -100,10 +100,10 @@ async function fetchVedikaJson(
   query = ""
 ): Promise<VedikaFetchResult> {
   try {
-    const res = await fetch(`${VEDIKA_BASE}${path}${query ? `?${query}` : ""}`, {
+    const res = await fetch(`${VEDIKA_BASE_URL.value()}${path}${query ? `?${query}` : ""}`, {
       method: "GET",
       headers: {
-        "X-API-Key": VEDIKA_API_KEY.value(),
+        ...vedikaHeaders(),
         Accept: "application/json",
       },
     });

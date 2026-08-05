@@ -1274,6 +1274,12 @@ abstract class AppLocalizations {
   /// **'Online · knows your chart'**
   String get onlineKnowsChart;
 
+  /// Seeded assistant greeting bubble shown when the AI Astrologer chat screen opens, with the signed-in user's name substituted in.
+  ///
+  /// In en, this message translates to:
+  /// **'🙏 Namaste {name}! I have studied your birth chart. Ask me anything about career, marriage, health or the right muhurat.'**
+  String aiGreeting(String name);
+
   /// Header pill on the AI Astrologer chat screen showing how many free questions have been used today.
   ///
   /// In en, this message translates to:
@@ -1370,11 +1376,41 @@ abstract class AppLocalizations {
   /// **'Upgrade for unlimited questions'**
   String get upgradeUnlimited;
 
-  /// Snackbar shown after sending a chat message, since no AI backend is wired up yet (provider decision still open per CLAUDE.md).
+  /// Error shown on the AI Astrologer chat screen when the askAiAstrologer callable fails with HttpsError code resource-exhausted (daily free-question quota used up).
   ///
   /// In en, this message translates to:
-  /// **'AI replies will appear here once the AI service is connected.'**
-  String get aiNotConnected;
+  /// **'You\'ve reached today\'s free question limit. Upgrade for unlimited AI questions.'**
+  String get aiErrorQuotaExceeded;
+
+  /// Error shown on the AI Astrologer chat screen when the askAiAstrologer callable fails with HttpsError code failed-precondition (no birth profile saved yet).
+  ///
+  /// In en, this message translates to:
+  /// **'Add your birth details first so Rishi can study your chart.'**
+  String get aiErrorBirthDetailsMissing;
+
+  /// Error shown on the AI Astrologer chat screen when the askAiAstrologer callable fails with HttpsError code invalid-argument.
+  ///
+  /// In en, this message translates to:
+  /// **'That question couldn\'t be processed — try rephrasing it.'**
+  String get aiErrorInvalidQuestion;
+
+  /// Error shown on the AI Astrologer chat screen when the askAiAstrologer callable fails with HttpsError code unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Rishi is temporarily unavailable. Please try again in a moment.'**
+  String get aiErrorServiceUnavailable;
+
+  /// Fallback error shown on the AI Astrologer chat screen for any askAiAstrologer failure not otherwise classified (e.g. deadline-exceeded).
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get aiErrorGeneric;
+
+  /// Caption under a user's own chat bubble on the AI Astrologer screen when that message's askAiAstrologer call failed, so a failed send never looks like it went through.
+  ///
+  /// In en, this message translates to:
+  /// **'Not delivered — please try again.'**
+  String get aiMessageFailedToSend;
 
   /// Header title on the Premium Reports screen.
   ///

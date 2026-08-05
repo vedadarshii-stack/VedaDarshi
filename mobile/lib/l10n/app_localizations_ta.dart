@@ -642,6 +642,11 @@ class AppLocalizationsTa extends AppLocalizations {
   String get onlineKnowsChart => 'ஆன்லைன் · உங்கள் ஜாதகம் தெரியும்';
 
   @override
+  String aiGreeting(String name) {
+    return '🙏 வணக்கம் $name! நான் உங்கள் ஜாதகத்தை ஆய்வு செய்துள்ளேன். தொழில், திருமணம், ஆரோக்கியம் அல்லது சரியான முகூர்த்தம் பற்றி என்னிடம் எதுவும் கேளுங்கள்.';
+  }
+
+  @override
   String freeQuota(String used, String total) {
     return '$used/$total இலவசம்';
   }
@@ -692,8 +697,27 @@ class AppLocalizationsTa extends AppLocalizations {
   String get upgradeUnlimited => 'வரம்பற்ற கேள்விகளுக்கு அப்கிரேட் செய்யவும்';
 
   @override
-  String get aiNotConnected =>
-      'AI சேவை இணைக்கப்பட்டதும் பதில்கள் இங்கே தோன்றும்.';
+  String get aiErrorQuotaExceeded =>
+      'இன்றைய இலவச கேள்வி வரம்பை எட்டிவிட்டீர்கள். வரம்பற்ற AI கேள்விகளுக்கு அப்கிரேட் செய்யவும்.';
+
+  @override
+  String get aiErrorBirthDetailsMissing =>
+      'ரிஷி உங்கள் ஜாதகத்தை ஆய்வு செய்ய முதலில் உங்கள் பிறப்பு விவரங்களைச் சேர்க்கவும்.';
+
+  @override
+  String get aiErrorInvalidQuestion =>
+      'அந்தக் கேள்வியைச் செயலாக்க முடியவில்லை — மீண்டும் எழுதி முயற்சிக்கவும்.';
+
+  @override
+  String get aiErrorServiceUnavailable =>
+      'ரிஷி தற்காலிகமாக கிடைக்கவில்லை. சிறிது நேரம் கழித்து மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get aiErrorGeneric => 'ஏதோ தவறு நடந்தது. மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get aiMessageFailedToSend =>
+      'அனுப்பப்படவில்லை — மீண்டும் முயற்சிக்கவும்.';
 
   @override
   String get premiumReportsTitle => 'பிரீமியம் அறிக்கைகள்';

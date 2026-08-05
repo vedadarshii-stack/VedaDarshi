@@ -92,6 +92,25 @@ class BirthProfile {
       'fullName': fullName,
       'gender': gender.name,
       'dateOfBirth': Timestamp.fromDate(dateOfBirth),
+      // The CALENDAR date the user actually picked, as plain 'YYYY-MM-DD'.
+      //
+      // Deliberately redundant with `dateOfBirth` above, because that field
+      // alone cannot be read back correctly by a server. `Timestamp` stores
+      // an absolute instant, and `dateOfBirth` is local midnight — so the
+      // instant is (midnight − THIS DEVICE's UTC offset), and that offset is
+      // not stored anywhere. A Cloud Function can only re-derive the date by
+      // guessing an offset to view the instant through. Guessing the birth
+      // CITY's offset (the one field we do store) is right only while the
+      // device and the birth city share a timezone: on an IST phone saving a
+      // New York birth city, local midnight 1990-05-15 lands on
+      // 1990-05-14T18:30Z, and shifting by the city's −04:00 yields
+      // 1990-05-14 — the chart would be built for the WRONG DAY.
+      //
+      // Astrology is date-critical, so this is stored explicitly rather than
+      // reconstructed. `_dateOnlyIso` is the same helper `toJson` uses, so
+      // the local cache and Firestore agree by construction, and it reads
+      // the SAME y/m/d that kundli_repository.dart sends to Vedika.
+      'dateOfBirthYmd': _dateOnlyIso(dateOfBirth),
       'timeOfBirth': _formatTimeOfDay(timeOfBirth),
       'isBirthTimeUnknown': isBirthTimeUnknown,
       'isPrimary': true,

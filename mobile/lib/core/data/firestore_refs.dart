@@ -27,3 +27,11 @@ const String primaryProfileId = 'primary';
 /// can be delivered to all of them rather than only the most recent. See
 /// `lib/core/notifications/push_notification_service.dart`.
 const String fcmTokensCollection = 'fcmTokens';
+
+/// SUBCOLLECTION of `/users/{uid}` (i.e. `/users/{uid}/aiChats/{docId}`)
+/// holding one document per AI Astrologer question/answer pair, written by
+/// the `askAiAstrologer` Cloud Function — this is the DURABLE chat history.
+/// It is deliberately separate from the backend's own conversation
+/// tracking (`conversationId`), which expires after 24h — see
+/// `lib/features/ai/ai_repository.dart`.
+const String aiChatsCollection = 'aiChats';

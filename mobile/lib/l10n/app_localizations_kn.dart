@@ -639,6 +639,11 @@ class AppLocalizationsKn extends AppLocalizations {
   String get onlineKnowsChart => 'ಆನ್‌ಲೈನ್ · ನಿಮ್ಮ ಜಾತಕ ತಿಳಿದಿದೆ';
 
   @override
+  String aiGreeting(String name) {
+    return '🙏 ನಮಸ್ತೆ $name! ನಾನು ನಿಮ್ಮ ಜಾತಕವನ್ನು ಅಧ್ಯಯನ ಮಾಡಿದ್ದೇನೆ. ವೃತ್ತಿ, ವಿವಾಹ, ಆರೋಗ್ಯ ಅಥವಾ ಸರಿಯಾದ ಮುಹೂರ್ತದ ಬಗ್ಗೆ ನನ್ನನ್ನು ಏನಾದರೂ ಕೇಳಿ.';
+  }
+
+  @override
   String freeQuota(String used, String total) {
     return '$used/$total ಉಚಿತ';
   }
@@ -689,8 +694,27 @@ class AppLocalizationsKn extends AppLocalizations {
   String get upgradeUnlimited => 'ಅಪರಿಮಿತ ಪ್ರಶ್ನೆಗಳಿಗಾಗಿ ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ';
 
   @override
-  String get aiNotConnected =>
-      'AI ಸೇವೆ ಸಂಪರ್ಕಗೊಂಡ ನಂತರ ಉತ್ತರಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.';
+  String get aiErrorQuotaExceeded =>
+      'ಇಂದಿನ ಉಚಿತ ಪ್ರಶ್ನೆಗಳ ಮಿತಿ ಮುಗಿದಿದೆ. ಅಪರಿಮಿತ AI ಪ್ರಶ್ನೆಗಳಿಗಾಗಿ ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ.';
+
+  @override
+  String get aiErrorBirthDetailsMissing =>
+      'ಋಷಿ ನಿಮ್ಮ ಜಾತಕವನ್ನು ಅಧ್ಯಯನ ಮಾಡಲು ಮೊದಲು ನಿಮ್ಮ ಜನನ ವಿವರಗಳನ್ನು ಸೇರಿಸಿ.';
+
+  @override
+  String get aiErrorInvalidQuestion =>
+      'ಆ ಪ್ರಶ್ನೆಯನ್ನು ಪ್ರಕ್ರಿಯೆಗೊಳಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ — ದಯವಿಟ್ಟು ಮರುರೂಪಿಸಿ.';
+
+  @override
+  String get aiErrorServiceUnavailable =>
+      'ಋಷಿ ತಾತ್ಕಾಲಿಕವಾಗಿ ಲಭ್ಯವಿಲ್ಲ. ದಯವಿಟ್ಟು ಸ್ವಲ್ಪ ಸಮಯದ ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get aiErrorGeneric => 'ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get aiMessageFailedToSend =>
+      'ಕಳುಹಿಸಲಾಗಿಲ್ಲ — ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
 
   @override
   String get premiumReportsTitle => 'ಪ್ರೀಮಿಯಂ ವರದಿಗಳು';

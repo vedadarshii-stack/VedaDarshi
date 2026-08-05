@@ -1,6 +1,6 @@
 import { onRequest } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
-import { VEDIKA_API_KEY, VEDIKA_BASE } from "./config";
+import { VEDIKA_API_KEY, VEDIKA_BASE_URL, vedikaHeaders } from "./config";
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -127,11 +127,11 @@ export const vedika = onRequest(
     let upstream: Response;
     try {
       upstream = await fetch(
-        `${VEDIKA_BASE}${path}${query ? `?${query}` : ""}`,
+        `${VEDIKA_BASE_URL.value()}${path}${query ? `?${query}` : ""}`,
         {
           method: req.method,
           headers: {
-            "X-API-Key": VEDIKA_API_KEY.value(),
+            ...vedikaHeaders(),
             Accept: "application/json",
             ...(req.method === "POST"
               ? { "Content-Type": "application/json" }

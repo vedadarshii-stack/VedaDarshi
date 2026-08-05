@@ -846,6 +846,16 @@
   "@onlineKnowsChart": {
     "description": "Header subtitle of the AI Astrologer chat screen, confirming the assistant has the user's birth chart."
   },
+  "aiGreeting": "🙏 Namaste {name}! I have studied your birth chart. Ask me anything about career, marriage, health or the right muhurat.",
+  "@aiGreeting": {
+    "description": "Seeded assistant greeting bubble shown when the AI Astrologer chat screen opens, with the signed-in user's name substituted in.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Ananya"
+      }
+    }
+  },
   "freeQuota": "{used}/{total} free",
   "@freeQuota": {
     "description": "Header pill on the AI Astrologer chat screen showing how many free questions have been used today.",
@@ -920,9 +930,29 @@
   "@upgradeUnlimited": {
     "description": "Label of the upgrade link under the input bar on the AI Astrologer chat screen. A ✨ emoji prefix is appended in code, not stored in this string."
   },
-  "aiNotConnected": "AI replies will appear here once the AI service is connected.",
-  "@aiNotConnected": {
-    "description": "Snackbar shown after sending a chat message, since no AI backend is wired up yet (provider decision still open per CLAUDE.md)."
+  "aiErrorQuotaExceeded": "You've reached today's free question limit. Upgrade for unlimited AI questions.",
+  "@aiErrorQuotaExceeded": {
+    "description": "Error shown on the AI Astrologer chat screen when the askAiAstrologer callable fails with HttpsError code resource-exhausted (daily free-question quota used up)."
+  },
+  "aiErrorBirthDetailsMissing": "Add your birth details first so Rishi can study your chart.",
+  "@aiErrorBirthDetailsMissing": {
+    "description": "Error shown on the AI Astrologer chat screen when the askAiAstrologer callable fails with HttpsError code failed-precondition (no birth profile saved yet)."
+  },
+  "aiErrorInvalidQuestion": "That question couldn't be processed — try rephrasing it.",
+  "@aiErrorInvalidQuestion": {
+    "description": "Error shown on the AI Astrologer chat screen when the askAiAstrologer callable fails with HttpsError code invalid-argument."
+  },
+  "aiErrorServiceUnavailable": "Rishi is temporarily unavailable. Please try again in a moment.",
+  "@aiErrorServiceUnavailable": {
+    "description": "Error shown on the AI Astrologer chat screen when the askAiAstrologer callable fails with HttpsError code unavailable."
+  },
+  "aiErrorGeneric": "Something went wrong. Please try again.",
+  "@aiErrorGeneric": {
+    "description": "Fallback error shown on the AI Astrologer chat screen for any askAiAstrologer failure not otherwise classified (e.g. deadline-exceeded)."
+  },
+  "aiMessageFailedToSend": "Not delivered — please try again.",
+  "@aiMessageFailedToSend": {
+    "description": "Caption under a user's own chat bubble on the AI Astrologer screen when that message's askAiAstrologer call failed, so a failed send never looks like it went through."
   },
   "premiumReportsTitle": "Premium Reports",
   "@premiumReportsTitle": {

@@ -8,7 +8,10 @@ import '../../l10n/app_localizations.dart';
 import '../home/home_static_data.dart';
 import '../premium/subscription_paywall_screen.dart';
 import '../profile/birth_profile_repository.dart';
-import 'ai_chat_static_data.dart';
+import 'ai_chat_message.dart';
+import 'ai_error_messages.dart';
+import 'ai_repository.dart';
+import 'ai_topics.dart';
 
 /// AI Astrologer chat, per the approved Figma "C3 · AI Astrologer"
 /// (node 21:2) concept.
@@ -18,11 +21,12 @@ import 'ai_chat_static_data.dart';
 /// has NO bottom nav in the design — it's a pushed destination with its own
 /// back button.
 ///
-/// The seeded conversation, topic chips and suggestion chips are all STATIC
-/// PLACEHOLDER DATA from [AiChatStaticData]; see that file's doc comment for
-/// what eventually replaces it. There is deliberately NO simulated AI reply
-/// here — sending a message shows an honest "not connected yet" notice
-/// instead of fabricating one (see [_AiAstrologerScreenState._handleSend]).
+/// Wired to the real `askAiAstrologer` Cloud Function (see
+/// `ai_repository.dart`) — the topic chips and the follow-up chip row are
+/// still small pieces of local UI structure ([aiTopics], the seeded
+/// greeting), but every actual answer, the free-question counter and the
+/// follow-up suggestions now come from the backend, and the durable
+/// question/answer history is read back from Firestore on open.
 class AiAstrologerScreen extends ConsumerStatefulWidget {
   const AiAstrologerScreen({super.key});
 
@@ -35,38 +39,102 @@ class _AiAstrologerScreenState extends ConsumerState<AiAstrologerScreen> {
   final _inputController = TextEditingController();
   final _inputFocusNode = FocusNode();
   final _scrollController = ScrollController();
-  bool _isTyping = false;
 
-  /// How many messages the conversation starts with (the greeting +
-  /// [AiChatStaticData.seedConversation]) — the topics block is only shown
-  /// while the conversation is still at exactly this length.
-  final int _seedMessageCount = AiChatStaticData.seedConversation.length + 1;
+  /// Guards BOTH the send button and the topic/follow-up chips against a
+  /// double-tap firing two requests — the explicit client requirement (see
+  /// the task's TASK 5). Set the instant a send starts, cleared only once
+  /// the callable settles (success or error).
+  bool _isSending = false;
+
+  /// Backend-returned follow-up suggestions for the most recent answer —
+  /// empty until the first response arrives, since these are never
+  /// fabricated client-side.
+  List<String> _followUps = const [];
+
+  /// The backend's own conversation-continuity id for the CURRENT screen
+  /// visit only. Deliberately never seeded from Firestore history —
+  /// Vedika's conversations expire after 24h, so an old id from a previous
+  /// visit is not safe to resume (see `ai_repository.dart`'s
+  /// `AiChatHistoryEntry` doc comment).
+  String? _conversationId;
+
+  /// Free-question usage/limit from the most recent `askQuestion` response.
+  /// `null` until the first response of this session — the header pill is
+  /// hidden rather than showing a guessed or stale number, since the quota
+  /// is enforced (and only known) server-side.
+  int? _used;
+  int? _limit;
+
+  /// Whether [didChangeDependencies] has already seeded the conversation.
+  ///
+  /// Required because that method runs again on EVERY dependency change —
+  /// an app-language switch, a theme flip — and re-running the seed would
+  /// append a second greeting (and a duplicate copy of the history) to a
+  /// live conversation.
+  bool _seeded = false;
 
   @override
   void initState() {
     super.initState();
+    // Only context-free setup belongs here. The greeting needs
+    // AppLocalizations, which is an INHERITED widget and therefore not
+    // available yet — see didChangeDependencies below.
+    _inputController.addListener(_onInputChanged);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Seeds the conversation exactly once.
+    //
+    // This cannot live in initState: `AppLocalizations.of(context)` walks
+    // up to an inherited widget, and Flutter asserts if that happens
+    // before initState completes ("dependOnInheritedWidgetOfExactType<
+    // _LocalizationsScope>() ... was called before initState() completed").
+    // didChangeDependencies is the framework's designated place for
+    // inherited-widget-dependent initialization, and is guarded by
+    // [_seeded] for the reason documented on that field.
+    if (_seeded) return;
+    _seeded = true;
+
     // Same fallback convention as Home/Gun Milan Result — see those
     // screens' own comments on why `valueOrNull` alone (no loading flash)
-    // is correct here. Read once at construction time to seed the greeting;
-    // this chat's message list is mutable app state from this point on, not
-    // something that should re-derive itself from the profile on every
-    // rebuild.
+    // is correct here. Read once to seed the greeting; this chat's message
+    // list is mutable app state from this point on, not something that
+    // re-derives itself from the profile on every rebuild.
     final profile = ref.read(birthProfileProvider).valueOrNull;
     final trimmedName = profile?.fullName.trim();
     final userName = (trimmedName != null && trimmedName.isNotEmpty)
         ? trimmedName
         : HomeStaticData.fallbackUserName;
-    _messages.addAll([
-      ChatMessage(
-        role: ChatRole.assistant,
-        text: AiChatStaticData.greetingTemplate.replaceFirst(
-          '{name}',
-          userName,
-        ),
-      ),
-      ...AiChatStaticData.seedConversation,
-    ]);
-    _inputController.addListener(_onInputChanged);
+    final l10n = AppLocalizations.of(context)!;
+    _messages.add(
+      ChatMessage(role: ChatRole.assistant, text: l10n.aiGreeting(userName)),
+    );
+
+    // Kept with the greeting (rather than in initState) so ordering is
+    // explicit: the greeting is in `_messages` before the awaited history
+    // is appended after it.
+    _loadHistory();
+  }
+
+  /// Loads the signed-in user's durable AI chat history and inserts it
+  /// after the greeting — this is what makes the conversation persist
+  /// across app restarts, distinct from the backend's own 24h-expiring
+  /// `conversationId` (see `_conversationId`'s doc comment).
+  Future<void> _loadHistory() async {
+    final history = await ref.read(aiChatHistoryProvider.future);
+    if (!mounted || history.isEmpty) return;
+    setState(() {
+      for (final entry in history) {
+        _messages.add(ChatMessage(role: ChatRole.user, text: entry.question));
+        _messages.add(
+          ChatMessage(role: ChatRole.assistant, text: entry.answer),
+        );
+      }
+      _followUps = history.last.followUps;
+    });
+    _scrollToBottom();
   }
 
   @override
@@ -80,16 +148,6 @@ class _AiAstrologerScreenState extends ConsumerState<AiAstrologerScreen> {
 
   void _onInputChanged() => setState(() {});
 
-  /// Prefills the input with a topic/suggestion label and focuses it — the
-  /// user still has to tap Send, nothing is auto-sent.
-  void _prefillInput(String text) {
-    _inputController.value = TextEditingValue(
-      text: text,
-      selection: TextSelection.collapsed(offset: text.length),
-    );
-    _inputFocusNode.requestFocus();
-  }
-
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_scrollController.hasClients) return;
@@ -101,32 +159,103 @@ class _AiAstrologerScreenState extends ConsumerState<AiAstrologerScreen> {
     });
   }
 
-  /// Sends the user's message. There is NO AI backend wired up yet — the
-  /// real implementation will call it (provider decision still open per
-  /// `projects/CLAUDE.md`: OpenAI vs Vedika's chart-grounded endpoint), and
-  /// the free-question quota shown in the header is enforced SERVER-SIDE,
-  /// never trusted from this screen's local state. So instead of fabricating
-  /// a reply, this briefly shows the typing indicator then an honest
-  /// "not connected yet" snackbar.
-  Future<void> _handleSend() async {
-    final text = _inputController.text.trim();
-    if (text.isEmpty) return;
+  /// Sends the message bar's current text.
+  Future<void> _handleSend() => _sendText(_inputController.text);
+
+  /// Tapping a topic tile or a follow-up chip sends that question directly
+  /// (no separate "prefill, then tap Send" step) — guarded by [_isSending]
+  /// exactly like the Send button, so a rapid double-tap on a chip can't
+  /// fire two requests either.
+  void _handleChipTap(String text) {
+    if (_isSending) return;
+    _sendText(text);
+  }
+
+  /// Topic chip tapped — seed the input box and focus it, WITHOUT sending.
+  ///
+  /// See the `onTopicTap` call site for why topics must not auto-send: the
+  /// label is one word, and a send costs a real, scarce credit.
+  void _handleTopicTap(String topicLabel) {
+    if (_isSending) return;
+    _inputController.text = topicLabel;
+    _inputController.selection = TextSelection.fromPosition(
+      TextPosition(offset: _inputController.text.length),
+    );
+    _inputFocusNode.requestFocus();
+  }
+
+  /// Sends [text] to `askAiAstrologer`: appends the user's bubble
+  /// immediately, shows the typing indicator while awaiting, then either
+  /// appends the answer bubble and refreshes the header/follow-ups, or
+  /// marks the user's own bubble as failed and shows the mapped error — a
+  /// failed send never looks like it went through.
+  Future<void> _sendText(String text) async {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty || _isSending) return;
+
+    final locale = Localizations.localeOf(context);
+    final l10n = AppLocalizations.of(context)!;
+    final messageIndex = _messages.length;
 
     setState(() {
-      _messages.add(ChatMessage(role: ChatRole.user, text: text));
+      _messages.add(
+        ChatMessage(
+          role: ChatRole.user,
+          text: trimmed,
+          status: ChatMessageStatus.sending,
+        ),
+      );
       _inputController.clear();
-      _isTyping = true;
+      _isSending = true;
     });
     _scrollToBottom();
 
-    await Future<void>.delayed(const Duration(milliseconds: 900));
-    if (!mounted) return;
-
-    setState(() => _isTyping = false);
-    final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(l10n.aiNotConnected)));
+    try {
+      final result = await ref
+          .read(aiRepositoryProvider)
+          .askQuestion(
+            question: trimmed,
+            language: locale.languageCode,
+            conversationId: _conversationId,
+          );
+      if (!mounted) return;
+      setState(() {
+        _messages[messageIndex] = _messages[messageIndex].copyWith(
+          status: ChatMessageStatus.sent,
+        );
+        _messages.add(
+          ChatMessage(role: ChatRole.assistant, text: result.answer),
+        );
+        _followUps = result.followUps;
+        _conversationId = result.conversationId;
+        _used = result.used;
+        _limit = result.limit;
+        _isSending = false;
+      });
+      _scrollToBottom();
+    } on AiAstrologerException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _messages[messageIndex] = _messages[messageIndex].copyWith(
+          status: ChatMessageStatus.failed,
+        );
+        _isSending = false;
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(aiErrorMessage(l10n, e.code))));
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _messages[messageIndex] = _messages[messageIndex].copyWith(
+          status: ChatMessageStatus.failed,
+        );
+        _isSending = false;
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.aiErrorGeneric)));
+    }
   }
 
   @override
@@ -139,16 +268,21 @@ class _AiAstrologerScreenState extends ConsumerState<AiAstrologerScreen> {
       resizeToAvoidBottomInset: true,
       body: Column(
         children: [
-          _Header(l10n: l10n, locale: locale),
+          _Header(l10n: l10n, locale: locale, used: _used, limit: _limit),
           Expanded(
             child: _ChatArea(
               l10n: l10n,
               locale: locale,
               messages: _messages,
-              showTopics: _messages.length <= _seedMessageCount,
-              isTyping: _isTyping,
+              // Topics are only useful before any real conversation exists
+              // — once history has loaded or the user has sent a message,
+              // showing them alongside real answers would be clutter.
+              showTopics: _messages.length <= 1,
+              followUps: _followUps,
+              isSending: _isSending,
               scrollController: _scrollController,
-              onSuggestionTap: _prefillInput,
+              onChipTap: _handleChipTap,
+              onTopicTap: _handleTopicTap,
             ),
           ),
           _InputBar(
@@ -156,6 +290,7 @@ class _AiAstrologerScreenState extends ConsumerState<AiAstrologerScreen> {
             locale: locale,
             controller: _inputController,
             focusNode: _inputFocusNode,
+            isSending: _isSending,
             onSend: _handleSend,
           ),
         ],
@@ -166,10 +301,21 @@ class _AiAstrologerScreenState extends ConsumerState<AiAstrologerScreen> {
 
 /// Header (Figma node 21:3): back, avatar, name/status, history, quota pill.
 class _Header extends StatelessWidget {
-  const _Header({required this.l10n, required this.locale});
+  const _Header({
+    required this.l10n,
+    required this.locale,
+    required this.used,
+    required this.limit,
+  });
 
   final AppLocalizations l10n;
   final Locale locale;
+
+  /// `null` until the first `askQuestion` response of this session — see
+  /// `_AiAstrologerScreenState._used`'s doc comment for why the pill is
+  /// hidden rather than guessed.
+  final int? used;
+  final int? limit;
 
   @override
   Widget build(BuildContext context) {
@@ -280,30 +426,32 @@ class _Header extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 6),
-          Flexible(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color: AppColors.genderSelectedBg,
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: Text(
-                l10n.freeQuota(
-                  AiChatStaticData.freeUsed.toString(),
-                  AiChatStaticData.freeTotal.toString(),
+          if (used != null && limit != null) ...[
+            const SizedBox(width: 6),
+            Flexible(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: AppFonts.body(
-                  locale,
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.genderSelectedText,
+                decoration: BoxDecoration(
+                  color: AppColors.genderSelectedBg,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  l10n.freeQuota(used.toString(), limit.toString()),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppFonts.body(
+                    locale,
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.genderSelectedText,
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -318,18 +466,26 @@ class _ChatArea extends StatelessWidget {
     required this.locale,
     required this.messages,
     required this.showTopics,
-    required this.isTyping,
+    required this.followUps,
+    required this.isSending,
     required this.scrollController,
-    required this.onSuggestionTap,
+    required this.onChipTap,
+    required this.onTopicTap,
   });
 
   final AppLocalizations l10n;
   final Locale locale;
   final List<ChatMessage> messages;
   final bool showTopics;
-  final bool isTyping;
+  final List<String> followUps;
+  final bool isSending;
   final ScrollController scrollController;
-  final ValueChanged<String> onSuggestionTap;
+
+  /// Follow-up chips — complete questions, sent immediately.
+  final ValueChanged<String> onChipTap;
+
+  /// Topic chips — single words, prefilled into the input instead of sent.
+  final ValueChanged<String> onTopicTap;
 
   @override
   Widget build(BuildContext context) {
@@ -341,11 +497,35 @@ class _ChatArea extends StatelessWidget {
         ),
       ),
       if (showTopics)
-        _TopicsBlock(l10n: l10n, locale: locale, onTap: onSuggestionTap),
+        _TopicsBlock(
+          l10n: l10n,
+          locale: locale,
+          enabled: !isSending,
+          // PREFILL, not send — deliberately different from the follow-up
+          // chips below. A topic chip's label is a single word ("Career",
+          // "Marriage"); sending it verbatim would both ask Vedika a
+          // one-word question AND spend a credit. Credits are scarce and
+          // real money (Free tier is ONE question per day, and each call
+          // bills the client's Vedika wallet), so a stray tap on a topic
+          // must never be able to consume the user's whole daily
+          // allowance. Topics seed the input box; the user still writes an
+          // actual question and presses Send.
+          onTap: onTopicTap,
+        ),
       for (final message in messages)
-        _MessageBubble(message: message, locale: locale),
-      _SuggestionChips(locale: locale, onTap: onSuggestionTap),
-      if (isTyping) _TypingIndicator(l10n: l10n, locale: locale),
+        _MessageBubble(message: message, locale: locale, l10n: l10n),
+      if (followUps.isNotEmpty)
+        _SuggestionChips(
+          locale: locale,
+          chips: followUps,
+          enabled: !isSending,
+          // SEND immediately — unlike the topic chips above. These come
+          // back from Vedika as complete, well-formed questions
+          // ("Which months this year are most favourable for a job
+          // change?"), so there is nothing for the user to fill in.
+          onTap: onChipTap,
+        ),
+      if (isSending) _TypingIndicator(l10n: l10n, locale: locale),
     ];
 
     return ListView.separated(
@@ -391,16 +571,17 @@ class _TopicsBlock extends StatelessWidget {
   const _TopicsBlock({
     required this.l10n,
     required this.locale,
+    required this.enabled,
     required this.onTap,
   });
 
   final AppLocalizations l10n;
   final Locale locale;
+  final bool enabled;
   final ValueChanged<String> onTap;
 
   @override
   Widget build(BuildContext context) {
-    final topics = AiChatStaticData.topics;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -415,9 +596,9 @@ class _TopicsBlock extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        _row(topics.sublist(0, 5)),
+        _row(aiTopics.sublist(0, 5)),
         const SizedBox(height: 6),
-        _row(topics.sublist(5, 10)),
+        _row(aiTopics.sublist(5, 10)),
       ],
     );
   }
@@ -432,6 +613,7 @@ class _TopicsBlock extends StatelessWidget {
               topic: rowTopics[i],
               locale: locale,
               l10n: l10n,
+              enabled: enabled,
               onTap: onTap,
             ),
           ),
@@ -446,12 +628,14 @@ class _TopicTile extends StatelessWidget {
     required this.topic,
     required this.locale,
     required this.l10n,
+    required this.enabled,
     required this.onTap,
   });
 
   final AiTopic topic;
   final Locale locale;
   final AppLocalizations l10n;
+  final bool enabled;
   final ValueChanged<String> onTap;
 
   @override
@@ -460,34 +644,44 @@ class _TopicTile extends StatelessWidget {
     return Semantics(
       button: true,
       label: label,
-      child: PressableScale(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () => onTap(label),
-        child: Container(
-          padding: const EdgeInsets.only(top: 9, bottom: 8, left: 2, right: 2),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            border: Border.all(color: AppColors.cardBorder),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(topic.emoji, style: AppFonts.body(locale, fontSize: 14)),
-              const SizedBox(height: 2),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: AppFonts.body(
-                  locale,
-                  fontSize: 8.5,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.muted,
+      enabled: enabled,
+      child: Opacity(
+        opacity: enabled ? 1 : 0.5,
+        child: PressableScale(
+          enabled: enabled,
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => onTap(label),
+          child: Container(
+            padding: const EdgeInsets.only(
+              top: 9,
+              bottom: 8,
+              left: 2,
+              right: 2,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              border: Border.all(color: AppColors.cardBorder),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(topic.emoji, style: AppFonts.body(locale, fontSize: 14)),
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: AppFonts.body(
+                    locale,
+                    fontSize: 8.5,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.muted,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -496,66 +690,106 @@ class _TopicTile extends StatelessWidget {
 }
 
 /// One chat bubble, styled per role (Figma node 21:2 message list).
+///
+/// A [ChatMessageStatus.failed] user bubble gets an added red-tinted border
+/// and a caption underneath — a deliberate departure from the pure Figma
+/// styling, since the design has no failed-send state to draw from and a
+/// failed send must never look identical to a delivered one.
 class _MessageBubble extends StatelessWidget {
-  const _MessageBubble({required this.message, required this.locale});
+  const _MessageBubble({
+    required this.message,
+    required this.locale,
+    required this.l10n,
+  });
 
   final ChatMessage message;
   final Locale locale;
+  final AppLocalizations l10n;
 
   @override
   Widget build(BuildContext context) {
     final isAssistant = message.role == ChatRole.assistant;
+    final isFailed = message.status == ChatMessageStatus.failed;
     final maxWidth = MediaQuery.sizeOf(context).width * 0.72;
 
     return Align(
       alignment: isAssistant ? Alignment.centerLeft : Alignment.centerRight,
-      child: Container(
-        constraints: BoxConstraints(maxWidth: maxWidth),
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-        decoration: BoxDecoration(
-          color: isAssistant ? AppColors.surface : null,
-          gradient: isAssistant ? null : AppColors.saffronGradient,
-          border: isAssistant ? Border.all(color: AppColors.cardBorder) : null,
-          borderRadius: isAssistant
-              ? const BorderRadius.only(
-                  topLeft: Radius.circular(18),
-                  topRight: Radius.circular(18),
-                  bottomRight: Radius.circular(18),
-                  bottomLeft: Radius.circular(6),
-                )
-              : const BorderRadius.only(
-                  topLeft: Radius.circular(18),
-                  topRight: Radius.circular(18),
-                  bottomLeft: Radius.circular(18),
-                  bottomRight: Radius.circular(6),
-                ),
-        ),
-        child: Text(
-          message.text,
-          style: AppFonts.body(
-            locale,
-            fontSize: 13,
-            color: isAssistant ? AppColors.bubbleText : Colors.white,
-            height: 1.5,
+      child: Column(
+        crossAxisAlignment: isAssistant
+            ? CrossAxisAlignment.start
+            : CrossAxisAlignment.end,
+        children: [
+          Container(
+            constraints: BoxConstraints(maxWidth: maxWidth),
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+            decoration: BoxDecoration(
+              color: isAssistant ? AppColors.surface : null,
+              gradient: isAssistant ? null : AppColors.saffronGradient,
+              border: isAssistant
+                  ? Border.all(color: AppColors.cardBorder)
+                  : (isFailed
+                        ? Border.all(color: AppColors.avoidText, width: 1.5)
+                        : null),
+              borderRadius: isAssistant
+                  ? const BorderRadius.only(
+                      topLeft: Radius.circular(18),
+                      topRight: Radius.circular(18),
+                      bottomRight: Radius.circular(18),
+                      bottomLeft: Radius.circular(6),
+                    )
+                  : const BorderRadius.only(
+                      topLeft: Radius.circular(18),
+                      topRight: Radius.circular(18),
+                      bottomLeft: Radius.circular(18),
+                      bottomRight: Radius.circular(6),
+                    ),
+            ),
+            child: Text(
+              message.text,
+              style: AppFonts.body(
+                locale,
+                fontSize: 13,
+                color: isAssistant ? AppColors.bubbleText : Colors.white,
+                height: 1.5,
+              ),
+            ),
           ),
-        ),
+          if (isFailed) ...[
+            const SizedBox(height: 4),
+            Text(
+              l10n.aiMessageFailedToSend,
+              style: AppFonts.body(
+                locale,
+                fontSize: 10,
+                color: AppColors.avoidText,
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
 }
 
-/// Horizontally scrollable suggestion chip row (Figma node 21:30) — the
-/// chips are deliberately allowed to overflow the screen edge, same as the
-/// design.
+/// Horizontally scrollable suggestion chip row (Figma node 21:30), now
+/// populated from the backend's `followUps` for the most recent answer
+/// rather than a fixed placeholder list — the chips are deliberately
+/// allowed to overflow the screen edge, same as the design.
 class _SuggestionChips extends StatelessWidget {
-  const _SuggestionChips({required this.locale, required this.onTap});
+  const _SuggestionChips({
+    required this.locale,
+    required this.chips,
+    required this.enabled,
+    required this.onTap,
+  });
 
   final Locale locale;
+  final List<String> chips;
+  final bool enabled;
   final ValueChanged<String> onTap;
 
   @override
   Widget build(BuildContext context) {
-    final chips = AiChatStaticData.suggestionChips;
     return SizedBox(
       height: 36,
       child: ListView.separated(
@@ -567,27 +801,32 @@ class _SuggestionChips extends StatelessWidget {
           return Semantics(
             button: true,
             label: chip,
-            child: PressableScale(
-              borderRadius: BorderRadius.circular(999),
-              onTap: () => onTap(chip),
-              child: Container(
-                alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 13,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  border: Border.all(color: AppColors.chipBorderWarm),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  chip,
-                  style: AppFonts.body(
-                    locale,
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.genderSelectedText,
+            enabled: enabled,
+            child: Opacity(
+              opacity: enabled ? 1 : 0.5,
+              child: PressableScale(
+                enabled: enabled,
+                borderRadius: BorderRadius.circular(999),
+                onTap: () => onTap(chip),
+                child: Container(
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 13,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    border: Border.all(color: AppColors.chipBorderWarm),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    chip,
+                    style: AppFonts.body(
+                      locale,
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.genderSelectedText,
+                    ),
                   ),
                 ),
               ),
@@ -722,6 +961,7 @@ class _InputBar extends StatelessWidget {
     required this.locale,
     required this.controller,
     required this.focusNode,
+    required this.isSending,
     required this.onSend,
   });
 
@@ -729,11 +969,14 @@ class _InputBar extends StatelessWidget {
   final Locale locale;
   final TextEditingController controller;
   final FocusNode focusNode;
+  final bool isSending;
   final VoidCallback onSend;
 
   @override
   Widget build(BuildContext context) {
-    final hasText = controller.text.trim().isNotEmpty;
+    // Disabled the instant a send starts (TASK 5's double-tap protection),
+    // not just while the text field happens to be empty.
+    final canSend = controller.text.trim().isNotEmpty && !isSending;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -768,6 +1011,7 @@ class _InputBar extends StatelessWidget {
                               controller: controller,
                               focusNode: focusNode,
                               maxLines: 1,
+                              enabled: !isSending,
                               textInputAction: TextInputAction.send,
                               onSubmitted: (_) => onSend(),
                               decoration: InputDecoration(
@@ -808,19 +1052,24 @@ class _InputBar extends StatelessWidget {
                   const SizedBox(width: 10),
                   Semantics(
                     button: true,
-                    enabled: hasText,
+                    enabled: canSend,
+                    // `onPressed`-style disabling, not just an ignored tap:
+                    // when `canSend` is false the button's own callback is
+                    // never invoked (see PressableScale.enabled) AND it is
+                    // visually dimmed below, so it genuinely LOOKS disabled
+                    // during a send, not merely inert.
                     child: PressableScale(
-                      enabled: hasText,
+                      enabled: canSend,
                       borderRadius: BorderRadius.circular(999),
-                      onTap: hasText ? onSend : () {},
+                      onTap: canSend ? onSend : () {},
                       child: Container(
                         width: 46,
                         height: 46,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          gradient: hasText ? AppColors.saffronGradient : null,
-                          color: hasText
+                          gradient: canSend ? AppColors.saffronGradient : null,
+                          color: canSend
                               ? null
                               : AppColors.saffron.withValues(alpha: 0.35),
                         ),

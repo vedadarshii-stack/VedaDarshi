@@ -634,6 +634,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineKnowsChart => 'Online · knows your chart';
 
   @override
+  String aiGreeting(String name) {
+    return '🙏 Namaste $name! I have studied your birth chart. Ask me anything about career, marriage, health or the right muhurat.';
+  }
+
+  @override
   String freeQuota(String used, String total) {
     return '$used/$total free';
   }
@@ -684,8 +689,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get upgradeUnlimited => 'Upgrade for unlimited questions';
 
   @override
-  String get aiNotConnected =>
-      'AI replies will appear here once the AI service is connected.';
+  String get aiErrorQuotaExceeded =>
+      'You\'ve reached today\'s free question limit. Upgrade for unlimited AI questions.';
+
+  @override
+  String get aiErrorBirthDetailsMissing =>
+      'Add your birth details first so Rishi can study your chart.';
+
+  @override
+  String get aiErrorInvalidQuestion =>
+      'That question couldn\'t be processed — try rephrasing it.';
+
+  @override
+  String get aiErrorServiceUnavailable =>
+      'Rishi is temporarily unavailable. Please try again in a moment.';
+
+  @override
+  String get aiErrorGeneric => 'Something went wrong. Please try again.';
+
+  @override
+  String get aiMessageFailedToSend => 'Not delivered — please try again.';
 
   @override
   String get premiumReportsTitle => 'Premium Reports';
