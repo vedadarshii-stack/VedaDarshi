@@ -1,5 +1,18 @@
 {
   "projects": {
     "default": "vedadarshi-20989"
-  }
+  },
+  "targets": {
+    "vedadarshi-20989": {
+      "hosting": {
+        "admin": [
+          "vedadarshi-20989"
+        ],
+        "legal": [
+          "vedadarshi-legal"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

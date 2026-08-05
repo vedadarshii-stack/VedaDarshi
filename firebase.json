@@ -3,40 +3,75 @@
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   },
-  "hosting": {
-    "public": "admin/dist",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ],
-    "headers": [
-      {
-        "source": "/assets/**",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "public, max-age=31536000, immutable"
-          }
-        ]
-      },
-      {
-        "source": "/index.html",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-cache"
-          }
-        ]
-      }
-    ]
-  },
+  "hosting": [
+    {
+      "target": "admin",
+      "public": "admin/dist",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "headers": [
+        {
+          "source": "/assets/**",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=31536000, immutable"
+            }
+          ]
+        },
+        {
+          "source": "/index.html",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "target": "legal",
+      "public": "legal",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "cleanUrls": true,
+      "headers": [
+        {
+          "comment": "HTML and CSS are revalidated on every request. style.css has no content hash in its name, so any positive max-age means an edit (e.g. filling in a placeholder) stays invisible until the cache expires — which already cost one debugging round. These files are a few KB; caching them buys nothing.",
+          "source": "**/*.@(html|css)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            }
+          ]
+        },
+        {
+          "comment": "Fonts are immutable — their names never change and their bytes never change.",
+          "source": "/fonts/**",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=31536000, immutable"
+            }
+          ]
+        }
+      ]
+    }
+  ],
   "functions": [
     {
       "source": "functions",

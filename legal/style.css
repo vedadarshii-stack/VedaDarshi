@@ -1,0 +1,604 @@
+/* Vedadarshi legal/support site — shared stylesheet
+   Self-hosted Playfair Display + Poppins (see fonts/fonts.css) — no external
+   requests of any kind. Dark theme only, mirroring the Vedadarshi app's palette
+   (mobile/lib/core/theme/app_palette.dart). Plain CSS, no frameworks, no JS. */
+
+@import url('fonts/fonts.css');
+
+:root {
+  color-scheme: dark;
+
+  /* App palette — verbatim from app_palette.dart */
+  --bg: #0B0F19;
+  --surface: #161C2A;
+  --surface-2: #222B3D;
+  --ink: #F0F2F7;
+  --muted: #8A92A6;
+  --saffron: #E8720C;
+  --saffron-br: #F0821E;
+  --gold: #D4AF37;
+  --cream: #FFE3C4;
+  --cream-soft: #FFF3E3;
+
+  --border: rgba(212, 175, 55, 0.18);
+  --border-strong: rgba(212, 175, 55, 0.34);
+
+  --radius-lg: 20px;
+  --radius-md: 16px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
+
+  --max-width: 720px;
+
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Poppins', system-ui, -apple-system, sans-serif;
+
+  --shadow-card: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.75;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (min-width: 640px) {
+  body {
+    font-size: 17px;
+  }
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+::selection {
+  background: var(--saffron);
+  color: var(--cream-soft);
+}
+
+/* ---------- Links ---------- */
+a {
+  color: var(--saffron-br);
+  text-decoration: underline;
+  text-decoration-color: var(--saffron);
+  text-underline-offset: 3px;
+}
+
+a:visited {
+  color: var(--saffron-br);
+}
+
+a:hover,
+a:focus-visible {
+  color: var(--cream);
+  text-decoration-color: var(--saffron-br);
+}
+
+*:focus-visible {
+  outline: 2px solid var(--saffron-br);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ---------- Header ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(11, 15, 25, 0.94);
+  border-bottom: 1px solid var(--border);
+}
+
+.header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: nowrap;
+  padding: 0.85rem 1.25rem;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.brand:hover,
+.brand:focus-visible {
+  color: var(--cream);
+  text-decoration: none;
+}
+
+.om-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.14);
+  border: 1px solid var(--border-strong);
+  color: var(--gold);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.site-nav {
+  display: flex;
+  gap: 0.35rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 2px;
+}
+
+.site-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-link {
+  flex-shrink: 0;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-link:hover,
+.nav-link:focus-visible {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.nav-link.is-current {
+  background: var(--saffron);
+  color: var(--cream);
+  font-weight: 600;
+}
+
+.nav-link.is-current:hover {
+  color: var(--cream);
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  padding: 2rem 0 0.25rem;
+}
+
+.hero-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  padding: 2rem 1.5rem;
+  color: var(--cream);
+  box-shadow: var(--shadow-card);
+  /* Saffron gradient with a darkening scrim so cream text clears WCAG AA.
+     The alpha is 0.42, NOT a round 0.35 — measured, not guessed. Contrast
+     has to hold at the BRIGHTEST point of the gradient (#F0821E), not just
+     its average: cream #FFE3C4 on the scrimmed gradient measures
+       0.35 -> 4.29:1  ✗ fails AA for the 16px subtitle (needs 4.5)
+       0.42 -> 5.00:1  ✓ passes with margin
+     Raising it further (0.50 -> 5.96) keeps passing but visibly greys out
+     the saffron, so 0.42 is the point where the brand colour survives and
+     the text is still legible. If you change either saffron token or the
+     hero text colour, re-measure — do not assume this still holds. */
+  background-image: linear-gradient(135deg, rgba(11, 15, 25, 0.42), rgba(11, 15, 25, 0.42)),
+    linear-gradient(135deg, var(--saffron), var(--saffron-br));
+}
+
+.hero--large .hero-card {
+  padding: 2.5rem 1.75rem;
+}
+
+.hero .om-badge {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: 0.9rem;
+  background: rgba(255, 227, 196, 0.16);
+  border-color: rgba(255, 227, 196, 0.4);
+  color: var(--cream-soft);
+  font-size: 1.3rem;
+}
+
+.hero--large .om-badge {
+  width: 3.1rem;
+  height: 3.1rem;
+  font-size: 1.55rem;
+}
+
+.hero h1 {
+  margin: 0 0 0.6rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--cream-soft);
+  font-size: clamp(1.55rem, 5.5vw, 2.3rem);
+  line-height: 1.25;
+}
+
+.hero--large h1 {
+  font-size: clamp(1.8rem, 6.5vw, 2.65rem);
+}
+
+.hero-subtitle {
+  margin: 0;
+  max-width: 46ch;
+  font-family: var(--font-body);
+  font-weight: 500;
+  color: var(--cream);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.error-page .hero-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* ---------- Main / content card ---------- */
+main {
+  padding: 1.5rem 0 3rem;
+}
+
+main .container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem 1.25rem;
+}
+
+@media (min-width: 640px) {
+  main .container {
+    padding: 2.25rem 2rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .hero-card {
+    padding: 1.5rem 1.1rem;
+  }
+
+  main .container {
+    padding: 1.4rem 1rem;
+  }
+}
+
+.error-page main .container {
+  text-align: center;
+}
+
+/* ---------- Typography ---------- */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  color: var(--ink);
+}
+
+h2 {
+  font-weight: 700;
+  font-size: 1.4rem;
+  line-height: 1.35;
+  margin: 2.25rem 0 0.85rem;
+  scroll-margin-top: 88px;
+}
+
+main .container > h2:first-of-type {
+  margin-top: 0.25rem;
+}
+
+h3 {
+  font-weight: 600;
+  font-size: 1.08rem;
+  line-height: 1.4;
+  margin: 1.5rem 0 0.5rem;
+}
+
+p {
+  margin: 0 0 1.1rem;
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+ul,
+ol {
+  margin: 0 0 1.1rem;
+  padding-left: 1.4rem;
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
+
+li:last-child {
+  margin-bottom: 0;
+}
+
+strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+code {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.15em 0.45em;
+  font-size: 0.9em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--cream-soft);
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+
+/* ---------- Meta pill ---------- */
+.meta {
+  display: inline-block;
+  margin: 0 0 1.5rem;
+  padding: 0.3rem 0.9rem;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--gold);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+/* ---------- Section eyebrow ---------- */
+.eyebrow {
+  margin: 0 0 0.6rem;
+  color: var(--gold);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ---------- Table of contents ---------- */
+.toc {
+  margin: 0 0 2rem;
+  padding: 1.25rem 1.25rem 1.4rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.toc-list {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 560px) {
+  .toc-list {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1.25rem;
+  }
+}
+
+.toc-list li {
+  margin: 0;
+}
+
+.toc-list a {
+  display: block;
+  padding: 0.3rem 0;
+  border-bottom: 1px dashed transparent;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.toc-list a:hover,
+.toc-list a:focus-visible {
+  color: var(--saffron-br);
+  border-bottom-color: var(--border-strong);
+}
+
+/* ---------- Page-links (index cards) ---------- */
+.page-links {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.page-links li {
+  margin: 0;
+}
+
+.page-links a {
+  display: block;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .page-links a {
+    transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+  }
+}
+
+.page-links a:hover,
+.page-links a:focus-visible {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+.page-links .desc {
+  display: block;
+  margin-top: 0.3rem;
+  font-weight: 400;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+/* ---------- Setup checklist (index page) ---------- */
+.checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+
+.checklist li {
+  position: relative;
+  margin-bottom: 0.6rem;
+  padding: 0.7rem 0.9rem 0.7rem 2.15rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+}
+
+.checklist li::before {
+  content: "\2610";
+  position: absolute;
+  left: 0.9rem;
+  top: 0.72rem;
+  color: var(--gold);
+}
+
+/* ---------- .todo placeholder — must be unmistakable but intentional ---------- */
+.todo {
+  display: inline-block;
+  background: rgba(212, 175, 55, 0.14);
+  color: var(--gold);
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  border-radius: 8px;
+  padding: 0.2rem 0.6rem;
+  font-weight: 600;
+  font-size: 0.92em;
+  line-height: 1.6;
+}
+
+.todo::before {
+  content: "\26A0\FE0E";
+  margin-right: 0.4em;
+}
+
+/* ---------- Callout — astrology disclaimer, most prominent element on its page ---------- */
+.callout {
+  margin: 1.75rem 0;
+  padding: 1.4rem 1.4rem 1.5rem;
+  background: var(--surface-2);
+  border: 2px solid var(--saffron-br);
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 0 1px rgba(232, 114, 12, 0.15), 0 14px 30px rgba(232, 114, 12, 0.12);
+}
+
+.callout h2 {
+  margin-top: 0;
+  color: var(--saffron-br);
+  font-size: 1.3rem;
+}
+
+.callout h2::before {
+  content: "\26A0\FE0E ";
+}
+
+.callout strong {
+  color: var(--cream-soft);
+}
+
+.callout p:last-child {
+  margin-bottom: 0;
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+  margin-top: 2rem;
+  padding: 2rem 0 2.5rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.footer-top {
+  margin-bottom: 1rem;
+}
+
+.footer-top p {
+  margin: 0.2rem 0;
+}
+
+.footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.footer-nav a {
+  color: var(--muted);
+  text-decoration-color: rgba(232, 114, 12, 0.4);
+  font-size: 0.88rem;
+}
+
+.footer-nav a:hover,
+.footer-nav a:focus-visible {
+  color: var(--saffron-br);
+  text-decoration-color: var(--saffron-br);
+}

@@ -1,0 +1,8 @@
+/* Self-hosted subset — deliberately NOT the Google Fonts CDN.
+   This site tells users we run no analytics and no third-party tracking;
+   pulling fonts from fonts.gstatic.com would hand Google every visitor's
+   IP address on exactly the page making that claim. latin subset only. */
+@font-face{font-family:'Playfair Display';src:url('playfair-var.woff2')format('woff2');font-weight:400 700;font-style:normal;font-display:swap}
+@font-face{font-family:'Poppins';src:url('poppins-400.woff2')format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Poppins';src:url('poppins-500.woff2')format('woff2');font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:'Poppins';src:url('poppins-600.woff2')format('woff2');font-weight:600;font-style:normal;font-display:swap}
