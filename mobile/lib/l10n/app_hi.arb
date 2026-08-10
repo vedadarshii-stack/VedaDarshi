@@ -343,5 +343,22 @@
   "kundliPlanetPositionsEmpty": "इस कुंडली के लिए ग्रह स्थिति अभी उपलब्ध नहीं है।",
   "kundliDashaTimelineEmpty": "अभी कोई दशा अवधि उपलब्ध नहीं है।",
   "kundliNakshatraPada": "पद {pada}",
-  "kundliDoshaPitruPresent": "पितृ दोष मौजूद है"
+  "kundliDoshaPitruPresent": "पितृ दोष मौजूद है",
+  "tierBronze": "Bronze",
+  "tierSilver": "Silver",
+  "tierGold": "Gold",
+  "tierPlatinum": "Platinum",
+  "plansUnavailableTitle": "योजनाएं अभी उपलब्ध नहीं हैं",
+  "plansUnavailableMessage": "सदस्यता योजनाएं लोड नहीं हो सकीं। अपना कनेक्शन जांचें और पुनः प्रयास करें।",
+  "perMonthBilledYearly": "{price}/माह · वार्षिक बिलिंग",
+  "savePercent": "{percent}% बचत",
+  "currentPlanLabel": "आपकी वर्तमान योजना",
+  "purchaseSuccess": "आपकी सदस्यता सक्रिय है। Vedadarshi प्रीमियम का आनंद लें।",
+  "purchasesRestored": "खरीदारी बहाल कर दी गई।",
+  "purchasesNothingToRestore": "कोई पिछली खरीदारी नहीं मिली।",
+  "purchaseErrorGeneric": "खरीदारी पूरी नहीं हो सकी। कृपया पुनः प्रयास करें।",
+  "purchaseErrorNotAllowed": "इस खाते या डिवाइस पर खरीदारी उपलब्ध नहीं है।",
+  "purchaseErrorNetwork": "कोई कनेक्शन नहीं। अपना नेटवर्क जांचें और पुनः प्रयास करें।",
+  "purchaseErrorAlreadyOwned": "यह योजना आपके पास पहले से है — सिंक करने के लिए 'खरीदारी बहाल करें' दबाएं।",
+  "purchaseErrorUnavailable": "यह योजना अभी उपलब्ध नहीं है।"
 }

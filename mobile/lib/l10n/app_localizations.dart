@@ -2167,6 +2167,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pitru Dosha present'**
   String get kundliDoshaPitruPresent;
+
+  /// Name of the Bronze subscription tier on the paywall.
+  ///
+  /// In en, this message translates to:
+  /// **'Bronze'**
+  String get tierBronze;
+
+  /// Name of the Silver subscription tier on the paywall.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver'**
+  String get tierSilver;
+
+  /// Name of the Gold subscription tier on the paywall.
+  ///
+  /// In en, this message translates to:
+  /// **'Gold'**
+  String get tierGold;
+
+  /// Name of the Platinum subscription tier on the paywall.
+  ///
+  /// In en, this message translates to:
+  /// **'Platinum'**
+  String get tierPlatinum;
+
+  /// Paywall empty-state title when no offering could be loaded from RevenueCat/Play.
+  ///
+  /// In en, this message translates to:
+  /// **'Plans aren\'t available right now'**
+  String get plansUnavailableTitle;
+
+  /// Paywall empty-state body when no offering could be loaded.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load subscription plans. Check your connection and try again.'**
+  String get plansUnavailableMessage;
+
+  /// Subtitle on an annual plan card showing the per-month equivalent. The price is computed from the live store price divided by 12.
+  ///
+  /// In en, this message translates to:
+  /// **'{price}/month · billed yearly'**
+  String perMonthBilledYearly(String price);
+
+  /// Badge on an annual plan card. The percentage is computed from live prices (annual vs 12x monthly), never hardcoded.
+  ///
+  /// In en, this message translates to:
+  /// **'SAVE {percent}%'**
+  String savePercent(String percent);
+
+  /// Badge marking the tier the user is already subscribed to.
+  ///
+  /// In en, this message translates to:
+  /// **'Your current plan'**
+  String get currentPlanLabel;
+
+  /// Snackbar after a successful purchase.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re subscribed. Enjoy Vedadarshi Premium.'**
+  String get purchaseSuccess;
+
+  /// Snackbar after Restore purchase found and restored an entitlement.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchases restored.'**
+  String get purchasesRestored;
+
+  /// Snackbar after Restore purchase found nothing.
+  ///
+  /// In en, this message translates to:
+  /// **'No previous purchases found.'**
+  String get purchasesNothingToRestore;
+
+  /// Snackbar for an unclassified purchase failure.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase couldn\'t be completed. Please try again.'**
+  String get purchaseErrorGeneric;
+
+  /// Snackbar when Play refuses purchases on this account/device.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchases aren\'t available on this account or device.'**
+  String get purchaseErrorNotAllowed;
+
+  /// Snackbar when the purchase failed because the device is offline.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection. Check your network and try again.'**
+  String get purchaseErrorNetwork;
+
+  /// Snackbar when the plan is already owned and just needs restoring.
+  ///
+  /// In en, this message translates to:
+  /// **'You already own this plan — tap Restore purchase to sync it.'**
+  String get purchaseErrorAlreadyOwned;
+
+  /// Snackbar when the product is missing or inactive in Play Console.
+  ///
+  /// In en, this message translates to:
+  /// **'This plan isn\'t available right now.'**
+  String get purchaseErrorUnavailable;
 }
 
 class _AppLocalizationsDelegate

@@ -1141,4 +1141,66 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get kundliDoshaPitruPresent => 'பித்ரு தோஷம் உள்ளது';
+
+  @override
+  String get tierBronze => 'Bronze';
+
+  @override
+  String get tierSilver => 'Silver';
+
+  @override
+  String get tierGold => 'Gold';
+
+  @override
+  String get tierPlatinum => 'Platinum';
+
+  @override
+  String get plansUnavailableTitle => 'திட்டங்கள் தற்போது கிடைக்கவில்லை';
+
+  @override
+  String get plansUnavailableMessage =>
+      'சந்தா திட்டங்களை ஏற்ற முடியவில்லை. உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String perMonthBilledYearly(String price) {
+    return '$price/மாதம் · ஆண்டுதோறும் பில் செய்யப்படும்';
+  }
+
+  @override
+  String savePercent(String percent) {
+    return '$percent% சேமிப்பு';
+  }
+
+  @override
+  String get currentPlanLabel => 'உங்கள் தற்போதைய திட்டம்';
+
+  @override
+  String get purchaseSuccess =>
+      'உங்கள் சந்தா செயலில் உள்ளது. Vedadarshi பிரீமியத்தை அனுபவியுங்கள்.';
+
+  @override
+  String get purchasesRestored => 'கொள்முதல்கள் மீட்டமைக்கப்பட்டன.';
+
+  @override
+  String get purchasesNothingToRestore => 'முந்தைய கொள்முதல்கள் எதுவும் இல்லை.';
+
+  @override
+  String get purchaseErrorGeneric =>
+      'கொள்முதலை முடிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get purchaseErrorNotAllowed =>
+      'இந்தக் கணக்கிலோ சாதனத்திலோ கொள்முதல் கிடைக்கவில்லை.';
+
+  @override
+  String get purchaseErrorNetwork =>
+      'இணைப்பு இல்லை. உங்கள் நெட்வொர்க்கைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get purchaseErrorAlreadyOwned =>
+      'இந்தத் திட்டம் ஏற்கெனவே உங்களிடம் உள்ளது — ஒத்திசைக்க \'கொள்முதலை மீட்டமை\' என்பதை அழுத்தவும்.';
+
+  @override
+  String get purchaseErrorUnavailable =>
+      'இந்தத் திட்டம் தற்போது கிடைக்கவில்லை.';
 }

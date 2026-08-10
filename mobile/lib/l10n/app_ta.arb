@@ -343,5 +343,22 @@
   "kundliPlanetPositionsEmpty": "இந்த ஜாதகத்திற்கு கிரக நிலைகள் இன்னும் கிடைக்கவில்லை.",
   "kundliDashaTimelineEmpty": "இன்னும் தசை காலங்கள் இல்லை.",
   "kundliNakshatraPada": "பாதம் {pada}",
-  "kundliDoshaPitruPresent": "பித்ரு தோஷம் உள்ளது"
+  "kundliDoshaPitruPresent": "பித்ரு தோஷம் உள்ளது",
+  "tierBronze": "Bronze",
+  "tierSilver": "Silver",
+  "tierGold": "Gold",
+  "tierPlatinum": "Platinum",
+  "plansUnavailableTitle": "திட்டங்கள் தற்போது கிடைக்கவில்லை",
+  "plansUnavailableMessage": "சந்தா திட்டங்களை ஏற்ற முடியவில்லை. உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.",
+  "perMonthBilledYearly": "{price}/மாதம் · ஆண்டுதோறும் பில் செய்யப்படும்",
+  "savePercent": "{percent}% சேமிப்பு",
+  "currentPlanLabel": "உங்கள் தற்போதைய திட்டம்",
+  "purchaseSuccess": "உங்கள் சந்தா செயலில் உள்ளது. Vedadarshi பிரீமியத்தை அனுபவியுங்கள்.",
+  "purchasesRestored": "கொள்முதல்கள் மீட்டமைக்கப்பட்டன.",
+  "purchasesNothingToRestore": "முந்தைய கொள்முதல்கள் எதுவும் இல்லை.",
+  "purchaseErrorGeneric": "கொள்முதலை முடிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.",
+  "purchaseErrorNotAllowed": "இந்தக் கணக்கிலோ சாதனத்திலோ கொள்முதல் கிடைக்கவில்லை.",
+  "purchaseErrorNetwork": "இணைப்பு இல்லை. உங்கள் நெட்வொர்க்கைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.",
+  "purchaseErrorAlreadyOwned": "இந்தத் திட்டம் ஏற்கெனவே உங்களிடம் உள்ளது — ஒத்திசைக்க 'கொள்முதலை மீட்டமை' என்பதை அழுத்தவும்.",
+  "purchaseErrorUnavailable": "இந்தத் திட்டம் தற்போது கிடைக்கவில்லை."
 }

@@ -9,6 +9,8 @@ import 'package:timezone/data/latest.dart' as tz_data;
 
 import 'core/locale/locale_controller.dart';
 import 'core/notifications/push_notification_service.dart';
+import 'core/purchases/purchases_providers.dart';
+import 'core/purchases/purchases_service.dart';
 import 'core/theme/app_colors.dart';
 import 'core/theme/app_palette.dart';
 import 'core/theme/theme_controller.dart';
@@ -58,6 +60,22 @@ void main() async {
     );
   }
 
+  // Built here rather than inside its provider so `configure()` can be
+  // awaited before the first frame, and handed to `ProviderScope` below —
+  // letting the provider default-construct its own instance would leave the
+  // whole app talking to an UNCONFIGURED second service while this one sits
+  // unused.
+  final purchasesService = PurchasesService();
+
+  // RevenueCat (in-app subscriptions). Must run before any widget reads
+  // `purchasesServiceProvider`, because the SDK rejects every other call
+  // until `configure()` has completed. Like the `.env` and push-notification
+  // guards above this can only ever degrade, never abort: `configure()`
+  // swallows its own failures and simply leaves purchases disabled, which
+  // the paywall renders as its "plans unavailable" state. A missing
+  // REVENUECAT_ANDROID_KEY is a supported configuration, not a crash.
+  await purchasesService.configure();
+
   // All brand/UI fonts are bundled in assets/google_fonts/ (see AppFonts).
   // Disabling runtime fetching means a missing font throws immediately in
   // debug instead of silently falling back to a network request, and it
@@ -82,6 +100,7 @@ void main() async {
   runApp(
     ProviderScope(
       overrides: [
+        purchasesServiceProvider.overrideWithValue(purchasesService),
         if (savedLocale != null)
           localeControllerProvider.overrideWith(
             () => LocaleController(savedLocale),

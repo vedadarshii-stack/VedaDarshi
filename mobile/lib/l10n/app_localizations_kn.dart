@@ -1138,4 +1138,65 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get kundliDoshaPitruPresent => 'ಪಿತೃ ದೋಷವಿದೆ';
+
+  @override
+  String get tierBronze => 'Bronze';
+
+  @override
+  String get tierSilver => 'Silver';
+
+  @override
+  String get tierGold => 'Gold';
+
+  @override
+  String get tierPlatinum => 'Platinum';
+
+  @override
+  String get plansUnavailableTitle => 'ಯೋಜನೆಗಳು ಸದ್ಯಕ್ಕೆ ಲಭ್ಯವಿಲ್ಲ';
+
+  @override
+  String get plansUnavailableMessage =>
+      'ಚಂದಾದಾರಿಕೆ ಯೋಜನೆಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ. ನಿಮ್ಮ ಸಂಪರ್ಕವನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String perMonthBilledYearly(String price) {
+    return '$price/ತಿಂಗಳು · ವಾರ್ಷಿಕವಾಗಿ ಬಿಲ್ ಮಾಡಲಾಗುತ್ತದೆ';
+  }
+
+  @override
+  String savePercent(String percent) {
+    return '$percent% ಉಳಿತಾಯ';
+  }
+
+  @override
+  String get currentPlanLabel => 'ನಿಮ್ಮ ಪ್ರಸ್ತುತ ಯೋಜನೆ';
+
+  @override
+  String get purchaseSuccess =>
+      'ನಿಮ್ಮ ಚಂದಾದಾರಿಕೆ ಸಕ್ರಿಯವಾಗಿದೆ. Vedadarshi ಪ್ರೀಮಿಯಂ ಆನಂದಿಸಿ.';
+
+  @override
+  String get purchasesRestored => 'ಖರೀದಿಗಳನ್ನು ಮರುಸ್ಥಾಪಿಸಲಾಗಿದೆ.';
+
+  @override
+  String get purchasesNothingToRestore => 'ಹಿಂದಿನ ಯಾವುದೇ ಖರೀದಿಗಳು ಕಂಡುಬಂದಿಲ್ಲ.';
+
+  @override
+  String get purchaseErrorGeneric =>
+      'ಖರೀದಿಯನ್ನು ಪೂರ್ಣಗೊಳಿಸಲಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get purchaseErrorNotAllowed =>
+      'ಈ ಖಾತೆ ಅಥವಾ ಸಾಧನದಲ್ಲಿ ಖರೀದಿಗಳು ಲಭ್ಯವಿಲ್ಲ.';
+
+  @override
+  String get purchaseErrorNetwork =>
+      'ಸಂಪರ್ಕವಿಲ್ಲ. ನಿಮ್ಮ ನೆಟ್‌ವರ್ಕ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get purchaseErrorAlreadyOwned =>
+      'ಈ ಯೋಜನೆ ಈಗಾಗಲೇ ನಿಮ್ಮ ಬಳಿ ಇದೆ — ಸಿಂಕ್ ಮಾಡಲು \'ಖರೀದಿ ಮರುಸ್ಥಾಪಿಸಿ\' ಒತ್ತಿ.';
+
+  @override
+  String get purchaseErrorUnavailable => 'ಈ ಯೋಜನೆ ಸದ್ಯಕ್ಕೆ ಲಭ್ಯವಿಲ್ಲ.';
 }

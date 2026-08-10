@@ -1128,4 +1128,65 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get kundliDoshaPitruPresent => 'पितृ दोष मौजूद है';
+
+  @override
+  String get tierBronze => 'Bronze';
+
+  @override
+  String get tierSilver => 'Silver';
+
+  @override
+  String get tierGold => 'Gold';
+
+  @override
+  String get tierPlatinum => 'Platinum';
+
+  @override
+  String get plansUnavailableTitle => 'योजनाएं अभी उपलब्ध नहीं हैं';
+
+  @override
+  String get plansUnavailableMessage =>
+      'सदस्यता योजनाएं लोड नहीं हो सकीं। अपना कनेक्शन जांचें और पुनः प्रयास करें।';
+
+  @override
+  String perMonthBilledYearly(String price) {
+    return '$price/माह · वार्षिक बिलिंग';
+  }
+
+  @override
+  String savePercent(String percent) {
+    return '$percent% बचत';
+  }
+
+  @override
+  String get currentPlanLabel => 'आपकी वर्तमान योजना';
+
+  @override
+  String get purchaseSuccess =>
+      'आपकी सदस्यता सक्रिय है। Vedadarshi प्रीमियम का आनंद लें।';
+
+  @override
+  String get purchasesRestored => 'खरीदारी बहाल कर दी गई।';
+
+  @override
+  String get purchasesNothingToRestore => 'कोई पिछली खरीदारी नहीं मिली।';
+
+  @override
+  String get purchaseErrorGeneric =>
+      'खरीदारी पूरी नहीं हो सकी। कृपया पुनः प्रयास करें।';
+
+  @override
+  String get purchaseErrorNotAllowed =>
+      'इस खाते या डिवाइस पर खरीदारी उपलब्ध नहीं है।';
+
+  @override
+  String get purchaseErrorNetwork =>
+      'कोई कनेक्शन नहीं। अपना नेटवर्क जांचें और पुनः प्रयास करें।';
+
+  @override
+  String get purchaseErrorAlreadyOwned =>
+      'यह योजना आपके पास पहले से है — सिंक करने के लिए \'खरीदारी बहाल करें\' दबाएं।';
+
+  @override
+  String get purchaseErrorUnavailable => 'यह योजना अभी उपलब्ध नहीं है।';
 }

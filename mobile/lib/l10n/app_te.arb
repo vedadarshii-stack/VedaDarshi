@@ -343,5 +343,22 @@
   "kundliPlanetPositionsEmpty": "ఈ జాతకానికి గ్రహ స్థానాలు ఇంకా అందుబాటులో లేవు.",
   "kundliDashaTimelineEmpty": "ఇంకా దశ కాలాలు అందుబాటులో లేవు.",
   "kundliNakshatraPada": "పాద {pada}",
-  "kundliDoshaPitruPresent": "పితృ దోషం ఉంది"
+  "kundliDoshaPitruPresent": "పితృ దోషం ఉంది",
+  "tierBronze": "Bronze",
+  "tierSilver": "Silver",
+  "tierGold": "Gold",
+  "tierPlatinum": "Platinum",
+  "plansUnavailableTitle": "ప్రణాళికలు ప్రస్తుతం అందుబాటులో లేవు",
+  "plansUnavailableMessage": "సబ్‌స్క్రిప్షన్ ప్రణాళికలను లోడ్ చేయలేకపోయాము. మీ కనెక్షన్‌ను తనిఖీ చేసి మళ్లీ ప్రయత్నించండి.",
+  "perMonthBilledYearly": "{price}/నెల · వార్షికంగా బిల్ చేయబడుతుంది",
+  "savePercent": "{percent}% ఆదా",
+  "currentPlanLabel": "మీ ప్రస్తుత ప్రణాళిక",
+  "purchaseSuccess": "మీ సబ్‌స్క్రిప్షన్ సక్రియంగా ఉంది. Vedadarshi ప్రీమియంను ఆస్వాదించండి.",
+  "purchasesRestored": "కొనుగోళ్లు పునరుద్ధరించబడ్డాయి.",
+  "purchasesNothingToRestore": "గత కొనుగోళ్లు ఏవీ కనుగొనబడలేదు.",
+  "purchaseErrorGeneric": "కొనుగోలు పూర్తి కాలేదు. దయచేసి మళ్లీ ప్రయత్నించండి.",
+  "purchaseErrorNotAllowed": "ఈ ఖాతా లేదా పరికరంలో కొనుగోళ్లు అందుబాటులో లేవు.",
+  "purchaseErrorNetwork": "కనెక్షన్ లేదు. మీ నెట్‌వర్క్‌ను తనిఖీ చేసి మళ్లీ ప్రయత్నించండి.",
+  "purchaseErrorAlreadyOwned": "ఈ ప్రణాళిక ఇప్పటికే మీ వద్ద ఉంది — సమకాలీకరించడానికి 'కొనుగోళ్లను పునరుద్ధరించు' నొక్కండి.",
+  "purchaseErrorUnavailable": "ఈ ప్రణాళిక ప్రస్తుతం అందుబాటులో లేదు."
 }

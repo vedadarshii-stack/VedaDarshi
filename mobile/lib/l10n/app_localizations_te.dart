@@ -1138,4 +1138,66 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get kundliDoshaPitruPresent => 'పితృ దోషం ఉంది';
+
+  @override
+  String get tierBronze => 'Bronze';
+
+  @override
+  String get tierSilver => 'Silver';
+
+  @override
+  String get tierGold => 'Gold';
+
+  @override
+  String get tierPlatinum => 'Platinum';
+
+  @override
+  String get plansUnavailableTitle => 'ప్రణాళికలు ప్రస్తుతం అందుబాటులో లేవు';
+
+  @override
+  String get plansUnavailableMessage =>
+      'సబ్‌స్క్రిప్షన్ ప్రణాళికలను లోడ్ చేయలేకపోయాము. మీ కనెక్షన్‌ను తనిఖీ చేసి మళ్లీ ప్రయత్నించండి.';
+
+  @override
+  String perMonthBilledYearly(String price) {
+    return '$price/నెల · వార్షికంగా బిల్ చేయబడుతుంది';
+  }
+
+  @override
+  String savePercent(String percent) {
+    return '$percent% ఆదా';
+  }
+
+  @override
+  String get currentPlanLabel => 'మీ ప్రస్తుత ప్రణాళిక';
+
+  @override
+  String get purchaseSuccess =>
+      'మీ సబ్‌స్క్రిప్షన్ సక్రియంగా ఉంది. Vedadarshi ప్రీమియంను ఆస్వాదించండి.';
+
+  @override
+  String get purchasesRestored => 'కొనుగోళ్లు పునరుద్ధరించబడ్డాయి.';
+
+  @override
+  String get purchasesNothingToRestore => 'గత కొనుగోళ్లు ఏవీ కనుగొనబడలేదు.';
+
+  @override
+  String get purchaseErrorGeneric =>
+      'కొనుగోలు పూర్తి కాలేదు. దయచేసి మళ్లీ ప్రయత్నించండి.';
+
+  @override
+  String get purchaseErrorNotAllowed =>
+      'ఈ ఖాతా లేదా పరికరంలో కొనుగోళ్లు అందుబాటులో లేవు.';
+
+  @override
+  String get purchaseErrorNetwork =>
+      'కనెక్షన్ లేదు. మీ నెట్‌వర్క్‌ను తనిఖీ చేసి మళ్లీ ప్రయత్నించండి.';
+
+  @override
+  String get purchaseErrorAlreadyOwned =>
+      'ఈ ప్రణాళిక ఇప్పటికే మీ వద్ద ఉంది — సమకాలీకరించడానికి \'కొనుగోళ్లను పునరుద్ధరించు\' నొక్కండి.';
+
+  @override
+  String get purchaseErrorUnavailable =>
+      'ఈ ప్రణాళిక ప్రస్తుతం అందుబాటులో లేదు.';
 }

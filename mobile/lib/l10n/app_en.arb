@@ -1569,5 +1569,85 @@
   "kundliDoshaPitruPresent": "Pitru Dosha present",
   "@kundliDoshaPitruPresent": {
     "description": "Shown in the Kundli dosha banner when Vedika reports Pitru Dosha present. Its presence also forces the banner off the 'clear' checkmark."
+  },
+  "tierBronze": "Bronze",
+  "@tierBronze": {
+    "description": "Name of the Bronze subscription tier on the paywall."
+  },
+  "tierSilver": "Silver",
+  "@tierSilver": {
+    "description": "Name of the Silver subscription tier on the paywall."
+  },
+  "tierGold": "Gold",
+  "@tierGold": {
+    "description": "Name of the Gold subscription tier on the paywall."
+  },
+  "tierPlatinum": "Platinum",
+  "@tierPlatinum": {
+    "description": "Name of the Platinum subscription tier on the paywall."
+  },
+  "plansUnavailableTitle": "Plans aren't available right now",
+  "@plansUnavailableTitle": {
+    "description": "Paywall empty-state title when no offering could be loaded from RevenueCat/Play."
+  },
+  "plansUnavailableMessage": "We couldn't load subscription plans. Check your connection and try again.",
+  "@plansUnavailableMessage": {
+    "description": "Paywall empty-state body when no offering could be loaded."
+  },
+  "perMonthBilledYearly": "{price}/month · billed yearly",
+  "@perMonthBilledYearly": {
+    "description": "Subtitle on an annual plan card showing the per-month equivalent. The price is computed from the live store price divided by 12.",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "₹183"
+      }
+    }
+  },
+  "savePercent": "SAVE {percent}%",
+  "@savePercent": {
+    "description": "Badge on an annual plan card. The percentage is computed from live prices (annual vs 12x monthly), never hardcoded.",
+    "placeholders": {
+      "percent": {
+        "type": "String",
+        "example": "16"
+      }
+    }
+  },
+  "currentPlanLabel": "Your current plan",
+  "@currentPlanLabel": {
+    "description": "Badge marking the tier the user is already subscribed to."
+  },
+  "purchaseSuccess": "You're subscribed. Enjoy Vedadarshi Premium.",
+  "@purchaseSuccess": {
+    "description": "Snackbar after a successful purchase."
+  },
+  "purchasesRestored": "Purchases restored.",
+  "@purchasesRestored": {
+    "description": "Snackbar after Restore purchase found and restored an entitlement."
+  },
+  "purchasesNothingToRestore": "No previous purchases found.",
+  "@purchasesNothingToRestore": {
+    "description": "Snackbar after Restore purchase found nothing."
+  },
+  "purchaseErrorGeneric": "Purchase couldn't be completed. Please try again.",
+  "@purchaseErrorGeneric": {
+    "description": "Snackbar for an unclassified purchase failure."
+  },
+  "purchaseErrorNotAllowed": "Purchases aren't available on this account or device.",
+  "@purchaseErrorNotAllowed": {
+    "description": "Snackbar when Play refuses purchases on this account/device."
+  },
+  "purchaseErrorNetwork": "No connection. Check your network and try again.",
+  "@purchaseErrorNetwork": {
+    "description": "Snackbar when the purchase failed because the device is offline."
+  },
+  "purchaseErrorAlreadyOwned": "You already own this plan — tap Restore purchase to sync it.",
+  "@purchaseErrorAlreadyOwned": {
+    "description": "Snackbar when the plan is already owned and just needs restoring."
+  },
+  "purchaseErrorUnavailable": "This plan isn't available right now.",
+  "@purchaseErrorUnavailable": {
+    "description": "Snackbar when the product is missing or inactive in Play Console."
   }
 }

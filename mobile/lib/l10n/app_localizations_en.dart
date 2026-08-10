@@ -1129,4 +1129,65 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get kundliDoshaPitruPresent => 'Pitru Dosha present';
+
+  @override
+  String get tierBronze => 'Bronze';
+
+  @override
+  String get tierSilver => 'Silver';
+
+  @override
+  String get tierGold => 'Gold';
+
+  @override
+  String get tierPlatinum => 'Platinum';
+
+  @override
+  String get plansUnavailableTitle => 'Plans aren\'t available right now';
+
+  @override
+  String get plansUnavailableMessage =>
+      'We couldn\'t load subscription plans. Check your connection and try again.';
+
+  @override
+  String perMonthBilledYearly(String price) {
+    return '$price/month · billed yearly';
+  }
+
+  @override
+  String savePercent(String percent) {
+    return 'SAVE $percent%';
+  }
+
+  @override
+  String get currentPlanLabel => 'Your current plan';
+
+  @override
+  String get purchaseSuccess => 'You\'re subscribed. Enjoy Vedadarshi Premium.';
+
+  @override
+  String get purchasesRestored => 'Purchases restored.';
+
+  @override
+  String get purchasesNothingToRestore => 'No previous purchases found.';
+
+  @override
+  String get purchaseErrorGeneric =>
+      'Purchase couldn\'t be completed. Please try again.';
+
+  @override
+  String get purchaseErrorNotAllowed =>
+      'Purchases aren\'t available on this account or device.';
+
+  @override
+  String get purchaseErrorNetwork =>
+      'No connection. Check your network and try again.';
+
+  @override
+  String get purchaseErrorAlreadyOwned =>
+      'You already own this plan — tap Restore purchase to sync it.';
+
+  @override
+  String get purchaseErrorUnavailable =>
+      'This plan isn\'t available right now.';
 }
