@@ -7,3 +7,11 @@ claudedocs/
 # Cloud Functions build output / deps
 functions/node_modules/
 functions/lib/
+
+# Release signing. key.properties holds the upload-key passwords in plain
+# text; the keystore itself lives outside the repo (see
+# mobile/android/key.properties) but these patterns are here as a second net
+# in case someone copies one in.
+mobile/android/key.properties
+*.jks
+*.keystore

@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // START: FlutterFire Configuration
@@ -5,6 +8,23 @@ plugins {
     // END: FlutterFire Configuration
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// Release (upload) signing credentials. GITIGNORED, and the `storeFile` it
+// names lives OUTSIDE the repo — see android/key.properties.
+//
+// Absent on a machine that has not been given the keystore, which is a
+// supported state: debug builds are unaffected, and a release build then
+// produces an UNSIGNED artifact rather than silently falling back to the
+// debug key. That fallback is what this file used to do, and it is a trap —
+// a debug-signed AAB is rejected by Play, but a debug-signed APK installs
+// happily and looks fine right up until you try to ship it.
+val keystorePropertiesFile = rootProject.file("key.properties")
+val hasReleaseKeystore = keystorePropertiesFile.exists()
+val keystoreProperties = Properties().apply {
+    if (hasReleaseKeystore) {
+        FileInputStream(keystorePropertiesFile).use { load(it) }
+    }
 }
 
 android {
@@ -43,13 +63,35 @@ android {
         versionName = flutter.versionName
     }
 
-    buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+    signingConfigs {
+        if (hasReleaseKeystore) {
+            create("release") {
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+            }
         }
     }
+
+    buildTypes {
+        release {
+            // Null when key.properties is missing → unsigned release output,
+            // which fails loudly at upload time instead of quietly shipping a
+            // debug-signed build. See the comment above the property load.
+            signingConfig = signingConfigs.findByName("release")
+        }
+    }
+}
+
+// Surfaced at configuration time so it appears on every build, not only when
+// someone happens to read the artifact name.
+if (!hasReleaseKeystore) {
+    logger.warn(
+        "WARNING: android/key.properties not found — release builds will be " +
+            "UNSIGNED and Play will reject them. Copy the keystore and " +
+            "key.properties from the project's secure backup."
+    )
 }
 
 kotlin {
