@@ -30,6 +30,14 @@
           }
         },
         {
+          "client_id": "1029956122-v1d2eudo1p6mrkb6bmrlqmerjrlqa4eu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gosewealth.vedadarshi",
+            "certificate_hash": "1b7ae89f56472389545831fa171ce980e03590ec"
+          }
+        },
+        {
           "client_id": "1029956122-p8j1kq5kj6li995h81t69tspv6e2vvtn.apps.googleusercontent.com",
           "client_type": 3
         }
