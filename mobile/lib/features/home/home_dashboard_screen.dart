@@ -949,7 +949,9 @@ class _RemedyMantraCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _MantraRow(
-            emoji: '🪷',
+            // 🌺 not 🪷 — see the note in lib/features/ai/ai_topics.dart:
+            // the lotus is Unicode 14 and renders as tofu on Android 12.
+            emoji: '🌺',
             label: l10n.todaysRemedy,
             body: Text(
               HomeStaticData.remedy,

@@ -222,6 +222,37 @@ class _BirthDetailsScreenState extends ConsumerState<BirthDetailsScreen> {
     );
     try {
       await ref.read(birthProfileRepositoryProvider).save(profile);
+
+      // MUST invalidate before navigating — fixed 18 Aug 2026.
+      //
+      // `birthProfileProvider` is a FutureProvider that already resolved to
+      // `null` earlier in this session (RootGate reads it on the first frame
+      // to decide where to send the user, and for a new sign-up the answer is
+      // "no profile yet"). Riverpod caches that resolved value, so writing to
+      // the repository here does NOT make the provider re-read it — Home and
+      // the Kundli screens keep seeing `null` and fall back to their
+      // `*_static_data.dart` placeholders.
+      //
+      // Observed on a clean install: after completing this form as
+      // "Ravi Kumar / Chennai", Home greeted "Nagarjuna", the Kundli profile
+      // card offered "14 Aug 1990 · 06:45 AM · Hyderabad", the Panchang
+      // location chip said "Hyderabad", and Generate Kundli failed with
+      // "Couldn't load your chart" WITHOUT making a network call — it had no
+      // profile to build a request from. Force-stopping and relaunching the
+      // app fixed all of it at once, which is what identified this as a stale
+      // provider rather than a persistence or API failure.
+      //
+      // `hasBirthProfileProvider` is invalidated too because it awaits
+      // `birthProfileProvider.future`; leaving it stale would keep RootGate
+      // believing the user still has no profile.
+      //
+      // This mirrors the sign-out path in `profile_settings_screen.dart`,
+      // which invalidates the same two providers for the mirror-image reason
+      // (there, a stale NON-null profile would strand a signed-out user on
+      // Home). Both writes to the profile must keep these two in sync.
+      ref.invalidate(birthProfileProvider);
+      ref.invalidate(hasBirthProfileProvider);
+
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil<void>(
         PageRouteBuilder<void>(

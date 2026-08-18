@@ -1645,7 +1645,9 @@ class _RemedyCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('🪷', style: const TextStyle(fontSize: 18)),
+          // 🌺 not 🪷 — Unicode 14 lotus is tofu on Android 12; see
+          // lib/features/ai/ai_topics.dart.
+          Text('🌺', style: const TextStyle(fontSize: 18)),
           const SizedBox(width: 10),
           Expanded(
             child: Text(

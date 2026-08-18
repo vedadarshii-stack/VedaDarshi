@@ -238,6 +238,9 @@ class _AiAstrologerScreenState extends ConsumerState<AiAstrologerScreen> {
       setState(() {
         _messages[messageIndex] = _messages[messageIndex].copyWith(
           status: ChatMessageStatus.failed,
+          // Carried onto the bubble so the reason OUTLIVES the SnackBar —
+          // see ChatMessage.failureCode.
+          failureCode: e.code,
         );
         _isSending = false;
       });
@@ -249,6 +252,7 @@ class _AiAstrologerScreenState extends ConsumerState<AiAstrologerScreen> {
       setState(() {
         _messages[messageIndex] = _messages[messageIndex].copyWith(
           status: ChatMessageStatus.failed,
+          failureCode: AiAstrologerErrorCode.unknown,
         );
         _isSending = false;
       });
@@ -757,7 +761,13 @@ class _MessageBubble extends StatelessWidget {
           if (isFailed) ...[
             const SizedBox(height: 4),
             Text(
-              l10n.aiMessageFailedToSend,
+              // The SPECIFIC reason, not a blanket "try again" — a quota
+              // failure cannot be retried and needs the upgrade prompt
+              // instead. Falls back to the generic line only when the code
+              // is genuinely unknown.
+              message.failureCode == null
+                  ? l10n.aiMessageFailedToSend
+                  : aiErrorMessage(l10n, message.failureCode!),
               style: AppFonts.body(
                 locale,
                 fontSize: 10,

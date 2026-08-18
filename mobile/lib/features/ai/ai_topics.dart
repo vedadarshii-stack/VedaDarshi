@@ -25,6 +25,13 @@ const List<AiTopic> aiTopics = [
   AiTopic(id: 'education', emoji: '🎓'),
   AiTopic(id: 'travel', emoji: '✈️'),
   AiTopic(id: 'gemstones', emoji: '💎'),
-  AiTopic(id: 'remedies', emoji: '🪷'),
+  // 🌺 not 🪷 — the lotus (U+1FAB7) is a Unicode 14 (2021) character and
+  // Android 12 has no glyph for it, so it rendered as an empty tofu box on
+  // a real device. Same class of bug as the bare typographic symbols the
+  // ICON RULE in projects/CLAUDE.md warns about; only the source differs
+  // (there: a font we bundle lacks the glyph, here: the OS emoji font is
+  // older than the codepoint). Keep new emoji at Unicode 13 or below until
+  // minSdk rises. 🌺 is Unicode 6.0 and safe on every supported device.
+  AiTopic(id: 'remedies', emoji: '🌺'),
   AiTopic(id: 'numerology', emoji: '🔢'),
 ];

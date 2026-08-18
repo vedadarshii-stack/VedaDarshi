@@ -20,7 +20,6 @@ import '../reports/premium_reports_screen.dart';
 import '../startup/root_gate.dart';
 import 'birth_profile.dart';
 import 'birth_profile_repository.dart';
-import 'profile_settings_static_data.dart';
 
 /// Which language option is offered in the APP LANGUAGE row — mirrors
 /// `language_select_screen.dart`'s private `_LanguageOption`/list. Kept as a
@@ -95,9 +94,26 @@ const List<_LanguageOption> _languageOptions = [
 ///    "saved/bookmarked articles" row in this design to route to
 ///    `ArticlesScreen` — the D5 frame simply doesn't have one.
 ///
-/// Activity counts / payment / subscription summary VALUES shown are static
-/// placeholder content from [ProfileSettingsStaticData]; see that file's doc
-/// comment for what eventually replaces each one.
+/// ACTIVITY COUNTS, PAYMENT AND SUBSCRIPTION SUMMARY ARE DELIBERATELY BLANK
+/// (18 Aug 2026). They used to render the Figma frame's sample values —
+/// "4 purchased", "3 files", "12 conversations",
+/// "Last: ₹1,999 · 12 Jun 2026", "Yearly · renews 12 Jun 2027" — as if they
+/// were this account's real records. On a device test they showed on an
+/// account created ten minutes earlier that had purchased nothing, and
+/// ₹1,999 is not even a price in the catalogue (it is the placeholder that
+/// was already deleted from the paywall for the same reason).
+///
+/// A fabricated payment record is worse than an empty row: the user cannot
+/// tell it apart from a real charge, and it is exactly what a Play reviewer
+/// or a support ticket screenshots. `_MenuRow.subtitle` is nullable and the
+/// row lays out cleanly without one, so the honest state costs nothing.
+///
+/// Restore a subtitle only when it is backed by a real source: purchased
+/// reports and payments from RevenueCat's `CustomerInfo` (never a
+/// client-side flag), and the AI chat count from `/users/{uid}/aiChats`,
+/// which IS now written on every successful, already-charged answer.
+/// The "Birth profiles" count above is already computed for real from
+/// `birthProfileProvider` — that is the pattern to follow.
 class ProfileSettingsScreen extends ConsumerStatefulWidget {
   const ProfileSettingsScreen({super.key});
 
@@ -245,7 +261,9 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                 _MenuRow(
                   emoji: '📜',
                   title: l10n.profileMyReports,
-                  subtitle: ProfileSettingsStaticData.reportsPurchased,
+                  // No subtitle: a purchased-reports count has no data source.
+                  // It read "4 purchased" on a brand-new account (see the
+                  // note above _MyActivity).
                   locale: locale,
                   onTap: () => Navigator.of(
                     context,
@@ -254,7 +272,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                 _MenuRow(
                   icon: Icons.file_download_outlined,
                   title: l10n.profileDownloadedPdfs,
-                  subtitle: ProfileSettingsStaticData.downloadedPdfs,
+                  // No subtitle: PDF export history isn't tracked anywhere.
                   locale: locale,
                   // PDF export/download history isn't tracked anywhere yet.
                   onTap: () {},
@@ -262,7 +280,10 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                 _MenuRow(
                   emoji: '🔮',
                   title: l10n.profileAiChatHistory,
-                  subtitle: ProfileSettingsStaticData.aiChatConversations,
+                  // No subtitle for now. A REAL count is finally possible —
+                  // `/users/{uid}/aiChats` is written on every successful,
+                  // already-charged AI answer — but until that count is
+                  // actually read, showing a number would be inventing one.
                   locale: locale,
                   // AI chat history persistence is a listed SCOPE WATCH item
                   // (projects/CLAUDE.md) — not built yet.
@@ -271,7 +292,9 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                 _MenuRow(
                   emoji: '💳',
                   title: l10n.profilePaymentHistory,
-                  subtitle: ProfileSettingsStaticData.lastPayment,
+                  // No subtitle. This previously read
+                  // "Last: ₹1,999 · 12 Jun 2026" — a payment that never
+                  // happened, at a price that isn't even in the catalogue.
                   locale: locale,
                   isLast: true,
                   // Payment history needs RevenueCat/Play Billing wired up
@@ -306,7 +329,10 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                 _MenuRow(
                   emoji: '👑',
                   title: l10n.profileManageSubscription,
-                  subtitle: ProfileSettingsStaticData.subscriptionSummary,
+                  // No subtitle: "Yearly · renews 12 Jun 2027" claimed an
+                  // active subscription for every user, free ones included.
+                  // Entitlement must come from RevenueCat's CustomerInfo and
+                  // is never asserted client-side.
                   locale: locale,
                   // Real subscription management lives on Google Play, not
                   // in this app — this would deep-link to the Play Store

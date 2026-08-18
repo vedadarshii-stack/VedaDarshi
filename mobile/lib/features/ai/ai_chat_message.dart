@@ -4,6 +4,8 @@
 /// converted into a user/assistant [ChatMessage] pair by the screen).
 library;
 
+import 'ai_repository.dart' show AiAstrologerErrorCode;
+
 /// Who sent a [ChatMessage].
 enum ChatRole { assistant, user }
 
@@ -29,13 +31,38 @@ class ChatMessage {
     required this.role,
     required this.text,
     this.status = ChatMessageStatus.sent,
+    this.failureCode,
   });
 
   final ChatRole role;
   final String text;
   final ChatMessageStatus status;
 
-  ChatMessage copyWith({ChatMessageStatus? status}) {
-    return ChatMessage(role: role, text: text, status: status ?? this.status);
+  /// WHY a [ChatMessageStatus.failed] message failed. Added 18 Aug 2026.
+  ///
+  /// The bubble used to label every failure "Not delivered — please try
+  /// again." That is actively wrong for the most common failure of all:
+  /// running out of daily AI questions. The server refuses those with
+  /// `resource-exhausted` (see `functions/src/aiCredits.ts` — the limit
+  /// check inside the reserve transaction), retrying cannot succeed until
+  /// tomorrow, and telling the user to try again wastes the one moment they
+  /// are most likely to upgrade.
+  ///
+  /// The correctly-mapped copy already existed and was already shown — but
+  /// only in a SnackBar, which is gone in a few seconds. The bubble is what
+  /// stays on screen, so it carries the reason too. Null for a message that
+  /// hasn't failed.
+  final AiAstrologerErrorCode? failureCode;
+
+  ChatMessage copyWith({
+    ChatMessageStatus? status,
+    AiAstrologerErrorCode? failureCode,
+  }) {
+    return ChatMessage(
+      role: role,
+      text: text,
+      status: status ?? this.status,
+      failureCode: failureCode ?? this.failureCode,
+    );
   }
 }
