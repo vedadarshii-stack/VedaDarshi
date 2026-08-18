@@ -139,8 +139,38 @@ service cloud.firestore {
     match /users/{userId} {
       allow get: if isOwner(userId);
       // No `list` — a client must never be able to enumerate users.
-      allow create, update: if isOwner(userId)
-                            && request.resource.data.uid == userId;
+      //
+      // `aiDailyCreditLimitOverride` is CARVED OUT of the client's own
+      // write. TIGHTENED 16 Aug 2026, before the real paid Vedika key goes
+      // live.
+      //
+      // functions/src/aiCredits.ts:83 reads that field off this document and
+      // trusts it as the user's daily AI question limit. The aiUsage ledger
+      // below is already write-protected, so a user cannot fake how many
+      // questions they have *spent* — but until now they could still write
+      // this field on their own document and raise the limit that ledger is
+      // checked against. `aiDailyCreditLimitOverride: 100000` would have
+      // bought unlimited AI questions, each one a real billed Vedika call
+      // ($0.012–0.048), i.e. unbounded spend of the account owner's money.
+      //
+      // Harmless while VEDIKA_API_KEY is still the free SANDBOX sentinel;
+      // a live financial hole the moment a real key is set. Hence now.
+      //
+      // The field is meant to be written ONLY by the Admin SDK / a verified
+      // RevenueCat webhook (Bronze=2, Silver=4, Gold=7, Platinum=10) — both
+      // of which bypass these rules entirely, so locking the client out here
+      // costs the server nothing.
+      //
+      // create and update are split because `resource.data` does not exist
+      // on a create, so `diff()` cannot be used there.
+      allow create: if isOwner(userId)
+                    && request.resource.data.uid == userId
+                    && !('aiDailyCreditLimitOverride' in request.resource.data);
+      allow update: if isOwner(userId)
+                    && request.resource.data.uid == userId
+                    && !request.resource.data.diff(resource.data)
+                          .affectedKeys()
+                          .hasAny(['aiDailyCreditLimitOverride']);
       // Account deletion must go through a Cloud Function so the whole
       // subtree (profiles, reports, chat history) is removed atomically.
       allow delete: if false;

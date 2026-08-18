@@ -109,16 +109,44 @@ class AuthService {
   /// The currently signed-in user, or `null` if nobody is signed in.
   User? get currentUser => _firebaseAuth.currentUser;
 
-  /// Signs the user in with a Google account via an interactive picker.
+  /// The OAuth **web** client id (type 3) from `google-services.json`.
   ///
-  /// On Android, the OAuth web client id is read from
-  /// `android/app/google-services.json` (`default_web_client_id`) — no
-  /// explicit `serverClientId` is passed to [GoogleSignIn.initialize].
+  /// PASSED EXPLICITLY, and it has to be — 18 Aug 2026. The previous code
+  /// called `GoogleSignIn.initialize()` with no arguments, on the documented
+  /// assumption that the google-services Gradle plugin compiles this value
+  /// into the APK as the `default_web_client_id` string resource and that
+  /// google_sign_in picks it up from there. **That resource is not in the
+  /// built APK.** Verified with
+  /// `aapt2 dump resources app-release.apk`: the plugin emits
+  /// `google_api_key`, `google_app_id`, `project_id`, `gcm_default` and
+  /// `google_storage_bucket`, but NOT `default_web_client_id` — even though
+  /// the type 3 client is present in `google-services.json`.
+  ///
+  /// Without it, google_sign_in 7.x on Android has no web client id to
+  /// request an `idToken` with, and `authenticate()` throws a
+  /// `GoogleSignInException` with `clientConfigurationError`. That maps to
+  /// [AuthErrorCode.providerDisabled] below, which is why every Google
+  /// sign-in surfaced the misleading "This sign-in method isn't available
+  /// yet" — the provider IS enabled (verified via the Identity Platform
+  /// admin API: `google.com enabled=true`) and the release keystore's SHA-1
+  /// IS registered. The failure was purely this missing id.
+  ///
+  /// NOT a secret: an OAuth *client id* is a public identifier that ships in
+  /// every build anyway, which is why it is a plain constant here rather
+  /// than a `.env` value — `.env` is gitignored, so a required-for-sign-in
+  /// value living there would break a fresh clone.
+  ///
+  /// If the Firebase project's web app is ever recreated, re-read this from
+  /// `android/app/google-services.json` (the `client_type: 3` entry).
+  static const String _googleServerClientId =
+      '1029956122-p8j1kq5kj6li995h81t69tspv6e2vvtn.apps.googleusercontent.com';
+
+  /// Signs the user in with a Google account via an interactive picker.
   Future<void> signInWithGoogle() async {
     try {
       final signIn = GoogleSignIn.instance;
       if (!_googleInitialised) {
-        await signIn.initialize();
+        await signIn.initialize(serverClientId: _googleServerClientId);
         _googleInitialised = true;
       }
       final account = await signIn.authenticate();

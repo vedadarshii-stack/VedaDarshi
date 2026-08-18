@@ -9,7 +9,8 @@
     "build": "tsc",
     "serve": "npm run build && firebase emulators:start --only functions",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "purge-cache": "tsc && node lib/scripts/purgeVedikaCache.js"
   },
   "dependencies": {
     "firebase-admin": "^12.7.0",
