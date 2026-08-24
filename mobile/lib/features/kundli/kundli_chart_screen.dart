@@ -9,6 +9,7 @@ import '../../core/vedika/vedika_config.dart';
 import '../../core/widgets/app_empty_state.dart';
 import '../../l10n/app_localizations.dart';
 import '../premium/subscription_paywall_screen.dart';
+import '../profile/birth_profile.dart';
 import '../profile/birth_profile_repository.dart';
 import 'kundli_chart_static_data.dart';
 import 'kundli_dasha_tab.dart';
@@ -20,6 +21,7 @@ import 'kundli_sandbox_banner.dart';
 import 'kundli_shimmer_block.dart';
 import 'kundli_static_data.dart';
 import 'north_indian_chart.dart';
+import 'south_indian_chart.dart';
 
 /// Which chart layout is shown. Public (unlike the private `_ChartStyle` on
 /// `kundli_input_screen.dart`) because [KundliChartScreen] accepts the
@@ -61,7 +63,16 @@ class KundliChartScreen extends ConsumerStatefulWidget {
   const KundliChartScreen({
     super.key,
     this.initialStyle = KundliChartStyle.northIndian,
+    this.subject,
   });
+
+  /// WHOSE chart this is. Null means the account owner's own profile.
+  ///
+  /// ADDED 21 Aug 2026 alongside the Kundli screen's "Add family or friend"
+  /// button. This screen used to read `birthProfileProvider` unconditionally,
+  /// so it could only ever draw one person's chart — which is why that
+  /// button had nowhere to go.
+  final BirthProfile? subject;
 
   /// The chart-style toggle carried over from the Kundli input screen.
   final KundliChartStyle initialStyle;
@@ -110,7 +121,9 @@ class _KundliChartScreenState extends ConsumerState<KundliChartScreen> {
     // KundliStaticData's doc comment). This is display-only — it never
     // stands in for the actual coordinates the chart is computed from, see
     // [request] below.
-    final profile = ref.watch(birthProfileProvider).valueOrNull;
+    // The selected subject wins; the account profile is the default.
+    final profile =
+        widget.subject ?? ref.watch(birthProfileProvider).valueOrNull;
     final trimmedName = profile?.fullName.trim();
     final profileName = (trimmedName != null && trimmedName.isNotEmpty)
         ? trimmedName
@@ -360,37 +373,44 @@ class _SectionTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _TabPill(
+    // HORIZONTALLY SCROLLABLE, pills at their natural width — changed
+    // 21 Aug 2026.
+    //
+    // Each pill used to be `Expanded`, so all four took an equal quarter of
+    // the row regardless of how long their labels are. "Chart" then sat in
+    // a pill with slack to spare while "Vimshottari Dasha" — more than
+    // three times as long — was clipped to "Vimshottari Da…", hiding which
+    // dasha system it is. Four labels of such unequal length simply do not
+    // fit a 360dp row at a legible size, so the row scrolls instead of
+    // truncating. `clipBehavior: none` keeps the selected pill's press
+    // scale from being clipped at the row edges.
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      clipBehavior: Clip.none,
+      child: Row(
+        children: [
+          _TabPill(
             label: l10n.tabChart,
             locale: locale,
             isSelected: selected == _KundliTab.chart,
             onTap: () => onSelect(_KundliTab.chart),
           ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _TabPill(
+          const SizedBox(width: 8),
+          _TabPill(
             label: l10n.tabPlanetPositions,
             locale: locale,
             isSelected: selected == _KundliTab.planetPositions,
             onTap: () => onSelect(_KundliTab.planetPositions),
           ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _TabPill(
+          const SizedBox(width: 8),
+          _TabPill(
             label: l10n.tabDasha,
             locale: locale,
             isSelected: selected == _KundliTab.dasha,
             onTap: () => onSelect(_KundliTab.dasha),
           ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _TabPill(
+          const SizedBox(width: 8),
+          _TabPill(
             label: '${l10n.tabPredictions} 👑',
             locale: locale,
             isSelected: false,
@@ -402,8 +422,8 @@ class _SectionTabs extends StatelessWidget {
               context,
             ).push(fadeThroughRoute(const SubscriptionPaywallScreen())),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -431,7 +451,9 @@ class _TabPill extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          // Horizontal padding matters now that the pill hugs its label
+          // instead of being stretched by `Expanded`.
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           decoration: BoxDecoration(
             color: isSelected ? AppColors.saffron : AppColors.surface,
             borderRadius: BorderRadius.circular(999),
@@ -832,9 +854,9 @@ class _ChartCard extends StatelessWidget {
       // screen width instead of copying that fixed height.
       child: AspectRatio(
         aspectRatio: 1,
-        child: style == KundliChartStyle.northIndian
-            ? _EntranceChart(planets: planets)
-            : _SouthIndianComingSoon(l10n: l10n, locale: locale),
+        // Both styles are REAL charts as of 21 Aug 2026 — South Indian was
+        // a "coming soon" note behind a fully-styled toggle until then.
+        child: _EntranceChart(planets: planets, style: style),
       ),
     );
   }
@@ -846,9 +868,10 @@ class _ChartCard extends StatelessWidget {
 /// motion widget for this one call site — [EntranceFadeSlide] there is a
 /// fade+SLIDE for staggered list items, which isn't this shape.
 class _EntranceChart extends StatelessWidget {
-  const _EntranceChart({required this.planets});
+  const _EntranceChart({required this.planets, required this.style});
 
   final List<ChartPlanet> planets;
+  final KundliChartStyle style;
 
   @override
   Widget build(BuildContext context) {
@@ -862,37 +885,18 @@ class _EntranceChart extends StatelessWidget {
           child: Transform.scale(scale: 0.96 + 0.04 * t, child: child),
         );
       },
-      child: NorthIndianChart(planets: planets),
+      child: style == KundliChartStyle.northIndian
+          ? NorthIndianChart(planets: planets)
+          : SouthIndianChart(planets: planets),
     );
   }
 }
 
-/// Shown inside the chart card when South Indian is selected. Only the
-/// North Indian layout is implemented — drawing a South Indian grid here
-/// would either misrepresent working functionality or require guessing at
-/// a layout not yet built from the real chart data, so this is an honest
-/// "coming soon" note rather than a wrong/placeholder grid.
-class _SouthIndianComingSoon extends StatelessWidget {
-  const _SouthIndianComingSoon({required this.l10n, required this.locale});
-
-  final AppLocalizations l10n;
-  final Locale locale;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Text(
-          l10n.southChartComingSoon,
-          textAlign: TextAlign.center,
-          style: AppFonts.body(locale, fontSize: 13, color: AppColors.muted),
-        ),
-      ),
-    );
-  }
-}
-
+/// The South Indian "coming soon" placeholder that used to live here was
+/// deleted on 21 Aug 2026, when `south_indian_chart.dart` replaced it with a
+/// real grid. Its l10n key `southChartComingSoon` is now unused; left in the
+/// ARBs rather than removed, since deleting a key from five locale files is
+/// a separate, noisier change.
 /// "KEY PLANETS" legend (Figma node 50:29).
 class _KeyPlanetsLegend extends StatelessWidget {
   const _KeyPlanetsLegend({required this.l10n, required this.locale});
@@ -1047,7 +1051,11 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      // Horizontal padding added 21 Aug 2026 — there was none, so a long
+      // value ran flush into the rounded border. "Purva Ashadha" (a real
+      // nakshatra, and far from the longest: "Uttara Bhadrapada" is longer
+      // still) touched both edges of its card.
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       decoration: BoxDecoration(
         color: AppColors.surface,
         border: Border.all(color: AppColors.cardBorder),
@@ -1063,15 +1071,22 @@ class _StatCard extends StatelessWidget {
             style: AppFonts.body(locale, fontSize: 10, color: AppColors.hint),
           ),
           const SizedBox(height: 1),
-          Text(
-            value,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: AppFonts.body(
-              locale,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: AppColors.ink,
+          // Shrinks rather than ellipsising. These are three cards of equal
+          // width holding names of very unequal length; clipping "Purva
+          // Ashadha" to "Purva Asha…" would hide the identifying half of a
+          // nakshatra name, whereas a point or two smaller still reads
+          // cleanly and keeps the row visually even.
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              maxLines: 1,
+              style: AppFonts.body(
+                locale,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.ink,
+              ),
             ),
           ),
         ],

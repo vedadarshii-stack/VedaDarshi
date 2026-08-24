@@ -6,6 +6,9 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../core/widgets/app_radio_dot.dart';
 import '../../l10n/app_localizations.dart';
+import '../profile/birth_profile.dart';
+import '../matching/partner_details_screen.dart';
+import 'guest_profiles.dart';
 import '../profile/birth_profile_repository.dart';
 import 'kundli_chart_screen.dart';
 import 'kundli_static_data.dart';
@@ -38,6 +41,10 @@ class KundliInputScreen extends ConsumerStatefulWidget {
 class _KundliInputScreenState extends ConsumerState<KundliInputScreen> {
   _ChartStyle _chartStyle = _ChartStyle.northIndian;
 
+  /// -1 = the account owner's own profile; 0..n index into
+  /// `guestProfilesProvider`.
+  int _selectedProfileIndex = -1;
+
   void _selectChartStyle(_ChartStyle style) {
     if (style == _chartStyle) return;
     setState(() => _chartStyle = style);
@@ -55,6 +62,7 @@ class _KundliInputScreenState extends ConsumerState<KundliInputScreen> {
     // loading state or render zero profile cards, so `valueOrNull` covers
     // loading/error/null with the same fallback.
     final profile = ref.watch(birthProfileProvider).valueOrNull;
+    final guests = ref.watch(guestProfilesProvider);
     final trimmedName = profile?.fullName.trim();
     final profileName = (trimmedName != null && trimmedName.isNotEmpty)
         ? trimmedName
@@ -92,6 +100,25 @@ class _KundliInputScreenState extends ConsumerState<KundliInputScreen> {
                       locale: locale,
                       profileName: profileName,
                       profileSummary: profileSummary,
+                      guests: guests,
+                      selectedIndex: _selectedProfileIndex,
+                      onSelect: (index) =>
+                          setState(() => _selectedProfileIndex = index),
+                      onAdd: () async {
+                        final entered = await Navigator.of(context)
+                            .push<BirthProfile>(
+                              fadeThroughRoute(const PartnerDetailsScreen()),
+                            );
+                        if (entered == null || !mounted) return;
+                        ref
+                            .read(guestProfilesProvider.notifier)
+                            .add(entered);
+                        // Select what was just added — the user entered it
+                        // to look at it.
+                        setState(
+                          () => _selectedProfileIndex = guests.length,
+                        );
+                      },
                     ),
                     const SizedBox(height: 18),
                     _SectionLabel(text: l10n.chartStyle, locale: locale),
@@ -109,6 +136,12 @@ class _KundliInputScreenState extends ConsumerState<KundliInputScreen> {
                       l10n: l10n,
                       locale: locale,
                       chartStyle: _chartStyle,
+                      // null = the account owner; otherwise the family/
+                      // friend selected above.
+                      subject: _selectedProfileIndex >= 0 &&
+                              _selectedProfileIndex < guests.length
+                          ? guests[_selectedProfileIndex]
+                          : null,
                     ),
                   ],
                 ),
@@ -198,12 +231,23 @@ class _ProfileList extends StatelessWidget {
     required this.locale,
     required this.profileName,
     required this.profileSummary,
+    required this.guests,
+    required this.selectedIndex,
+    required this.onSelect,
+    required this.onAdd,
   });
 
   final AppLocalizations l10n;
   final Locale locale;
   final String profileName;
   final String profileSummary;
+
+  /// Extra people added this session. -1 in [selectedIndex] means the
+  /// account owner's own profile.
+  final List<BirthProfile> guests;
+  final int selectedIndex;
+  final ValueChanged<int> onSelect;
+  final VoidCallback onAdd;
 
   @override
   Widget build(BuildContext context) {
@@ -213,9 +257,23 @@ class _ProfileList extends StatelessWidget {
           name: profileName,
           summary: profileSummary,
           locale: locale,
+          isSelected: selectedIndex == -1,
+          onTap: () => onSelect(-1),
         ),
+        // Family/friends added this session — 21 Aug 2026. Before this the
+        // list could only ever contain the account owner.
+        for (var i = 0; i < guests.length; i++) ...[
+          const SizedBox(height: 10),
+          _ProfileCard(
+            name: guests[i].fullName,
+            summary: guests[i].summaryLine,
+            locale: locale,
+            isSelected: selectedIndex == i,
+            onTap: () => onSelect(i),
+          ),
+        ],
         const SizedBox(height: 10),
-        _AddFamilyFriendButton(l10n: l10n, locale: locale),
+        _AddFamilyFriendButton(l10n: l10n, locale: locale, onAdd: onAdd),
       ],
     );
   }
@@ -228,11 +286,18 @@ class _ProfileCard extends StatelessWidget {
     required this.name,
     required this.summary,
     required this.locale,
+    required this.isSelected,
+    required this.onTap,
   });
 
   final String name;
   final String summary;
   final Locale locale;
+
+  /// Selection is real since 21 Aug 2026 — with more than one profile on
+  /// screen, the radio dot has to mean something.
+  final bool isSelected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -304,7 +369,7 @@ class _ProfileCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          const AppRadioDot(isSelected: true),
+          AppRadioDot(isSelected: isSelected),
         ],
       ),
     );
@@ -313,10 +378,15 @@ class _ProfileCard extends StatelessWidget {
 
 /// "Add family or friend" dashed placeholder button (Figma node 17:23).
 class _AddFamilyFriendButton extends StatelessWidget {
-  const _AddFamilyFriendButton({required this.l10n, required this.locale});
+  const _AddFamilyFriendButton({
+    required this.l10n,
+    required this.locale,
+    required this.onAdd,
+  });
 
   final AppLocalizations l10n;
   final Locale locale;
+  final VoidCallback onAdd;
 
   @override
   Widget build(BuildContext context) {
@@ -325,11 +395,10 @@ class _AddFamilyFriendButton extends StatelessWidget {
       label: l10n.addFamilyFriend,
       child: PressableScale(
         borderRadius: BorderRadius.circular(16),
-        // Multi-profile support (family/friends) is a follow-up feature not
-        // implemented yet — this button is its honest placeholder entry
-        // point. See kundli_static_data.dart's doc comment for the full
-        // rationale (why this screen doesn't fabricate a second profile).
-        onTap: () {},
+        // Real since 21 Aug 2026 — opens the same birth-details form Gun
+        // Milan uses, and the person entered becomes a selectable profile
+        // above. Was an inert dashed button.
+        onTap: onAdd,
         child: CustomPaint(
           painter: _DashedBorderPainter(color: AppColors.otpBorderFilled),
           child: Container(
@@ -598,6 +667,7 @@ class _InfoNote extends StatelessWidget {
 /// `_GetOtpButton`.
 class _GenerateKundliButton extends StatelessWidget {
   const _GenerateKundliButton({
+    required this.subject,
     required this.l10n,
     required this.locale,
     required this.chartStyle,
@@ -606,6 +676,9 @@ class _GenerateKundliButton extends StatelessWidget {
   final AppLocalizations l10n;
   final Locale locale;
   final _ChartStyle chartStyle;
+
+  /// Whose chart to generate — null means the account owner.
+  final BirthProfile? subject;
 
   @override
   Widget build(BuildContext context) {
@@ -633,6 +706,7 @@ class _GenerateKundliButton extends StatelessWidget {
                   initialStyle: chartStyle == _ChartStyle.northIndian
                       ? KundliChartStyle.northIndian
                       : KundliChartStyle.southIndian,
+                  subject: subject,
                 ),
               ),
             );

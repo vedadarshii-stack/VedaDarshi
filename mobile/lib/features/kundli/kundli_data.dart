@@ -104,7 +104,14 @@ class KundliData {
   /// dropped rather than guessed at.
   List<ChartPlanet> toChartPlanets() {
     final result = <ChartPlanet>[
-      const ChartPlanet(PlanetCode.ascendant, house: 1),
+      // The Ascendant carries the chart's anchor rashi — that is what lets
+      // a South Indian chart place every other planet even when Vedika
+      // omits their own `signNumber` (21 Aug 2026).
+      ChartPlanet(
+        PlanetCode.ascendant,
+        house: 1,
+        signNumber: ascendant?.signNumber,
+      ),
     ];
     for (final planet in planets) {
       final chartPlanet = planet.toChartPlanet();
@@ -308,6 +315,7 @@ class KundliPlanet {
     return ChartPlanet(
       planetCode,
       house: planetHouse,
+      signNumber: signNumber,
       isRetrograde: isRetrograde,
       isExalted:
           interpretation?.inThisChart?.dignity?.trim().toLowerCase() ==

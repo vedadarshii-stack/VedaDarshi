@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -15,15 +13,6 @@ enum AuthErrorCode {
   /// No/unstable network connection.
   network,
 
-  /// The phone number the user entered is not a valid, dialable number.
-  invalidPhone,
-
-  /// The 6-digit code the user entered does not match what was sent.
-  invalidOtp,
-
-  /// The OTP session/code expired before it was verified.
-  otpExpired,
-
   /// Too many attempts in a short window (Firebase abuse protection).
   tooManyRequests,
 
@@ -36,6 +25,21 @@ enum AuthErrorCode {
 
   /// Anything else / not otherwise classified.
   unknown,
+
+  /// The email address entered on sign-up is already registered.
+  emailInUse,
+
+  /// The email address is not validly formatted.
+  invalidEmail,
+
+  /// The chosen password doesn't meet Firebase's minimum strength.
+  weakPassword,
+
+  /// The email/password combination was rejected.
+  wrongCredentials,
+
+  /// No account exists for the entered email address.
+  userNotFound,
 }
 
 /// The single exception type every [AuthService] method throws.
@@ -51,34 +55,9 @@ class AuthException implements Exception {
   String toString() => 'AuthException(${code.name})';
 }
 
-/// Result of a successful `sendOtp` call — the bookkeeping the UI needs to
-/// either show the OTP entry screen or (on Android instant verification)
-/// skip straight past it.
-class PhoneCodeSent {
-  const PhoneCodeSent({
-    required this.verificationId,
-    required this.resendToken,
-    this.autoVerified = false,
-  });
-
-  /// Opaque id identifying this OTP session; must be passed back to
-  /// [AuthService.verifyOtp].
-  final String verificationId;
-
-  /// Token to pass to a follow-up [AuthService.sendOtp] call when the user
-  /// taps "Resend", so Firebase can route the retry through the same SMS
-  /// session instead of starting a fresh one.
-  final int? resendToken;
-
-  /// `true` when Android's instant SMS-retrieval verified the device and
-  /// completed sign-in automatically — the caller should skip the OTP entry
-  /// screen entirely and proceed straight to the signed-in state.
-  final bool autoVerified;
-}
-
-/// Thin wrapper around `firebase_auth` (phone/anonymous/credential sign-in)
-/// and `google_sign_in` (Google OAuth), giving the rest of the app a single,
-/// Firebase-agnostic surface for authentication.
+/// Thin wrapper around `firebase_auth` (email/password and anonymous
+/// sign-in) and `google_sign_in` (Google OAuth), giving the rest of the app
+/// a single, Firebase-agnostic surface for authentication.
 ///
 /// This is a plain class, not a Riverpod provider itself — see
 /// `lib/core/auth/auth_providers.dart` for the `authServiceProvider` /
@@ -178,99 +157,44 @@ class AuthService {
     }
   }
 
-  /// Starts phone-number verification, sending an SMS OTP to [phoneE164].
-  ///
-  /// [resendToken] should be the token from a previous [PhoneCodeSent] when
-  /// this is a "Resend" retry, so Firebase reuses the same SMS session.
-  ///
-  /// Completes with a [PhoneCodeSent] once the SMS has been dispatched
-  /// (`codeSent`), OR — on Android, when the device can auto-read the SMS —
-  /// once [verificationCompleted] has already signed the user in, in which
-  /// case [PhoneCodeSent.autoVerified] is `true` and the caller should skip
-  /// the OTP entry screen.
-  Future<PhoneCodeSent> sendOtp({required String phoneE164, int? resendToken}) {
-    final completer = Completer<PhoneCodeSent>();
-
-    void completeError(AuthException exception) {
-      if (!completer.isCompleted) completer.completeError(exception);
-    }
-
-    unawaited(
-      _firebaseAuth
-          .verifyPhoneNumber(
-            phoneNumber: phoneE164,
-            forceResendingToken: resendToken,
-            timeout: const Duration(seconds: 60),
-            verificationCompleted: (PhoneAuthCredential credential) async {
-              // Android instant verification: the device auto-detected and
-              // validated the SMS, so sign in immediately without ever
-              // showing the OTP entry screen.
-              try {
-                await _firebaseAuth.signInWithCredential(credential);
-                if (!completer.isCompleted) {
-                  completer.complete(
-                    const PhoneCodeSent(
-                      verificationId: '',
-                      resendToken: null,
-                      autoVerified: true,
-                    ),
-                  );
-                }
-              } on FirebaseAuthException catch (e) {
-                completeError(_mapFirebase(e));
-              } catch (_) {
-                completeError(const AuthException(AuthErrorCode.unknown));
-              }
-            },
-            verificationFailed: (FirebaseAuthException e) {
-              completeError(_mapFirebase(e));
-            },
-            codeSent: (String verificationId, int? newResendToken) {
-              if (!completer.isCompleted) {
-                completer.complete(
-                  PhoneCodeSent(
-                    verificationId: verificationId,
-                    resendToken: newResendToken,
-                  ),
-                );
-              }
-            },
-            codeAutoRetrievalTimeout: (String verificationId) {
-              // If codeSent already resolved the completer, this is just
-              // notifying us that auto-retrieval gave up — nothing to do.
-              if (!completer.isCompleted) {
-                completer.complete(
-                  PhoneCodeSent(
-                    verificationId: verificationId,
-                    resendToken: resendToken,
-                  ),
-                );
-              }
-            },
-          )
-          .catchError((Object e) {
-            if (e is FirebaseAuthException) {
-              completeError(_mapFirebase(e));
-            } else {
-              completeError(const AuthException(AuthErrorCode.unknown));
-            }
-          }),
-    );
-
-    return completer.future;
-  }
-
-  /// Completes phone sign-in using the OTP the user typed in.
-  Future<void> verifyOtp({
-    required String verificationId,
-    required String smsCode,
+  /// Signs the user in with an existing email/password account.
+  Future<void> signInWithEmail({
+    required String email,
+    required String password,
   }) async {
     try {
-      final credential = PhoneAuthProvider.credential(
-        verificationId: verificationId,
-        smsCode: smsCode,
+      await _firebaseAuth.signInWithEmailAndPassword(
+        email: email.trim(),
+        password: password,
       );
-      await _firebaseAuth.signInWithCredential(credential);
+    } on FirebaseAuthException catch (e) {
+      throw _mapFirebase(e);
+    } catch (_) {
+      throw const AuthException(AuthErrorCode.unknown);
+    }
+  }
+
+  /// Creates a new email/password account and signs the user into it.
+  Future<void> signUpWithEmail({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email.trim(),
+        password: password,
+      );
+    } on FirebaseAuthException catch (e) {
+      throw _mapFirebase(e);
+    } catch (_) {
+      throw const AuthException(AuthErrorCode.unknown);
+    }
+  }
+
+  /// Sends a password reset email to [email].
+  Future<void> sendPasswordResetEmail({required String email}) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email.trim());
     } on FirebaseAuthException catch (e) {
       throw _mapFirebase(e);
     } catch (_) {
@@ -294,13 +218,25 @@ class AuthService {
 
   AuthException _mapFirebase(FirebaseAuthException e) {
     switch (e.code) {
-      case 'invalid-phone-number':
-        return const AuthException(AuthErrorCode.invalidPhone);
-      case 'invalid-verification-code':
-        return const AuthException(AuthErrorCode.invalidOtp);
-      case 'session-expired':
-      case 'code-expired':
-        return const AuthException(AuthErrorCode.otpExpired);
+      case 'email-already-in-use':
+        return const AuthException(AuthErrorCode.emailInUse);
+      case 'invalid-email':
+        return const AuthException(AuthErrorCode.invalidEmail);
+      case 'weak-password':
+        return const AuthException(AuthErrorCode.weakPassword);
+      case 'wrong-password':
+        return const AuthException(AuthErrorCode.wrongCredentials);
+      // Modern Firebase projects with email-enumeration protection enabled
+      // return the generic 'invalid-credential' code for both a wrong
+      // password AND an unrecognized email, rather than distinguishing
+      // 'wrong-password'/'user-not-found' — so both collapse to the same
+      // generic "incorrect email or password" message here.
+      case 'invalid-credential':
+        return const AuthException(AuthErrorCode.wrongCredentials);
+      case 'user-not-found':
+        return const AuthException(AuthErrorCode.userNotFound);
+      case 'user-disabled':
+        return const AuthException(AuthErrorCode.wrongCredentials);
       case 'too-many-requests':
       case 'quota-exceeded':
         return const AuthException(AuthErrorCode.tooManyRequests);

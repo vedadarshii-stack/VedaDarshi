@@ -188,18 +188,6 @@ abstract class AppLocalizations {
   /// **'Sign in to save your birth profiles and unlock personalised predictions.'**
   String get welcomeSubtitle;
 
-  /// Placeholder hint text in the phone number input field on the Welcome/Login screen.
-  ///
-  /// In en, this message translates to:
-  /// **'Mobile number'**
-  String get phoneHint;
-
-  /// Label of the CTA button that requests an OTP for the entered phone number.
-  ///
-  /// In en, this message translates to:
-  /// **'Get OTP'**
-  String get getOtp;
-
   /// Divider label between the phone sign-in section and the Google sign-in button.
   ///
   /// In en, this message translates to:
@@ -224,77 +212,11 @@ abstract class AppLocalizations {
   /// **'By continuing you agree to our Terms of Service & Privacy Policy'**
   String get termsNotice;
 
-  /// Heading of the OTP verification screen.
-  ///
-  /// In en, this message translates to:
-  /// **'Verify your number'**
-  String get otpTitle;
-
-  /// Subtitle of the OTP verification screen, naming the masked phone number the code was sent to.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter the 6-digit code sent to {phone}'**
-  String otpSubtitle(String phone);
-
-  /// Prompt introducing the resend option on the OTP verification screen.
-  ///
-  /// In en, this message translates to:
-  /// **'Didn\'t receive the code?'**
-  String get otpNoCode;
-
-  /// Countdown shown before the resend option becomes available on the OTP verification screen.
-  ///
-  /// In en, this message translates to:
-  /// **'Resend in {seconds}'**
-  String otpResendIn(String seconds);
-
-  /// Tappable label to request a new OTP once the resend countdown has finished.
-  ///
-  /// In en, this message translates to:
-  /// **'Resend'**
-  String get otpResend;
-
-  /// Label of the CTA button that submits the entered OTP code.
-  ///
-  /// In en, this message translates to:
-  /// **'Verify & Continue'**
-  String get otpVerify;
-
-  /// Reassurance notice at the bottom of the OTP verification screen.
-  ///
-  /// In en, this message translates to:
-  /// **'🔒 Your number is kept private and secure'**
-  String get otpPrivacy;
-
-  /// Confirmation snackbar shown after successfully requesting a new OTP code.
-  ///
-  /// In en, this message translates to:
-  /// **'A new code has been sent.'**
-  String get otpResent;
-
   /// Error message shown when an auth operation fails due to no/unstable network connectivity.
   ///
   /// In en, this message translates to:
   /// **'No internet connection. Please check your network and try again.'**
   String get authErrorNetwork;
-
-  /// Error message shown when the entered phone number is not a valid, dialable number.
-  ///
-  /// In en, this message translates to:
-  /// **'That phone number doesn\'t look right. Please check and try again.'**
-  String get authErrorInvalidPhone;
-
-  /// Error message shown when the entered OTP code does not match what was sent.
-  ///
-  /// In en, this message translates to:
-  /// **'That code is incorrect. Please try again.'**
-  String get authErrorInvalidOtp;
-
-  /// Error message shown when the OTP session/code expired before it was verified.
-  ///
-  /// In en, this message translates to:
-  /// **'That code has expired. Please request a new one.'**
-  String get authErrorOtpExpired;
 
   /// Error message shown when too many auth attempts trigger Firebase's abuse protection.
   ///
@@ -2269,6 +2191,192 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This plan isn\'t available right now.'**
   String get purchaseErrorUnavailable;
+
+  /// Panchang location screen (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval, like the rest of this file.
+  ///
+  /// In en, this message translates to:
+  /// **'Use my current location'**
+  String get panchangLocationUseAutomatic;
+
+  /// Panchang location screen (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval, like the rest of this file.
+  ///
+  /// In en, this message translates to:
+  /// **'Chosen by you'**
+  String get panchangLocationSourceManual;
+
+  /// Panchang location screen (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval, like the rest of this file.
+  ///
+  /// In en, this message translates to:
+  /// **'Detected from your location'**
+  String get panchangLocationSourceDevice;
+
+  /// Panchang location screen (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval, like the rest of this file.
+  ///
+  /// In en, this message translates to:
+  /// **'From your birth details'**
+  String get panchangLocationSourceBirthProfile;
+
+  /// Panchang location screen (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval, like the rest of this file.
+  ///
+  /// In en, this message translates to:
+  /// **'Default location'**
+  String get panchangLocationSourceFallback;
+
+  /// Muhurat timings screen (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval.
+  ///
+  /// In en, this message translates to:
+  /// **'DAY CHOGHADIYA'**
+  String get muhuratDay;
+
+  /// Muhurat timings screen (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval.
+  ///
+  /// In en, this message translates to:
+  /// **'NIGHT CHOGHADIYA'**
+  String get muhuratNight;
+
+  /// Muhurat timings screen (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval.
+  ///
+  /// In en, this message translates to:
+  /// **'Muhurat timings aren\'t available right now.'**
+  String get muhuratUnavailable;
+
+  /// Gun Milan partner details (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval.
+  ///
+  /// In en, this message translates to:
+  /// **'Partner\'s birth details'**
+  String get partnerDetailsTitle;
+
+  /// Gun Milan partner details (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval.
+  ///
+  /// In en, this message translates to:
+  /// **'Save details'**
+  String get partnerDetailsSave;
+
+  /// Gun Milan partner details (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval.
+  ///
+  /// In en, this message translates to:
+  /// **'Add the partner\'s birth details to match.'**
+  String get matchNeedsPartner;
+
+  /// Placeholder hint text in the email input field on the Welcome/Login and sign-up screens.
+  ///
+  /// In en, this message translates to:
+  /// **'Email address'**
+  String get emailHint;
+
+  /// Placeholder hint text in the password input field.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get passwordHint;
+
+  /// Placeholder hint text in the confirm-password input field on the sign-up screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get confirmPasswordHint;
+
+  /// Label of the CTA button that submits the email/password sign-in form.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get signInAction;
+
+  /// Tappable label on the Welcome/Login screen that opens the forgot-password screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get forgotPassword;
+
+  /// Prompt on the Welcome/Login screen inviting a new user to create an account.
+  ///
+  /// In en, this message translates to:
+  /// **'New to Vedadarshi?'**
+  String get noAccountPrompt;
+
+  /// Tappable label that navigates to the sign-up screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Create account'**
+  String get createAccount;
+
+  /// Title of the email sign-up screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your account'**
+  String get signUpTitle;
+
+  /// Prompt inviting a user on the sign-up screen to sign in instead.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account?'**
+  String get haveAccountPrompt;
+
+  /// Title of the forgot-password screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset your password'**
+  String get forgotPasswordTitle;
+
+  /// Explanatory body text on the forgot-password screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the email address you signed up with and we\'ll send you a link to reset your password.'**
+  String get forgotPasswordSubtitle;
+
+  /// Label of the CTA button that sends the password reset email.
+  ///
+  /// In en, this message translates to:
+  /// **'Send reset link'**
+  String get sendResetLink;
+
+  /// Confirmation snackbar shown after requesting a password reset, worded so it never reveals whether the email is actually registered.
+  ///
+  /// In en, this message translates to:
+  /// **'If that email is registered, a reset link is on its way.'**
+  String get resetLinkSent;
+
+  /// Validation message shown when the entered password is shorter than the minimum length.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 6 characters.'**
+  String get passwordTooShort;
+
+  /// Validation message shown when the password and confirm-password fields differ.
+  ///
+  /// In en, this message translates to:
+  /// **'Those passwords don\'t match.'**
+  String get passwordsDoNotMatch;
+
+  /// Error message shown when signing up with an email address that already has an account.
+  ///
+  /// In en, this message translates to:
+  /// **'That email is already registered. Try signing in instead.'**
+  String get authErrorEmailInUse;
+
+  /// Error message shown when the entered email address is not validly formatted.
+  ///
+  /// In en, this message translates to:
+  /// **'That email address doesn\'t look right.'**
+  String get authErrorInvalidEmail;
+
+  /// Error message shown when the chosen password doesn't meet Firebase's minimum strength requirement.
+  ///
+  /// In en, this message translates to:
+  /// **'Please choose a password of at least 6 characters.'**
+  String get authErrorWeakPassword;
+
+  /// Error message shown when email/password sign-in fails due to a wrong password or unrecognized credential.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect email or password. Please try again.'**
+  String get authErrorWrongCredentials;
+
+  /// Error message shown when no account exists for the entered email address.
+  ///
+  /// In en, this message translates to:
+  /// **'No account found with that email address.'**
+  String get authErrorUserNotFound;
 }
 
 class _AppLocalizationsDelegate

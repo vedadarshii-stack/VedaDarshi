@@ -11,12 +11,6 @@ String? authErrorMessage(AppLocalizations l10n, AuthErrorCode code) {
   switch (code) {
     case AuthErrorCode.network:
       return l10n.authErrorNetwork;
-    case AuthErrorCode.invalidPhone:
-      return l10n.authErrorInvalidPhone;
-    case AuthErrorCode.invalidOtp:
-      return l10n.authErrorInvalidOtp;
-    case AuthErrorCode.otpExpired:
-      return l10n.authErrorOtpExpired;
     case AuthErrorCode.tooManyRequests:
       return l10n.authErrorTooManyRequests;
     case AuthErrorCode.providerDisabled:
@@ -25,5 +19,15 @@ String? authErrorMessage(AppLocalizations l10n, AuthErrorCode code) {
       return null;
     case AuthErrorCode.unknown:
       return l10n.authErrorUnknown;
+    case AuthErrorCode.emailInUse:
+      return l10n.authErrorEmailInUse;
+    case AuthErrorCode.invalidEmail:
+      return l10n.authErrorInvalidEmail;
+    case AuthErrorCode.weakPassword:
+      return l10n.authErrorWeakPassword;
+    case AuthErrorCode.wrongCredentials:
+      return l10n.authErrorWrongCredentials;
+    case AuthErrorCode.userNotFound:
+      return l10n.authErrorUserNotFound;
   }
 }

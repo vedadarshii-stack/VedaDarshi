@@ -56,12 +56,6 @@ class AppLocalizationsTa extends AppLocalizations {
       'உங்கள் பிறப்பு விவரங்களைச் சேமித்து, தனிப்பயன் கணிப்புகளைத் திறக்க உள்நுழையவும்.';
 
   @override
-  String get phoneHint => 'மொபைல் எண்';
-
-  @override
-  String get getOtp => 'OTP பெறவும்';
-
-  @override
   String get orContinueWith => 'அல்லது இதனுடன் தொடரவும்';
 
   @override
@@ -75,49 +69,8 @@ class AppLocalizationsTa extends AppLocalizations {
       'தொடர்வதன் மூலம் நீங்கள் எங்கள் சேவை விதிமுறைகள் & தனியுரிமைக் கொள்கையை ஏற்கிறீர்கள்';
 
   @override
-  String get otpTitle => 'உங்கள் எண்ணைச் சரிபார்க்கவும்';
-
-  @override
-  String otpSubtitle(String phone) {
-    return '$phone க்கு அனுப்பப்பட்ட 6-இலக்க குறியீட்டை உள்ளிடவும்';
-  }
-
-  @override
-  String get otpNoCode => 'குறியீடு கிடைக்கவில்லையா?';
-
-  @override
-  String otpResendIn(String seconds) {
-    return '$secondsஇல் மீண்டும் அனுப்பவும்';
-  }
-
-  @override
-  String get otpResend => 'மீண்டும் அனுப்பவும்';
-
-  @override
-  String get otpVerify => 'சரிபார்த்து தொடரவும்';
-
-  @override
-  String get otpPrivacy =>
-      '🔒 உங்கள் எண் தனிப்பட்டதாகவும் பாதுகாப்பாகவும் வைக்கப்படுகிறது';
-
-  @override
-  String get otpResent => 'புதிய குறியீடு அனுப்பப்பட்டது.';
-
-  @override
   String get authErrorNetwork =>
       'இணைய இணைப்பு இல்லை. உங்கள் நெட்வொர்க்கைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.';
-
-  @override
-  String get authErrorInvalidPhone =>
-      'அந்த தொலைபேசி எண் சரியாகத் தெரியவில்லை. சரிபார்த்து மீண்டும் முயற்சிக்கவும்.';
-
-  @override
-  String get authErrorInvalidOtp =>
-      'அந்த குறியீடு தவறானது. மீண்டும் முயற்சிக்கவும்.';
-
-  @override
-  String get authErrorOtpExpired =>
-      'அந்த குறியீடு காலாவதியானது. புதிதாக ஒன்றைக் கோரவும்.';
 
   @override
   String get authErrorTooManyRequests =>
@@ -1203,4 +1156,109 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get purchaseErrorUnavailable =>
       'இந்தத் திட்டம் தற்போது கிடைக்கவில்லை.';
+
+  @override
+  String get panchangLocationUseAutomatic =>
+      'எனது தற்போதைய இருப்பிடத்தைப் பயன்படுத்து';
+
+  @override
+  String get panchangLocationSourceManual => 'நீங்கள் தேர்ந்தெடுத்தது';
+
+  @override
+  String get panchangLocationSourceDevice =>
+      'உங்கள் இருப்பிடத்திலிருந்து கண்டறியப்பட்டது';
+
+  @override
+  String get panchangLocationSourceBirthProfile =>
+      'உங்கள் பிறப்பு விவரங்களிலிருந்து';
+
+  @override
+  String get panchangLocationSourceFallback => 'இயல்புநிலை இருப்பிடம்';
+
+  @override
+  String get muhuratDay => 'பகல் சௌகடியா';
+
+  @override
+  String get muhuratNight => 'இரவு சௌகடியா';
+
+  @override
+  String get muhuratUnavailable => 'முகூர்த்த நேரங்கள் தற்போது கிடைக்கவில்லை.';
+
+  @override
+  String get partnerDetailsTitle => 'துணையின் பிறப்பு விவரங்கள்';
+
+  @override
+  String get partnerDetailsSave => 'விவரங்களைச் சேமி';
+
+  @override
+  String get matchNeedsPartner =>
+      'பொருத்த துணையின் பிறப்பு விவரங்களைச் சேர்க்கவும்.';
+
+  @override
+  String get emailHint => 'மின்னஞ்சல் முகவரி';
+
+  @override
+  String get passwordHint => 'கடவுச்சொல்';
+
+  @override
+  String get confirmPasswordHint => 'கடவுச்சொல்லை உறுதிப்படுத்தவும்';
+
+  @override
+  String get signInAction => 'உள்நுழையவும்';
+
+  @override
+  String get forgotPassword => 'கடவுச்சொல் மறந்துவிட்டதா?';
+
+  @override
+  String get noAccountPrompt => 'Vedadarshi-க்கு புதியவரா?';
+
+  @override
+  String get createAccount => 'கணக்கை உருவாக்கவும்';
+
+  @override
+  String get signUpTitle => 'உங்கள் கணக்கை உருவாக்கவும்';
+
+  @override
+  String get haveAccountPrompt => 'ஏற்கனவே கணக்கு உள்ளதா?';
+
+  @override
+  String get forgotPasswordTitle => 'உங்கள் கடவுச்சொல்லை மீட்டமைக்கவும்';
+
+  @override
+  String get forgotPasswordSubtitle =>
+      'நீங்கள் பதிவு செய்த மின்னஞ்சல் முகவரியை உள்ளிடவும், உங்கள் கடவுச்சொல்லை மீட்டமைக்க ஒரு இணைப்பை அனுப்புவோம்.';
+
+  @override
+  String get sendResetLink => 'மீட்டமைப்பு இணைப்பை அனுப்பவும்';
+
+  @override
+  String get resetLinkSent =>
+      'அந்த மின்னஞ்சல் பதிவு செய்யப்பட்டிருந்தால், மீட்டமைப்பு இணைப்பு அனுப்பப்படுகிறது.';
+
+  @override
+  String get passwordTooShort =>
+      'கடவுச்சொல் குறைந்தது 6 எழுத்துகள் இருக்க வேண்டும்.';
+
+  @override
+  String get passwordsDoNotMatch => 'அந்த கடவுச்சொற்கள் பொருந்தவில்லை.';
+
+  @override
+  String get authErrorEmailInUse =>
+      'அந்த மின்னஞ்சல் ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது. அதற்கு பதிலாக உள்நுழையவும்.';
+
+  @override
+  String get authErrorInvalidEmail =>
+      'அந்த மின்னஞ்சல் முகவரி சரியாகத் தெரியவில்லை.';
+
+  @override
+  String get authErrorWeakPassword =>
+      'தயவுசெய்து குறைந்தது 6 எழுத்துகள் கொண்ட கடவுச்சொல்லைத் தேர்ந்தெடுக்கவும்.';
+
+  @override
+  String get authErrorWrongCredentials =>
+      'தவறான மின்னஞ்சல் அல்லது கடவுச்சொல். மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get authErrorUserNotFound =>
+      'அந்த மின்னஞ்சல் முகவரியுடன் கணக்கு எதுவும் இல்லை.';
 }

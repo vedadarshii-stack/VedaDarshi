@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../core/vedika/vedika_config.dart';
 import '../../core/widgets/app_bottom_nav.dart';
 import '../../core/widgets/app_empty_state.dart';
 import '../../l10n/app_localizations.dart';
-import '../profile/birth_profile_repository.dart';
+import 'muhurat_timings_screen.dart';
 import 'panchang_data.dart';
+import 'panchang_location.dart';
 import 'panchang_repository.dart';
 import 'panchang_static_data.dart';
 
@@ -16,9 +18,9 @@ import 'panchang_static_data.dart';
 /// guest, or the profile still loading) — Hyderabad, matching the location
 /// chip's static placeholder text (see [PanchangStaticData.location]) so the
 /// two never visibly disagree.
-const double _fallbackLatitude = 17.3850;
-const double _fallbackLongitude = 78.4867;
-const String _fallbackTimezoneId = 'Asia/Kolkata';
+// Fallback coordinates now live in `panchang_location.dart` as
+// `kFallbackPanchangCity`, so the label and the coordinates can never drift
+// apart (21 Aug 2026).
 
 const List<String> _weekdayNames = [
   'Monday',
@@ -121,27 +123,37 @@ List<PanchangElement> _elementsFrom(PanchangData? data, AppLocalizations l10n) {
   ];
 }
 
-/// Builds the Muhurat grid's 4 cards from live [muhurta], falling back to
-/// [PanchangStaticData.muhurats] card-by-card.
+/// The muhurat cards that are backed by REAL data. Possibly just one.
 ///
-/// Only Rahu Kaal has a matching field in `/v2/daily/muhurta` — Abhijit
-/// Muhurat, Yamaganda and Gulika Kaal have no equivalent in that response
-/// at all, so those three ALWAYS stay on their static placeholder (per the
-/// "keep the placeholder rather than show a wrong value" rule), and only
-/// the Rahu Kaal card's time is ever replaced with a real value. The
-/// returned list always has the same 4 entries in the same order as
-/// [PanchangStaticData.muhurats] — callers (`_MuhuratGrid`) index into it
-/// positionally.
+/// REWRITTEN 22 Aug 2026 — it used to always return four, padding Abhijit
+/// Muhurat, Yamaganda and Gulika Kaal with [PanchangStaticData.muhurats]'
+/// fixed times so the 2x2 grid always filled.
+///
+/// Those three are now DROPPED rather than faked, because there is no
+/// source for them that can be trusted:
+///
+///  - `/v2/daily/muhurta`, the endpoint this screen calls, does not return
+///    them at all — only `rahu_kaal`, `choghadiya` and `hora`.
+///  - The `/v2/astrology/panchang` bundle DOES return them, and every one
+///    is corrupt: `end` before `start` on all three (abhijit
+///    00:53 -> 00:09, yamaganda 04:39 -> 03:16, gulika 01:54 -> 00:31,
+///    measured 21 Aug 2026). That is the same upstream defect that made
+///    Rahu Kaal render as an impossible "06:55 - 05:33 PM" before its own
+///    fix, so the data cannot simply be swapped in.
+///
+/// A muhurat is a window a user PLANS AROUND — they will avoid signing a
+/// contract during Yamaganda or start something during Abhijit. A fixed
+/// time that never changes with the day or the place is not a placeholder
+/// in any harmless sense; it is advice, and it is wrong. Showing one real
+/// window is better than four where three are invented.
+///
+/// Restore them when Vedika's timestamps are valid: the shape is already
+/// modelled, so it is a parse away.
 List<Muhurat> _muhuratsFrom(MuhurtaData? muhurta) {
-  final fallback = PanchangStaticData.muhurats;
   final rahuRange = muhurta?.rahuKaal?.formattedRange;
-  if (rahuRange == null) return fallback;
-  return [
-    fallback[0],
-    Muhurat(fallback[1].name, rahuRange, fallback[1].kind),
-    fallback[2],
-    fallback[3],
-  ];
+  if (rahuRange == null) return const [];
+  final rahuTemplate = PanchangStaticData.muhurats[1];
+  return [Muhurat(rahuTemplate.name, rahuRange, rahuTemplate.kind)];
 }
 
 /// Panchang — daily Vedic almanac, per the approved Figma "B2 · Panchang"
@@ -199,21 +211,33 @@ class _PanchangScreenState extends ConsumerState<PanchangScreen> {
     final locale = Localizations.localeOf(context);
     final isCompact = MediaQuery.sizeOf(context).height < 840;
 
-    // The panchang endpoint needs a location. Prefer the signed-in user's
-    // saved birth profile; fall back to a fixed default (documented above)
-    // while it's still loading or doesn't exist (guest browsing) rather
-    // than blocking the whole screen on it — `valueOrNull` degrades
-    // loading/error states to `null` exactly as needed here.
-    final city = ref.watch(birthProfileProvider).valueOrNull?.city;
+    // WHERE THE USER IS, not where they were born — 21 Aug 2026.
+    //
+    // This used to read the saved birth profile's city. Sunrise, sunset and
+    // Rahu Kaal are all derived from the observer's position, so a user born
+    // in Jaipur and living in Erode was shown Jaipur's timings, and
+    // travelling changed nothing. `panchangLocationProvider` resolves
+    // manual override > device GPS > birth city > fallback; see
+    // `panchang_location.dart`.
+    final panchangLocation = ref.watch(panchangLocationProvider);
+    final city = panchangLocation.city;
     final request = (
       date: _selectedDate,
-      lat: city?.latitude ?? _fallbackLatitude,
-      lon: city?.longitude ?? _fallbackLongitude,
-      tz: city?.timezoneId ?? _fallbackTimezoneId,
+      lat: city.latitude,
+      lon: city.longitude,
+      tz: city.timezoneId,
     );
 
     final panchangAsync = ref.watch(panchangDataProvider(request));
-    final muhurtaAsync = ref.watch(muhurtaDataProvider);
+    // Same location as the panchang request — Rahu Kaal is sunrise/sunset
+    // derived and therefore location-dependent (21 Aug 2026).
+    final muhurtaAsync = ref.watch(
+      muhurtaDataProvider((
+        lat: request.lat,
+        lon: request.lon,
+        tz: request.tz,
+      )),
+    );
 
     return Scaffold(
       backgroundColor: AppColors.cream,
@@ -225,6 +249,8 @@ class _PanchangScreenState extends ConsumerState<PanchangScreen> {
             isCompact: isCompact,
             selectedDate: _selectedDate,
             masaPaksha: _masaPakshaLine(panchangAsync.valueOrNull),
+            // Name the city the coordinates above actually belong to.
+            locationName: city.name,
             onPrevious: _goToPreviousDay,
             onNext: _goToNextDay,
           ),
@@ -242,6 +268,9 @@ class _PanchangScreenState extends ConsumerState<PanchangScreen> {
                 locale: locale,
                 elements: _elementsFrom(data, l10n),
                 muhurats: _muhuratsFrom(muhurtaAsync.valueOrNull),
+                sunTimes: data.sunTimes,
+                guidance: data.guidance,
+                festivalToday: data.festivalToday,
               ),
               loading: () => _PanchangLoadingView(l10n: l10n, locale: locale),
               error: (error, stackTrace) => _PanchangErrorView(
@@ -269,6 +298,9 @@ class _PanchangBody extends StatelessWidget {
     required this.locale,
     required this.elements,
     required this.muhurats,
+    required this.sunTimes,
+    required this.guidance,
+    required this.festivalToday,
   });
 
   final AppLocalizations l10n;
@@ -276,34 +308,83 @@ class _PanchangBody extends StatelessWidget {
   final List<PanchangElement> elements;
   final List<Muhurat> muhurats;
 
+  /// Real sun/moon times when the response carried them; null falls back to
+  /// the static placeholder inside [_SunMoonCard].
+  final PanchangSunTimes? sunTimes;
+
+  /// Live guidance block — feeds the spiritual-advice card.
+  final PanchangGuidance? guidance;
+
+  /// A festival falling on the shown date, or null on the great majority of
+  /// days that have none.
+  final PanchangFestival? festivalToday;
+
   @override
   Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
       children: [
-        _SunMoonCard(l10n: l10n, locale: locale),
+        _SunMoonCard(
+          l10n: l10n,
+          locale: locale,
+          sunTimes: sunTimes,
+        ),
         const SizedBox(height: 14),
         _ElementsCard(l10n: l10n, locale: locale, elements: elements),
-        const SizedBox(height: 14),
-        Text(
-          l10n.muhuratToday,
-          style: AppFonts.heading(
-            locale,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: AppColors.ink,
+        // Heading AND grid together — a "Muhurat today" heading with
+        // nothing under it reads as a failed load rather than as "there is
+        // nothing to show". Rahu Kaal is always available in practice, so
+        // this hides only when the muhurta call itself failed.
+        if (muhurats.isNotEmpty) ...[
+          const SizedBox(height: 14),
+          Text(
+            l10n.muhuratToday,
+            style: AppFonts.heading(
+              locale,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: AppColors.ink,
+            ),
           ),
+          const SizedBox(height: 10),
+          _MuhuratGrid(l10n: l10n, locale: locale, muhurats: muhurats),
+        ],
+        const SizedBox(height: 14),
+        // Shown ONLY when a festival genuinely falls today (21 Aug 2026).
+        // Was a hardcoded "Kamika Ekadashi" on every date — an Ekadashi
+        // shown on a Navami, in the wrong month. The API's block is
+        // "upcoming" festivals, so most days correctly have none and the
+        // card is simply absent rather than inventing one.
+        if (festivalToday != null) ...[
+          _FestivalCard(
+            l10n: l10n,
+            locale: locale,
+            festival: festivalToday!,
+          ),
+          const SizedBox(height: 14),
+        ],
+        _AdviceCard(
+          l10n: l10n,
+          locale: locale,
+          guidance: guidance,
         ),
-        const SizedBox(height: 10),
-        _MuhuratGrid(l10n: l10n, locale: locale, muhurats: muhurats),
-        const SizedBox(height: 14),
-        _FestivalCard(l10n: l10n, locale: locale),
-        const SizedBox(height: 14),
-        _AdviceCard(l10n: l10n, locale: locale),
         const SizedBox(height: 14),
         _ViewAllMuhuratLink(l10n: l10n, locale: locale),
         const SizedBox(height: 14),
-        _OfflineBadge(l10n: l10n, locale: locale),
+        // _OfflineBadge REMOVED 21 Aug 2026 — it read
+        // "Available offline · Updated 6:00 AM", and neither half was true.
+        //
+        // There is no offline store: `PanchangRepository`'s cache is an
+        // in-memory map that dies with the process (its own doc comment
+        // says "a per-session optimization, not durable storage"), so a
+        // cold start with no connection shows the error view, not cached
+        // values. And "6:00 AM" was a hardcoded string, not a real fetch
+        // time — it never moved.
+        //
+        // Telling a user their almanac is available offline is a promise
+        // the app breaks the first time they open it on a train. Restore
+        // this only alongside real persistence, with a genuine timestamp.
+
       ],
     );
   }
@@ -441,9 +522,19 @@ class _PanchangHeader extends StatelessWidget {
     required this.isCompact,
     required this.selectedDate,
     required this.masaPaksha,
+    required this.locationName,
     required this.onPrevious,
     required this.onNext,
   });
+
+  /// The city this panchang was actually computed for.
+  ///
+  /// Was `PanchangStaticData.location` — the constant 'Hyderabad' — while
+  /// the REQUEST underneath already used the user's saved birth city. A
+  /// Jaipur user saw Jaipur's panchang labelled "Hyderabad" (21 Aug 2026).
+  /// Falls back to the same Hyderabad default the coordinates fall back to,
+  /// so the label and the data always name the same place.
+  final String locationName;
 
   final AppLocalizations l10n;
   final Locale locale;
@@ -514,7 +605,7 @@ class _PanchangHeader extends StatelessWidget {
                     const Icon(Icons.place, size: 12, color: Colors.white),
                     const SizedBox(width: 4),
                     Text(
-                      PanchangStaticData.location,
+                      locationName,
                       style: AppFonts.body(
                         locale,
                         fontSize: 11,
@@ -631,10 +722,20 @@ class _StepperArrow extends StatelessWidget {
 
 /// Sunrise / sunset / moonrise / moonset stat strip.
 class _SunMoonCard extends StatelessWidget {
-  const _SunMoonCard({required this.l10n, required this.locale});
+  const _SunMoonCard({
+    required this.l10n,
+    required this.locale,
+    required this.sunTimes,
+  });
 
   final AppLocalizations l10n;
   final Locale locale;
+
+  /// REAL sunrise/sunset/moonrise/moonset for the requested location, when
+  /// the response carried them (21 Aug 2026). Null falls back to the static
+  /// placeholder, which is what every user used to see unconditionally:
+  /// one fixed set of times for every city and every date.
+  final PanchangSunTimes? sunTimes;
 
   @override
   Widget build(BuildContext context) {
@@ -647,25 +748,25 @@ class _SunMoonCard extends StatelessWidget {
         Icons.wb_sunny_rounded,
         AppColors.genderSelectedText,
         l10n.panchangSunrise,
-        PanchangStaticData.sunrise,
+        sunTimes?.sunriseText ?? PanchangStaticData.sunrise,
       ),
       (
         Icons.wb_twilight_rounded,
         AppColors.tilePinkFg,
         l10n.panchangSunset,
-        PanchangStaticData.sunset,
+        sunTimes?.sunsetText ?? PanchangStaticData.sunset,
       ),
       (
         Icons.nightlight_round,
         AppColors.tileBlueFg,
         l10n.panchangMoonrise,
-        PanchangStaticData.moonrise,
+        sunTimes?.moonriseText ?? PanchangStaticData.moonrise,
       ),
       (
         Icons.dark_mode_rounded,
         AppColors.tilePurpleFg,
         l10n.panchangMoonset,
-        PanchangStaticData.moonset,
+        sunTimes?.moonsetText ?? PanchangStaticData.moonset,
       ),
     ];
 
@@ -820,7 +921,19 @@ class _ElementRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
       child: Row(
         children: [
-          Expanded(
+          // Flexible, NOT Expanded — fixed 21 Aug 2026.
+          //
+          // `Expanded` forced this label to claim a full equal share of the
+          // row even when it is as short as "Tithi", leaving the value side
+          // too narrow: "Shukla Navami · 98% left" ellipsised down to
+          // "Shukla N… 98% left". The tithi name is the single most
+          // important value on this screen, and it was the one being cut.
+          //
+          // `Flexible` lets a short label take only the width it needs and
+          // hands the slack to the value, while a long Indic label
+          // ("తిథి"/"ಕರಣ" etc. plus longer translations) can still shrink
+          // proportionally rather than overflowing.
+          Flexible(
             child: Text(
               label,
               style: AppFonts.body(
@@ -833,9 +946,15 @@ class _ElementRow extends StatelessWidget {
           const SizedBox(width: 8),
           // The value + "till" pair must be allowed to wrap/shrink: in
           // Telugu/Tamil/Kannada the label alone can take most of the row.
-          Flexible(
+          // Expanded (not Flexible) so the value side receives ALL the width
+          // the short label leaves behind, and right-aligned within it. An
+          // earlier attempt used Flexible + a Spacer; Spacer is
+          // Expanded(SizedBox()), so it swallowed the slack itself and made
+          // the truncation worse ("Shukla N…" -> "Shukl…").
+          Expanded(
             child: Row(
               mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Flexible(
                   child: Text(
@@ -853,16 +972,24 @@ class _ElementRow extends StatelessWidget {
                 ),
                 if (element.tillLabel != null) ...[
                   const SizedBox(width: 4),
-                  Flexible(
-                    child: Text(
-                      element.tillLabel!,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppFonts.body(
-                        locale,
-                        fontSize: 10.5,
-                        color: AppColors.hint,
-                      ),
+                  // NOT Flexible — the qualifier takes its intrinsic width
+                  // and the NAME gets everything else.
+                  //
+                  // While both were Flexible they split the row evenly, so
+                  // "Shukla Navami" was clipped to "Shukla N…" to make room
+                  // for "98% left". The tithi name is the headline value on
+                  // this screen; the percentage is a footnote. These
+                  // qualifiers are short and bounded by construction —
+                  // "98% left" and "Pada 2" — so giving them their natural
+                  // width cannot starve the name.
+                  Text(
+                    element.tillLabel!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppFonts.body(
+                      locale,
+                      fontSize: 10.5,
+                      color: AppColors.hint,
                     ),
                   ),
                 ],
@@ -931,55 +1058,47 @@ class _MuhuratGrid extends StatelessWidget {
   final AppLocalizations l10n;
   final Locale locale;
 
-  /// Always 4 entries, same order as [PanchangStaticData.muhurats] — see
-  /// `_muhuratsFrom` for how this is built.
+  /// However many muhurats are REAL — no longer a fixed four.
+  ///
+  /// This used to be indexed positionally (`muhurats[0]`..`[3]`), which
+  /// only worked because the list was always padded to four with static
+  /// placeholders. Now that unbacked windows are dropped rather than
+  /// invented, the count varies and the layout has to follow.
   final List<Muhurat> muhurats;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
+    // Laid out in rows of two, with a half-width trailing card when the
+    // count is odd — rather than stretching a lone card across the full
+    // width, which would read as a different kind of element.
+    final rows = <Widget>[];
+    for (var i = 0; i < muhurats.length; i += 2) {
+      if (i != 0) rows.add(const SizedBox(height: 10));
+      rows.add(
         Row(
           children: [
             Expanded(
               child: _MuhuratCard(
-                muhurat: muhurats[0],
+                muhurat: muhurats[i],
                 l10n: l10n,
                 locale: locale,
               ),
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: _MuhuratCard(
-                muhurat: muhurats[1],
-                l10n: l10n,
-                locale: locale,
-              ),
+              child: i + 1 < muhurats.length
+                  ? _MuhuratCard(
+                      muhurat: muhurats[i + 1],
+                      l10n: l10n,
+                      locale: locale,
+                    )
+                  : const SizedBox.shrink(),
             ),
           ],
         ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            Expanded(
-              child: _MuhuratCard(
-                muhurat: muhurats[2],
-                l10n: l10n,
-                locale: locale,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _MuhuratCard(
-                muhurat: muhurats[3],
-                l10n: l10n,
-                locale: locale,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
+      );
+    }
+    return Column(children: rows);
   }
 }
 
@@ -1053,7 +1172,14 @@ class _MuhuratCard extends StatelessWidget {
 /// Festival-of-the-day navy strip — identical recipe to the Home dashboard's
 /// festival card.
 class _FestivalCard extends StatelessWidget {
-  const _FestivalCard({required this.l10n, required this.locale});
+  const _FestivalCard({
+    required this.l10n,
+    required this.locale,
+    required this.festival,
+  });
+
+  /// The real festival falling today.
+  final PanchangFestival festival;
 
   final AppLocalizations l10n;
   final Locale locale;
@@ -1067,7 +1193,13 @@ class _FestivalCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: () {},
+          // Opens the festival's own details — wired 21 Aug 2026. The card
+          // carried a "Details ›" affordance from the day it was built and
+          // never had a destination, because there was no real festival
+          // behind it to describe. Now that `upcoming_festivals` is parsed
+          // there is: name, date, a written description, and Vedika's own
+          // confidence rating with a source URL.
+          onTap: () => _showFestivalDetails(context, l10n, locale, festival),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
             decoration: BoxDecoration(
@@ -1098,7 +1230,7 @@ class _FestivalCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        PanchangStaticData.festival,
+                        festival.name ?? '',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppFonts.body(
@@ -1149,7 +1281,20 @@ class _FestivalCard extends StatelessWidget {
 
 /// Spiritual advice card.
 class _AdviceCard extends StatelessWidget {
-  const _AdviceCard({required this.l10n, required this.locale});
+  const _AdviceCard({
+    required this.l10n,
+    required this.locale,
+    required this.guidance,
+  });
+
+  /// Live reading of the day from `guidance.summary` — it names this day's
+  /// actual tithi, nakshatra and yoga.
+  ///
+  /// WIRED 21 Aug 2026. The field was in every panchang response already;
+  /// it simply was never parsed, so this card showed one fixed paragraph
+  /// ("An auspicious day for charity...") on every date, including days the
+  /// API itself rates "Challenging".
+  final PanchangGuidance? guidance;
 
   final AppLocalizations l10n;
   final Locale locale;
@@ -1197,7 +1342,7 @@ class _AdviceCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  PanchangStaticData.advice,
+                  guidance?.summary ?? PanchangStaticData.advice,
                   style: AppFonts.body(
                     locale,
                     fontSize: 11.5,
@@ -1226,7 +1371,14 @@ class _ViewAllMuhuratLink extends StatelessWidget {
       button: true,
       child: InkWell(
         borderRadius: BorderRadius.circular(8),
-        onTap: () {},
+        // Real destination since 21 Aug 2026 — this was `onTap: () {}` on a
+        // link that looked and behaved like every working link in the app.
+        // The full day/night choghadiya schedule was already being fetched
+        // and parsed on this screen; only Rahu Kaal was ever rendered from
+        // it. See MuhuratTimingsScreen.
+        onTap: () => Navigator.of(
+          context,
+        ).push(fadeThroughRoute(const MuhuratTimingsScreen())),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Row(
@@ -1254,6 +1406,7 @@ class _ViewAllMuhuratLink extends StatelessWidget {
   }
 }
 
+// ignore: unused_element  — restore alongside real offline persistence
 class _OfflineBadge extends StatelessWidget {
   const _OfflineBadge({required this.l10n, required this.locale});
 
@@ -1295,4 +1448,94 @@ class _OfflineBadge extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Festival details, as a modal sheet.
+///
+/// ADDED 21 Aug 2026 for the festival card's previously-inert "Details ›"
+/// link. A sheet rather than a pushed screen: this is one short reading
+/// about one day, and a full route for three paragraphs would be heavier
+/// than the content.
+///
+/// Everything shown is Vedika's own — including [PanchangFestival.confidence]
+/// and [PanchangFestival.source]. Festival dates are genuinely contested
+/// (regional calendars disagree, and some depend on local sunrise), so where
+/// the API says a date is "verified" and names where it got it, passing that
+/// through is more honest than presenting every date with equal certainty.
+Future<void> _showFestivalDetails(
+  BuildContext context,
+  AppLocalizations l10n,
+  Locale locale,
+  PanchangFestival festival,
+) {
+  return showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: AppColors.surface,
+    showDragHandle: true,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+    ),
+    builder: (sheetContext) {
+      return SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(22, 4, 22, 26),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                festival.name ?? '',
+                style: AppFonts.heading(
+                  locale,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.ink,
+                ),
+              ),
+              if (festival.date != null) ...[
+                const SizedBox(height: 4),
+                Text(
+                  festival.date!,
+                  style: AppFonts.body(
+                    locale,
+                    fontSize: 12.5,
+                    color: AppColors.hint,
+                  ),
+                ),
+              ],
+              if (festival.description != null &&
+                  festival.description!.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Text(
+                  festival.description!,
+                  style: AppFonts.body(
+                    locale,
+                    fontSize: 13.5,
+                    color: AppColors.muted,
+                    height: 1.55,
+                  ),
+                ),
+              ],
+              if (festival.source != null && festival.source!.isNotEmpty) ...[
+                const SizedBox(height: 18),
+                // Shown as plain text, not a tappable link: opening an
+                // external browser is a bigger action than this sheet
+                // implies, and the app has no url_launcher dependency. The
+                // attribution is the point.
+                Text(
+                  festival.source!,
+                  style: AppFonts.body(
+                    locale,
+                    fontSize: 10.5,
+                    color: AppColors.hint,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }

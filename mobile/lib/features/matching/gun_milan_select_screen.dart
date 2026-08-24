@@ -5,8 +5,12 @@ import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../l10n/app_localizations.dart';
+import '../profile/birth_profile.dart';
 import '../profile/birth_profile_repository.dart';
+import '../profile/birth_details_screen.dart';
 import 'gun_milan_result_screen.dart';
+import 'partner_details_screen.dart';
+import 'partner_profile.dart';
 import 'gun_milan_static_data.dart';
 
 /// Gun Milan — Select, per the approved Figma "C1 · Gun Milan — Select"
@@ -312,10 +316,18 @@ class _GroomCard extends StatelessWidget {
                 label: l10n.change,
                 child: PressableScale(
                   borderRadius: BorderRadius.circular(8),
-                  // Switching the groom to a different saved profile needs
-                  // multi-profile support, which isn't built — see
-                  // GunMilanStaticData's doc comment. No-op for now.
-                  onTap: () {},
+                  // Opens the account's own Birth Details for editing —
+                  // 21 Aug 2026. This was `onTap: () {}` on a control that
+                  // looks and reads exactly like a working button.
+                  //
+                  // "Change" cannot yet mean "pick a different saved
+                  // profile" (multi-profile isn't built), but it CAN mean
+                  // "these details are wrong, correct them", which is what
+                  // a user tapping it almost always wants — and a wrong
+                  // birth time silently poisons the whole 36-guna score.
+                  onTap: () => Navigator.of(
+                    context,
+                  ).push(fadeThroughRoute(const BirthDetailsScreen())),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 4,
@@ -369,23 +381,33 @@ class _HeartDivider extends StatelessWidget {
 /// BRIDE card (Figma node 19:22) — an intentional EMPTY STATE, since
 /// multi-profile support (family/friends) isn't built yet. The whole card is
 /// tappable, but currently a no-op — see [GunMilanStaticData]'s doc comment.
-class _BrideCard extends StatelessWidget {
+class _BrideCard extends ConsumerWidget {
   const _BrideCard({required this.l10n, required this.locale});
 
   final AppLocalizations l10n;
   final Locale locale;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // The REAL partner once entered (21 Aug 2026); the empty state below is
+    // shown only while there genuinely isn't one.
+    final partner = ref.watch(partnerProfileProvider);
     return Semantics(
       button: true,
       label: l10n.selectBrideProfile,
       child: PressableScale(
         borderRadius: BorderRadius.circular(18),
-        // Choosing/adding a bride profile requires multi-profile support —
-        // the same follow-up the Kundli input screen's "Add family or
-        // friend" button is the honest entry point for. No-op for now.
-        onTap: () {},
+        // Collects the partner's birth details (21 Aug 2026). Previously a
+        // no-op, which is why the Result screen had nothing to match
+        // against and fell back to a fabricated bride.
+        onTap: () async {
+          final entered = await Navigator.of(context).push<BirthProfile>(
+            fadeThroughRoute(PartnerDetailsScreen(initial: partner)),
+          );
+          if (entered != null) {
+            ref.read(partnerProfileProvider.notifier).set(entered);
+          }
+        },
         child: _ProfileCardShell(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -427,7 +449,7 @@ class _BrideCard extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          l10n.selectBrideProfile,
+                          partner?.fullName ?? l10n.selectBrideProfile,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: AppFonts.body(
@@ -439,7 +461,7 @@ class _BrideCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 1),
                         Text(
-                          l10n.selectBrideHint,
+                          partner?.summaryLine ?? l10n.selectBrideHint,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: AppFonts.body(
@@ -514,16 +536,32 @@ class _PrivacyNote extends StatelessWidget {
 /// Full-width "Match Kundlis 💞" CTA (Figma node 19:35). Shares the
 /// saffron-gradient pill recipe of the Kundli input screen's Generate
 /// button.
-class _MatchKundlisButton extends StatelessWidget {
+class _MatchKundlisButton extends ConsumerWidget {
   const _MatchKundlisButton({required this.l10n, required this.locale});
 
   final AppLocalizations l10n;
   final Locale locale;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // GATED ON A REAL PARTNER — 21 Aug 2026.
+    //
+    // This button used to be permanently enabled, "per the design". Tapping
+    // it with no partner selected did not fail: the Result screen filled the
+    // gap with a hardcoded chart and produced a complete, specific verdict —
+    // "13.5 out of 36 · Not recommended for marriage" — for a bride named
+    // "Ananya" who does not exist, with a download button beside it.
+    //
+    // A marriage-compatibility verdict is not a placeholder that a user can
+    // recognise as fake. Disabling the button until there is a second real
+    // chart is the fix; the Result screen refuses the fallback as well, so
+    // neither path can produce a fabricated reading.
+    final partner = ref.watch(partnerProfileProvider);
+    final isEnabled = partner != null;
+
     return Semantics(
       button: true,
+      enabled: isEnabled,
       label: l10n.matchKundlis,
       child: Container(
         width: double.infinity,
@@ -531,7 +569,7 @@ class _MatchKundlisButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(999),
           boxShadow: [
             BoxShadow(
-              color: AppColors.saffron.withValues(alpha: 0.35),
+              color: AppColors.saffron.withValues(alpha: isEnabled ? 0.35 : 0),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -539,25 +577,24 @@ class _MatchKundlisButton extends StatelessWidget {
         ),
         child: PressableScale(
           borderRadius: BorderRadius.circular(999),
-          // Kept enabled per the design rather than gated on a selected
-          // bride — becomes conditional once multi-profile support lands.
-          //
-          // No profile data is threaded through this navigation call: the
-          // Result screen independently re-reads the same
-          // `birthProfileProvider` for the groom (exactly like this screen
-          // does above) and falls back to
-          // `GunMilanStaticData.placeholderBridePartnerParams` for the
-          // bride, since there is still no second saved profile to select
-          // here — see that constant's doc comment for the multi-profile
-          // gap this stands in for. Once multi-profile support exists, a
-          // real selected bride profile needs to be passed forward from
-          // here instead.
-          onTap: () => Navigator.of(
-            context,
-          ).push(fadeThroughRoute(const GunMilanResultScreen())),
+          // Both charts are read independently by the Result screen from
+          // `birthProfileProvider` (groom) and `partnerProfileProvider`
+          // (partner), so nothing needs threading through this call.
+          // PressableScale.onTap is non-nullable, so "disabled" is a no-op
+          // callback plus the flattened styling below — the button reads as
+          // inert and cannot navigate.
+          onTap: () {
+            if (!isEnabled) return;
+            Navigator.of(
+              context,
+            ).push(fadeThroughRoute(const GunMilanResultScreen()));
+          },
           child: Ink(
             padding: const EdgeInsets.symmetric(vertical: 17),
-            decoration: BoxDecoration(gradient: AppColors.saffronGradient),
+            decoration: BoxDecoration(
+              gradient: isEnabled ? AppColors.saffronGradient : null,
+              color: isEnabled ? null : AppColors.cardBorder,
+            ),
             child: Center(
               child: Text(
                 '${l10n.matchKundlis} 💞',

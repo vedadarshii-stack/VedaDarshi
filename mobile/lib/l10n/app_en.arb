@@ -56,14 +56,6 @@
   "@welcomeSubtitle": {
     "description": "Subtitle under the greeting on the Welcome/Login screen, explaining why the user should sign in."
   },
-  "phoneHint": "Mobile number",
-  "@phoneHint": {
-    "description": "Placeholder hint text in the phone number input field on the Welcome/Login screen."
-  },
-  "getOtp": "Get OTP",
-  "@getOtp": {
-    "description": "Label of the CTA button that requests an OTP for the entered phone number."
-  },
   "orContinueWith": "or continue with",
   "@orContinueWith": {
     "description": "Divider label between the phone sign-in section and the Google sign-in button."
@@ -80,65 +72,9 @@
   "@termsNotice": {
     "description": "Fine-print notice at the bottom of the Welcome/Login screen referencing the legal terms."
   },
-  "otpTitle": "Verify your number",
-  "@otpTitle": {
-    "description": "Heading of the OTP verification screen."
-  },
-  "otpSubtitle": "Enter the 6-digit code sent to {phone}",
-  "@otpSubtitle": {
-    "description": "Subtitle of the OTP verification screen, naming the masked phone number the code was sent to.",
-    "placeholders": {
-      "phone": {
-        "type": "String",
-        "example": "+91 98••• ••210"
-      }
-    }
-  },
-  "otpNoCode": "Didn't receive the code?",
-  "@otpNoCode": {
-    "description": "Prompt introducing the resend option on the OTP verification screen."
-  },
-  "otpResendIn": "Resend in {seconds}",
-  "@otpResendIn": {
-    "description": "Countdown shown before the resend option becomes available on the OTP verification screen.",
-    "placeholders": {
-      "seconds": {
-        "type": "String",
-        "example": "00:24"
-      }
-    }
-  },
-  "otpResend": "Resend",
-  "@otpResend": {
-    "description": "Tappable label to request a new OTP once the resend countdown has finished."
-  },
-  "otpVerify": "Verify & Continue",
-  "@otpVerify": {
-    "description": "Label of the CTA button that submits the entered OTP code."
-  },
-  "otpPrivacy": "🔒 Your number is kept private and secure",
-  "@otpPrivacy": {
-    "description": "Reassurance notice at the bottom of the OTP verification screen."
-  },
-  "otpResent": "A new code has been sent.",
-  "@otpResent": {
-    "description": "Confirmation snackbar shown after successfully requesting a new OTP code."
-  },
   "authErrorNetwork": "No internet connection. Please check your network and try again.",
   "@authErrorNetwork": {
     "description": "Error message shown when an auth operation fails due to no/unstable network connectivity."
-  },
-  "authErrorInvalidPhone": "That phone number doesn't look right. Please check and try again.",
-  "@authErrorInvalidPhone": {
-    "description": "Error message shown when the entered phone number is not a valid, dialable number."
-  },
-  "authErrorInvalidOtp": "That code is incorrect. Please try again.",
-  "@authErrorInvalidOtp": {
-    "description": "Error message shown when the entered OTP code does not match what was sent."
-  },
-  "authErrorOtpExpired": "That code has expired. Please request a new one.",
-  "@authErrorOtpExpired": {
-    "description": "Error message shown when the OTP session/code expired before it was verified."
   },
   "authErrorTooManyRequests": "Too many attempts. Please wait a while before trying again.",
   "@authErrorTooManyRequests": {
@@ -1649,5 +1585,129 @@
   "purchaseErrorUnavailable": "This plan isn't available right now.",
   "@purchaseErrorUnavailable": {
     "description": "Snackbar when the product is missing or inactive in Play Console."
+  },
+  "panchangLocationUseAutomatic": "Use my current location",
+  "@panchangLocationUseAutomatic": {
+    "description": "Panchang location screen (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval, like the rest of this file."
+  },
+  "panchangLocationSourceManual": "Chosen by you",
+  "@panchangLocationSourceManual": {
+    "description": "Panchang location screen (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval, like the rest of this file."
+  },
+  "panchangLocationSourceDevice": "Detected from your location",
+  "@panchangLocationSourceDevice": {
+    "description": "Panchang location screen (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval, like the rest of this file."
+  },
+  "panchangLocationSourceBirthProfile": "From your birth details",
+  "@panchangLocationSourceBirthProfile": {
+    "description": "Panchang location screen (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval, like the rest of this file."
+  },
+  "panchangLocationSourceFallback": "Default location",
+  "@panchangLocationSourceFallback": {
+    "description": "Panchang location screen (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval, like the rest of this file."
+  },
+  "muhuratDay": "DAY CHOGHADIYA",
+  "@muhuratDay": {
+    "description": "Muhurat timings screen (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval."
+  },
+  "muhuratNight": "NIGHT CHOGHADIYA",
+  "@muhuratNight": {
+    "description": "Muhurat timings screen (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval."
+  },
+  "muhuratUnavailable": "Muhurat timings aren't available right now.",
+  "@muhuratUnavailable": {
+    "description": "Muhurat timings screen (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval."
+  },
+  "partnerDetailsTitle": "Partner's birth details",
+  "@partnerDetailsTitle": {
+    "description": "Gun Milan partner details (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval."
+  },
+  "partnerDetailsSave": "Save details",
+  "@partnerDetailsSave": {
+    "description": "Gun Milan partner details (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval."
+  },
+  "matchNeedsPartner": "Add the partner's birth details to match.",
+  "@matchNeedsPartner": {
+    "description": "Gun Milan partner details (added 21 Aug 2026). hi/te/ta/kn are machine drafts pending client approval."
+  },
+  "emailHint": "Email address",
+  "@emailHint": {
+    "description": "Placeholder hint text in the email input field on the Welcome/Login and sign-up screens."
+  },
+  "passwordHint": "Password",
+  "@passwordHint": {
+    "description": "Placeholder hint text in the password input field."
+  },
+  "confirmPasswordHint": "Confirm password",
+  "@confirmPasswordHint": {
+    "description": "Placeholder hint text in the confirm-password input field on the sign-up screen."
+  },
+  "signInAction": "Sign in",
+  "@signInAction": {
+    "description": "Label of the CTA button that submits the email/password sign-in form."
+  },
+  "forgotPassword": "Forgot password?",
+  "@forgotPassword": {
+    "description": "Tappable label on the Welcome/Login screen that opens the forgot-password screen."
+  },
+  "noAccountPrompt": "New to Vedadarshi?",
+  "@noAccountPrompt": {
+    "description": "Prompt on the Welcome/Login screen inviting a new user to create an account."
+  },
+  "createAccount": "Create account",
+  "@createAccount": {
+    "description": "Tappable label that navigates to the sign-up screen."
+  },
+  "signUpTitle": "Create your account",
+  "@signUpTitle": {
+    "description": "Title of the email sign-up screen."
+  },
+  "haveAccountPrompt": "Already have an account?",
+  "@haveAccountPrompt": {
+    "description": "Prompt inviting a user on the sign-up screen to sign in instead."
+  },
+  "forgotPasswordTitle": "Reset your password",
+  "@forgotPasswordTitle": {
+    "description": "Title of the forgot-password screen."
+  },
+  "forgotPasswordSubtitle": "Enter the email address you signed up with and we'll send you a link to reset your password.",
+  "@forgotPasswordSubtitle": {
+    "description": "Explanatory body text on the forgot-password screen."
+  },
+  "sendResetLink": "Send reset link",
+  "@sendResetLink": {
+    "description": "Label of the CTA button that sends the password reset email."
+  },
+  "resetLinkSent": "If that email is registered, a reset link is on its way.",
+  "@resetLinkSent": {
+    "description": "Confirmation snackbar shown after requesting a password reset, worded so it never reveals whether the email is actually registered."
+  },
+  "passwordTooShort": "Password must be at least 6 characters.",
+  "@passwordTooShort": {
+    "description": "Validation message shown when the entered password is shorter than the minimum length."
+  },
+  "passwordsDoNotMatch": "Those passwords don't match.",
+  "@passwordsDoNotMatch": {
+    "description": "Validation message shown when the password and confirm-password fields differ."
+  },
+  "authErrorEmailInUse": "That email is already registered. Try signing in instead.",
+  "@authErrorEmailInUse": {
+    "description": "Error message shown when signing up with an email address that already has an account."
+  },
+  "authErrorInvalidEmail": "That email address doesn't look right.",
+  "@authErrorInvalidEmail": {
+    "description": "Error message shown when the entered email address is not validly formatted."
+  },
+  "authErrorWeakPassword": "Please choose a password of at least 6 characters.",
+  "@authErrorWeakPassword": {
+    "description": "Error message shown when the chosen password doesn't meet Firebase's minimum strength requirement."
+  },
+  "authErrorWrongCredentials": "Incorrect email or password. Please try again.",
+  "@authErrorWrongCredentials": {
+    "description": "Error message shown when email/password sign-in fails due to a wrong password or unrecognized credential."
+  },
+  "authErrorUserNotFound": "No account found with that email address.",
+  "@authErrorUserNotFound": {
+    "description": "Error message shown when no account exists for the entered email address."
   }
 }

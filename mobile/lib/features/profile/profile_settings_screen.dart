@@ -14,7 +14,8 @@ import '../../l10n/app_localizations.dart';
 import '../kundli/kundli_static_data.dart';
 import '../auth/auth_error_messages.dart';
 import '../notifications/notifications_screen.dart';
-import '../panchang/panchang_static_data.dart';
+import '../panchang/panchang_location.dart';
+import '../panchang/panchang_location_screen.dart';
 import '../premium/subscription_paywall_screen.dart';
 import '../reports/premium_reports_screen.dart';
 import '../startup/root_gate.dart';
@@ -321,10 +322,24 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                 _MenuRow(
                   emoji: '📍',
                   title: l10n.profilePanchangLocation,
-                  subtitle: PanchangStaticData.location,
+                  // The city the panchang is ACTUALLY computed for — the
+                  // saved birth city, which is what `panchang_screen.dart`
+                  // and Home both send as coordinates. This row previously
+                  // read the constant `PanchangStaticData.location`
+                  // ('Hyderabad') and so contradicted the Panchang tab's own
+                  // header for every user not born there (21 Aug 2026).
+                  //
+                  // Null while the profile loads or for a guest — the row
+                  // then shows no subtitle rather than naming a city that
+                  // isn't theirs.
+                  subtitle: ref.watch(panchangLocationProvider).city.name,
                   locale: locale,
-                  // No location-settings screen exists yet.
-                  onTap: () {},
+                  // Now a real destination (21 Aug 2026): panchang location
+                  // IS its own setting, because a daily almanac is about
+                  // where the user IS while the birth city is fixed history.
+                  onTap: () => Navigator.of(context).push(
+                    fadeThroughRoute(const PanchangLocationScreen()),
+                  ),
                 ),
                 _MenuRow(
                   emoji: '👑',

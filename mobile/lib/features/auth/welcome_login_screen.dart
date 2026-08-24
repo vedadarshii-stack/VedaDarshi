@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/auth/auth_providers.dart';
 import '../../core/auth/auth_service.dart';
+import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../l10n/app_localizations.dart';
 import '../profile/post_sign_in_route.dart';
 import 'auth_error_messages.dart';
-import 'otp_verify_screen.dart';
+import 'auth_widgets.dart';
+import 'email_sign_up_screen.dart';
+import 'forgot_password_screen.dart';
 
 /// Welcome/Login screen, matching the approved Figma "A3 · Welcome / Login"
 /// (node 7:2) concept.
 ///
-/// Offers phone-number sign-in (OTP), Google sign-in, or a guest pass-through
+/// Offers email/password sign-in, Google sign-in, or a guest pass-through
 /// into the app. Reached from [LanguageSelectScreen]'s Continue button.
 class WelcomeLoginScreen extends ConsumerStatefulWidget {
   const WelcomeLoginScreen({super.key});
@@ -24,71 +26,59 @@ class WelcomeLoginScreen extends ConsumerStatefulWidget {
 }
 
 class _WelcomeLoginScreenState extends ConsumerState<WelcomeLoginScreen> {
-  final _phoneController = TextEditingController();
-  final _phoneFocusNode = FocusNode();
+  final _emailController = TextEditingController();
+  final _emailFocusNode = FocusNode();
+  final _passwordController = TextEditingController();
+  final _passwordFocusNode = FocusNode();
 
-  bool _isSendingOtp = false;
+  bool _obscurePassword = true;
+  bool _isSigningIn = false;
   bool _isGoogleLoading = false;
   bool _isGuestLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _phoneController.addListener(_onPhoneChanged);
-    _phoneFocusNode.addListener(_onFocusChanged);
+    _emailController.addListener(_onFieldChanged);
+    _emailFocusNode.addListener(_onFieldChanged);
+    _passwordController.addListener(_onFieldChanged);
+    _passwordFocusNode.addListener(_onFieldChanged);
   }
 
   @override
   void dispose() {
-    _phoneController.removeListener(_onPhoneChanged);
-    _phoneFocusNode.removeListener(_onFocusChanged);
-    _phoneController.dispose();
-    _phoneFocusNode.dispose();
+    _emailController.removeListener(_onFieldChanged);
+    _emailFocusNode.removeListener(_onFieldChanged);
+    _passwordController.removeListener(_onFieldChanged);
+    _passwordFocusNode.removeListener(_onFieldChanged);
+    _emailController.dispose();
+    _emailFocusNode.dispose();
+    _passwordController.dispose();
+    _passwordFocusNode.dispose();
     super.dispose();
   }
 
   bool get _isAnyLoading =>
-      _isSendingOtp || _isGoogleLoading || _isGuestLoading;
+      _isSigningIn || _isGoogleLoading || _isGuestLoading;
 
-  void _onPhoneChanged() => setState(() {});
+  void _onFieldChanged() => setState(() {});
 
-  void _onFocusChanged() => setState(() {});
+  bool get _isEmailValid => _emailController.text.contains('@');
 
-  bool get _isPhoneValid => _phoneController.text.length == 10;
+  bool get _isPasswordValid => _passwordController.text.length >= 6;
 
-  void _goToOtpVerify(String phoneE164, PhoneCodeSent sent) {
-    Navigator.of(context).push<void>(
-      PageRouteBuilder<void>(
-        transitionDuration: const Duration(milliseconds: 350),
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            OtpVerifyScreen(
-              phoneE164: phoneE164,
-              verificationId: sent.verificationId,
-              resendToken: sent.resendToken,
-            ),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-      ),
-    );
-  }
-
-  Future<void> _requestOtp() async {
-    if (!_isPhoneValid || _isAnyLoading) return;
+  Future<void> _signIn() async {
+    if (!_isEmailValid || !_isPasswordValid || _isAnyLoading) return;
     final l10n = AppLocalizations.of(context)!;
     final authService = ref.read(authServiceProvider);
-    setState(() => _isSendingOtp = true);
-    final phoneE164 = '+91${_phoneController.text}';
+    setState(() => _isSigningIn = true);
     try {
-      final sent = await authService.sendOtp(phoneE164: phoneE164);
+      await authService.signInWithEmail(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
       if (!mounted) return;
-      if (sent.autoVerified) {
-        // Android instant verification already signed the user in — skip
-        // the OTP entry screen entirely.
-        await navigateAfterSignIn(context, ref);
-      } else {
-        _goToOtpVerify(phoneE164, sent);
-      }
+      await navigateAfterSignIn(context, ref);
     } on AuthException catch (e) {
       if (!mounted) return;
       final message = authErrorMessage(l10n, e.code);
@@ -98,7 +88,7 @@ class _WelcomeLoginScreenState extends ConsumerState<WelcomeLoginScreen> {
         ).showSnackBar(SnackBar(content: Text(message)));
       }
     } finally {
-      if (mounted) setState(() => _isSendingOtp = false);
+      if (mounted) setState(() => _isSigningIn = false);
     }
   }
 
@@ -143,6 +133,14 @@ class _WelcomeLoginScreenState extends ConsumerState<WelcomeLoginScreen> {
         await navigateAfterSignIn(context, ref);
       }
     }
+  }
+
+  void _goToForgotPassword() {
+    Navigator.of(context).push<void>(fadeThroughRoute(const ForgotPasswordScreen()));
+  }
+
+  void _goToSignUp() {
+    Navigator.of(context).push<void>(fadeThroughRoute(const EmailSignUpScreen()));
   }
 
   @override
@@ -203,23 +201,72 @@ class _WelcomeLoginScreenState extends ConsumerState<WelcomeLoginScreen> {
                           ),
                         ),
                         SizedBox(height: bodyGap),
-                        _PhoneField(
-                          l10n: l10n,
+                        AuthTextField(
                           locale: locale,
-                          controller: _phoneController,
-                          focusNode: _phoneFocusNode,
+                          controller: _emailController,
+                          focusNode: _emailFocusNode,
                           enabled: !_isAnyLoading,
-                          onSubmitted: (_) => _requestOtp(),
+                          hintText: l10n.emailHint,
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.next,
+                          onSubmitted: (_) =>
+                              FocusScope.of(context).requestFocus(_passwordFocusNode),
                         ),
                         SizedBox(height: bodyGap),
-                        _GetOtpButton(
-                          l10n: l10n,
+                        AuthTextField(
                           locale: locale,
-                          enabled: _isPhoneValid && !_isAnyLoading,
-                          loading: _isSendingOtp,
-                          onTap: _requestOtp,
+                          controller: _passwordController,
+                          focusNode: _passwordFocusNode,
+                          enabled: !_isAnyLoading,
+                          hintText: l10n.passwordHint,
+                          obscureText: _obscurePassword,
+                          textInputAction: TextInputAction.done,
+                          onSubmitted: (_) => _signIn(),
+                          suffixIcon: IconButton(
+                            onPressed: () => setState(
+                              () => _obscurePassword = !_obscurePassword,
+                            ),
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_outlined
+                                  : Icons.visibility_off_outlined,
+                            ),
+                            color: AppColors.hint,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            visualDensity: VisualDensity.compact,
+                            splashRadius: 20,
+                          ),
                         ),
                         SizedBox(height: bodyGap),
+                        AuthPrimaryButton(
+                          locale: locale,
+                          label: l10n.signInAction,
+                          enabled:
+                              _isEmailValid && _isPasswordValid && !_isAnyLoading,
+                          loading: _isSigningIn,
+                          onTap: _signIn,
+                        ),
+                        SizedBox(height: bodyGap * 0.6),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: GestureDetector(
+                            onTap: _isAnyLoading ? null : _goToForgotPassword,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Text(
+                                l10n.forgotPassword,
+                                style: AppFonts.body(
+                                  locale,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.saffron,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: bodyGap * 0.6),
                         _DividerRow(l10n: l10n, locale: locale),
                         SizedBox(height: bodyGap),
                         _GoogleButton(
@@ -240,17 +287,51 @@ class _WelcomeLoginScreenState extends ConsumerState<WelcomeLoginScreen> {
                         const Spacer(),
                         SafeArea(
                           top: false,
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: Text(
-                              l10n.termsNotice,
-                              textAlign: TextAlign.center,
-                              style: AppFonts.body(
-                                locale,
-                                fontSize: 11,
-                                color: AppColors.hint,
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                width: double.infinity,
+                                child: Text(
+                                  l10n.termsNotice,
+                                  textAlign: TextAlign.center,
+                                  style: AppFonts.body(
+                                    locale,
+                                    fontSize: 11,
+                                    color: AppColors.hint,
+                                  ),
+                                ),
                               ),
-                            ),
+                              const SizedBox(height: 14),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      l10n.noAccountPrompt,
+                                      textAlign: TextAlign.center,
+                                      style: AppFonts.body(
+                                        locale,
+                                        fontSize: 13,
+                                        color: AppColors.muted,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  GestureDetector(
+                                    onTap: _isAnyLoading ? null : _goToSignUp,
+                                    child: Text(
+                                      l10n.createAccount,
+                                      style: AppFonts.body(
+                                        locale,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.saffron,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -335,174 +416,6 @@ class _Hero extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Section 2 — the phone number input, with a fixed "🇮🇳 +91" country-code
-/// prefix and animated focus border.
-class _PhoneField extends StatelessWidget {
-  const _PhoneField({
-    required this.l10n,
-    required this.locale,
-    required this.controller,
-    required this.focusNode,
-    required this.enabled,
-    required this.onSubmitted,
-  });
-
-  final AppLocalizations l10n;
-  final Locale locale;
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final bool enabled;
-  final ValueChanged<String> onSubmitted;
-
-  @override
-  Widget build(BuildContext context) {
-    final isFocused = focusNode.hasFocus;
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeInOut,
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isFocused ? AppColors.saffron : AppColors.cardBorder,
-          width: isFocused ? 1.5 : 1,
-        ),
-      ),
-      child: Row(
-        children: [
-          // The country code is deliberately NOT localised — it is a fixed
-          // ISO dialing prefix, not user-facing prose.
-          Text(
-            '🇮🇳  +91',
-            style: AppFonts.body(
-              const Locale('en'),
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-              color: AppColors.ink,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Container(width: 1, height: 22, color: AppColors.cardBorder),
-          const SizedBox(width: 12),
-          Expanded(
-            child: TextField(
-              controller: controller,
-              focusNode: focusNode,
-              enabled: enabled,
-              keyboardType: TextInputType.phone,
-              maxLength: 10,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              textInputAction: TextInputAction.done,
-              onSubmitted: onSubmitted,
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                isDense: true,
-                counterText: '',
-                contentPadding: EdgeInsets.zero,
-                hintText: l10n.phoneHint,
-                hintStyle: AppFonts.body(
-                  locale,
-                  fontSize: 15,
-                  color: AppColors.hint,
-                ),
-              ),
-              // Digits are always Latin regardless of the active app locale.
-              style: AppFonts.body(
-                const Locale('en'),
-                fontSize: 15,
-                color: AppColors.ink,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Section 3 — full-width "Get OTP" CTA, disabled until 10 digits are
-/// entered. Shares the saffron-gradient pill recipe of the language select
-/// screen's `_ContinueButton`.
-class _GetOtpButton extends StatelessWidget {
-  const _GetOtpButton({
-    required this.l10n,
-    required this.locale,
-    required this.enabled,
-    required this.loading,
-    required this.onTap,
-  });
-
-  final AppLocalizations l10n;
-  final Locale locale;
-  final bool enabled;
-  final bool loading;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      enabled: enabled,
-      label: l10n.getOtp,
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(999),
-          boxShadow: enabled
-              ? [
-                  BoxShadow(
-                    color: AppColors.saffron.withValues(alpha: 0.35),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ]
-              : null,
-        ),
-        child: Material(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(999),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: enabled ? onTap : null,
-            child: Ink(
-              padding: const EdgeInsets.symmetric(vertical: 17),
-              decoration: BoxDecoration(
-                gradient: enabled ? AppColors.saffronGradient : null,
-                color: enabled
-                    ? null
-                    : AppColors.saffron.withValues(alpha: 0.35),
-              ),
-              child: Center(
-                child: loading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
-                        ),
-                      )
-                    : Text(
-                        l10n.getOtp,
-                        style: AppFonts.body(
-                          locale,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-              ),
-            ),
-          ),
         ),
       ),
     );

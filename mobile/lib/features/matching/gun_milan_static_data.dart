@@ -31,6 +31,20 @@ import 'guna_milan_data.dart';
 /// mock — it only supplies the numbers the API call cannot run without.
 /// Replace both the instant this app can store a second profile.
 abstract final class GunMilanStaticData {
+  // DELETED 21 Aug 2026: `placeholderBrideName` ('Ananya') and
+  // `placeholderBridePartnerParams` (a hardcoded Mumbai 1997 chart).
+  //
+  // They were the only reason the Result screen could run without a second
+  // person, and the result was a complete marriage verdict — "13.5 out of
+  // 36 · Not recommended for marriage" — attributed to someone who does not
+  // exist. The constants' own doc comment said "Do not let this silently
+  // reach production"; it had shipped. Partner details are now entered via
+  // `PartnerDetailsScreen` and held in `partnerProfileProvider`, and both
+  // the CTA and the Result screen refuse to proceed without one.
+  //
+  // Removed rather than deprecated: a plausible-looking fallback left in
+  // reach is exactly how this happened.
+
   static const String fallbackGroomName = 'Nagarjuna';
   static const String fallbackGroomSummary =
       '14 Aug 1990 · 06:45 AM · Hyderabad';
@@ -48,24 +62,5 @@ abstract final class GunMilanStaticData {
         timezone: '+05:30',
       );
 
-  /// Bride display name for the Result screen's "$groomName 💞 $brideName"
-  /// header line — the same 'Ananya' placeholder the Select screen's empty
-  /// bride card design implies, kept as ONE shared constant rather than
-  /// re-declared per screen.
-  static const String placeholderBrideName = 'Ananya';
 
-  /// Placeholder bride birth params (Mumbai, India — 19.0728°N 72.8826°E,
-  /// also fixed +05:30) — the ONLY thing that makes the Result screen's API
-  /// call runnable today, per this file's doc comment on the multi-profile
-  /// gap. Arbitrary: not meant to represent a real "Ananya", just a
-  /// plausible second chart. **Do not let this silently reach production**
-  /// — once multi-profile support exists, the Result screen must require a
-  /// real selected bride profile instead of falling back to this constant.
-  static const GunaMilanPartnerParams placeholderBridePartnerParams =
-      GunaMilanPartnerParams(
-        datetime: '1997-03-15T14:00:00',
-        latitude: 19.0728,
-        longitude: 72.8826,
-        timezone: '+05:30',
-      );
 }

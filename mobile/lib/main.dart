@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
 
+import 'core/geo/city.dart';
 import 'core/locale/locale_controller.dart';
 import 'core/notifications/push_notification_service.dart';
 import 'core/purchases/purchases_providers.dart';
@@ -14,6 +15,7 @@ import 'core/purchases/purchases_service.dart';
 import 'core/theme/app_colors.dart';
 import 'core/theme/app_palette.dart';
 import 'core/theme/theme_controller.dart';
+import 'features/panchang/panchang_location.dart';
 import 'features/startup/root_gate.dart';
 import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
@@ -97,6 +99,11 @@ void main() async {
   // SharedPreferences loads asynchronously later (see theme_controller.dart).
   final savedThemeMode = await loadSavedThemeMode();
 
+  // And the panchang location override, for the same reason: a user who has
+  // pinned a city must not see one city's almanac flash before theirs loads
+  // (see panchang_location.dart).
+  final savedPanchangCity = await PanchangLocationOverride.loadSaved();
+
   runApp(
     ProviderScope(
       overrides: [
@@ -108,10 +115,25 @@ void main() async {
         themeControllerProvider.overrideWith(
           () => ThemeController(savedThemeMode),
         ),
+        if (savedPanchangCity != null)
+          panchangLocationOverrideProvider.overrideWith(
+            () => _SeededPanchangLocationOverride(savedPanchangCity),
+          ),
       ],
       child: const MainApp(),
     ),
   );
+}
+
+/// Seeds [PanchangLocationOverride] with the value already read from disk in
+/// `main()`, mirroring how the locale and theme controllers are seeded.
+class _SeededPanchangLocationOverride extends PanchangLocationOverride {
+  _SeededPanchangLocationOverride(this._initial);
+
+  final City _initial;
+
+  @override
+  City? build() => _initial;
 }
 
 class MainApp extends ConsumerStatefulWidget {

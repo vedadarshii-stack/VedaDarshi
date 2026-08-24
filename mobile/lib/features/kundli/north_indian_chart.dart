@@ -197,10 +197,32 @@ class _NorthIndianChartPainter extends CustomPainter {
         ? -verticalOffset
         : verticalOffset;
     final center = Offset(anchor.dx * size.width, anchor.dy * size.height + dy);
-    painter.paint(
-      canvas,
-      center - Offset(painter.width / 2, painter.height / 2),
+
+    // CLAMPED TO THE CHART SQUARE — fixed 21 Aug 2026.
+    //
+    // The offset above exists to push a planet group clear of its house
+    // NUMBER label. For the houses whose anchors already sit close to an
+    // edge (2 and 12 along the top, 6 and 8 along the bottom, 9 and 11 at
+    // the sides) that shift pushed the text straight out of the chart: on
+    // a real chart "Ke" and "Sa" rendered ABOVE the top border and "Ma"
+    // and "Ra" BELOW the bottom one, floating outside the square with no
+    // visible connection to any house.
+    //
+    // Clamping keeps the nudge wherever there is room for it and simply
+    // stops at the border where there isn't, so a planet is always inside
+    // the compartment it belongs to. The margin is a fraction of the
+    // canvas, like every other measurement in this painter, so it holds at
+    // any rendered size.
+    final half = Offset(painter.width / 2, painter.height / 2);
+    final margin = size.width * 0.015;
+    final topLeft = Offset(
+      (center.dx - half.dx).clamp(margin, size.width - painter.width - margin),
+      (center.dy - half.dy).clamp(
+        margin,
+        size.height - painter.height - margin,
+      ),
     );
+    painter.paint(canvas, topLeft);
   }
 
   TextStyle _planetStyle(double fontSize, Color color) => AppFonts.body(

@@ -170,6 +170,53 @@ class AssetCityPlaceSearch implements PlaceSearch {
     // The offline dataset has no billing/session concept — nothing to do.
   }
 
+  /// The nearest city in the offline dataset to the given coordinates, or
+  /// `null` if the dataset failed to load.
+  ///
+  /// ADDED 21 Aug 2026 for the Panchang location feature: device GPS gives
+  /// coordinates, and the panchang needs a NAMED place with an IANA zone to
+  /// show in the header and to send to Vedika. Resolving that offline
+  /// against the bundled 5,599-city dataset means no reverse-geocoding API
+  /// call, no cost, and — the part that matters for the privacy policy —
+  /// **the device's coordinates never leave the phone**. Only the resolved
+  /// city's own published coordinates are ever sent to Vedika.
+  ///
+  /// [timezoneForCoordinates] is the older, narrower form of the same
+  /// search and now delegates here.
+  Future<City?> nearestCity(
+    double lat,
+    double lon, {
+    String? countryCode,
+  }) async {
+    final cities = await _loadCities();
+    if (cities.isEmpty) return null;
+
+    var candidates = cities;
+    if (countryCode != null && countryCode.isNotEmpty) {
+      final sameCountry = cities
+          .where((c) => c.countryCode == countryCode)
+          .toList(growable: false);
+      if (sameCountry.isNotEmpty) candidates = sameCountry;
+    }
+
+    // Equirectangular approximation, longitude scaled by cos(latitude).
+    // Exact great-circle distance is unnecessary when the answer only has
+    // to pick the closest of thousands of cities.
+    final latRad = lat * pi / 180;
+    City? nearest;
+    double? nearestDist;
+    for (final city in candidates) {
+      final dLat = city.latitude - lat;
+      final dLon = (city.longitude - lon) * cos(latRad);
+      final dist = dLat * dLat + dLon * dLon;
+      if (nearestDist == null || dist < nearestDist) {
+        nearestDist = dist;
+        nearest = city;
+      }
+    }
+    return nearest;
+  }
+
   /// Finds the IANA timezone of the nearest city in the offline dataset to
   /// the given coordinates.
   ///

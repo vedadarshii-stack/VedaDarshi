@@ -11,13 +11,13 @@ import 'birth_details_screen.dart';
 import 'birth_profile_repository.dart';
 
 /// Navigates to the correct screen after a SUCCESSFUL sign-in — Google,
-/// phone OTP (manual or Android auto-verification), or guest — clearing the
-/// nav stack so back never returns to the auth screens.
+/// email/password, or guest — clearing the nav stack so back never returns
+/// to the auth screens.
 ///
-/// Shared by [WelcomeLoginScreen] (Google + guest + OTP auto-verification)
-/// and [OtpVerifyScreen] (manual OTP + resend auto-verification) so the
-/// "does this identity already have a birth profile?" decision lives in one
-/// place instead of being duplicated across both screens.
+/// Shared by [WelcomeLoginScreen] (email/password sign-in + Google + guest)
+/// and [EmailSignUpScreen] (email/password sign-up) so the "does this
+/// identity already have a birth profile?" decision lives in one place
+/// instead of being duplicated across both screens.
 ///
 /// Goes to [HomeDashboardScreen] if a [BirthProfile] was already saved for
 /// this device, otherwise to [BirthDetailsScreen] to collect it first.

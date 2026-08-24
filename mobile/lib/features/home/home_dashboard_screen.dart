@@ -13,13 +13,14 @@ import '../articles/articles_screen.dart';
 import '../articles/articles_static_data.dart';
 import '../horoscope/horoscope_detail_screen.dart';
 import '../horoscope/horoscope_signs_screen.dart';
-import '../horoscope/horoscope_static_data.dart';
+import '../horoscope/user_sign_provider.dart';
 import '../horoscope/zodiac_sign.dart';
 import '../kundli/kundli_input_screen.dart';
 import '../matching/gun_milan_select_screen.dart';
 import '../notifications/notifications_screen.dart';
 import '../notifications/notifications_static_data.dart';
 import '../panchang/panchang_data.dart';
+import '../panchang/panchang_location.dart';
 import '../panchang/panchang_repository.dart';
 import '../profile/birth_profile_repository.dart';
 import '../reports/premium_reports_screen.dart';
@@ -32,9 +33,8 @@ import 'home_static_data.dart';
 /// the Panchang tab never visibly disagree about whose "today" they're
 /// showing sample data for. Not shared code (that constant is private to its
 /// own library) — kept in sync deliberately if either ever changes.
-const double _fallbackLatitude = 17.3850;
-const double _fallbackLongitude = 78.4867;
-const String _fallbackTimezoneId = 'Asia/Kolkata';
+// Fallback coordinates now live in `panchang_location.dart` as
+// `kFallbackPanchangCity` (21 Aug 2026).
 
 const List<String> _weekdayNames = [
   'Monday',
@@ -82,22 +82,53 @@ DateTime _today() {
 }
 
 /// Builds the 6 "Today at a glance" tiles, swapping in a live value
-/// wherever one exists. Only [GlanceTileId.muhurat] has a matching field in
-/// `/v2/daily/muhurta` (Rahu Kaal — same limitation as
-/// `panchang_screen.dart`'s `_muhuratsFrom`); Lucky Number, Lucky Color,
-/// Direction, Today's Planet and Moon Phase have NO Vedika equivalent at
-/// all — verified against the endpoint's response shape in
-/// `panchang_data.dart` — so those 5 stay on [HomeStaticData] permanently,
-/// not just until the API "gets around to" wiring them.
-List<GlanceTile> _glanceTilesFrom(MuhurtaData? muhurta) {
+/// wherever one exists.
+///
+/// REWRITTEN 21 Aug 2026. The previous version wired only Muhurat and said
+/// the other five "have NO Vedika equivalent at all — verified", so they
+/// were to "stay on [HomeStaticData] permanently". That verification was
+/// done against `/v2/astrology/panchang/today` and a parameter-less
+/// `/v2/daily/muhurta` — the two narrowest routes in the contract. Three of
+/// the five are in the panchang BUNDLE this app already fetches:
+///
+///  - Lucky Color   <- `vaara.interpretation.luckyColor`
+///  - Today's Planet<- `vaara.lord` (the weekday's ruling graha)
+///  - Direction     <- `disha_shool.safeDirections`
+///
+/// so they cost nothing extra. Every one of them was previously a constant
+/// shown to every user on every day: "Gold", "Shukra", "East".
+///
+/// Still genuinely absent from anything this app calls:
+///  - Lucky Number — no field in any response consumed here.
+///  - Moon Phase   — `/v2/daily/moon-phase` exists in the contract but is a
+///    separate BILLED call; not added unasked.
+///
+/// Those two keep their placeholders, and this comment is now the honest
+/// record of which is which.
+List<GlanceTile> _glanceTilesFrom(MuhurtaData? muhurta, PanchangData? panchang) {
   final rahuRange = muhurta?.rahuKaal?.formattedRange;
-  if (rahuRange == null) return HomeStaticData.glanceTiles;
+  final luckyColor = panchang?.vara?.luckyColor;
+  final planet = panchang?.vara?.lord;
+  // "Direction" on this tile means the AUSPICIOUS way to travel, so it is
+  // the first safe direction — NOT `disha_shool.direction`, which is the
+  // direction to avoid. Rendering the inauspicious one under a bare
+  // "Direction" label would invert the advice.
+  final safe = panchang?.dishaShool?.safeDirections;
+  final direction = (safe != null && safe.isNotEmpty) ? safe.first : null;
+
   return [
     for (final tile in HomeStaticData.glanceTiles)
-      if (tile.id == GlanceTileId.muhurat)
-        GlanceTile(GlanceTileId.muhurat, rahuRange)
-      else
-        tile,
+      switch (tile.id) {
+        GlanceTileId.muhurat when rahuRange != null =>
+          GlanceTile(GlanceTileId.muhurat, rahuRange),
+        GlanceTileId.luckyColor when luckyColor != null =>
+          GlanceTile(GlanceTileId.luckyColor, luckyColor),
+        GlanceTileId.todaysPlanet when planet != null =>
+          GlanceTile(GlanceTileId.todaysPlanet, planet),
+        GlanceTileId.direction when direction != null =>
+          GlanceTile(GlanceTileId.direction, direction),
+        _ => tile,
+      },
   ];
 }
 
@@ -156,12 +187,15 @@ class HomeDashboardScreen extends ConsumerWidget {
     // (guest browsing) — `valueOrNull` degrades loading/error to `null`
     // exactly as needed. Home has no date stepper, so the date is always
     // TODAY.
-    final city = savedProfile?.city;
+    // WHERE THE USER IS, not their birth city — 21 Aug 2026. Same change and
+    // same reasoning as `panchang_screen.dart`; both must agree, since Home's
+    // hero card and the Panchang tab show the same day's almanac.
+    final city = ref.watch(panchangLocationProvider).city;
     final panchangRequest = (
       date: _today(),
-      lat: city?.latitude ?? _fallbackLatitude,
-      lon: city?.longitude ?? _fallbackLongitude,
-      tz: city?.timezoneId ?? _fallbackTimezoneId,
+      lat: city.latitude,
+      lon: city.longitude,
+      tz: city.timezoneId,
     );
     // `.valueOrNull` IS the graceful-degradation mechanism here: loading,
     // an error, and "not fetched yet" all collapse to `null`, and every
@@ -171,7 +205,17 @@ class HomeDashboardScreen extends ConsumerWidget {
     final livePanchang = ref
         .watch(panchangDataProvider(panchangRequest))
         .valueOrNull;
-    final liveMuhurta = ref.watch(muhurtaDataProvider).valueOrNull;
+    // Muhurta takes the SAME location as the panchang request — Rahu Kaal
+    // is derived from sunrise/sunset, so it varies by place (21 Aug 2026).
+    final liveMuhurta = ref
+        .watch(
+          muhurtaDataProvider((
+            lat: panchangRequest.lat,
+            lon: panchangRequest.lon,
+            tz: panchangRequest.tz,
+          )),
+        )
+        .valueOrNull;
 
     return Scaffold(
       backgroundColor: AppColors.cream,
@@ -194,12 +238,23 @@ class HomeDashboardScreen extends ConsumerWidget {
             ],
             _PanchangHeroCard(l10n: l10n, locale: locale, live: livePanchang),
             const SizedBox(height: 14),
-            _GlanceSection(l10n: l10n, locale: locale, muhurta: liveMuhurta),
+            _GlanceSection(
+              l10n: l10n,
+              locale: locale,
+              muhurta: liveMuhurta,
+              panchang: livePanchang,
+            ),
             const SizedBox(height: 14),
             _RemedyMantraCard(l10n: l10n, locale: locale),
             const SizedBox(height: 14),
-            _FestivalCard(l10n: l10n, locale: locale),
-            const SizedBox(height: 14),
+            // _FestivalCard REMOVED 21 Aug 2026 — it was hardcoded to
+            // "Sawan Somvar — tomorrow". On 21 Aug 2026 the Panchang screen
+            // (live) read "Bhadrapada Masa": Sawan was over, and the day was
+            // a Friday, not Somvar. A festival card that names the wrong
+            // festival on the wrong day is worse than no card, and there is
+            // no festival field in any endpoint this app calls. Restore it
+            // when a real source exists — the widget itself is kept below.
+
             _ExploreSection(l10n: l10n, locale: locale),
             const SizedBox(height: 14),
             _HoroscopeSection(l10n: l10n, locale: locale),
@@ -208,8 +263,13 @@ class HomeDashboardScreen extends ConsumerWidget {
             const SizedBox(height: 14),
             _ContinueAiCard(l10n: l10n, locale: locale),
             const SizedBox(height: 14),
-            _RecentReportsSection(l10n: l10n, locale: locale),
-            const SizedBox(height: 14),
+            // _RecentReportsSection REMOVED 21 Aug 2026 — it listed
+            // "Career Report · Viewed 2 days ago" and "Marriage Report ·
+            // New" on accounts that had opened neither. Same defect class as
+            // the "Last: ₹1,999" line already removed from Profile: invented
+            // activity the user cannot tell apart from their own. Nothing
+            // tracks report views yet. Restore when it does.
+
             _DailyQuoteCard(locale: locale),
           ],
         ),
@@ -523,18 +583,38 @@ class _PanchangHeroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // NO FABRICATED ASTROLOGY — CHANGED 21 Aug 2026.
+    //
+    // These four used to fall back to `HomeStaticData.panchang`, whose
+    // values are a designer's sample: 'Shukla Ashtami' / 'Rohini' /
+    // 'Siddhi' / 'Bava'. `live` is null while the request is in flight, so
+    // on every cold start Home stated a specific, confident, WRONG tithi
+    // for a second or two before the real one replaced it. On 21 Aug 2026
+    // the real values were Navami / Anuradha / Indra / Balava — nothing in
+    // common. It is also what made this look like a permanently broken
+    // binding when it was only ever the loading state.
+    //
+    // A wrong tithi is not a cosmetic placeholder in a panchang app: it is
+    // the product, and a user who glances at it during load and closes the
+    // app has simply been told the wrong thing. An em dash says "not yet"
+    // and can never be mistaken for a reading.
+    //
+    // Applies to the error path too, deliberately. If the fetch fails we
+    // still must not invent a tithi — Home stays quiet and the Panchang tab
+    // (which does surface a real error card) is where the user finds out.
+    const pending = '—';
+    // Still needed for sunrise/sunset below: those two have NO field in any
+    // endpoint this app calls, so they remain documented placeholders rather
+    // than a loading state.
     final fallback = HomeStaticData.panchang;
-
-    // Field-by-field fallback, same "a partially-populated response never
-    // blanks a whole row" rule as `panchang_screen.dart`'s `_elementsFrom`.
     final tithiName = live?.tithi?.name;
     final tithiPaksha = live?.tithi?.paksha;
     final tithi = tithiName == null
-        ? fallback.tithi
+        ? pending
         : (tithiPaksha == null ? tithiName : '$tithiPaksha $tithiName');
-    final nakshatra = live?.nakshatra?.name ?? fallback.nakshatra;
-    final yoga = live?.yoga?.name ?? fallback.yoga;
-    final karana = live?.karana?.name ?? fallback.karana;
+    final nakshatra = live?.nakshatra?.name ?? pending;
+    final yoga = live?.yoga?.name ?? pending;
+    final karana = live?.karana?.name ?? pending;
 
     // The date line is always today's real date — unlike the other fields
     // above, this one never falls back to the frozen mock date in
@@ -548,7 +628,15 @@ class _PanchangHeroCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(22),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: () {},
+          // Opens the Panchang tab — wired 21 Aug 2026. The whole hero
+          // card is the tap target, which is what the "Full Panchang ›"
+          // affordance in its footer has always implied; both were inert.
+          //
+          // Goes through AppBottomNav.openTab rather than pushing
+          // PanchangScreen directly: Panchang is a tab ROOT, entered with a
+          // zero-duration pushReplacement. A plain push would stack a second
+          // Panchang over Home and grow the back stack on every tap.
+          onTap: () => AppBottomNav.openTab(context, AppTab.panchang),
           child: Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
@@ -668,66 +756,93 @@ class _PanchangHeroCard extends StatelessWidget {
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    Icon(
-                      Icons.wb_sunny_outlined,
-                      size: 14,
-                      color: AppColors.creamTextSoft,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      // Sunrise/sunset stay on the static placeholder — no
-                      // Vedika endpoint this app calls returns them (see
-                      // this widget's class doc and `panchang_data.dart`).
-                      fallback.sunrise,
-                      style: AppFonts.body(
-                        locale,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.creamTextSoft,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Icon(
-                      Icons.nightlight_round,
-                      size: 14,
-                      color: AppColors.creamTextSoft,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      fallback.sunset,
-                      style: AppFonts.body(
-                        locale,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.creamTextSoft,
-                      ),
-                    ),
-                    const Spacer(),
-                    Flexible(
+                    // The TIMES side flexes; the link keeps its natural
+                    // width — fixed 21 Aug 2026.
+                    //
+                    // This row was [times…, Spacer(), Flexible(link)].
+                    // `Spacer` is `Expanded`, so it took every spare pixel
+                    // and the link was left with only the remainder, which
+                    // ellipsised "Full Panchang" down to "Full Pa…". A
+                    // truncated call-to-action is worse than a truncated
+                    // value: the user cannot tell what tapping it does.
+                    // Now the times shrink first (they are also the less
+                    // important half of the row) and the link is always
+                    // whole.
+                    Expanded(
                       child: Row(
-                        mainAxisSize: MainAxisSize.min,
                         children: [
+                          Icon(
+                            Icons.wb_sunny_outlined,
+                            size: 14,
+                            color: AppColors.creamTextSoft,
+                          ),
+                          const SizedBox(width: 4),
                           Flexible(
                             child: Text(
-                              l10n.fullPanchang,
+                              // REAL sunrise/sunset since 21 Aug 2026 —
+                              // `include=sunrise` on the panchang bundle
+                              // returns them (see PanchangSunTimes). The old
+                              // comment here said no endpoint provided them,
+                              // which was true only of the `/today` route
+                              // this app used to call. The Panchang tab was
+                              // wired first; Home was still showing the
+                              // fixed 05:52, so the two screens disagreed
+                              // about the same sunrise.
+                              live?.sunTimes?.sunriseText ?? fallback.sunrise,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: AppFonts.body(
                                 locale,
                                 fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.creamTextSoft,
                               ),
                             ),
                           ),
+                          const SizedBox(width: 12),
+                          Icon(
+                            Icons.nightlight_round,
+                            size: 14,
+                            color: AppColors.creamTextSoft,
+                          ),
                           const SizedBox(width: 4),
-                          const Icon(
-                            Icons.arrow_forward_ios,
-                            size: 10,
-                            color: Colors.white,
+                          Flexible(
+                            child: Text(
+                              live?.sunTimes?.sunsetText ?? fallback.sunset,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppFonts.body(
+                                locale,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.creamTextSoft,
+                              ),
+                            ),
                           ),
                         ],
                       ),
+                    ),
+                    const SizedBox(width: 10),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          l10n.fullPanchang,
+                          maxLines: 1,
+                          style: AppFonts.body(
+                            locale,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(
+                          Icons.arrow_forward_ios,
+                          size: 10,
+                          color: Colors.white,
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -824,18 +939,22 @@ class _GlanceSection extends StatelessWidget {
     required this.l10n,
     required this.locale,
     required this.muhurta,
+    required this.panchang,
   });
 
   final AppLocalizations l10n;
   final Locale locale;
 
-  /// Today's live muhurta, from the shared `muhurtaDataProvider` — see
-  /// [_glanceTilesFrom] for which single tile this can ever change.
+  /// Today's live muhurta — the Muhurat tile's Rahu Kaal range.
   final MuhurtaData? muhurta;
+
+  /// Today's live panchang — Lucky Color, Today's Planet and Direction all
+  /// come from here (21 Aug 2026). See [_glanceTilesFrom].
+  final PanchangData? panchang;
 
   @override
   Widget build(BuildContext context) {
-    final tiles = _glanceTilesFrom(muhurta);
+    final tiles = _glanceTilesFrom(muhurta, panchang);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1040,6 +1159,7 @@ class _MantraRow extends StatelessWidget {
 }
 
 /// Festival-of-the-day navy strip.
+// ignore: unused_element  — kept for when a real festival source exists
 class _FestivalCard extends StatelessWidget {
   const _FestivalCard({required this.l10n, required this.locale});
 
@@ -1295,29 +1415,46 @@ void _openAllSigns(BuildContext context) {
   ).push<void>(fadeThroughRoute(const HoroscopeSignsScreen()));
 }
 
-/// Opens "B4 · Horoscope Detail" for the user's own sign, resolved from
-/// [kZodiacSigns] by [HoroscopeStaticData.userSignId] (falls back to the
-/// first sign if the id is ever missing, so this can never throw).
-void _openHoroscopeDetail(BuildContext context) {
-  final sign = kZodiacSigns.firstWhere(
-    (sign) => sign.id == HoroscopeStaticData.userSignId,
-    orElse: () => kZodiacSigns.first,
-  );
+/// Opens "B4 · Horoscope Detail" for the user's OWN sign.
+///
+/// [sign] is the rashi derived from their birth chart
+/// (`userZodiacSignProvider`). It used to be resolved from the constant
+/// `HoroscopeStaticData.userSignId` — i.e. Leo, for everybody.
+///
+/// When it is still null (chart loading, guest, or fetch failed) this opens
+/// the all-signs grid instead of guessing: sending someone to a stranger's
+/// horoscope is exactly the defect being fixed.
+void _openHoroscopeDetail(BuildContext context, ZodiacSign? sign) {
+  if (sign == null) {
+    _openAllSigns(context);
+    return;
+  }
   Navigator.of(
     context,
   ).push<void>(fadeThroughRoute(HoroscopeDetailScreen(sign: sign)));
 }
 
 /// "Today's Horoscope" teaser card.
-class _HoroscopeSection extends StatelessWidget {
+///
+/// A ConsumerWidget since 21 Aug 2026 so the SIGN can come from the user's
+/// own chart (`userZodiacSignProvider`) instead of the hardcoded
+/// "Simha · Leo" every user saw. The prediction body and rating below are
+/// still [HomeStaticData] — the daily horoscope endpoint is not wired into
+/// this teaser yet — but the sign it is attributed to is now real.
+class _HoroscopeSection extends ConsumerWidget {
   const _HoroscopeSection({required this.l10n, required this.locale});
 
   final AppLocalizations l10n;
   final Locale locale;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final horoscope = HomeStaticData.horoscope;
+    final userSign = ref.watch(userZodiacSignProvider);
+    // Em dash, never a default sign — see userZodiacSignProvider's doc.
+    final signLabel = userSign == null
+        ? '—'
+        : '${userSign.sanskritName} · ${userSign.englishName}';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1335,7 +1472,7 @@ class _HoroscopeSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             clipBehavior: Clip.antiAlias,
             child: InkWell(
-              onTap: () => _openHoroscopeDetail(context),
+              onTap: () => _openHoroscopeDetail(context, userSign),
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -1354,14 +1491,20 @@ class _HoroscopeSection extends StatelessWidget {
                         shape: BoxShape.circle,
                         gradient: AppColors.navyGradient,
                       ),
-                      // ♌ (zodiac glyph) is safe to keep as plain text —
-                      // Android renders zodiac signs via the system emoji
-                      // font, unlike the bare typographic symbols elsewhere
-                      // in this design.
+                      // The user's OWN glyph — was hardcoded '♌' (Leo)
+                      // alongside the hardcoded "Simha · Leo" label. Fixing
+                      // only the label would have left the card showing a
+                      // Leo glyph beside "Dhanu · Sagittarius", which reads
+                      // as a rendering bug rather than the data bug it is.
+                      //
+                      // Uses AppFonts.zodiac (the bundled ZodiacGlyphs.ttf),
+                      // not AppFonts.body: Android renders ♈–♓ from its
+                      // COLOUR emoji font, which ignores `color:` — the old
+                      // `AppColors.gold` here was silently doing nothing.
+                      // See the ICON RULE in projects/CLAUDE.md.
                       child: Text(
-                        '♌',
-                        style: AppFonts.body(
-                          locale,
+                        userSign?.glyph ?? '·',
+                        style: AppFonts.zodiac(
                           fontSize: 24,
                           color: AppColors.gold,
                         ),
@@ -1377,7 +1520,7 @@ class _HoroscopeSection extends StatelessWidget {
                             children: [
                               Flexible(
                                 child: Text(
-                                  horoscope.sign,
+                                  signLabel,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: AppFonts.body(
@@ -1735,6 +1878,7 @@ class _ContinueAiCard extends StatelessWidget {
 }
 
 /// "Recent reports" — two report teaser cards.
+// ignore: unused_element  — kept for when report history is tracked
 class _RecentReportsSection extends StatelessWidget {
   const _RecentReportsSection({required this.l10n, required this.locale});
 

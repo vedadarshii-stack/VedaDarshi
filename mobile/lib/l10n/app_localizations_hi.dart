@@ -54,12 +54,6 @@ class AppLocalizationsHi extends AppLocalizations {
       'अपनी जन्म कुंडली सहेजने और व्यक्तिगत भविष्यवाणियाँ अनलॉक करने के लिए साइन इन करें।';
 
   @override
-  String get phoneHint => 'मोबाइल नंबर';
-
-  @override
-  String get getOtp => 'OTP प्राप्त करें';
-
-  @override
   String get orContinueWith => 'या इसके साथ जारी रखें';
 
   @override
@@ -73,47 +67,8 @@ class AppLocalizationsHi extends AppLocalizations {
       'जारी रखकर आप हमारी सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं';
 
   @override
-  String get otpTitle => 'अपना नंबर सत्यापित करें';
-
-  @override
-  String otpSubtitle(String phone) {
-    return '$phone पर भेजा गया 6-अंकों का कोड दर्ज करें';
-  }
-
-  @override
-  String get otpNoCode => 'कोड नहीं मिला?';
-
-  @override
-  String otpResendIn(String seconds) {
-    return '$seconds में पुनः भेजें';
-  }
-
-  @override
-  String get otpResend => 'पुनः भेजें';
-
-  @override
-  String get otpVerify => 'सत्यापित करें और जारी रखें';
-
-  @override
-  String get otpPrivacy => '🔒 आपका नंबर निजी और सुरक्षित रखा जाता है';
-
-  @override
-  String get otpResent => 'एक नया कोड भेजा गया है।';
-
-  @override
   String get authErrorNetwork =>
       'इंटरनेट कनेक्शन नहीं है। कृपया अपना नेटवर्क जांचें और पुनः प्रयास करें।';
-
-  @override
-  String get authErrorInvalidPhone =>
-      'यह फ़ोन नंबर सही नहीं लगता। कृपया जांचें और पुनः प्रयास करें।';
-
-  @override
-  String get authErrorInvalidOtp => 'यह कोड गलत है। कृपया पुनः प्रयास करें।';
-
-  @override
-  String get authErrorOtpExpired =>
-      'यह कोड समाप्त हो गया है। कृपया एक नया अनुरोध करें।';
 
   @override
   String get authErrorTooManyRequests =>
@@ -1189,4 +1144,102 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get purchaseErrorUnavailable => 'यह योजना अभी उपलब्ध नहीं है।';
+
+  @override
+  String get panchangLocationUseAutomatic => 'मेरा वर्तमान स्थान उपयोग करें';
+
+  @override
+  String get panchangLocationSourceManual => 'आपके द्वारा चुना गया';
+
+  @override
+  String get panchangLocationSourceDevice => 'आपके स्थान से पता चला';
+
+  @override
+  String get panchangLocationSourceBirthProfile => 'आपके जन्म विवरण से';
+
+  @override
+  String get panchangLocationSourceFallback => 'डिफ़ॉल्ट स्थान';
+
+  @override
+  String get muhuratDay => 'दिन का चौघड़िया';
+
+  @override
+  String get muhuratNight => 'रात का चौघड़िया';
+
+  @override
+  String get muhuratUnavailable => 'मुहूर्त समय अभी उपलब्ध नहीं है।';
+
+  @override
+  String get partnerDetailsTitle => 'साथी का जन्म विवरण';
+
+  @override
+  String get partnerDetailsSave => 'विवरण सहेजें';
+
+  @override
+  String get matchNeedsPartner => 'मिलान के लिए साथी का जन्म विवरण जोड़ें।';
+
+  @override
+  String get emailHint => 'ईमेल पता';
+
+  @override
+  String get passwordHint => 'पासवर्ड';
+
+  @override
+  String get confirmPasswordHint => 'पासवर्ड की पुष्टि करें';
+
+  @override
+  String get signInAction => 'साइन इन करें';
+
+  @override
+  String get forgotPassword => 'पासवर्ड भूल गए?';
+
+  @override
+  String get noAccountPrompt => 'Vedadarshi में नए हैं?';
+
+  @override
+  String get createAccount => 'खाता बनाएं';
+
+  @override
+  String get signUpTitle => 'अपना खाता बनाएं';
+
+  @override
+  String get haveAccountPrompt => 'पहले से खाता है?';
+
+  @override
+  String get forgotPasswordTitle => 'अपना पासवर्ड रीसेट करें';
+
+  @override
+  String get forgotPasswordSubtitle =>
+      'वह ईमेल पता दर्ज करें जिससे आपने साइन अप किया था, हम आपको पासवर्ड रीसेट करने के लिए एक लिंक भेजेंगे।';
+
+  @override
+  String get sendResetLink => 'रीसेट लिंक भेजें';
+
+  @override
+  String get resetLinkSent =>
+      'यदि वह ईमेल पंजीकृत है, तो एक रीसेट लिंक भेजी जा रही है।';
+
+  @override
+  String get passwordTooShort => 'पासवर्ड कम से कम 6 अक्षरों का होना चाहिए।';
+
+  @override
+  String get passwordsDoNotMatch => 'वे पासवर्ड मेल नहीं खाते।';
+
+  @override
+  String get authErrorEmailInUse =>
+      'वह ईमेल पहले से पंजीकृत है। इसके बजाय साइन इन करने का प्रयास करें।';
+
+  @override
+  String get authErrorInvalidEmail => 'वह ईमेल पता सही नहीं लगता।';
+
+  @override
+  String get authErrorWeakPassword =>
+      'कृपया कम से कम 6 अक्षरों का पासवर्ड चुनें।';
+
+  @override
+  String get authErrorWrongCredentials =>
+      'गलत ईमेल या पासवर्ड। कृपया पुनः प्रयास करें।';
+
+  @override
+  String get authErrorUserNotFound => 'उस ईमेल पते से कोई खाता नहीं मिला।';
 }

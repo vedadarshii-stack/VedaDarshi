@@ -127,10 +127,32 @@ class _SubscriptionPaywallScreenState
     }
   }
 
+  /// Purchase feedback, styled for THIS screen.
+  ///
+  /// The default SnackBar is a light bar pinned to the bottom edge — on the
+  /// paywall's full-bleed navy gradient it reads as a system message from
+  /// somewhere else in the app rather than the answer to the button the
+  /// user just pressed, and its 4-second default is short for a sentence
+  /// someone has to act on. Floating, dark, and given time to be read.
   void _showMessage(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    final locale = Localizations.localeOf(context);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            message,
+            style: AppFonts.body(locale, fontSize: 13, color: Colors.white),
+          ),
+          backgroundColor: AppColors.navyTop,
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(16),
+          duration: const Duration(seconds: 6),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      );
   }
 
   static String _failureMessage(AppLocalizations l10n, PurchaseFailure reason) {
@@ -760,38 +782,64 @@ class _Cta extends StatelessWidget {
         onTap: isBusy ? () {} : onTap,
         child: Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 17),
+          padding: const EdgeInsets.symmetric(vertical: 17, horizontal: 20),
           decoration: BoxDecoration(
             gradient: AppColors.goldCtaGradient,
             borderRadius: BorderRadius.circular(999),
             boxShadow: [
               BoxShadow(
-                color: AppColors.gold.withValues(alpha: 0.45),
+                // The glow reads as "pressable". Dropping it while busy is
+                // half of what makes the button look inert rather than
+                // merely slow.
+                color: AppColors.gold.withValues(alpha: isBusy ? 0.12 : 0.45),
                 blurRadius: 22,
                 offset: const Offset(0, 8),
               ),
             ],
           ),
-          child: isBusy
-              ? SizedBox(
-                  height: 19,
-                  width: 19,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: AppColors.onGold,
+          // SPINNER BESIDE THE LABEL, NOT INSTEAD OF IT — 21 Aug 2026.
+          //
+          // The spinner used to replace the text outright, so the moment a
+          // user tapped "Start Premium — ₹219.00" the button became an
+          // anonymous gold pill with a dot spinning in it. Purchases can
+          // take several seconds while Play's sheet is fetched, and for
+          // that whole time the screen no longer said what was being bought
+          // or how much it cost — which is precisely when a user wants that
+          // confirmed. Keeping the label also stops the button's height
+          // jumping between the two states.
+          child: Opacity(
+            opacity: isBusy ? 0.72 : 1,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (isBusy) ...[
+                  SizedBox(
+                    height: 16,
+                    width: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.onGold,
+                    ),
                   ),
-                )
-              : Text(
-                  l10n.startPremium(option.priceString),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  style: AppFonts.body(
-                    locale,
-                    fontSize: 15.5,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.onGold,
+                  const SizedBox(width: 10),
+                ],
+                Flexible(
+                  child: Text(
+                    l10n.startPremium(option.priceString),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    style: AppFonts.body(
+                      locale,
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.onGold,
+                    ),
                   ),
                 ),
+              ],
+            ),
+          ),
         ),
       ),
     );

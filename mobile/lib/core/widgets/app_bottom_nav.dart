@@ -134,7 +134,26 @@ class AppBottomNav extends StatelessWidget {
   void _handleTap(BuildContext context, AppTab tapped) {
     // Tapping the current tab is a no-op — there is nowhere to navigate to.
     if (tapped == currentTab) return;
+    openTab(context, tapped);
+  }
 
+  /// Opens [tapped] using this app's per-tab navigation conventions.
+  ///
+  /// Made public 21 Aug 2026 so surfaces OUTSIDE the nav bar can send the
+  /// user to a tab without restating those conventions. Home's Panchang hero
+  /// card is the first: its "Full Panchang ›" link was `onTap: () {}`, and
+  /// the obvious local fix — a plain `push` of `PanchangScreen` — would have
+  /// been subtly wrong. Panchang is a tab ROOT, so it must be entered with
+  /// `pushReplacement` and no transition; a `push` would stack a second
+  /// Panchang on top of Home and grow the back stack every time the card was
+  /// tapped.
+  ///
+  /// Keeping the switch here means those rules live in exactly one place —
+  /// which matters, because they are not uniform: Home/Panchang/Profile are
+  /// instant replacements, while Kundli and Ask AI are pushes with a
+  /// fade-through, since the design gives those screens a back button and no
+  /// nav bar.
+  static void openTab(BuildContext context, AppTab tapped) {
     switch (tapped) {
       case AppTab.home:
         Navigator.of(

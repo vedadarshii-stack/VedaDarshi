@@ -38,7 +38,7 @@
 
   <main>
     <div class="container">
-      <p class="meta">Last updated: 5 August 2026</p>
+      <p class="meta">Last updated: 24 August 2026</p>
 
       <nav class="toc" aria-label="Table of contents">
         <p class="eyebrow">On this page</p>
@@ -68,7 +68,7 @@
       <h3>2.1 Account identity</h3>
       <p>The app uses Firebase Authentication and supports three sign-in methods:</p>
       <ul>
-        <li><strong>Mobile number with OTP</strong> — your phone number is used to send a one-time verification code.</li>
+        <li><strong>Email address and password</strong> — your email address identifies your account, and is also the address we send a password-reset link to if you ask for one. Passwords are handled entirely by Firebase Authentication: they are stored only as salted hashes on Google's servers, and neither GOSE WEALTH nor the app ever sees or stores your password.</li>
         <li><strong>Google Sign-In</strong> — this gives the app your email address and basic Google profile information (such as your name).</li>
         <li><strong>Guest / anonymous sign-in</strong> — no personal identifiers are collected with this option.</li>
       </ul>
@@ -85,16 +85,22 @@
       <h3>2.5 Push notification tokens</h3>
       <p>We store a notification token for each device you use, so we can send you notifications.</p>
 
-      <h3>2.6 Purchases</h3>
+      <h3>2.6 Approximate location (optional)</h3>
+      <p>The Panchang and daily timings shown in the app depend on where you are, because sunrise, Rahu Kaal and the choghadiya windows differ from city to city. If you grant the optional location permission, the app takes a low-accuracy fix and immediately resolves it to the <strong>nearest city</strong> from a list bundled inside the app. Only that city — its name and coordinates — is used to request your Panchang. <strong>The raw GPS reading never leaves your device</strong>, and we do not store your location against your account.</p>
+      <p>This is entirely optional. You can decline the permission, or choose your city manually at any time, and the rest of the app works exactly the same. The app requests coarse (city-level) location only; it never requests precise location.</p>
+
+      <h3>2.7 Purchases</h3>
       <p>Subscriptions and one-time purchases are processed entirely by Google Play Billing. We never receive or store your card or bank details.</p>
 
-      <h3>2.7 What we do NOT collect</h3>
+      <h3>2.8 What we do NOT collect</h3>
       <ul>
-        <li>We do <strong>not</strong> collect your device location. The app requests no location permission — you type or search for your birth city yourself; it is never detected automatically.</li>
+        <li>We do <strong>not</strong> collect your precise location, and we do not store any location against your account. See section 2.6 for the optional, city-level location used for Panchang timings.</li>
+        <li>We do <strong>not</strong> collect your phone number. The app has no SMS or phone-number sign-in, and never asks for a mobile number.</li>
+        <li>We do <strong>not</strong> ever see or store your password — see section 2.1.</li>
         <li>We do <strong>not</strong> use analytics.</li>
         <li>We do <strong>not</strong> use crash reporting.</li>
         <li>We do <strong>not</strong> show third-party advertising.</li>
-        <li>The only Android permission the app requests is <strong>POST_NOTIFICATIONS</strong> (to send you push notifications).</li>
+        <li>The app requests only two Android permissions, both optional: <strong>POST_NOTIFICATIONS</strong> (to send you push notifications) and <strong>ACCESS_COARSE_LOCATION</strong> (city-level only, for Panchang timings — see section 2.6). It never requests <strong>ACCESS_FINE_LOCATION</strong>.</li>
       </ul>
 
       <h2 id="why-we-collect-it">3. Why we collect it</h2>
@@ -157,7 +163,7 @@
     <div class="container">
       <div class="footer-top">
         <p>A product of GOSE WEALTH</p>
-        <p>Last updated: 5 August 2026</p>
+        <p>Last updated: 24 August 2026</p>
       </div>
       <nav class="footer-nav" aria-label="Legal pages">
         <a href="index.html">Home</a>

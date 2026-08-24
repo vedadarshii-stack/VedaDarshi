@@ -27,6 +27,11 @@ dependencies:
   permission_handler: ^12.0.3
   cloud_functions: ^6.3.6
   purchases_flutter: ^10.8.0
+  # Panchang location (21 Aug 2026). Coarse GPS only — the coordinates
+  # are turned into a city name and IANA zone OFFLINE via assets/data/
+  # cities.json, so no reverse-geocoding API call and no coordinates leave
+  # the device.
+  geolocator: ^14.0.3
 
 dev_dependencies:
   flutter_test:

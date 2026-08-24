@@ -8,6 +8,7 @@ import '../../l10n/app_localizations.dart';
 import 'horoscope_detail_screen.dart';
 import 'horoscope_period.dart';
 import 'horoscope_static_data.dart';
+import 'user_sign_provider.dart';
 import 'zodiac_sign.dart';
 
 /// Horoscope — All Signs, per the approved Figma "B3 · Horoscope — All
@@ -299,7 +300,7 @@ class _SignRow extends StatelessWidget {
   }
 }
 
-class _SignCard extends StatelessWidget {
+class _SignCard extends ConsumerWidget {
   const _SignCard({
     required this.sign,
     required this.l10n,
@@ -313,8 +314,12 @@ class _SignCard extends StatelessWidget {
   final HoroscopePeriod period;
 
   @override
-  Widget build(BuildContext context) {
-    final isUserSign = sign.id == HoroscopeStaticData.userSignId;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userSign = ref.watch(userZodiacSignProvider);
+    // Compared against the user's DERIVED rashi (21 Aug 2026). This used to
+    // read `HoroscopeStaticData.userSignId`, a constant 'simha', so the
+    // "Your sign" badge sat on Leo for every user in the app.
+    final isUserSign = userSign != null && sign.id == userSign.id;
 
     return Semantics(
       button: true,

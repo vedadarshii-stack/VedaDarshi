@@ -11,11 +11,21 @@
 /// that real data source later is a matter of replacing the provider that
 /// supplies these values — it should never require touching the widgets
 /// themselves.
-abstract final class HoroscopeStaticData {
-  /// Which [ZodiacSign.id] gets the "Your sign" badge on the grid.
-  ///
-  /// The real sign must be DERIVED from the saved birth profile's moon/sun
-  /// sign, which needs the Vedika API — hardcoded to Simha per the design
-  /// until then.
-  static const String userSignId = 'simha';
-}
+/// DELETED 21 Aug 2026: `userSignId`.
+///
+/// It was `'simha'` — a constant, so the "Your sign" badge on the grid, the
+/// Home horoscope teaser and the sign that teaser opened were **Leo for
+/// every user of the app**, whatever their birth date. The doc comment here
+/// said the real sign "must be DERIVED from the saved birth profile", which
+/// is now what happens: see `userZodiacSignProvider` in
+/// `user_sign_provider.dart`, which reads the Moon's rashi off the user's
+/// own kundli.
+///
+/// The constant is removed rather than deprecated on purpose — leaving a
+/// plausible-looking default in reach is how it ended up on three screens.
+/// Anything needing the user's sign watches the provider and renders a
+/// neutral state when it is null.
+///
+/// This class is now empty; the file is kept for the doc note above and as
+/// the home for genuine horoscope placeholder content if any is added.
+abstract final class HoroscopeStaticData {}

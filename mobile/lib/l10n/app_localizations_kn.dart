@@ -55,12 +55,6 @@ class AppLocalizationsKn extends AppLocalizations {
       'ನಿಮ್ಮ ಜನ್ಮ ವಿವರಗಳನ್ನು ಉಳಿಸಲು ಮತ್ತು ವೈಯಕ್ತಿಕ ಭವಿಷ್ಯವಾಣಿಗಳನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಲು ಸೈನ್ ಇನ್ ಮಾಡಿ.';
 
   @override
-  String get phoneHint => 'ಮೊಬೈಲ್ ಸಂಖ್ಯೆ';
-
-  @override
-  String get getOtp => 'OTP ಪಡೆಯಿರಿ';
-
-  @override
   String get orContinueWith => 'ಅಥವಾ ಇದರೊಂದಿಗೆ ಮುಂದುವರಿಸಿ';
 
   @override
@@ -74,49 +68,8 @@ class AppLocalizationsKn extends AppLocalizations {
       'ಮುಂದುವರಿಸುವ ಮೂಲಕ ನೀವು ನಮ್ಮ ಸೇವಾ ನಿಯಮಗಳು ಮತ್ತು ಗೌಪ್ಯತಾ ನೀತಿಗೆ ಒಪ್ಪುತ್ತೀರಿ';
 
   @override
-  String get otpTitle => 'ನಿಮ್ಮ ಸಂಖ್ಯೆಯನ್ನು ಪರಿಶೀಲಿಸಿ';
-
-  @override
-  String otpSubtitle(String phone) {
-    return '$phoneಗೆ ಕಳುಹಿಸಲಾದ 6-ಅಂಕಿಯ ಕೋಡ್ ಅನ್ನು ನಮೂದಿಸಿ';
-  }
-
-  @override
-  String get otpNoCode => 'ಕೋಡ್ ಸಿಗಲಿಲ್ಲವೇ?';
-
-  @override
-  String otpResendIn(String seconds) {
-    return '$secondsರಲ್ಲಿ ಮರುಕಳುಹಿಸಿ';
-  }
-
-  @override
-  String get otpResend => 'ಮರುಕಳುಹಿಸಿ';
-
-  @override
-  String get otpVerify => 'ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮುಂದುವರಿಸಿ';
-
-  @override
-  String get otpPrivacy =>
-      '🔒 ನಿಮ್ಮ ಸಂಖ್ಯೆಯನ್ನು ಖಾಸಗಿ ಮತ್ತು ಸುರಕ್ಷಿತವಾಗಿ ಇರಿಸಲಾಗುತ್ತದೆ';
-
-  @override
-  String get otpResent => 'ಹೊಸ ಕೋಡ್ ಕಳುಹಿಸಲಾಗಿದೆ.';
-
-  @override
   String get authErrorNetwork =>
       'ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕವಿಲ್ಲ. ದಯವಿಟ್ಟು ನಿಮ್ಮ ನೆಟ್‌ವರ್ಕ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
-
-  @override
-  String get authErrorInvalidPhone =>
-      'ಆ ಫೋನ್ ಸಂಖ್ಯೆ ಸರಿಯಾಗಿ ಕಾಣುತ್ತಿಲ್ಲ. ದಯವಿಟ್ಟು ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
-
-  @override
-  String get authErrorInvalidOtp =>
-      'ಆ ಕೋಡ್ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
-
-  @override
-  String get authErrorOtpExpired =>
-      'ಆ ಕೋಡ್ ಅವಧಿ ಮುಗಿದಿದೆ. ದಯವಿಟ್ಟು ಹೊಸದನ್ನು ವಿನಂತಿಸಿ.';
 
   @override
   String get authErrorTooManyRequests =>
@@ -1199,4 +1152,103 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get purchaseErrorUnavailable => 'ಈ ಯೋಜನೆ ಸದ್ಯಕ್ಕೆ ಲಭ್ಯವಿಲ್ಲ.';
+
+  @override
+  String get panchangLocationUseAutomatic => 'ನನ್ನ ಪ್ರಸ್ತುತ ಸ್ಥಳವನ್ನು ಬಳಸಿ';
+
+  @override
+  String get panchangLocationSourceManual => 'ನೀವು ಆರಿಸಿದ್ದು';
+
+  @override
+  String get panchangLocationSourceDevice => 'ನಿಮ್ಮ ಸ್ಥಳದಿಂದ ಪತ್ತೆಯಾಗಿದೆ';
+
+  @override
+  String get panchangLocationSourceBirthProfile => 'ನಿಮ್ಮ ಜನನ ವಿವರಗಳಿಂದ';
+
+  @override
+  String get panchangLocationSourceFallback => 'ಡೀಫಾಲ್ಟ್ ಸ್ಥಳ';
+
+  @override
+  String get muhuratDay => 'ಹಗಲಿನ ಚೌಘಡಿಯಾ';
+
+  @override
+  String get muhuratNight => 'ರಾತ್ರಿಯ ಚೌಘಡಿಯಾ';
+
+  @override
+  String get muhuratUnavailable => 'ಮುಹೂರ್ತ ಸಮಯಗಳು ಸದ್ಯ ಲಭ್ಯವಿಲ್ಲ.';
+
+  @override
+  String get partnerDetailsTitle => 'ಸಂಗಾತಿಯ ಜನನ ವಿವರಗಳು';
+
+  @override
+  String get partnerDetailsSave => 'ವಿವರಗಳನ್ನು ಉಳಿಸಿ';
+
+  @override
+  String get matchNeedsPartner => 'ಹೊಂದಿಸಲು ಸಂಗಾತಿಯ ಜನನ ವಿವರಗಳನ್ನು ಸೇರಿಸಿ.';
+
+  @override
+  String get emailHint => 'ಇಮೇಲ್ ವಿಳಾಸ';
+
+  @override
+  String get passwordHint => 'ಪಾಸ್‌ವರ್ಡ್';
+
+  @override
+  String get confirmPasswordHint => 'ಪಾಸ್‌ವರ್ಡ್ ಅನ್ನು ಖಚಿತಪಡಿಸಿ';
+
+  @override
+  String get signInAction => 'ಸೈನ್ ಇನ್ ಮಾಡಿ';
+
+  @override
+  String get forgotPassword => 'ಪಾಸ್‌ವರ್ಡ್ ಮರೆತಿರಾ?';
+
+  @override
+  String get noAccountPrompt => 'Vedadarshiಗೆ ಹೊಸಬರೇ?';
+
+  @override
+  String get createAccount => 'ಖಾತೆ ರಚಿಸಿ';
+
+  @override
+  String get signUpTitle => 'ನಿಮ್ಮ ಖಾತೆಯನ್ನು ರಚಿಸಿ';
+
+  @override
+  String get haveAccountPrompt => 'ಈಗಾಗಲೇ ಖಾತೆ ಇದೆಯೇ?';
+
+  @override
+  String get forgotPasswordTitle => 'ನಿಮ್ಮ ಪಾಸ್‌ವರ್ಡ್ ಮರುಹೊಂದಿಸಿ';
+
+  @override
+  String get forgotPasswordSubtitle =>
+      'ನೀವು ಸೈನ್ ಅಪ್ ಮಾಡಿದ ಇಮೇಲ್ ವಿಳಾಸವನ್ನು ನಮೂದಿಸಿ, ನಿಮ್ಮ ಪಾಸ್‌ವರ್ಡ್ ಅನ್ನು ಮರುಹೊಂದಿಸಲು ನಾವು ನಿಮಗೆ ಲಿಂಕ್ ಕಳುಹಿಸುತ್ತೇವೆ.';
+
+  @override
+  String get sendResetLink => 'ಮರುಹೊಂದಿಸುವ ಲಿಂಕ್ ಕಳುಹಿಸಿ';
+
+  @override
+  String get resetLinkSent =>
+      'ಆ ಇಮೇಲ್ ನೋಂದಾಯಿತವಾಗಿದ್ದರೆ, ಮರುಹೊಂದಿಸುವ ಲಿಂಕ್ ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ.';
+
+  @override
+  String get passwordTooShort => 'ಪಾಸ್‌ವರ್ಡ್ ಕನಿಷ್ಠ 6 ಅಕ್ಷರಗಳಿರಬೇಕು.';
+
+  @override
+  String get passwordsDoNotMatch => 'ಆ ಪಾಸ್‌ವರ್ಡ್‌ಗಳು ಹೊಂದಾಣಿಕೆಯಾಗುತ್ತಿಲ್ಲ.';
+
+  @override
+  String get authErrorEmailInUse =>
+      'ಆ ಇಮೇಲ್ ಈಗಾಗಲೇ ನೋಂದಾಯಿಸಲಾಗಿದೆ. ಬದಲಿಗೆ ಸೈನ್ ಇನ್ ಮಾಡಲು ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get authErrorInvalidEmail => 'ಆ ಇಮೇಲ್ ವಿಳಾಸ ಸರಿಯಾಗಿ ಕಾಣುತ್ತಿಲ್ಲ.';
+
+  @override
+  String get authErrorWeakPassword =>
+      'ದಯವಿಟ್ಟು ಕನಿಷ್ಠ 6 ಅಕ್ಷರಗಳ ಪಾಸ್‌ವರ್ಡ್ ಆಯ್ಕೆಮಾಡಿ.';
+
+  @override
+  String get authErrorWrongCredentials =>
+      'ತಪ್ಪಾದ ಇಮೇಲ್ ಅಥವಾ ಪಾಸ್‌ವರ್ಡ್. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get authErrorUserNotFound =>
+      'ಆ ಇಮೇಲ್ ವಿಳಾಸದೊಂದಿಗೆ ಯಾವುದೇ ಖಾತೆ ಕಂಡುಬಂದಿಲ್ಲ.';
 }

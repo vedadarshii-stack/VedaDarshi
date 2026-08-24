@@ -14,6 +14,7 @@ import '../profile/birth_profile_repository.dart';
 import 'guna_milan_data.dart';
 import 'guna_milan_repository.dart';
 import 'gun_milan_static_data.dart';
+import 'partner_profile.dart';
 
 /// Gun Milan — Result, per the approved Figma "C2 · Gun Milan — Result"
 /// (node 20:2) concept.
@@ -63,11 +64,28 @@ class _GunMilanResultScreenState extends ConsumerState<GunMilanResultScreen> {
     final maleParams = profile != null
         ? GunaMilanPartnerParams.fromBirthProfile(profile)
         : GunMilanStaticData.fallbackGroomPartnerParams;
-    // BRIDE side has no real profile to read — see
-    // GunMilanStaticData.placeholderBridePartnerParams's doc comment for
-    // why this is a fixed placeholder rather than a second saved profile,
-    // and the multi-profile gap that causes it.
-    final femaleParams = GunMilanStaticData.placeholderBridePartnerParams;
+
+    // THE REAL PARTNER, OR NOTHING — 21 Aug 2026.
+    //
+    // This used to be `GunMilanStaticData.placeholderBridePartnerParams`, a
+    // hardcoded Mumbai 1997 chart. With no way to enter a partner, EVERY
+    // match ran against it, and the screen presented the result as a
+    // finished reading: "13.5 out of 36 · 38% Compatible · Not Compatible —
+    // Not recommended for marriage", captioned "<user> 💞 Ananya", with a
+    // download button. Ananya does not exist. That constant's own doc
+    // comment ended "Do not let this silently reach production" — it had.
+    //
+    // A 36-guna score is the kind of thing families act on. Refusing to
+    // compute one without a second real chart is the only safe behaviour,
+    // so a null partner short-circuits to an empty state and never reaches
+    // the API. The select screen also disables its CTA, but this check is
+    // the one that matters: it is the last point before a verdict exists.
+    final partner = ref.watch(partnerProfileProvider);
+    if (partner == null) {
+      return _MissingPartnerScaffold(l10n: l10n, locale: locale);
+    }
+    final femaleParams = GunaMilanPartnerParams.fromBirthProfile(partner);
+    final brideName = partner.fullName.trim();
     final request = (male: maleParams, female: femaleParams);
 
     final resultAsync = ref.watch(gunaMilanResultProvider(request));
@@ -79,6 +97,7 @@ class _GunMilanResultScreenState extends ConsumerState<GunMilanResultScreen> {
           l10n: l10n,
           locale: locale,
           groomName: groomName,
+          brideName: brideName,
           result: result,
         ),
         loading: () => _LoadingBody(l10n: l10n, locale: locale),
@@ -225,12 +244,14 @@ class _ResultContent extends StatelessWidget {
     required this.l10n,
     required this.locale,
     required this.groomName,
+    required this.brideName,
     required this.result,
   });
 
   final AppLocalizations l10n;
   final Locale locale;
   final String groomName;
+  final String brideName;
   final GunaMilanResult result;
 
   @override
@@ -240,7 +261,13 @@ class _ResultContent extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.zero,
       children: [
-        _Header(l10n: l10n, locale: locale, groomName: groomName, result: result),
+        _Header(
+          l10n: l10n,
+          locale: locale,
+          groomName: groomName,
+          brideName: brideName,
+          result: result,
+        ),
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
           child: Column(
@@ -338,12 +365,14 @@ class _Header extends StatelessWidget {
     required this.l10n,
     required this.locale,
     required this.groomName,
+    required this.brideName,
     required this.result,
   });
 
   final AppLocalizations l10n;
   final Locale locale;
   final String groomName;
+  final String brideName;
   final GunaMilanResult result;
 
   @override
@@ -440,7 +469,7 @@ class _Header extends StatelessWidget {
           ],
           const SizedBox(height: 10),
           Text(
-            '$groomName  💞  ${GunMilanStaticData.placeholderBrideName}',
+            '$groomName  💞  $brideName',
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -1109,6 +1138,45 @@ class _FooterHint extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+
+/// Shown when Gun Milan is opened without a partner's birth details.
+///
+/// This screen must never fall back to a stand-in chart: a 36-guna score
+/// carries a marriage recommendation, and one computed against a fabricated
+/// person is indistinguishable from a real reading. See the comment at the
+/// `partnerProfileProvider` read above for what shipped before this.
+class _MissingPartnerScaffold extends StatelessWidget {
+  const _MissingPartnerScaffold({required this.l10n, required this.locale});
+
+  final AppLocalizations l10n;
+  final Locale locale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.cream,
+      appBar: AppBar(
+        backgroundColor: AppColors.cream,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Text(
+            l10n.matchNeedsPartner,
+            textAlign: TextAlign.center,
+            style: AppFonts.body(locale, fontSize: 14, color: AppColors.muted),
+          ),
+        ),
+      ),
     );
   }
 }

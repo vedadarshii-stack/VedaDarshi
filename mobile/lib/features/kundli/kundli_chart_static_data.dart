@@ -115,6 +115,7 @@ class ChartPlanet {
   const ChartPlanet(
     this.code, {
     required this.house,
+    this.signNumber,
     this.isRetrograde = false,
     this.isExalted = false,
   });
@@ -123,6 +124,19 @@ class ChartPlanet {
 
   /// 1–12.
   final int house;
+
+  /// The RASHI this planet occupies, 1 = Aries … 12 = Pisces.
+  ///
+  /// ADDED 21 Aug 2026 for [SouthIndianChart]. A North Indian chart does not
+  /// need it — its twelve compartments ARE the houses, fixed on screen, so
+  /// [house] alone places a planet. A South Indian chart is the opposite:
+  /// the twelve boxes are fixed SIGNS and the house numbers rotate, so a
+  /// planet cannot be placed without knowing its rashi.
+  ///
+  /// Null when Vedika omitted it; [SouthIndianChart] then derives it from
+  /// the Ascendant instead (see its doc), so a missing value degrades to a
+  /// computed one rather than dropping the planet off the chart.
+  final int? signNumber;
 
   final bool isRetrograde;
   final bool isExalted;

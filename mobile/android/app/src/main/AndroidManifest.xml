@@ -7,6 +7,20 @@
          first reaches NotificationsScreen), or the OS blocks the prompt
          entirely. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- COARSE location only (21 Aug 2026), for the Panchang location.
+         Sunrise, sunset and Rahu Kaal depend on where the user IS, and the
+         app previously computed them from the BIRTH city.
+
+         Coarse, never fine: the fix is resolved to the nearest city in the
+         bundled offline dataset on-device (assets/data/cities.json), and only
+         that city's own published coordinates are ever sent to Vedika — the
+         device's actual position never leaves the phone. City-level accuracy
+         is all a panchang needs.
+
+         Optional in every sense: denial is a supported path (the app falls
+         back to the birth city), and Settings has a manual city picker that
+         overrides detection entirely. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <application
         android:label="Vedadarshi"
         android:name="${applicationName}"

@@ -57,10 +57,15 @@ DateTime? _dateTime(dynamic v) {
 /// Panchang screen falls back to its static placeholder copy row-by-row —
 /// see `panchang_screen.dart`'s `_elementsFrom`).
 ///
-/// There is deliberately NO sunrise/sunset/moonrise/moonset field here —
-/// this endpoint does not return them (verified), so the screen keeps its
-/// static placeholder for that card unconditionally rather than this model
-/// inventing a field that doesn't exist.
+/// SUNRISE/SUNSET/MOONRISE/MOONSET: available after all — see [sunTimes].
+/// This doc previously said they did "not exist", which was true only of
+/// `/v2/astrology/panchang/today`, the one route this app happened to call.
+/// The `/v2/astrology/panchang` bundle returns them under a `sunrise` block
+/// when asked with `include=sunrise` (21 Aug 2026). The lesson is the one
+/// already recorded in projects/CLAUDE.md for the dosha endpoints: "the
+/// endpoint I happened to call doesn't have it" is not "the API doesn't
+/// have it" — there are 615 paths in the contract, so search it before
+/// concluding something is impossible.
 @immutable
 class PanchangData {
   const PanchangData({
@@ -75,6 +80,8 @@ class PanchangData {
     this.ritu,
     this.dishaShool,
     this.guidance,
+    this.sunTimes,
+    this.festivals = const [],
   });
 
   final PanchangCoordinates? coordinates;
@@ -89,6 +96,29 @@ class PanchangData {
   final PanchangDishaShool? dishaShool;
   final PanchangGuidance? guidance;
 
+  /// Real sunrise/sunset/moonrise/moonset for the requested location.
+  ///
+  /// Null unless the request asked for `include=sunrise`. See
+  /// [PanchangSunTimes].
+  final PanchangSunTimes? sunTimes;
+
+  /// Festivals near this date, from the `upcoming_festivals` block
+  /// (`include=festivals`). Empty unless the request asked for it.
+  final List<PanchangFestival> festivals;
+
+  /// The festival falling on the requested day, or null.
+  ///
+  /// Note the block is called UPCOMING festivals: on most days the nearest
+  /// entry is days away. A card headed "Festival today" must therefore show
+  /// something only when [PanchangFestival.isToday] — anything else would
+  /// swap one wrong festival for another.
+  PanchangFestival? get festivalToday {
+    for (final festival in festivals) {
+      if (festival.isToday) return festival;
+    }
+    return null;
+  }
+
   factory PanchangData.fromJson(Map<String, dynamic> json) {
     return PanchangData(
       coordinates: PanchangCoordinates.fromJson(_map(json['coordinates'])),
@@ -97,11 +127,18 @@ class PanchangData {
       nakshatra: PanchangNakshatra.fromJson(_map(json['nakshatra'])),
       yoga: PanchangYoga.fromJson(_map(json['yoga'])),
       karana: PanchangKarana.fromJson(_map(json['karana'])),
-      vara: PanchangVara.fromJson(_map(json['vara'])),
+      // `vara` on /v2/astrology/panchang/today, `vaara` on the
+      // /v2/astrology/panchang bundle. Accept BOTH so the model does not
+      // care which endpoint produced it (21 Aug 2026).
+      vara: PanchangVara.fromJson(_map(json['vara'] ?? json['vaara'])),
       masa: PanchangMasa.fromJson(_map(json['masa'])),
       ritu: PanchangRitu.fromJson(_map(json['ritu'])),
       dishaShool: PanchangDishaShool.fromJson(_map(json['disha_shool'])),
       guidance: PanchangGuidance.fromJson(_map(json['guidance'])),
+      // Present only when the request asks for it via `include=sunrise`
+      // (the bundle endpoint). Null on the plain /today route.
+      sunTimes: PanchangSunTimes.fromJson(_map(json['sunrise'])),
+      festivals: PanchangFestival._listFrom(json['upcoming_festivals']),
     );
   }
 }
@@ -148,7 +185,8 @@ class PanchangTithi {
     return PanchangTithi(
       name: _str(json['name']),
       number: _int(json['number']),
-      paksha: _str(json['paksha']),
+      // String on /today, `{id, name}` on the bundle — accept either.
+      paksha: _str(json['paksha']) ?? _str(_map(json['paksha'])?['name']),
       lord: _str(json['lord']),
       percentageRemaining: _dbl(json['percentageRemaining']),
     );
@@ -217,14 +255,35 @@ class PanchangKarana {
 
 @immutable
 class PanchangVara {
-  const PanchangVara({this.name, this.lord});
+  const PanchangVara({this.name, this.lord, this.luckyColor, this.gemstone});
 
   final String? name;
+
+  /// Ruling planet of the weekday, e.g. `"Venus"` on a Friday.
   final String? lord;
+
+  /// e.g. `"White or Pink"`. From `interpretation.luckyColor`.
+  ///
+  /// ADDED 21 Aug 2026. Home's "Lucky Color" tile was a fixed "Gold" for
+  /// every user on every day, under a comment stating that no endpoint this
+  /// app calls returns one. The field was in the same response the tile's
+  /// neighbours already used.
+  final String? luckyColor;
+
+  final String? gemstone;
 
   static PanchangVara? fromJson(Map<String, dynamic>? json) {
     if (json == null) return null;
-    return PanchangVara(name: _str(json['name']), lord: _str(json['lord']));
+    // The bundle returns BOTH `name` ("Shukravara") and `englishName`
+    // ("Friday"); /today returns only `name`, already in English. The screen
+    // shows a weekday, so English wins when offered.
+    final interpretation = _map(json['interpretation']);
+    return PanchangVara(
+      name: _str(json['englishName']) ?? _str(json['name']),
+      lord: _str(json['lord']),
+      luckyColor: _str(interpretation?['luckyColor']),
+      gemstone: _str(interpretation?['gemstone']),
+    );
   }
 }
 
@@ -296,16 +355,34 @@ class PanchangDishaShool {
 
 @immutable
 class PanchangGuidance {
-  const PanchangGuidance({this.activitiesToAvoid, this.bestActivities});
+  const PanchangGuidance({
+    this.activitiesToAvoid,
+    this.bestActivities,
+    this.summary,
+    this.overallAuspiciousness,
+  });
 
   final List<String>? activitiesToAvoid;
   final List<String>? bestActivities;
+
+  /// A written reading of the day, referencing this day's actual tithi,
+  /// nakshatra and yoga.
+  ///
+  /// ADDED 21 Aug 2026 — it was in the response all along, just never
+  /// parsed, while the Panchang screen showed a fixed "Today's Spiritual
+  /// Advice" paragraph that never changed.
+  final String? summary;
+
+  /// e.g. `"Challenging"` / `"Auspicious"`.
+  final String? overallAuspiciousness;
 
   static PanchangGuidance? fromJson(Map<String, dynamic>? json) {
     if (json == null) return null;
     return PanchangGuidance(
       activitiesToAvoid: _strList(json['activitiesToAvoid']),
       bestActivities: _strList(json['bestActivities']),
+      summary: _str(json['summary']),
+      overallAuspiciousness: _str(json['overallAuspiciousness']),
     );
   }
 }
@@ -370,24 +447,41 @@ class MuhurtaData {
 class RahuKaal {
   const RahuKaal({this.start, this.end, this.isDay});
 
-  /// Deliberately read AS PARSED — [start]/[end]'s `.hour`/`.minute` are
-  /// used directly by [formattedRange] WITHOUT calling `.toLocal()`.
-  /// Vedika stamps these with a trailing `Z`, but the sandbox's fixed
-  /// 1995-01-01 sample is wall-clock local time for that sample city, not
-  /// true UTC (verified: the returned window sits in the afternoon, which
-  /// is consistent with a Sunday Rahu Kaal in IST, not with a UTC morning
-  /// reading) — running it through `.toLocal()` would silently double-shift
-  /// it by the device's own timezone offset on top of that mislabeling.
+  /// TRUE UTC, converted with `.toLocal()` before display — CHANGED
+  /// 21 Aug 2026.
+  ///
+  /// These were previously read as-parsed, on the sandbox-derived belief
+  /// that the trailing `Z` was a mislabelled wall-clock time and that
+  /// `.toLocal()` would double-shift it. **Production does not behave that
+  /// way** — it stamps genuine UTC, verified against a request whose
+  /// correct answer is independently known:
+  ///
+  /// ```
+  /// 2026-08-21 Jaipur -> 05:24:09Z – 07:01:26Z
+  ///                      = 10:54 – 12:31 IST, is_day:true, 1.62 h
+  /// ```
+  ///
+  /// Friday Rahu Kaal really is ~10:30–12:00, so the UTC reading is the
+  /// correct one and the conversion is required. Read as-parsed it rendered
+  /// as "05:24 – 07:01 AM" — plausible, and wrong by 5h30m.
   final DateTime? start;
   final DateTime? end;
   final bool? isDay;
 
-  /// `09:06 – 10:42 AM`-style range, or `null` if either timestamp is
-  /// missing/unparseable.
+  /// `09:06 – 10:42 AM`-style range in the DEVICE's local time, or `null`
+  /// when the window is missing, unparseable, or self-contradictory.
+  ///
+  /// The `!e.isAfter(s)` guard is not defensive padding — Vedika really does
+  /// return `end` BEFORE `start` when the endpoint is called without its
+  /// `datetime`/location parameters (see `PanchangRepository.fetchMuhurta`,
+  /// which now always sends them). Returning `null` makes the caller fall
+  /// back to its placeholder instead of printing an impossible ~10-hour
+  /// "06:55 – 05:33 PM" Rahu Kaal, which is what shipped before.
   String? get formattedRange {
-    final s = start;
-    final e = end;
+    final s = start?.toLocal();
+    final e = end?.toLocal();
     if (s == null || e == null) return null;
+    if (!e.isAfter(s)) return null;
     return _formatClockRange(s, e);
   }
 
@@ -400,6 +494,13 @@ class RahuKaal {
     );
   }
 }
+
+/// Whether a choghadiya window is auspicious, neutral or to be avoided.
+///
+/// [unknown] is a real state, not padding: Vedika omits `vpiType` on some
+/// windows, and a screen must be able to show the timing without asserting
+/// a quality it was never given.
+enum ChoghadiyaQuality { good, neutral, bad, unknown }
 
 @immutable
 class ChoghadiyaPeriod {
@@ -426,6 +527,33 @@ class ChoghadiyaPeriod {
   final DateTime? start;
   final DateTime? end;
   final bool? isDay;
+
+  /// `06:00 – 07:36 AM`-style local range, or null when either end is
+  /// missing or the window is self-contradictory.
+  ///
+  /// Converts with `.toLocal()` and rejects `end <= start` for exactly the
+  /// same reasons as [RahuKaal.formattedRange] — same endpoint, same
+  /// timestamps, so the same two hazards apply.
+  String? get formattedRange {
+    final s = start?.toLocal();
+    final e = end?.toLocal();
+    if (s == null || e == null || !e.isAfter(s)) return null;
+    return _formatClockRange(s, e);
+  }
+
+  /// Coarse quality of this window, normalised from Vedika's `vpiType`.
+  ChoghadiyaQuality get quality {
+    switch (vpiType?.trim().toLowerCase()) {
+      case 'good':
+        return ChoghadiyaQuality.good;
+      case 'bad':
+        return ChoghadiyaQuality.bad;
+      case 'neutral':
+        return ChoghadiyaQuality.neutral;
+      default:
+        return ChoghadiyaQuality.unknown;
+    }
+  }
 
   static ChoghadiyaPeriod? fromJson(Map<String, dynamic>? json) {
     if (json == null) return null;
@@ -507,5 +635,121 @@ class HoraSchedule {
   static HoraSchedule? fromJson(Map<String, dynamic>? json) {
     if (json == null) return null;
     return HoraSchedule(periods: HoraPeriod._listFromJson(json['hora']));
+  }
+}
+
+/// Sunrise, sunset, moonrise and moonset for the requested coordinates.
+///
+/// From the `sunrise` add-on block of `/v2/astrology/panchang`
+/// (`include=sunrise`). These are the first REAL values the app has had for
+/// this card — it previously showed a fixed `05:52 AM / 07:04 PM /
+/// 11:20 AM / 11:52 PM` to every user in every city on every date.
+///
+/// Timestamps arrive with a real offset (`2026-08-20T06:00:29+05:30`), so
+/// they are converted with `.toLocal()` before formatting — same rule as
+/// [RahuKaal], and unlike it these have never been ambiguous.
+///
+/// ⚠️ KNOWN UPSTREAM QUIRK: this block is computed for the SERVER's current
+/// day, not the `datetime` sent with the request — a call for 21 Aug 2026
+/// returned a `sunrise` block stamped 20 Aug while `tithi`/`vaara` in the
+/// same response correctly described the 21st. Sunrise moves by about a
+/// minute a day, so the displayed time is right to within a minute, but the
+/// date it belongs to can be off by one. Do not use these timestamps' DATE
+/// for anything; use their time-of-day only.
+@immutable
+class PanchangSunTimes {
+  const PanchangSunTimes({
+    this.sunrise,
+    this.sunset,
+    this.moonrise,
+    this.moonset,
+  });
+
+  final DateTime? sunrise;
+  final DateTime? sunset;
+  final DateTime? moonrise;
+  final DateTime? moonset;
+
+  /// `05:52 AM`-style local clock time, or null when absent.
+  String? get sunriseText => _clock(sunrise);
+  String? get sunsetText => _clock(sunset);
+  String? get moonriseText => _clock(moonrise);
+  String? get moonsetText => _clock(moonset);
+
+  static String? _clock(DateTime? t) {
+    if (t == null) return null;
+    final local = t.toLocal();
+    return '${_formatClock(local)} ${local.hour >= 12 ? 'PM' : 'AM'}';
+  }
+
+  static PanchangSunTimes? fromJson(Map<String, dynamic>? json) {
+    if (json == null) return null;
+    return PanchangSunTimes(
+      sunrise: _dateTime(json['sunrise']),
+      sunset: _dateTime(json['sunset']),
+      moonrise: _dateTime(json['moonrise']),
+      moonset: _dateTime(json['moonset']),
+    );
+  }
+}
+
+
+/// One festival from the panchang bundle's `upcoming_festivals` block.
+///
+/// ADDED 21 Aug 2026. The Panchang screen's festival card was the constant
+/// "Kamika Ekadashi", and Home's was "Sawan Somvar — tomorrow". Both were
+/// simply wrong on 21 Aug 2026: the day was Shukla Navami in Bhadrapada, so
+/// neither an Ekadashi nor in Sawan, and it was a Friday rather than a
+/// Somvar. Real festivals were available in the same response.
+///
+/// [confidence] is Vedika's own word — entries are marked `"verified"` and
+/// carry a [source] URL. Worth surfacing eventually; a festival date the API
+/// is unsure about should not be stated as flatly as one it has verified.
+@immutable
+class PanchangFestival {
+  const PanchangFestival({
+    this.name,
+    this.date,
+    this.daysFromNow,
+    this.description,
+    this.confidence,
+    this.source,
+  });
+
+  final String? name;
+
+  /// `YYYY-MM-DD`, as returned.
+  final String? date;
+
+  /// 0 = today. Vedika computes this, so it is preferred over parsing
+  /// [date] and comparing locally — that would reintroduce exactly the
+  /// timezone-boundary bug that made the whole panchang a day late.
+  final int? daysFromNow;
+
+  final String? description;
+  final String? confidence;
+  final String? source;
+
+  bool get isToday => daysFromNow == 0;
+
+  static PanchangFestival? fromJson(Map<String, dynamic>? json) {
+    if (json == null) return null;
+    return PanchangFestival(
+      name: _str(json['name']),
+      date: _str(json['date']),
+      daysFromNow: _int(json['daysFromNow']),
+      description: _str(json['description']),
+      confidence: _str(json['confidence']),
+      source: _str(json['source']),
+    );
+  }
+
+  static List<PanchangFestival> _listFrom(dynamic json) {
+    if (json is! List) return const [];
+    return json
+        .whereType<Map<String, dynamic>>()
+        .map(PanchangFestival.fromJson)
+        .whereType<PanchangFestival>()
+        .toList();
   }
 }

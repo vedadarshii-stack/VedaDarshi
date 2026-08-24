@@ -55,12 +55,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Sign in to save your birth profiles and unlock personalised predictions.';
 
   @override
-  String get phoneHint => 'Mobile number';
-
-  @override
-  String get getOtp => 'Get OTP';
-
-  @override
   String get orContinueWith => 'or continue with';
 
   @override
@@ -74,47 +68,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'By continuing you agree to our Terms of Service & Privacy Policy';
 
   @override
-  String get otpTitle => 'Verify your number';
-
-  @override
-  String otpSubtitle(String phone) {
-    return 'Enter the 6-digit code sent to $phone';
-  }
-
-  @override
-  String get otpNoCode => 'Didn\'t receive the code?';
-
-  @override
-  String otpResendIn(String seconds) {
-    return 'Resend in $seconds';
-  }
-
-  @override
-  String get otpResend => 'Resend';
-
-  @override
-  String get otpVerify => 'Verify & Continue';
-
-  @override
-  String get otpPrivacy => '🔒 Your number is kept private and secure';
-
-  @override
-  String get otpResent => 'A new code has been sent.';
-
-  @override
   String get authErrorNetwork =>
       'No internet connection. Please check your network and try again.';
-
-  @override
-  String get authErrorInvalidPhone =>
-      'That phone number doesn\'t look right. Please check and try again.';
-
-  @override
-  String get authErrorInvalidOtp => 'That code is incorrect. Please try again.';
-
-  @override
-  String get authErrorOtpExpired =>
-      'That code has expired. Please request a new one.';
 
   @override
   String get authErrorTooManyRequests =>
@@ -1190,4 +1145,104 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get purchaseErrorUnavailable =>
       'This plan isn\'t available right now.';
+
+  @override
+  String get panchangLocationUseAutomatic => 'Use my current location';
+
+  @override
+  String get panchangLocationSourceManual => 'Chosen by you';
+
+  @override
+  String get panchangLocationSourceDevice => 'Detected from your location';
+
+  @override
+  String get panchangLocationSourceBirthProfile => 'From your birth details';
+
+  @override
+  String get panchangLocationSourceFallback => 'Default location';
+
+  @override
+  String get muhuratDay => 'DAY CHOGHADIYA';
+
+  @override
+  String get muhuratNight => 'NIGHT CHOGHADIYA';
+
+  @override
+  String get muhuratUnavailable =>
+      'Muhurat timings aren\'t available right now.';
+
+  @override
+  String get partnerDetailsTitle => 'Partner\'s birth details';
+
+  @override
+  String get partnerDetailsSave => 'Save details';
+
+  @override
+  String get matchNeedsPartner => 'Add the partner\'s birth details to match.';
+
+  @override
+  String get emailHint => 'Email address';
+
+  @override
+  String get passwordHint => 'Password';
+
+  @override
+  String get confirmPasswordHint => 'Confirm password';
+
+  @override
+  String get signInAction => 'Sign in';
+
+  @override
+  String get forgotPassword => 'Forgot password?';
+
+  @override
+  String get noAccountPrompt => 'New to Vedadarshi?';
+
+  @override
+  String get createAccount => 'Create account';
+
+  @override
+  String get signUpTitle => 'Create your account';
+
+  @override
+  String get haveAccountPrompt => 'Already have an account?';
+
+  @override
+  String get forgotPasswordTitle => 'Reset your password';
+
+  @override
+  String get forgotPasswordSubtitle =>
+      'Enter the email address you signed up with and we\'ll send you a link to reset your password.';
+
+  @override
+  String get sendResetLink => 'Send reset link';
+
+  @override
+  String get resetLinkSent =>
+      'If that email is registered, a reset link is on its way.';
+
+  @override
+  String get passwordTooShort => 'Password must be at least 6 characters.';
+
+  @override
+  String get passwordsDoNotMatch => 'Those passwords don\'t match.';
+
+  @override
+  String get authErrorEmailInUse =>
+      'That email is already registered. Try signing in instead.';
+
+  @override
+  String get authErrorInvalidEmail => 'That email address doesn\'t look right.';
+
+  @override
+  String get authErrorWeakPassword =>
+      'Please choose a password of at least 6 characters.';
+
+  @override
+  String get authErrorWrongCredentials =>
+      'Incorrect email or password. Please try again.';
+
+  @override
+  String get authErrorUserNotFound =>
+      'No account found with that email address.';
 }
