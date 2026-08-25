@@ -19,6 +19,8 @@ import '../panchang/panchang_location_screen.dart';
 import '../premium/subscription_paywall_screen.dart';
 import '../reports/premium_reports_screen.dart';
 import '../startup/root_gate.dart';
+import 'account_deletion_error_messages.dart';
+import 'account_deletion_repository.dart';
 import 'birth_profile.dart';
 import 'birth_profile_repository.dart';
 
@@ -78,6 +80,16 @@ const List<_LanguageOption> _languageOptions = [
 ///    clear+invalidate step is the exact bug `projects/CLAUDE.md` warns
 ///    about — a signed-out user routed straight back to Home off the stale
 ///    cached profile.
+///  - Delete account is REAL (24 Aug 2026): confirms with an irreversible-
+///    action dialog (see [_confirmDeleteAccount]), then calls the
+///    `deleteAccount` Cloud Function (`AccountDeletionRepository`, per
+///    `projects/CLAUDE.md`'s "Delete Account" section — the backend
+///    deletes the whole `/users/{uid}` Firestore subtree and the Auth
+///    user server-side). Unlike log out, this does NOT call
+///    `AuthService.signOut()` — the Firebase user no longer exists by the
+///    time the callable returns — but it still clears the local profile
+///    cache and invalidates both providers before resetting to
+///    [RootGate], for the same stale-cache reason as log out.
 ///  - The dark-mode switch is REAL (see [_AppearanceRow]) — it reflects
 ///    whether dark is currently active (resolving [ThemeMode.system] via the
 ///    platform brightness) and toggling it sets an explicit
@@ -90,7 +102,7 @@ const List<_LanguageOption> _languageOptions = [
 ///    Every other row (Birth profiles, Downloaded PDFs, AI Chat History,
 ///    Payment History, Panchang location, Manage subscription, Privacy &
 ///    security, Help & support, Refer & Earn, Invite Friends, Rate,
-///    Send Feedback, Delete account) is an honest no-op — see each row's
+///    Send Feedback) is an honest no-op — see each row's
 ///    `onTap` comment for what it will eventually do. There is no
 ///    "saved/bookmarked articles" row in this design to route to
 ///    `ArticlesScreen` — the D5 frame simply doesn't have one.
@@ -126,6 +138,10 @@ class ProfileSettingsScreen extends ConsumerStatefulWidget {
 class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
   /// Guards against a double-tap firing two concurrent sign-outs.
   bool _isSigningOut = false;
+
+  /// Guards against a double-tap firing two concurrent account deletions —
+  /// mirrors [_isSigningOut].
+  bool _isDeleting = false;
 
   Future<void> _confirmSignOut(AppLocalizations l10n, Locale locale) async {
     final confirmed = await showDialog<bool>(
@@ -191,9 +207,29 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
     setState(() => _isSigningOut = true);
     final l10n = AppLocalizations.of(context)!;
     try {
-      await ref
-          .read(pushNotificationServiceProvider)
-          .removeTokenForCurrentUser();
+      // FCM token cleanup is BEST-EFFORT and must never be able to block
+      // signing out — 24 Aug 2026, client-reported "logout is failing".
+      //
+      // It still runs FIRST, and for the documented reason: the Firestore
+      // rules only allow writes under /users/{uid} for that uid, so deleting
+      // the token after signOut() is denied and the device keeps receiving
+      // the previous account's pushes.
+      //
+      // But it was previously awaited bare in the critical path, so ANY
+      // failure here — offline, a denied write, no FCM on the device, a
+      // guest with no uid — fell through to the generic `catch` below and
+      // aborted the whole sign-out. The user tapped "Log out", saw
+      // "Something went wrong", and stayed signed in with no way to leave
+      // the account. Losing a token row is a far smaller problem than being
+      // unable to sign out, so this swallows its own failure.
+      try {
+        await ref
+            .read(pushNotificationServiceProvider)
+            .removeTokenForCurrentUser();
+      } catch (_) {
+        // Orphaned token: it stops working on its own once Firebase rotates
+        // or the install is removed, and the next sign-in overwrites it.
+      }
       await ref.read(authServiceProvider).signOut();
       await ref.read(birthProfileRepositoryProvider).clearLocal();
       ref.invalidate(birthProfileProvider);
@@ -220,6 +256,126 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.authErrorUnknown)));
+    }
+  }
+
+  /// Confirmation dialog for the destructive, irreversible "Delete account"
+  /// action — modeled on [_confirmSignOut]'s styling but deliberately
+  /// harder to dismiss by accident: `barrierDismissible: false` (tapping
+  /// outside does nothing; the user must explicitly choose Cancel or
+  /// Delete), the body spells out exactly what is destroyed, and Cancel —
+  /// not Delete — is the safe default.
+  Future<void> _confirmDeleteAccount(AppLocalizations l10n, Locale locale) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(
+          l10n.profileDeleteAccountConfirmTitle,
+          style: AppFonts.heading(
+            locale,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: AppColors.ink,
+          ),
+        ),
+        content: Text(
+          l10n.profileDeleteAccountConfirmMessage,
+          style: AppFonts.body(locale, fontSize: 13, color: AppColors.muted),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(
+              l10n.profileCancel,
+              style: AppFonts.body(
+                locale,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.muted,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(
+              l10n.profileDeleteAccountConfirmAction,
+              style: AppFonts.body(
+                locale,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.ashubhFg,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+    await _deleteAccount();
+  }
+
+  /// Permanently deletes the signed-in user's account via the
+  /// `deleteAccount` Cloud Function (`AccountDeletionRepository`, per
+  /// `projects/CLAUDE.md`'s "Delete Account" section).
+  ///
+  /// Deliberately DOES NOT call `AuthService.signOut()` first, unlike
+  /// [_signOut] — the callable has already deleted the Firebase Auth user
+  /// server-side by the time it returns, so there is no session left to
+  /// sign out of. What it MUST still do, for the exact reason documented
+  /// on this class and on [_signOut], is clear the local profile cache and
+  /// invalidate both providers before resetting to [RootGate] — otherwise
+  /// the gate finds a stale saved profile and routes the now-deleted
+  /// account straight back to Home instead of onboarding.
+  Future<void> _deleteAccount() async {
+    if (_isDeleting) return;
+    setState(() => _isDeleting = true);
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      // FCM token cleanup is BEST-EFFORT and must never be able to block
+      // account deletion — same reasoning, and the same bug class, as the
+      // fix documented on `_signOut` (24 Aug 2026, client-reported "logout
+      // is failing" from an unguarded await here). It still runs FIRST,
+      // while the user is still authenticated: the Firestore rules only
+      // allow a write under /users/{uid} for that uid, so attempting it
+      // after the account is gone would fail anyway.
+      try {
+        await ref
+            .read(pushNotificationServiceProvider)
+            .removeTokenForCurrentUser();
+      } catch (_) {
+        // Orphaned token: harmless — the account (and its Firestore doc)
+        // no longer exists to receive pushes for.
+      }
+      await ref.read(accountDeletionRepositoryProvider).deleteAccount();
+      // The Firebase user is already gone server-side — do NOT call
+      // AuthService.signOut() here (see this method's doc comment). But
+      // the local cache must still be cleared, or RootGate strands the
+      // user on Home off the stale cached profile.
+      await ref.read(birthProfileRepositoryProvider).clearLocal();
+      ref.invalidate(birthProfileProvider);
+      ref.invalidate(hasBirthProfileProvider);
+      if (!mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute<void>(builder: (_) => const RootGate()),
+        (route) => false,
+      );
+    } on AccountDeletionException catch (e) {
+      // Never leave the user staring at a dialog that appeared to do
+      // nothing — surface exactly why it failed.
+      if (!mounted) return;
+      setState(() => _isDeleting = false);
+      final message = accountDeletionErrorMessage(l10n, e.code);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isDeleting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.accountDeletionErrorGeneric)),
+      );
     }
   }
 
@@ -433,6 +589,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
               l10n: l10n,
               locale: locale,
               onLogOut: () => _confirmSignOut(l10n, locale),
+              onDeleteAccount: () => _confirmDeleteAccount(l10n, locale),
             ),
           ],
         ),
@@ -901,11 +1058,13 @@ class _FooterActions extends StatelessWidget {
     required this.l10n,
     required this.locale,
     required this.onLogOut,
+    required this.onDeleteAccount,
   });
 
   final AppLocalizations l10n;
   final Locale locale;
   final VoidCallback onLogOut;
+  final VoidCallback onDeleteAccount;
 
   @override
   Widget build(BuildContext context) {
@@ -936,11 +1095,13 @@ class _FooterActions extends StatelessWidget {
           button: true,
           child: InkWell(
             borderRadius: BorderRadius.circular(8),
-            // Account deletion must go through a Cloud Function so the
-            // whole /users/{uid} subtree is removed atomically — client
-            // deletes of the account doc are forbidden by the deployed
-            // security rules (see projects/CLAUDE.md). Not built yet.
-            onTap: () {},
+            // Account deletion goes through the `deleteAccount` Cloud
+            // Function (24 Aug 2026) so the whole /users/{uid} subtree is
+            // removed atomically — client deletes of the account doc are
+            // forbidden by the deployed security rules (see
+            // projects/CLAUDE.md). See `_confirmDeleteAccount`/
+            // `_deleteAccount` above for the confirmation + call flow.
+            onTap: onDeleteAccount,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
               child: Text(

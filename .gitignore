@@ -15,3 +15,7 @@ functions/lib/
 mobile/android/key.properties
 *.jks
 *.keystore
+
+# Claude Code local state (worktrees, agent scratch, session data) —
+# tooling artefacts, never part of the deliverable.
+.claude/

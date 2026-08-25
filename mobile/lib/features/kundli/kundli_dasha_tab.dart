@@ -214,7 +214,7 @@ class _CurrentMahadashaCard extends StatelessWidget {
     final planetLabel = _planetLabel(current.planet, current.vedicName, l10n);
     final range = _dateRange(current.startDate, current.endDate, l10n);
     final phase = guidance?.currentPhase;
-    final timeRemaining = guidance?.timeRemaining;
+    final remainingLabel = dashaRemainingLabel(current.endDate, l10n);
 
     return Container(
       width: double.infinity,
@@ -252,10 +252,14 @@ class _CurrentMahadashaCard extends StatelessWidget {
             range,
             style: AppFonts.body(locale, fontSize: 11, color: AppColors.muted),
           ),
-          // `phase`/`timeRemaining` are Vedika's own ready-made English
-          // sentences (see `DashaGuidance`'s doc comment) — rendered as-is
-          // regardless of app locale, same documented gap as the Chart
-          // tab's summary banner.
+          // `phase` is Vedika's own ready-made English sentence (see
+          // `DashaGuidance`'s doc comment) — rendered as-is regardless of
+          // app locale, same documented gap as the Chart tab's summary
+          // banner. The "remaining" line below is DIFFERENT: it used to be
+          // `guidance.timeRemaining`, also one of Vedika's sentences, but
+          // that field was REMOVED — see `dashaRemainingLabel`'s doc
+          // comment for why — and is now computed locally (and therefore
+          // properly localized) from `current.endDate`.
           if (phase != null) ...[
             const SizedBox(height: 10),
             Text(
@@ -263,10 +267,10 @@ class _CurrentMahadashaCard extends StatelessWidget {
               style: AppFonts.body(locale, fontSize: 11.5, color: AppColors.ink),
             ),
           ],
-          if (timeRemaining != null) ...[
+          if (remainingLabel != null) ...[
             const SizedBox(height: 6),
             Text(
-              timeRemaining,
+              remainingLabel,
               style: AppFonts.body(
                 locale,
                 fontSize: 10.5,
@@ -442,4 +446,70 @@ String _planetLabel(String? planet, String? vedicName, AppLocalizations l10n) {
 String _dateRange(String? start, String? end, AppLocalizations l10n) {
   if (start == null && end == null) return l10n.kundliValueUnavailable;
   return '${start ?? l10n.kundliValueUnavailable} – ${end ?? l10n.kundliValueUnavailable}';
+}
+
+/// Computes a localized "X years, Y months remaining" label from a
+/// maha-dasha's `end_date`, or `null` when the date is missing,
+/// unparsable, or already in the past.
+///
+/// WHY THIS EXISTS INSTEAD OF RENDERING `guidance.time_remaining` (see
+/// `projects/CLAUDE.md`'s "VEDIKA RETURNS A WRONG `time_remaining`"
+/// section, 24 Aug 2026): a live `POST /v2/astrology/vimshottari-dasha`
+/// response for a Hyderabad 1990-05-15 chart whose `maha_dasha` runs
+/// `2011-12-09 → 2029-12-09` returned, in the SAME payload,
+/// `guidance.time_remaining: "4 years, 6 months remaining"`. That is
+/// exactly the correct remaining time as of **2025-06-09** — i.e. the
+/// string was **441 days stale**, as though computed once at a fixed
+/// build date rather than freshly per request. The true remaining time
+/// from 2026-08-24 to 2029-12-09 is **3 years, 3 months, 15 days**.
+/// `current_dasha.maha_dasha.end_date` is authoritative and internally
+/// self-consistent (it's what the "current mahadasha" period range
+/// itself is built from — see `_dateRange` above), so this derives the
+/// label from it directly instead of trusting Vedika's pre-formatted
+/// sentence. Side benefit: Vedika's string was English-only regardless of
+/// app locale — computing it ourselves makes it localizable in all five
+/// app languages too.
+///
+/// NOTE FOR ANYONE TEMPTED TO "SIMPLIFY" THIS BACK: do not restore
+/// `guidance.timeRemaining` (the field itself was removed from
+/// `DashaGuidance` — see its doc comment) — it is wrong for every chart,
+/// not just this one, per the client-reported bug this fixes.
+///
+/// Calendar-accurate: computes a year/month "borrow" difference the same
+/// way `java.time.Period.between` does, rather than dividing total days
+/// by 365/30 — that would drift against real calendar months (28–31
+/// days) and misreport, e.g., a `end_date` a few days before the
+/// "now" day-of-month as a whole extra month short.
+String? dashaRemainingLabel(String? endDateString, AppLocalizations l10n) {
+  if (endDateString == null) return null;
+  final endDate = DateTime.tryParse(endDateString);
+  if (endDate == null) return null;
+
+  final now = DateTime.now();
+  if (!endDate.isAfter(now)) return null; // Dasha has already ended.
+
+  var years = endDate.year - now.year;
+  var months = endDate.month - now.month;
+  if (endDate.day < now.day) {
+    months -= 1;
+  }
+  if (months < 0) {
+    years -= 1;
+    months += 12;
+  }
+
+  if (years == 0 && months == 0) {
+    // Under a month remaining — "0 years, 0 months remaining" would read
+    // as broken, so this gets its own dedicated copy instead.
+    return l10n.kundliDashaRemainingLessThanMonth;
+  }
+  if (years == 0) {
+    // Under a year remaining — omit the "0 years" segment entirely rather
+    // than reading e.g. "0 years, 4 months remaining".
+    return l10n.kundliDashaRemainingMonthsOnly(months);
+  }
+  if (months == 0) {
+    return l10n.kundliDashaRemainingYearsOnly(years);
+  }
+  return l10n.kundliDashaRemainingYearsMonths(years, months);
 }

@@ -9,6 +9,7 @@ const db = admin.firestore();
 // firebase.json) picks up every function from one entry point.
 export { dailyPrewarm } from "./dailyPrewarm";
 export { askAiAstrologer } from "./aiCredits";
+export { deleteAccount } from "./deleteAccount";
 
 /**
  * The paid Vedika API key is imported from ./config (see that file for

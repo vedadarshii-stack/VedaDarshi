@@ -10,7 +10,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../core/widgets/app_radio_dot.dart';
 import '../../l10n/app_localizations.dart';
-import '../reports/reports_static_data.dart';
+import 'tier_feature_catalogue.dart';
 
 /// Subscription Paywall, per the approved Figma "C5 · Subscription Paywall"
 /// (node 23:2) concept, now driven by the LIVE RevenueCat offering.
@@ -193,8 +193,6 @@ class _SubscriptionPaywallScreenState
               ),
               const SizedBox(height: 16),
               _Hero(l10n: l10n, locale: locale),
-              const SizedBox(height: 16),
-              _BenefitList(l10n: l10n, locale: locale),
               const SizedBox(height: 16),
               catalogueAsync.when(
                 loading: () => const Padding(
@@ -525,36 +523,14 @@ class _Hero extends StatelessWidget {
   }
 }
 
-/// 4-row benefit list (Figma node 23:12).
-class _BenefitList extends StatelessWidget {
-  const _BenefitList({required this.l10n, required this.locale});
-
-  final AppLocalizations l10n;
-  final Locale locale;
-
-  @override
-  Widget build(BuildContext context) {
-    final benefits = [
-      l10n.benefitReports(ReportsStaticData.totalReports.toString()),
-      l10n.benefitUnlimitedAi,
-      l10n.benefitAdvancedKundli,
-      l10n.benefitAdFree,
-    ];
-
-    return Column(
-      children: [
-        for (var i = 0; i < benefits.length; i++) ...[
-          if (i != 0) const SizedBox(height: 8),
-          _BenefitRow(text: benefits[i], locale: locale),
-        ],
-      ],
-    );
-  }
-}
-
-/// One benefit row: a small gold check circle + wrapping text.
-class _BenefitRow extends StatelessWidget {
-  const _BenefitRow({required this.text, required this.locale});
+/// One feature row: a small gold check circle + wrapping text.
+///
+/// Originally the row type for the paywall's single shared 4-item benefit
+/// list (Figma node 23:12); that list was replaced by a per-tier feature
+/// list driven by [TierFeatureCatalogue] (see [_PlanCard]), so this is now
+/// reused per-card rather than duplicated.
+class _TierFeatureRow extends StatelessWidget {
+  const _TierFeatureRow({required this.text, required this.locale});
 
   final String text;
   final Locale locale;
@@ -643,6 +619,13 @@ class _PlanCard extends StatelessWidget {
         ? l10n.currentPlanLabel
         : (savings == null ? null : l10n.savePercent(savings.toString()));
 
+    // The claim this card is allowed to make about what the tier actually
+    // includes — see TierFeatureCatalogue's doc comment for the source of
+    // truth. Deliberately per-tier: a shared list across all four cards is
+    // what let "unlimited AI" and "ad-free" survive as false claims no tier
+    // could back up.
+    final featureLines = TierFeatureCatalogue.linesFor(option.tier, l10n);
+
     final card = Semantics(
       button: true,
       selected: isSelected,
@@ -673,74 +656,91 @@ class _PlanCard extends StatelessWidget {
                   ]
                 : null,
           ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              AppRadioDot(isSelected: isSelected, size: 20),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (badge != null) ...[
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.gold,
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: Text(
-                          badge,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+              Row(
+                children: [
+                  AppRadioDot(isSelected: isSelected, size: 20),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (badge != null) ...[
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.gold,
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Text(
+                              badge,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppFonts.body(
+                                locale,
+                                fontSize: 8.5,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.onGold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                        ],
+                        Text(
+                          _tierName,
                           style: AppFonts.body(
                             locale,
-                            fontSize: 8.5,
+                            fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.onGold,
+                            color: Colors.white,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                    ],
-                    Text(
-                      _tierName,
-                      style: AppFonts.body(
-                        locale,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
+                        if (subtitle != null) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            subtitle,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppFonts.body(
+                              locale,
+                              fontSize: 10.5,
+                              color: AppColors.mutedOnNavy,
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
-                    if (subtitle != null) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        subtitle,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppFonts.body(
-                          locale,
-                          fontSize: 10.5,
-                          color: AppColors.mutedOnNavy,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    option.priceString,
+                    style: AppFonts.heading(
+                      locale,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: isSelected ? AppColors.quoteGold : Colors.white,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              Text(
-                option.priceString,
-                style: AppFonts.heading(
-                  locale,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                  color: isSelected ? AppColors.quoteGold : Colors.white,
+              if (featureLines.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Container(
+                  height: 1,
+                  color: Colors.white.withValues(alpha: 0.12),
                 ),
-              ),
+                const SizedBox(height: 12),
+                for (var i = 0; i < featureLines.length; i++) ...[
+                  if (i != 0) const SizedBox(height: 8),
+                  _TierFeatureRow(text: featureLines[i], locale: locale),
+                ],
+              ],
             ],
           ),
         ),

@@ -416,12 +416,6 @@ abstract class AppLocalizations {
   /// **'Today\'s Planet'**
   String get todaysPlanet;
 
-  /// Label of the moon-phase tile in the Home Dashboard's 'Today at a glance' grid.
-  ///
-  /// In en, this message translates to:
-  /// **'Moon Phase'**
-  String get moonPhase;
-
   /// Label of the auspicious-time tile in the Home Dashboard's 'Today at a glance' grid.
   ///
   /// In en, this message translates to:
@@ -1490,29 +1484,59 @@ abstract class AppLocalizations {
   /// **'Unlimited cosmic guidance, one simple plan'**
   String get premiumTagline;
 
-  /// First benefit line item on the Subscription Paywall, naming the total number of reports in the full catalogue.
+  /// Per-tier feature line on the Subscription Paywall's plan cards, naming the daily AI Astrologer question cap for that tier (includes the free daily question — never phrase this as unlimited, no tier is).
   ///
   /// In en, this message translates to:
-  /// **'All {total} premium reports with PDF export'**
-  String benefitReports(String total);
+  /// **'{count} AI Astrologer questions a day'**
+  String tierFeatureAiQuestions(int count);
 
-  /// Second benefit line item on the Subscription Paywall.
+  /// Per-tier feature line on the Subscription Paywall's plan cards, for tiers (Bronze, Silver) that unlock Weekly and Monthly horoscope plus the full Panchang calendar, but not Yearly horoscope.
   ///
   /// In en, this message translates to:
-  /// **'Unlimited AI Astrologer questions'**
-  String get benefitUnlimitedAi;
+  /// **'Weekly & monthly horoscope, full Panchang calendar'**
+  String get tierFeatureHoroscopeStandard;
 
-  /// Third benefit line item on the Subscription Paywall.
+  /// Per-tier feature line on the Subscription Paywall's plan cards, for tiers (Gold, Platinum) that additionally unlock Yearly horoscope.
   ///
   /// In en, this message translates to:
-  /// **'Advanced Kundli: dasha, dosha & remedies'**
-  String get benefitAdvancedKundli;
+  /// **'Weekly, monthly & yearly horoscope, full Panchang calendar'**
+  String get tierFeatureHoroscopeWithYearly;
 
-  /// Fourth benefit line item on the Subscription Paywall.
+  /// Per-tier feature line on the Subscription Paywall's plan cards, naming the saved-kundali cap for tiers below Silver (Bronze only — Silver and above are unlimited).
   ///
   /// In en, this message translates to:
-  /// **'Ad-free experience across the app'**
-  String get benefitAdFree;
+  /// **'{count} saved Kundlis'**
+  String tierFeatureKundalisLimited(int count);
+
+  /// Per-tier feature line on the Subscription Paywall's plan cards, for tiers (Silver and above) with no cap on saved kundalis.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited saved Kundlis'**
+  String get tierFeatureKundalisUnlimited;
+
+  /// Per-tier feature line on the Subscription Paywall's plan cards, naming the monthly detailed (Gun Milan) compatibility report allowance for that tier.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} detailed compatibility reports a month'**
+  String tierFeatureCompatibility(int count);
+
+  /// Per-tier feature line on the Subscription Paywall's plan cards, naming the discount percentage that tier gets on premium report purchases (reports are always a separate one-time purchase, never included free — this line must not imply otherwise).
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% off premium reports'**
+  String tierFeatureReportDiscount(int percent);
+
+  /// Per-tier feature line on the Subscription Paywall's plan cards, shown only for tiers (Gold, Platinum) that unlock premium articles.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium articles'**
+  String get tierFeaturePremiumArticles;
+
+  /// Per-tier feature line on the Subscription Paywall's plan cards, shown only for Platinum, naming its monthly Complete Life Report credit allowance.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Complete Life Report credit a month'**
+  String tierFeatureLifeReportCredit(int count);
 
   /// Name of the monthly subscription plan card on the Subscription Paywall.
   ///
@@ -1904,7 +1928,7 @@ abstract class AppLocalizations {
   /// **'Log out'**
   String get profileLogOut;
 
-  /// Label of the Delete account action at the bottom of the Profile & Settings screen — not yet wired up (must go through a Cloud Function per projects/CLAUDE.md).
+  /// Label of the Delete account action at the bottom of the Profile & Settings screen — calls the deleteAccount Cloud Function after confirmation (see profileDeleteAccountConfirmTitle).
   ///
   /// In en, this message translates to:
   /// **'Delete account'**
@@ -1933,6 +1957,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancel'**
   String get profileCancel;
+
+  /// Title of the confirmation dialog shown before permanently deleting the account from the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete your account?'**
+  String get profileDeleteAccountConfirmTitle;
+
+  /// Body message of the confirmation dialog shown before permanently deleting the account, spelling out exactly what is destroyed.
+  ///
+  /// In en, this message translates to:
+  /// **'This permanently deletes your birth profiles, AI chat history and account. This cannot be undone.'**
+  String get profileDeleteAccountConfirmMessage;
+
+  /// Label of the destructive confirming action button in the delete-account confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get profileDeleteAccountConfirmAction;
+
+  /// Error shown on the Profile & Settings screen when the deleteAccount callable fails with HttpsError code unauthenticated (the auth token was no longer valid).
+  ///
+  /// In en, this message translates to:
+  /// **'Your session has expired. Please sign in again to delete your account.'**
+  String get accountDeletionErrorUnauthenticated;
+
+  /// Fallback error shown on the Profile & Settings screen for any deleteAccount failure not otherwise classified (e.g. HttpsError code internal).
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get accountDeletionErrorGeneric;
 
   /// Non-negotiable banner on the Kundli Chart screen shown whenever the app is pointed at Vedika's sandbox, which always returns one fixed sample chart regardless of the birth details sent.
   ///
@@ -2077,6 +2131,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No dasha periods available yet.'**
   String get kundliDashaTimelineEmpty;
+
+  /// Time remaining in the current mahadasha, shown on the 'currently running' card on the Vimshottari Dasha tab, computed locally from current_dasha.maha_dasha.end_date (see dashaRemainingLabel's doc comment for why this replaced Vedika's own guidance.time_remaining string). Used when both years and months remaining are non-zero.
+  ///
+  /// In en, this message translates to:
+  /// **'{years, plural, one{1 year} other{{years} years}}, {months, plural, one{1 month} other{{months} months}} remaining'**
+  String kundliDashaRemainingYearsMonths(int years, int months);
+
+  /// Time remaining in the current mahadasha, same source as kundliDashaRemainingYearsMonths, used when the remaining months component is exactly zero (a whole number of years remaining).
+  ///
+  /// In en, this message translates to:
+  /// **'{years, plural, one{1 year} other{{years} years}} remaining'**
+  String kundliDashaRemainingYearsOnly(int years);
+
+  /// Time remaining in the current mahadasha, same source as kundliDashaRemainingYearsMonths, used when under a year remains (the years component is exactly zero) — deliberately omits a '0 years' segment.
+  ///
+  /// In en, this message translates to:
+  /// **'{months, plural, one{1 month} other{{months} months}} remaining'**
+  String kundliDashaRemainingMonthsOnly(int months);
+
+  /// Time remaining in the current mahadasha, same source as kundliDashaRemainingYearsMonths, used when both the years and months components are exactly zero (the mahadasha ends within days).
+  ///
+  /// In en, this message translates to:
+  /// **'Less than a month remaining'**
+  String get kundliDashaRemainingLessThanMonth;
 
   /// A nakshatra's quarter/pada (1-4), shown next to a planet's nakshatra on the Planet Positions tab.
   ///

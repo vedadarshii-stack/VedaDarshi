@@ -12,6 +12,7 @@ import '../articles/article_detail_screen.dart';
 import '../articles/articles_screen.dart';
 import '../articles/articles_static_data.dart';
 import '../horoscope/horoscope_detail_screen.dart';
+import '../horoscope/horoscope_repository.dart';
 import '../horoscope/horoscope_signs_screen.dart';
 import '../horoscope/user_sign_provider.dart';
 import '../horoscope/zodiac_sign.dart';
@@ -81,32 +82,90 @@ DateTime _today() {
   return DateTime(now.year, now.month, now.day);
 }
 
-/// Builds the 6 "Today at a glance" tiles, swapping in a live value
-/// wherever one exists.
+/// Picks the next upcoming AUSPICIOUS window for the Muhurat tile.
 ///
-/// REWRITTEN 21 Aug 2026. The previous version wired only Muhurat and said
+/// ADDED 24 Aug 2026, replacing a genuine bug: the tile was filled from
+/// `muhurta.rahuKaal.formattedRange` — Rahu Kaal is the one INAUSPICIOUS
+/// window Vedic tradition says to avoid, so a "Muhurat" (auspicious-time)
+/// label pointed straight at it, telling a user to go ahead and act during
+/// the one window they should not. Same defect class already fixed once on
+/// this screen for the Direction tile (see `_glanceTilesFrom`'s comment on
+/// `disha_shool` safe-vs-avoid) — a screen that surfaces both a "safe" and
+/// an "avoid" value under the same endpoint must never let the avoid value
+/// leak out under the safe value's label. Rahu Kaal itself is legitimate and
+/// stays exactly where it belongs: the Panchang tab's own Rahu Kaal card.
+///
+/// [schedule] is `MuhurtaData.choghadiya` — the SAME `/v2/daily/muhurta`
+/// call `rahuKaal` already came from, so this costs no extra request. Each
+/// `ChoghadiyaPeriod.quality` of `good` is a genuinely auspicious window;
+/// `bad`/`neutral`/`unknown` are not, and must never be shown here.
+///
+/// Walks the day list then the night list (their natural chronological
+/// order) and returns the first `good` window whose start time is still in
+/// the future. If every `good` window today has already started, falls back
+/// to the FIRST `good` window of the day so the tile still shows something
+/// meaningful rather than nothing. Returns `null` — the tile is omitted
+/// entirely, see `_glanceTilesFrom` — only when no `good` window exists in
+/// the schedule at all; there is no placeholder value to fall back to,
+/// because a wrong or made-up muhurat is worse than no tile.
+String? _nextGoodMuhuratRange(ChoghadiyaSchedule? schedule) {
+  if (schedule == null) return null;
+  final goodPeriods = [
+    for (final period in [...schedule.day, ...schedule.night])
+      if (period.quality == ChoghadiyaQuality.good) period,
+  ];
+  if (goodPeriods.isEmpty) return null;
+
+  final now = DateTime.now();
+  for (final period in goodPeriods) {
+    final start = period.start?.toLocal();
+    final range = period.formattedRange;
+    if (start != null && range != null && start.isAfter(now)) {
+      return range;
+    }
+  }
+  // Nothing left today — first good window of the day is still a genuinely
+  // auspicious answer, just not an upcoming one.
+  for (final period in goodPeriods) {
+    final range = period.formattedRange;
+    if (range != null) return range;
+  }
+  return null;
+}
+
+/// Builds the "Today at a glance" tiles, swapping in a live value wherever
+/// one exists and OMITTING a tile entirely when the live value is the only
+/// honest one and it isn't available (Lucky Number, Muhurat) — see
+/// [HomeStaticData.glanceTiles]'s doc comment.
+///
+/// REWRITTEN 21 Aug 2026, then again 24 Aug 2026. The previous version wired
+/// only Muhurat (and wired it wrong — see [_nextGoodMuhuratRange]) and said
 /// the other five "have NO Vedika equivalent at all — verified", so they
 /// were to "stay on [HomeStaticData] permanently". That verification was
 /// done against `/v2/astrology/panchang/today` and a parameter-less
 /// `/v2/daily/muhurta` — the two narrowest routes in the contract. Three of
-/// the five are in the panchang BUNDLE this app already fetches:
+/// the six are in the panchang BUNDLE this app already fetches:
 ///
 ///  - Lucky Color   <- `vaara.interpretation.luckyColor`
 ///  - Today's Planet<- `vaara.lord` (the weekday's ruling graha)
 ///  - Direction     <- `disha_shool.safeDirections`
 ///
-/// so they cost nothing extra. Every one of them was previously a constant
-/// shown to every user on every day: "Gold", "Shukra", "East".
-///
-/// Still genuinely absent from anything this app calls:
-///  - Lucky Number — no field in any response consumed here.
-///  - Moon Phase   — `/v2/daily/moon-phase` exists in the contract but is a
-///    separate BILLED call; not added unasked.
-///
-/// Those two keep their placeholders, and this comment is now the honest
-/// record of which is which.
-List<GlanceTile> _glanceTilesFrom(MuhurtaData? muhurta, PanchangData? panchang) {
-  final rahuRange = muhurta?.rahuKaal?.formattedRange;
+/// so they cost nothing extra, and still fall back to their
+/// [HomeStaticData] placeholder when unavailable — those placeholders are
+/// plausible defaults, not wrong advice, so degrading to them silently is
+/// fine. Lucky Number (`luckyNumber`, from the user's own daily horoscope —
+/// see `HomeDashboardScreen.build`) and Muhurat do NOT get that treatment:
+/// their old placeholders were either the same value for every user forever
+/// (Lucky Number) or actively wrong (Muhurat's Rahu Kaal), so both are
+/// omitted from the grid rather than shown as a guess. Moon Phase is gone
+/// outright — `/v2/daily/moon-phase` exists in the contract but is a
+/// separate BILLED call, not added unasked (see [HomeStaticData]'s doc).
+List<GlanceTile> _glanceTilesFrom({
+  required MuhurtaData? muhurta,
+  required PanchangData? panchang,
+  required int? luckyNumber,
+}) {
+  final muhuratRange = _nextGoodMuhuratRange(muhurta?.choghadiya);
   final luckyColor = panchang?.vara?.luckyColor;
   final planet = panchang?.vara?.lord;
   // "Direction" on this tile means the AUSPICIOUS way to travel, so it is
@@ -116,19 +175,23 @@ List<GlanceTile> _glanceTilesFrom(MuhurtaData? muhurta, PanchangData? panchang) 
   final safe = panchang?.dishaShool?.safeDirections;
   final direction = (safe != null && safe.isNotEmpty) ? safe.first : null;
 
+  final staticById = {
+    for (final tile in HomeStaticData.glanceTiles) tile.id: tile,
+  };
+
   return [
-    for (final tile in HomeStaticData.glanceTiles)
-      switch (tile.id) {
-        GlanceTileId.muhurat when rahuRange != null =>
-          GlanceTile(GlanceTileId.muhurat, rahuRange),
-        GlanceTileId.luckyColor when luckyColor != null =>
-          GlanceTile(GlanceTileId.luckyColor, luckyColor),
-        GlanceTileId.todaysPlanet when planet != null =>
-          GlanceTile(GlanceTileId.todaysPlanet, planet),
-        GlanceTileId.direction when direction != null =>
-          GlanceTile(GlanceTileId.direction, direction),
-        _ => tile,
-      },
+    if (luckyNumber != null)
+      GlanceTile(GlanceTileId.luckyNumber, '$luckyNumber'),
+    luckyColor != null
+        ? GlanceTile(GlanceTileId.luckyColor, luckyColor)
+        : staticById[GlanceTileId.luckyColor]!,
+    direction != null
+        ? GlanceTile(GlanceTileId.direction, direction)
+        : staticById[GlanceTileId.direction]!,
+    planet != null
+        ? GlanceTile(GlanceTileId.todaysPlanet, planet)
+        : staticById[GlanceTileId.todaysPlanet]!,
+    if (muhuratRange != null) GlanceTile(GlanceTileId.muhurat, muhuratRange),
   ];
 }
 
@@ -139,28 +202,47 @@ List<GlanceTile> _glanceTilesFrom(MuhurtaData? muhurta, PanchangData? panchang) 
 /// `post_sign_in_route.dart`) — replaces the temporary
 /// `HomePlaceholderScreen`.
 ///
-/// **What's LIVE (wired 1 Aug 2026), sourced from the same
-/// `panchangDataProvider` / `muhurtaDataProvider` the Panchang tab uses
-/// (see `panchang_repository.dart`) — deliberately reused rather than a
-/// second repository/HTTP call, so Home and the Panchang tab share one
-/// cached, one-billed fetch per day:**
+/// **What's LIVE, sourced from the same `panchangDataProvider` /
+/// `muhurtaDataProvider` the Panchang tab uses (see
+/// `panchang_repository.dart`) — deliberately reused rather than a second
+/// repository/HTTP call, so Home and the Panchang tab share one cached,
+/// one-billed fetch per day:**
 ///  - the Panchang hero card's Tithi, Nakshatra, Yoga and Karana, and its
 ///    date line (always today's real date, not a frozen mock date);
-///  - the "Today at a glance" Muhurat tile (Rahu Kaal time only).
+///  - the "Today at a glance" grid's Lucky Color, Direction and Today's
+///    Planet (from the panchang bundle), and Muhurat — the next upcoming
+///    AUSPICIOUS (`good`) choghadiya window, from the same muhurta call
+///    that already fetches Rahu Kaal (see [_nextGoodMuhuratRange]) — and
+///    Lucky Number, from the signed-in user's own daily horoscope
+///    (`dailyHoroscopeProvider`, keyed by `userZodiacSignProvider`'s
+///    rashi — the SAME provider the horoscope teaser below already
+///    watches, so this adds no new call the app wasn't already capable of
+///    making);
+///  - the remedy line of the remedy card — the first entry of
+///    `disha_shool.remedies`, from the same panchang bundle fetch, when
+///    Vedika supplies one.
+///
+/// Lucky Number, Muhurat and the remedy line have NO placeholder to
+/// degrade to on failure — see [HomeStaticData]'s doc comment for why —
+/// so each is simply omitted from the screen while loading, on a fetch
+/// error, or when the live value doesn't exist. Lucky Color, Direction and
+/// Today's Planet keep their [HomeStaticData] placeholder in that
+/// situation, since those placeholders are plausible defaults rather than
+/// wrong advice.
 ///
 /// **What's still STATIC PLACEHOLDER DATA from [HomeStaticData], and why:**
-/// sunrise/sunset on the hero card, and 5 of the 6 glance tiles (Lucky
-/// Number, Lucky Color, Direction, Today's Planet, Moon Phase) — no Vedika
-/// endpoint this app calls returns any of them (verified against
-/// `panchang_data.dart`'s response models, same limitation documented on
-/// `panchang_screen.dart`). The remedy/mantra card, festival strip,
-/// horoscope teaser, articles, AI teaser, reports and daily quote are all
-/// still 100% static; see [HomeStaticData]'s doc comment.
+/// sunrise/sunset on the hero card, the Lucky Color/Direction/Today's
+/// Planet glance tiles' fallback values — no Vedika endpoint this app calls
+/// returns anything better for them (verified against `panchang_data.dart`'s
+/// response models, same limitation documented on `panchang_screen.dart`).
+/// The festival strip, horoscope teaser body/rating, articles, AI teaser,
+/// reports and daily quote are all still 100% static; see
+/// [HomeStaticData]'s doc comment.
 ///
-/// Every live field degrades to its static counterpart — silently, with NO
-/// error UI — while loading, on a fetch error, or before a birth profile
-/// resolves: Home is the app's landing screen and must never show a
-/// full-screen failure over one card's data. A small sandbox banner
+/// Every live field degrades to its static counterpart, or is omitted —
+/// silently, with NO error UI — while loading, on a fetch error, or before a
+/// birth profile resolves: Home is the app's landing screen and must never
+/// show a full-screen failure over one card's data. A small sandbox banner
 /// (matching the Panchang tab's wording/styling) appears instead whenever
 /// [VedikaConfig.isSandbox] is true, since the sandbox always returns one
 /// fixed sample location rather than the user's own.
@@ -217,6 +299,29 @@ class HomeDashboardScreen extends ConsumerWidget {
         )
         .valueOrNull;
 
+    // Lucky Number — ADDED 24 Aug 2026, replacing a constant "3, 9" shown to
+    // every user on every day. Reuses `userZodiacSignProvider` (the same
+    // provider `_HoroscopeSection` below already watches for the horoscope
+    // teaser's sign) and `dailyHoroscopeProvider` (the same provider/cache
+    // `horoscope_detail_screen.dart` uses) — no new network call path.
+    // `.valueOrNull` on both collapses "no kundli yet", "still loading" and
+    // "fetch failed" to `null` alike, which is exactly what
+    // `_glanceTilesFrom` needs to omit the tile silently.
+    final userSign = ref.watch(userZodiacSignProvider);
+    final liveDailyHoroscope = userSign == null
+        ? null
+        : ref.watch(dailyHoroscopeProvider(userSign.id)).valueOrNull;
+    final luckyNumber = liveDailyHoroscope?.luckyNumber;
+
+    // Remedy — the first entry of the SAME panchang bundle fetch above
+    // (`disha_shool.remedies`), when Vedika supplies one. No placeholder:
+    // an empty/missing list means the remedy card is omitted below rather
+    // than showing `HomeStaticData.remedy`'s old fixed sentence.
+    final liveRemedies = livePanchang?.dishaShool?.remedies;
+    final remedyText = (liveRemedies != null && liveRemedies.isNotEmpty)
+        ? liveRemedies.first
+        : null;
+
     return Scaffold(
       backgroundColor: AppColors.cream,
       body: SafeArea(
@@ -243,10 +348,18 @@ class HomeDashboardScreen extends ConsumerWidget {
               locale: locale,
               muhurta: liveMuhurta,
               panchang: livePanchang,
+              luckyNumber: luckyNumber,
             ),
             const SizedBox(height: 14),
-            _RemedyMantraCard(l10n: l10n, locale: locale),
-            const SizedBox(height: 14),
+            // _RemedyCard REMOVED entirely (not just its mantra half) when
+            // there is no live remedy — see the field's doc above and
+            // [HomeStaticData]'s class doc. An empty gap here would be
+            // worse than the plain absence of a spacer, so the spacing is
+            // conditional too, same pattern as `_FestivalCard` below.
+            if (remedyText != null) ...[
+              _RemedyCard(l10n: l10n, locale: locale, remedy: remedyText),
+              const SizedBox(height: 14),
+            ],
             // _FestivalCard REMOVED 21 Aug 2026 — it was hardcoded to
             // "Sawan Somvar — tomorrow". On 21 Aug 2026 the Panchang screen
             // (live) read "Bhadrapada Masa": Sawan was over, and the day was
@@ -926,60 +1039,85 @@ _GlanceTileMeta _glanceMeta(GlanceTileId id, AppLocalizations l10n) {
       return _GlanceTileMeta(l10n.direction, '🧭', AppColors.tileGreenBg);
     case GlanceTileId.todaysPlanet:
       return _GlanceTileMeta(l10n.todaysPlanet, '🪐', AppColors.tilePurpleBg);
-    case GlanceTileId.moonPhase:
-      return _GlanceTileMeta(l10n.moonPhase, '🌔', AppColors.tileCyanBg);
     case GlanceTileId.muhurat:
       return _GlanceTileMeta(l10n.muhurat, '⏰', AppColors.genderSelectedBg);
   }
 }
 
-/// "Today at a glance" — two rows of three quick-fact tiles.
+/// "Today at a glance" — a 3-per-row grid of quick-fact tiles.
+///
+/// REWRITTEN 24 Aug 2026 from two fixed `Row`s of exactly 3 tiles (`tiles[0
+/// .. 2]`, `tiles[3 .. 5]`) to a `Wrap`, because the tile count is no longer
+/// always 6: Lucky Number and Muhurat are each omitted outright when no live
+/// value exists (see [_glanceTilesFrom] and [HomeStaticData.glanceTiles]),
+/// so this section can now render 3, 4 or 5 tiles. `tiles.sublist(3, 6)`
+/// would throw on a 3- or 4-tile list; even patched to tolerate a short
+/// list, filling a partial row with `Expanded` would stretch its one or two
+/// tiles to the full row width instead of matching their neighbours' size.
+/// `Wrap` avoids both: every tile gets the SAME explicit width (one third of
+/// the available row width, computed via `LayoutBuilder`), and a short last
+/// row is simply left-aligned rather than stretched.
 class _GlanceSection extends StatelessWidget {
   const _GlanceSection({
     required this.l10n,
     required this.locale,
     required this.muhurta,
     required this.panchang,
+    required this.luckyNumber,
   });
 
   final AppLocalizations l10n;
   final Locale locale;
 
-  /// Today's live muhurta — the Muhurat tile's Rahu Kaal range.
+  /// Today's live muhurta — the Muhurat tile's next-good-choghadiya range.
+  /// See [_nextGoodMuhuratRange].
   final MuhurtaData? muhurta;
 
-  /// Today's live panchang — Lucky Color, Today's Planet and Direction all
-  /// come from here (21 Aug 2026). See [_glanceTilesFrom].
+  /// Today's live panchang — Lucky Color, Today's Planet, Direction and the
+  /// remedy line all come from here (21 Aug 2026). See [_glanceTilesFrom].
   final PanchangData? panchang;
+
+  /// The signed-in user's own Lucky Number for today, or `null` to omit the
+  /// tile — see `HomeDashboardScreen.build`.
+  final int? luckyNumber;
+
+  static const int _columns = 3;
+  static const double _spacing = 10;
 
   @override
   Widget build(BuildContext context) {
-    final tiles = _glanceTilesFrom(muhurta, panchang);
+    final tiles = _glanceTilesFrom(
+      muhurta: muhurta,
+      panchang: panchang,
+      luckyNumber: luckyNumber,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _SectionHeader(l10n.todayAtAGlance, locale: locale),
         const SizedBox(height: 10),
-        _glanceRow(tiles.sublist(0, 3)),
-        const SizedBox(height: 10),
-        _glanceRow(tiles.sublist(3, 6)),
-      ],
-    );
-  }
-
-  Widget _glanceRow(List<GlanceTile> rowTiles) {
-    return Row(
-      children: [
-        for (var i = 0; i < rowTiles.length; i++) ...[
-          if (i != 0) const SizedBox(width: 10),
-          Expanded(
-            child: _GlanceTileCard(
-              tile: rowTiles[i],
-              l10n: l10n,
-              locale: locale,
-            ),
-          ),
-        ],
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final tileWidth =
+                (constraints.maxWidth - _spacing * (_columns - 1)) /
+                _columns;
+            return Wrap(
+              spacing: _spacing,
+              runSpacing: _spacing,
+              children: [
+                for (final tile in tiles)
+                  SizedBox(
+                    width: tileWidth,
+                    child: _GlanceTileCard(
+                      tile: tile,
+                      l10n: l10n,
+                      locale: locale,
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
       ],
     );
   }
@@ -1048,12 +1186,32 @@ class _GlanceTileCard extends StatelessWidget {
   }
 }
 
-/// Today's remedy + mantra card.
-class _RemedyMantraCard extends StatelessWidget {
-  const _RemedyMantraCard({required this.l10n, required this.locale});
+/// Today's remedy card.
+///
+/// RENAMED from `_RemedyMantraCard` and shrunk to remedy-only 24 Aug 2026.
+/// The mantra half is REMOVED outright, not just its content: there is no
+/// live source for it at all (no endpoint this app calls returns one), so
+/// leaving the row in place would mean showing `HomeStaticData.mantra`'s
+/// fixed Devanagari text to every user forever — the exact defect already
+/// fixed for the remedy line itself. The `todaysMantra` l10n key stays valid
+/// (removing it would break `horoscope_detail_screen.dart`'s own, separate
+/// mantra card, which is out of this fix's scope) — it is simply unused
+/// here now. With only one row left there is nothing to retitle: this row
+/// already carries its own `l10n.todaysRemedy` label.
+///
+/// [remedy] is always non-null and non-empty here — the caller
+/// (`HomeDashboardScreen.build`) omits this whole card, spacing included,
+/// rather than constructing it with nothing to show.
+class _RemedyCard extends StatelessWidget {
+  const _RemedyCard({
+    required this.l10n,
+    required this.locale,
+    required this.remedy,
+  });
 
   final AppLocalizations l10n;
   final Locale locale;
+  final String remedy;
 
   @override
   Widget build(BuildContext context) {
@@ -1064,50 +1222,24 @@ class _RemedyMantraCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: AppColors.mantraBorder),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _MantraRow(
-            // 🌺 not 🪷 — see the note in lib/features/ai/ai_topics.dart:
-            // the lotus is Unicode 14 and renders as tofu on Android 12.
-            emoji: '🌺',
-            label: l10n.todaysRemedy,
-            body: Text(
-              HomeStaticData.remedy,
-              style: AppFonts.body(
-                locale,
-                fontSize: 12,
-                color: AppColors.mantraBody,
-              ),
-            ),
-            locale: locale,
-          ),
-          const SizedBox(height: 10),
-          Container(height: 1, color: AppColors.mantraBorder),
-          const SizedBox(height: 10),
-          _MantraRow(
-            emoji: '📿',
-            label: l10n.todaysMantra,
-            // Devanagari mantra — forced to the 'hi' font regardless of the
-            // app's active locale (see TYPOGRAPHY RULE).
-            body: Text(
-              HomeStaticData.mantra,
-              style: AppFonts.body(
-                const Locale('hi'),
-                fontSize: 12,
-                color: AppColors.mantraBody,
-              ),
-            ),
-            locale: locale,
-          ),
-        ],
+      child: _LabeledIconRow(
+        // 🌺 not 🪷 — see the note in lib/features/ai/ai_topics.dart:
+        // the lotus is Unicode 14 and renders as tofu on Android 12.
+        emoji: '🌺',
+        label: l10n.todaysRemedy,
+        body: Text(
+          remedy,
+          style: AppFonts.body(locale, fontSize: 12, color: AppColors.mantraBody),
+        ),
+        locale: locale,
       ),
     );
   }
 }
 
-class _MantraRow extends StatelessWidget {
-  const _MantraRow({
+/// Emoji + uppercase label + body, stacked in a row — used by [_RemedyCard].
+class _LabeledIconRow extends StatelessWidget {
+  const _LabeledIconRow({
     required this.emoji,
     required this.label,
     required this.body,

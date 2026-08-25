@@ -177,9 +177,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get todaysPlanet => 'Today\'s Planet';
 
   @override
-  String get moonPhase => 'Moon Phase';
-
-  @override
   String get muhurat => 'Muhurat';
 
   @override
@@ -750,19 +747,43 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumTagline => 'Unlimited cosmic guidance, one simple plan';
 
   @override
-  String benefitReports(String total) {
-    return 'All $total premium reports with PDF export';
+  String tierFeatureAiQuestions(int count) {
+    return '$count AI Astrologer questions a day';
   }
 
   @override
-  String get benefitUnlimitedAi => 'Unlimited AI Astrologer questions';
+  String get tierFeatureHoroscopeStandard =>
+      'Weekly & monthly horoscope, full Panchang calendar';
 
   @override
-  String get benefitAdvancedKundli =>
-      'Advanced Kundli: dasha, dosha & remedies';
+  String get tierFeatureHoroscopeWithYearly =>
+      'Weekly, monthly & yearly horoscope, full Panchang calendar';
 
   @override
-  String get benefitAdFree => 'Ad-free experience across the app';
+  String tierFeatureKundalisLimited(int count) {
+    return '$count saved Kundlis';
+  }
+
+  @override
+  String get tierFeatureKundalisUnlimited => 'Unlimited saved Kundlis';
+
+  @override
+  String tierFeatureCompatibility(int count) {
+    return '$count detailed compatibility reports a month';
+  }
+
+  @override
+  String tierFeatureReportDiscount(int percent) {
+    return '$percent% off premium reports';
+  }
+
+  @override
+  String get tierFeaturePremiumArticles => 'Premium articles';
+
+  @override
+  String tierFeatureLifeReportCredit(int count) {
+    return '$count Complete Life Report credit a month';
+  }
 
   @override
   String get planMonthly => 'Monthly';
@@ -994,6 +1015,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileCancel => 'Cancel';
 
   @override
+  String get profileDeleteAccountConfirmTitle => 'Delete your account?';
+
+  @override
+  String get profileDeleteAccountConfirmMessage =>
+      'This permanently deletes your birth profiles, AI chat history and account. This cannot be undone.';
+
+  @override
+  String get profileDeleteAccountConfirmAction => 'Delete account';
+
+  @override
+  String get accountDeletionErrorUnauthenticated =>
+      'Your session has expired. Please sign in again to delete your account.';
+
+  @override
+  String get accountDeletionErrorGeneric =>
+      'Something went wrong. Please try again.';
+
+  @override
   String get kundliSandboxBanner =>
       'Sample chart — not calculated from your birth details';
 
@@ -1076,6 +1115,48 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get kundliDashaTimelineEmpty => 'No dasha periods available yet.';
+
+  @override
+  String kundliDashaRemainingYearsMonths(int years, int months) {
+    String _temp0 = intl.Intl.pluralLogic(
+      years,
+      locale: localeName,
+      other: '$years years',
+      one: '1 year',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      months,
+      locale: localeName,
+      other: '$months months',
+      one: '1 month',
+    );
+    return '$_temp0, $_temp1 remaining';
+  }
+
+  @override
+  String kundliDashaRemainingYearsOnly(int years) {
+    String _temp0 = intl.Intl.pluralLogic(
+      years,
+      locale: localeName,
+      other: '$years years',
+      one: '1 year',
+    );
+    return '$_temp0 remaining';
+  }
+
+  @override
+  String kundliDashaRemainingMonthsOnly(int months) {
+    String _temp0 = intl.Intl.pluralLogic(
+      months,
+      locale: localeName,
+      other: '$months months',
+      one: '1 month',
+    );
+    return '$_temp0 remaining';
+  }
+
+  @override
+  String get kundliDashaRemainingLessThanMonth => 'Less than a month remaining';
 
   @override
   String kundliNakshatraPada(int pada) {

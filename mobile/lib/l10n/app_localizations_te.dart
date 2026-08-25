@@ -180,9 +180,6 @@ class AppLocalizationsTe extends AppLocalizations {
   String get todaysPlanet => 'ఈరోజు గ్రహం';
 
   @override
-  String get moonPhase => 'చంద్ర కళ';
-
-  @override
   String get muhurat => 'ముహూర్తం';
 
   @override
@@ -756,18 +753,43 @@ class AppLocalizationsTe extends AppLocalizations {
   String get premiumTagline => 'అపరిమిత విశ్వ మార్గదర్శకత్వం, ఒక సరళమైన ప్లాన్';
 
   @override
-  String benefitReports(String total) {
-    return 'PDF ఎగుమతితో అన్ని $total ప్రీమియం నివేదికలు';
+  String tierFeatureAiQuestions(int count) {
+    return '$count AI జ్యోతిష్కుడు ప్రశ్నలు రోజుకు';
   }
 
   @override
-  String get benefitUnlimitedAi => 'అపరిమిత AI జ్యోతిష్కుడు ప్రశ్నలు';
+  String get tierFeatureHoroscopeStandard =>
+      'వారానికి & నెలవారీ రాశిఫలం, పూర్తి పంచాంగం క్యాలెండర్';
 
   @override
-  String get benefitAdvancedKundli => 'అధునాతన కుండలి: దశ, దోష & పరిహారాలు';
+  String get tierFeatureHoroscopeWithYearly =>
+      'వారానికి, నెలవారీ & వార్షిక రాశిఫలం, పూర్తి పంచాంగం క్యాలెండర్';
 
   @override
-  String get benefitAdFree => 'యాప్ మొత్తంలో ప్రకటనలు-లేని అనుభవం';
+  String tierFeatureKundalisLimited(int count) {
+    return '$count సేవ్ చేసిన కుండలీలు';
+  }
+
+  @override
+  String get tierFeatureKundalisUnlimited => 'అపరిమిత సేవ్ చేసిన కుండలీలు';
+
+  @override
+  String tierFeatureCompatibility(int count) {
+    return '$count వివరణాత్మక అనుకూలత నివేదికలు నెలకు';
+  }
+
+  @override
+  String tierFeatureReportDiscount(int percent) {
+    return 'ప్రీమియం నివేదికలపై $percent% తగ్గింపు';
+  }
+
+  @override
+  String get tierFeaturePremiumArticles => 'ప్రీమియం వ్యాసాలు';
+
+  @override
+  String tierFeatureLifeReportCredit(int count) {
+    return '$count కంప్లీట్ లైఫ్ రిపోర్ట్ క్రెడిట్ నెలకు';
+  }
 
   @override
   String get planMonthly => 'నెలవారీ';
@@ -1002,6 +1024,24 @@ class AppLocalizationsTe extends AppLocalizations {
   String get profileCancel => 'రద్దు చేయండి';
 
   @override
+  String get profileDeleteAccountConfirmTitle => 'మీ ఖాతాను తొలగించాలా?';
+
+  @override
+  String get profileDeleteAccountConfirmMessage =>
+      'ఇది మీ జననం ప్రొఫైల్‌లు, AI చాట్ చరిత్ర మరియు ఖాతాను శాశ్వతంగా తొలగిస్తుంది. దీన్ని రద్దు చేయలేరు.';
+
+  @override
+  String get profileDeleteAccountConfirmAction => 'ఖాతాను తొలగించండి';
+
+  @override
+  String get accountDeletionErrorUnauthenticated =>
+      'మీ సెషన్ ముగిసింది. మీ ఖాతాను తొలగించడానికి దయచేసి మళ్లీ సైన్ ఇన్ చేయండి.';
+
+  @override
+  String get accountDeletionErrorGeneric =>
+      'ఏదో తప్పు జరిగింది. దయచేసి మళ్లీ ప్రయత్నించండి.';
+
+  @override
   String get kundliSandboxBanner =>
       'నమూనా జాతకం — మీ జనన వివరాల నుండి లెక్కించబడలేదు';
 
@@ -1084,6 +1124,49 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get kundliDashaTimelineEmpty => 'ఇంకా దశ కాలాలు అందుబాటులో లేవు.';
+
+  @override
+  String kundliDashaRemainingYearsMonths(int years, int months) {
+    String _temp0 = intl.Intl.pluralLogic(
+      years,
+      locale: localeName,
+      other: '$years సంవత్సరాలు',
+      one: '1 సంవత్సరం',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      months,
+      locale: localeName,
+      other: '$months నెలలు',
+      one: '1 నెల',
+    );
+    return '$_temp0, $_temp1 మిగిలి ఉంది';
+  }
+
+  @override
+  String kundliDashaRemainingYearsOnly(int years) {
+    String _temp0 = intl.Intl.pluralLogic(
+      years,
+      locale: localeName,
+      other: '$years సంవత్సరాలు',
+      one: '1 సంవత్సరం',
+    );
+    return '$_temp0 మిగిలి ఉంది';
+  }
+
+  @override
+  String kundliDashaRemainingMonthsOnly(int months) {
+    String _temp0 = intl.Intl.pluralLogic(
+      months,
+      locale: localeName,
+      other: '$months నెలలు',
+      one: '1 నెల',
+    );
+    return '$_temp0 మిగిలి ఉంది';
+  }
+
+  @override
+  String get kundliDashaRemainingLessThanMonth =>
+      'ఒక నెల కంటే తక్కువ మిగిలి ఉంది';
 
   @override
   String kundliNakshatraPada(int pada) {

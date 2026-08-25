@@ -226,10 +226,6 @@
   "@todaysPlanet": {
     "description": "Label of the ruling-planet tile in the Home Dashboard's 'Today at a glance' grid."
   },
-  "moonPhase": "Moon Phase",
-  "@moonPhase": {
-    "description": "Label of the moon-phase tile in the Home Dashboard's 'Today at a glance' grid."
-  },
   "muhurat": "Muhurat",
   "@muhurat": {
     "description": "Label of the auspicious-time tile in the Home Dashboard's 'Today at a glance' grid."
@@ -1012,27 +1008,71 @@
   "@premiumTagline": {
     "description": "Subtitle under the heading in the Subscription Paywall's hero section."
   },
-  "benefitReports": "All {total} premium reports with PDF export",
-  "@benefitReports": {
-    "description": "First benefit line item on the Subscription Paywall, naming the total number of reports in the full catalogue.",
+  "tierFeatureAiQuestions": "{count} AI Astrologer questions a day",
+  "@tierFeatureAiQuestions": {
+    "description": "Per-tier feature line on the Subscription Paywall's plan cards, naming the daily AI Astrologer question cap for that tier (includes the free daily question — never phrase this as unlimited, no tier is).",
     "placeholders": {
-      "total": {
-        "type": "String",
-        "example": "9"
+      "count": {
+        "type": "int",
+        "example": "7"
       }
     }
   },
-  "benefitUnlimitedAi": "Unlimited AI Astrologer questions",
-  "@benefitUnlimitedAi": {
-    "description": "Second benefit line item on the Subscription Paywall."
+  "tierFeatureHoroscopeStandard": "Weekly & monthly horoscope, full Panchang calendar",
+  "@tierFeatureHoroscopeStandard": {
+    "description": "Per-tier feature line on the Subscription Paywall's plan cards, for tiers (Bronze, Silver) that unlock Weekly and Monthly horoscope plus the full Panchang calendar, but not Yearly horoscope."
   },
-  "benefitAdvancedKundli": "Advanced Kundli: dasha, dosha & remedies",
-  "@benefitAdvancedKundli": {
-    "description": "Third benefit line item on the Subscription Paywall."
+  "tierFeatureHoroscopeWithYearly": "Weekly, monthly & yearly horoscope, full Panchang calendar",
+  "@tierFeatureHoroscopeWithYearly": {
+    "description": "Per-tier feature line on the Subscription Paywall's plan cards, for tiers (Gold, Platinum) that additionally unlock Yearly horoscope."
   },
-  "benefitAdFree": "Ad-free experience across the app",
-  "@benefitAdFree": {
-    "description": "Fourth benefit line item on the Subscription Paywall."
+  "tierFeatureKundalisLimited": "{count} saved Kundlis",
+  "@tierFeatureKundalisLimited": {
+    "description": "Per-tier feature line on the Subscription Paywall's plan cards, naming the saved-kundali cap for tiers below Silver (Bronze only — Silver and above are unlimited).",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "15"
+      }
+    }
+  },
+  "tierFeatureKundalisUnlimited": "Unlimited saved Kundlis",
+  "@tierFeatureKundalisUnlimited": {
+    "description": "Per-tier feature line on the Subscription Paywall's plan cards, for tiers (Silver and above) with no cap on saved kundalis."
+  },
+  "tierFeatureCompatibility": "{count} detailed compatibility reports a month",
+  "@tierFeatureCompatibility": {
+    "description": "Per-tier feature line on the Subscription Paywall's plan cards, naming the monthly detailed (Gun Milan) compatibility report allowance for that tier.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "10"
+      }
+    }
+  },
+  "tierFeatureReportDiscount": "{percent}% off premium reports",
+  "@tierFeatureReportDiscount": {
+    "description": "Per-tier feature line on the Subscription Paywall's plan cards, naming the discount percentage that tier gets on premium report purchases (reports are always a separate one-time purchase, never included free — this line must not imply otherwise).",
+    "placeholders": {
+      "percent": {
+        "type": "int",
+        "example": "15"
+      }
+    }
+  },
+  "tierFeaturePremiumArticles": "Premium articles",
+  "@tierFeaturePremiumArticles": {
+    "description": "Per-tier feature line on the Subscription Paywall's plan cards, shown only for tiers (Gold, Platinum) that unlock premium articles."
+  },
+  "tierFeatureLifeReportCredit": "{count} Complete Life Report credit a month",
+  "@tierFeatureLifeReportCredit": {
+    "description": "Per-tier feature line on the Subscription Paywall's plan cards, shown only for Platinum, naming its monthly Complete Life Report credit allowance.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "1"
+      }
+    }
   },
   "planMonthly": "Monthly",
   "@planMonthly": {
@@ -1346,7 +1386,7 @@
   },
   "profileDeleteAccount": "Delete account",
   "@profileDeleteAccount": {
-    "description": "Label of the Delete account action at the bottom of the Profile & Settings screen — not yet wired up (must go through a Cloud Function per projects/CLAUDE.md)."
+    "description": "Label of the Delete account action at the bottom of the Profile & Settings screen — calls the deleteAccount Cloud Function after confirmation (see profileDeleteAccountConfirmTitle)."
   },
   "profileSignOutConfirmTitle": "Log out?",
   "@profileSignOutConfirmTitle": {
@@ -1363,6 +1403,26 @@
   "profileCancel": "Cancel",
   "@profileCancel": {
     "description": "Label of the dismissing action button in the sign-out confirmation dialog."
+  },
+  "profileDeleteAccountConfirmTitle": "Delete your account?",
+  "@profileDeleteAccountConfirmTitle": {
+    "description": "Title of the confirmation dialog shown before permanently deleting the account from the Profile & Settings screen."
+  },
+  "profileDeleteAccountConfirmMessage": "This permanently deletes your birth profiles, AI chat history and account. This cannot be undone.",
+  "@profileDeleteAccountConfirmMessage": {
+    "description": "Body message of the confirmation dialog shown before permanently deleting the account, spelling out exactly what is destroyed."
+  },
+  "profileDeleteAccountConfirmAction": "Delete account",
+  "@profileDeleteAccountConfirmAction": {
+    "description": "Label of the destructive confirming action button in the delete-account confirmation dialog."
+  },
+  "accountDeletionErrorUnauthenticated": "Your session has expired. Please sign in again to delete your account.",
+  "@accountDeletionErrorUnauthenticated": {
+    "description": "Error shown on the Profile & Settings screen when the deleteAccount callable fails with HttpsError code unauthenticated (the auth token was no longer valid)."
+  },
+  "accountDeletionErrorGeneric": "Something went wrong. Please try again.",
+  "@accountDeletionErrorGeneric": {
+    "description": "Fallback error shown on the Profile & Settings screen for any deleteAccount failure not otherwise classified (e.g. HttpsError code internal)."
   },
   "kundliSandboxBanner": "Sample chart — not calculated from your birth details",
   "@kundliSandboxBanner": {
@@ -1491,6 +1551,44 @@
   "kundliDashaTimelineEmpty": "No dasha periods available yet.",
   "@kundliDashaTimelineEmpty": {
     "description": "Shown on the Vimshottari Dasha tab when the response loaded successfully but returned an empty maha_dasha list."
+  },
+  "kundliDashaRemainingYearsMonths": "{years, plural, one{1 year} other{{years} years}}, {months, plural, one{1 month} other{{months} months}} remaining",
+  "@kundliDashaRemainingYearsMonths": {
+    "description": "Time remaining in the current mahadasha, shown on the 'currently running' card on the Vimshottari Dasha tab, computed locally from current_dasha.maha_dasha.end_date (see dashaRemainingLabel's doc comment for why this replaced Vedika's own guidance.time_remaining string). Used when both years and months remaining are non-zero.",
+    "placeholders": {
+      "years": {
+        "type": "int",
+        "example": "3"
+      },
+      "months": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "kundliDashaRemainingYearsOnly": "{years, plural, one{1 year} other{{years} years}} remaining",
+  "@kundliDashaRemainingYearsOnly": {
+    "description": "Time remaining in the current mahadasha, same source as kundliDashaRemainingYearsMonths, used when the remaining months component is exactly zero (a whole number of years remaining).",
+    "placeholders": {
+      "years": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "kundliDashaRemainingMonthsOnly": "{months, plural, one{1 month} other{{months} months}} remaining",
+  "@kundliDashaRemainingMonthsOnly": {
+    "description": "Time remaining in the current mahadasha, same source as kundliDashaRemainingYearsMonths, used when under a year remains (the years component is exactly zero) — deliberately omits a '0 years' segment.",
+    "placeholders": {
+      "months": {
+        "type": "int",
+        "example": "4"
+      }
+    }
+  },
+  "kundliDashaRemainingLessThanMonth": "Less than a month remaining",
+  "@kundliDashaRemainingLessThanMonth": {
+    "description": "Time remaining in the current mahadasha, same source as kundliDashaRemainingYearsMonths, used when both the years and months components are exactly zero (the mahadasha ends within days)."
   },
   "kundliNakshatraPada": "Pada {pada}",
   "@kundliNakshatraPada": {

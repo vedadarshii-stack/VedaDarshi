@@ -19,9 +19,16 @@ import 'kundli_json.dart';
 /// (career/health/relationships/spiritual paragraphs, advice lists,
 /// remedies…) that would need its own detail screen to do justice to.
 /// [guidance] already surfaces Vedika's own condensed version of the same
-/// content (`current_phase`, `theme`, `key_advice`, `recommended_remedies`,
-/// `time_remaining`), which is what the Dasha tab actually renders — see
-/// `kundli_dasha_tab.dart`.
+/// content (`current_phase`, `theme`, `key_advice`, `recommended_remedies`),
+/// which is what the Dasha tab actually renders — see `kundli_dasha_tab.dart`.
+///
+/// **`guidance.time_remaining` was REMOVED from this model 24 Aug 2026** —
+/// a verified live response had it 441 days stale (contradicting
+/// `current_dasha.maha_dasha.end_date` in the SAME payload; see
+/// `projects/CLAUDE.md`'s "VEDIKA RETURNS A WRONG `time_remaining`"
+/// section and `kundli_dasha_tab.dart`'s `dashaRemainingLabel` doc comment
+/// for the full story). The Dasha tab now computes remaining time itself
+/// from `end_date`, which is authoritative and self-consistent.
 @immutable
 class VimshottariDashaData {
   const VimshottariDashaData({
@@ -151,7 +158,6 @@ class DashaGuidance {
   const DashaGuidance({
     this.currentPhase,
     this.theme,
-    this.timeRemaining,
     this.keyAdvice = const [],
     this.recommendedRemedies = const [],
   });
@@ -162,9 +168,8 @@ class DashaGuidance {
   /// e.g. `"Emotions, Mind, and Nurturing"`.
   final String? theme;
 
-  /// e.g. `"18 years, 11 months remaining"` — a ready-to-display sentence,
-  /// not a value this app recomputes.
-  final String? timeRemaining;
+  // `time_remaining` (e.g. `"18 years, 11 months remaining"`) was
+  // deliberately NOT modelled here — see this class's doc comment above.
   final List<String> keyAdvice;
   final List<String> recommendedRemedies;
 
@@ -172,7 +177,6 @@ class DashaGuidance {
     return DashaGuidance(
       currentPhase: json['current_phase'] as String?,
       theme: json['theme'] as String?,
-      timeRemaining: json['time_remaining'] as String?,
       keyAdvice: parseStrings(json['key_advice']),
       recommendedRemedies: parseStrings(json['recommended_remedies']),
     );

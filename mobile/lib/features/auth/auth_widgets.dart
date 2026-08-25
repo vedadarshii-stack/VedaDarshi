@@ -42,7 +42,20 @@ class AuthTextField extends StatelessWidget {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeInOut,
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      // HEIGHT IS SET BY A minHeight, NOT BY VERTICAL PADDING — 24 Aug 2026.
+      // With `vertical: 16` padding the password field rendered ~28dp taller
+      // than the email field, because a suffix `IconButton` keeps Material
+      // 3's 48dp minimum tap target even when handed `padding: zero` +
+      // `constraints: BoxConstraints()` (those are honoured on the M2 path
+      // only). So the row was 48 + 32 = 80dp, against ~52dp for a plain
+      // field, and the two inputs visibly disagreed.
+      //
+      // A minHeight instead means every field — suffix or not — settles at
+      // the same 56dp, since 48dp of icon still fits inside it. It stays a
+      // MINIMUM rather than a fixed `height:` so the field can still grow
+      // for large system font scales instead of clipping the text.
+      constraints: const BoxConstraints(minHeight: 56),
+      padding: const EdgeInsets.symmetric(horizontal: 18),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),

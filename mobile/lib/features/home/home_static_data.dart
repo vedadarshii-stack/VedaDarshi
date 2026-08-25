@@ -22,8 +22,21 @@ import 'package:flutter/foundation.dart' show immutable;
 /// exactly which fields that made live. [panchang] and [glanceTiles] remain
 /// here as the FALLBACK those live fields degrade to (loading, error, no
 /// profile yet) and as the permanent value for the fields Vedika has no
-/// equivalent for (sunrise/sunset; 5 of the 6 glance tiles) — they are not
-/// dead code waiting to be deleted.
+/// equivalent for (sunrise/sunset; Lucky Color/Direction/Today's Planet) —
+/// they are not dead code waiting to be deleted.
+///
+/// **CHANGED 24 Aug 2026** — Lucky Number, Muhurat and the remedy line no
+/// longer have a static fallback in this file at all: they are either the
+/// real value or omitted from the screen entirely (see `_glanceTilesFrom`
+/// and `_RemedyCard` in `home_dashboard_screen.dart`). A wrong-but-plausible
+/// placeholder is worse than no tile — Muhurat's old placeholder was
+/// actively Rahu Kaal, the INAUSPICIOUS window, mislabelled as the
+/// auspicious one; Lucky Number's was the same "3, 9" for every user
+/// forever; the remedy's was one fixed sentence for every user forever. The
+/// Moon Phase tile and the mantra half of the remedy card are removed
+/// outright — neither has a live source this app calls (Moon Phase needs a
+/// separate BILLED endpoint, `/v2/daily/moon-phase`, not added unasked; the
+/// mantra has no endpoint at all).
 abstract final class HomeStaticData {
   static const String greeting = 'Shubh Prabhat 🌅';
 
@@ -43,24 +56,15 @@ abstract final class HomeStaticData {
     sunset: '07:04 PM',
   );
 
+  /// Only the three tiles that always have SOME value to show — Lucky
+  /// Number and Muhurat are built (or omitted) live in
+  /// `_glanceTilesFrom`/`HomeDashboardScreen.build`, never from a static
+  /// constant (see this class's doc comment).
   static const List<GlanceTile> glanceTiles = [
-    GlanceTile(GlanceTileId.luckyNumber, '3, 9'),
     GlanceTile(GlanceTileId.luckyColor, 'Gold'),
     GlanceTile(GlanceTileId.direction, 'East'),
     GlanceTile(GlanceTileId.todaysPlanet, 'Shukra'),
-    GlanceTile(GlanceTileId.moonPhase, 'Waxing Gibbous'),
-    GlanceTile(GlanceTileId.muhurat, '11:54 AM'),
   ];
-
-  static const String remedy =
-      'Offer water to the rising Sun and donate yellow items.';
-
-  /// Devanagari mantra text. MUST always render with
-  /// `AppFonts.body(const Locale('hi'), …)` regardless of the active app
-  /// locale — Poppins/Playfair/the other Noto Sans faces contain no
-  /// Devanagari glyphs (see the project's TYPOGRAPHY RULE).
-  static const String mantra =
-      'ॐ द्रां द्रीं द्रौं सः शुक्राय नमः — chant 11 times';
 
   static const String festival = 'Sawan Somvar — tomorrow';
 
@@ -139,14 +143,7 @@ class HomePanchangData {
 /// Identifies which l10n label, emoji and tile color a [GlanceTile] should
 /// render with — the widget layer owns that presentation mapping since
 /// labels are UI chrome (l10n), not placeholder data.
-enum GlanceTileId {
-  luckyNumber,
-  luckyColor,
-  direction,
-  todaysPlanet,
-  moonPhase,
-  muhurat,
-}
+enum GlanceTileId { luckyNumber, luckyColor, direction, todaysPlanet, muhurat }
 
 /// One tile in the "Today at a glance" grid.
 @immutable
