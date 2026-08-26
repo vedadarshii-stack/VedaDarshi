@@ -330,19 +330,60 @@ class _ProfileCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
 
-    return Container(
+    // TWO BUGS FIXED HERE, 26 Aug 2026 (client: "not able to select profile").
+    //
+    // Both date from when this screen could only ever show ONE card — the
+    // account owner's own profile. That card was always the selected one and
+    // there was nothing else to switch to, so:
+    //
+    //  1. `onTap` was stored as a field but NEVER ATTACHED to anything. The
+    //     build returned a bare `Container`, so the card was not tappable at
+    //     all. Harmless with one card; the moment multi-profile landed it
+    //     meant a family profile could be added but never chosen.
+    //  2. The border and glow were hardcoded to saffron — the SELECTED
+    //     treatment — regardless of `isSelected`. So every card looked
+    //     selected and only the radio dot disagreed, which is exactly what
+    //     the client's screenshot showed.
+    //
+    // Now the whole card is a tap target, and selection drives the border,
+    // the glow and the dot together.
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: name,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: _cardBody(initial),
+        ),
+      ),
+    );
+  }
+
+  Widget _cardBody(String initial) {
+    return AnimatedContainer(
+      duration: kPressDuration,
+      curve: Curves.easeOut,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.saffron, width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.saffron.withValues(alpha: 0.12),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        border: Border.all(
+          color: isSelected ? AppColors.saffron : AppColors.cardBorder,
+          width: isSelected ? 1.5 : 1,
+        ),
+        boxShadow: isSelected
+            ? [
+                BoxShadow(
+                  color: AppColors.saffron.withValues(alpha: 0.12),
+                  blurRadius: 14,
+                  offset: const Offset(0, 6),
+                ),
+              ]
+            : null,
       ),
       child: Row(
         children: [
