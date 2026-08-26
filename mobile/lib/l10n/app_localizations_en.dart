@@ -370,14 +370,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumCta => 'Premium';
 
   @override
-  String get horoscopeSandboxBanner => 'Sample data — Vedika sandbox mode';
+  String get horoscopeSandboxBanner => 'Sample data — sandbox mode';
 
   @override
   String get horoscopeErrorTitle => 'Couldn\'t load horoscope';
 
   @override
   String get horoscopeErrorMessage =>
-      'Something went wrong reaching Vedika. Check your connection and try again.';
+      'Something went wrong reaching the astrology service. Check your connection and try again.';
 
   @override
   String get horoscopeRetryAction => 'Retry';
@@ -404,6 +404,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get monthlyKeyDatesTitle => 'Key Dates This Month';
+
+  @override
+  String get yearlySummaryTitle => 'This Year\'s Overview';
+
+  @override
+  String get yearlyScoresTitle => 'This Year\'s Scores';
+
+  @override
+  String yearlyOverallRating(int percent) {
+    return 'Overall $percent%';
+  }
+
+  @override
+  String get luckyDay => 'Lucky Day';
 
   @override
   String get generateKundliTitle => 'Generate Kundli';
@@ -806,10 +820,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get billingFinePrint =>
-      'Billed via Google Play · Cancel anytime · Secure with RevenueCat';
-
-  @override
   String get articlesTitle => 'Wisdom & Articles';
 
   @override
@@ -913,9 +923,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileBirthProfiles => 'Birth profiles';
 
   @override
-  String profileProfileCount(String count) {
-    return '$count profile';
+  String profileProfileCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count profiles',
+      one: '$count profile',
+    );
+    return '$_temp0';
   }
+
+  @override
+  String get birthProfilesYouBadge => 'You';
+
+  @override
+  String get birthProfilesDelete => 'Delete';
+
+  @override
+  String get birthProfilesDeleteConfirmTitle => 'Delete this profile?';
+
+  @override
+  String birthProfilesDeleteConfirmMessage(String name) {
+    return 'This permanently removes $name\'s saved birth profile. This cannot be undone.';
+  }
+
+  @override
+  String get birthProfilesPrimaryDeleteHint =>
+      'Your own profile can\'t be deleted here — use Delete Account in Settings instead.';
+
+  @override
+  String get birthProfilesEditorAddTitle => 'Add Profile';
+
+  @override
+  String get birthProfilesEditorEditTitle => 'Edit Profile';
+
+  @override
+  String get birthProfilesEditorSave => 'Save Profile';
+
+  @override
+  String get birthProfilesSaveFailed =>
+      'Couldn\'t save this profile. Please try again.';
+
+  @override
+  String get birthProfilesDeleteFailed =>
+      'Couldn\'t delete this profile. Please try again.';
+
+  @override
+  String get birthProfilesSignInRequired =>
+      'Sign in to add family & friend profiles.';
+
+  @override
+  String get birthProfilesEmpty => 'No profiles yet.';
 
   @override
   String get profileAppLanguageLabel => 'APP LANGUAGE';
@@ -931,6 +989,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileAiChatHistory => 'AI Chat History';
+
+  @override
+  String profileAiChatHistoryCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count conversations',
+      one: '$count conversation',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get aiChatHistoryEmptyTitle => 'No conversations yet';
+
+  @override
+  String get aiChatHistoryEmptyMessage =>
+      'Ask Rishi AI about your career, marriage, health or the right muhurat — your conversations will appear here.';
+
+  @override
+  String get aiChatHistoryEmptyAction => 'Ask Rishi AI';
 
   @override
   String get profilePaymentHistory => 'Payment History';
@@ -1031,6 +1110,35 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get accountDeletionErrorGeneric =>
       'Something went wrong. Please try again.';
+
+  @override
+  String get legalPrivacyPolicy => 'Privacy Policy';
+
+  @override
+  String get legalTermsOfService => 'Terms of Service';
+
+  @override
+  String get legalRefundsCancellation => 'Refunds & Cancellation';
+
+  @override
+  String get legalAccountDataDeletion => 'Account & Data Deletion';
+
+  @override
+  String get profileEmailSupport => 'Email us';
+
+  @override
+  String get profileEmailSupportSubtitle => 'Vedadarshii@gmail.com';
+
+  @override
+  String get supportEmailSubject => 'Vedadarshi support';
+
+  @override
+  String get feedbackEmailSubject => 'Vedadarshi feedback';
+
+  @override
+  String profileInviteFriendsMessage(String link) {
+    return 'Join me on Vedadarshi, your daily companion for Vedic astrology, Panchang and horoscopes. Download it here: $link';
+  }
 
   @override
   String get kundliSandboxBanner =>

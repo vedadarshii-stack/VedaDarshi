@@ -520,7 +520,7 @@ class KundliSummary {
 
   factory KundliSummary.fromJson(Map<String, dynamic> json) {
     return KundliSummary(
-      overview: json['overview'] as String?,
+      overview: parseFreeText(json['overview']),
       keyStrengths: parseStrings(json['keyStrengths']),
       areasOfFocus: parseStrings(json['areasOfFocus']),
       tips: parseStrings(json['tips']),

@@ -91,7 +91,7 @@ class MangalDosha {
     return MangalDosha(
       hasDosha: json['has_dosha'] as bool?,
       doshaType: json['dosha_type'] as String?,
-      description: json['description'] as String?,
+      description: parseFreeText(json['description']),
       severity: json['severity'] as String?,
       percentage: parseDouble(json['percentage']),
       doshaFromLagna: json['dosha_from_lagna'] as bool?,
@@ -147,7 +147,7 @@ class KaalSarpDosha {
   factory KaalSarpDosha.fromJson(Map<String, dynamic> json) {
     return KaalSarpDosha(
       hasDosha: json['has_dosha'] as bool?,
-      description: json['description'] as String?,
+      description: parseFreeText(json['description']),
       direction: json['direction'] as String?,
       type: json['type'] as String?,
       severity: json['severity'] as String?,

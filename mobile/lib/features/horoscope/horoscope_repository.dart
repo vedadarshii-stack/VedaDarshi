@@ -6,22 +6,28 @@ import 'zodiac_sign.dart';
 
 /// Fetches and caches horoscope readings from the Vedika Intelligence API.
 ///
-/// **Endpoints** (verified live against the sandbox 1 Aug 2026):
+/// **Endpoints** (daily/weekly/monthly verified live against the sandbox
+/// 1 Aug 2026; yearly verified live against production 26 Aug 2026):
 /// ```
-/// GET /v2/astrology/horoscope/{sign}            daily
-/// GET /v2/astrology/horoscope/{sign}/weekly      weekly
-/// GET /v2/astrology/horoscope/{sign}/monthly     monthly
+/// GET  /v2/astrology/horoscope/{sign}             daily
+/// GET  /v2/astrology/horoscope/{sign}/weekly       weekly
+/// GET  /v2/astrology/horoscope/{sign}/monthly      monthly
+/// POST /v2/astrology/prediction/yearly             yearly, body {"rashi": <sign>}
 /// ```
-/// `{sign}` is the lowercase English zodiac name (`ZodiacSign.englishName`
-/// lower-cased) — `aries`, `taurus`, … `pisces`.
+/// `{sign}`/`rashi` is the lowercase English zodiac name
+/// (`ZodiacSign.englishName` lower-cased) — `aries`, `taurus`, … `pisces`.
 ///
-/// **Yearly does not exist.** `GET .../yearly` answers `success: true` with
-/// an error payload in `data` (`{error, message, requested}`) rather than a
-/// 404 or a real reading, so `VedikaClient` can't detect it as a failure —
-/// it looks like a normal successful response until you read `data.error`.
-/// There is deliberately no `fetchYearly` here; the Horoscope — All Signs
-/// screen's Yearly chip stays on its existing static content (see
-/// `horoscope_signs_screen.dart`).
+/// **Yearly DOES exist — it just lives under a different path family.**
+/// `GET /v2/astrology/horoscope/{sign}/yearly` (the naturally-guessed path,
+/// matching the daily/weekly/monthly shape) genuinely 404s — that half of
+/// the earlier investigation was correct. What was wrong was concluding
+/// from that single 404 that Vedika has no yearly endpoint at all: it does,
+/// at `POST /v2/astrology/prediction/yearly` (body `{"rashi": "leo"}`),
+/// under `/prediction/*` rather than `/horoscope/*`. **Lesson recorded here
+/// so it isn't repeated**: a 404 on the pattern-matched URL only proves
+/// that URL is wrong, not that the capability is missing — check the full
+/// OpenAPI contract (`vedika.io/openapi.json`) before concluding an
+/// endpoint "doesn't exist".
 ///
 /// **Caching**: an in-memory map keyed `"{sign}|{period}|{yyyy-MM-dd}"`.
 /// Horoscope readings change once per calendar day, not per request, so
@@ -41,6 +47,7 @@ class HoroscopeRepository {
   final Map<String, DailyHoroscope> _dailyCache = {};
   final Map<String, WeeklyHoroscope> _weeklyCache = {};
   final Map<String, MonthlyHoroscope> _monthlyCache = {};
+  final Map<String, YearlyHoroscope> _yearlyCache = {};
 
   Future<DailyHoroscope> fetchDaily(String signId) async {
     final key = _cacheKey(signId, 'daily');
@@ -78,6 +85,27 @@ class HoroscopeRepository {
     );
     final horoscope = MonthlyHoroscope.fromJson(data);
     _monthlyCache[key] = horoscope;
+    return horoscope;
+  }
+
+  /// Yearly reading for [signId] — `POST /v2/astrology/prediction/yearly`
+  /// with body `{"rashi": _apiSign(signId)}`, unlike the `GET`s above (see
+  /// the class doc comment for why yearly is a `POST` under a different
+  /// path family). Cached the same "once per device-day" way as the other
+  /// periods, even though the underlying reading is really a rolling
+  /// 12-month window — re-fetching more than once a day would just re-bill
+  /// Vedika for a reading that hasn't meaningfully changed.
+  Future<YearlyHoroscope> fetchYearly(String signId) async {
+    final key = _cacheKey(signId, 'yearly');
+    final cached = _yearlyCache[key];
+    if (cached != null) return cached;
+
+    final data = await _client.post(
+      '/v2/astrology/prediction/yearly',
+      body: {'rashi': _apiSign(signId)},
+    );
+    final horoscope = YearlyHoroscope.fromJson(data);
+    _yearlyCache[key] = horoscope;
     return horoscope;
   }
 
@@ -132,4 +160,11 @@ final weeklyHoroscopeProvider = FutureProvider.family<WeeklyHoroscope, String>((
 final monthlyHoroscopeProvider =
     FutureProvider.family<MonthlyHoroscope, String>((ref, signId) {
       return ref.watch(horoscopeRepositoryProvider).fetchMonthly(signId);
+    });
+
+/// This year's [YearlyHoroscope] for the given [ZodiacSign.id], watched by
+/// `horoscope_detail_screen.dart` when the Yearly period chip is selected.
+final yearlyHoroscopeProvider =
+    FutureProvider.family<YearlyHoroscope, String>((ref, signId) {
+      return ref.watch(horoscopeRepositoryProvider).fetchYearly(signId);
     });

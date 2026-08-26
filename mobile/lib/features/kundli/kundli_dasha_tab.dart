@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
-import '../../core/vedika/vedika_client.dart';
 import '../../core/vedika/vedika_config.dart';
 import '../../core/widgets/app_empty_state.dart';
 import '../../l10n/app_localizations.dart';
@@ -56,13 +55,19 @@ class KundliDashaTab extends StatelessWidget {
     }
     return async.when(
       loading: () => _DashaLoadingState(l10n: l10n),
-      error: (error, stackTrace) => _DashaErrorState(
-        l10n: l10n,
-        message: error is VedikaException
-            ? error.message
-            : l10n.kundliDashaLoadErrorMessage,
-        onRetry: onRetry,
-      ),
+      error: (error, stackTrace) {
+        // Never render a VedikaException's own message — it's built from
+        // Vedika's raw error text (`"Vedika did not respond within 30s."`
+        // etc.) and would name the vendor on screen. Always show the
+        // app-owned localized fallback; the raw text still goes to the
+        // debug console, where naming the vendor is fine and useful.
+        debugPrint('KundliDashaTab: $error');
+        return _DashaErrorState(
+          l10n: l10n,
+          message: l10n.kundliDashaLoadErrorMessage,
+          onRetry: onRetry,
+        );
+      },
       data: (data) => _DashaLoadedSection(l10n: l10n, locale: locale, data: data),
     );
   }

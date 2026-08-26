@@ -372,15 +372,14 @@ class AppLocalizationsKn extends AppLocalizations {
   String get premiumCta => 'ಪ್ರೀಮಿಯಂ';
 
   @override
-  String get horoscopeSandboxBanner =>
-      'ಮಾದರಿ ಡೇಟಾ — ವೇದಿಕಾ ಸ್ಯಾಂಡ್‌ಬಾಕ್ಸ್ ಮೋಡ್';
+  String get horoscopeSandboxBanner => 'ಮಾದರಿ ಡೇಟಾ — ಸ್ಯಾಂಡ್‌ಬಾಕ್ಸ್ ಮೋಡ್';
 
   @override
   String get horoscopeErrorTitle => 'ರಾಶಿಫಲ ಲೋಡ್ ಆಗಲಿಲ್ಲ';
 
   @override
   String get horoscopeErrorMessage =>
-      'ವೇದಿಕಾವನ್ನು ತಲುಪುವಲ್ಲಿ ಸಮಸ್ಯೆ ಉಂಟಾಯಿತು. ದಯವಿಟ್ಟು ನಿಮ್ಮ ಸಂಪರ್ಕವನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+      'ಜ್ಯೋತಿಷ್ಯ ಸೇವೆಯನ್ನು ತಲುಪುವಲ್ಲಿ ಸಮಸ್ಯೆ ಉಂಟಾಯಿತು. ದಯವಿಟ್ಟು ನಿಮ್ಮ ಸಂಪರ್ಕವನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
 
   @override
   String get horoscopeRetryAction => 'ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ';
@@ -407,6 +406,20 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get monthlyKeyDatesTitle => 'ಈ ತಿಂಗಳ ಪ್ರಮುಖ ದಿನಾಂಕಗಳು';
+
+  @override
+  String get yearlySummaryTitle => 'ಈ ವರ್ಷದ ಸಾರಾಂಶ';
+
+  @override
+  String get yearlyScoresTitle => 'ಈ ವರ್ಷದ ಸ್ಕೋರ್‌ಗಳು';
+
+  @override
+  String yearlyOverallRating(int percent) {
+    return 'ಒಟ್ಟು $percent%';
+  }
+
+  @override
+  String get luckyDay => 'ಅದೃಷ್ಟ ದಿನ';
 
   @override
   String get generateKundliTitle => 'ಕುಂಡಲಿ ರಚಿಸಿ';
@@ -810,10 +823,6 @@ class AppLocalizationsKn extends AppLocalizations {
   }
 
   @override
-  String get billingFinePrint =>
-      'Google Play ಮೂಲಕ ಬಿಲ್ ಮಾಡಲಾಗಿದೆ · ಯಾವಾಗ ಬೇಕಾದರೂ ರದ್ದುಮಾಡಿ · RevenueCat ನೊಂದಿಗೆ ಸುರಕ್ಷಿತ';
-
-  @override
   String get articlesTitle => 'ಜ್ಞಾನ ಮತ್ತು ಲೇಖನಗಳು';
 
   @override
@@ -919,9 +928,57 @@ class AppLocalizationsKn extends AppLocalizations {
   String get profileBirthProfiles => 'ಜನ್ಮ ಪ್ರೊಫೈಲ್‌ಗಳು';
 
   @override
-  String profileProfileCount(String count) {
-    return '$count ಪ್ರೊಫೈಲ್';
+  String profileProfileCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ಪ್ರೊಫೈಲ್‌ಗಳು',
+      one: '$count ಪ್ರೊಫೈಲ್',
+    );
+    return '$_temp0';
   }
+
+  @override
+  String get birthProfilesYouBadge => 'ನೀವು';
+
+  @override
+  String get birthProfilesDelete => 'ಅಳಿಸಿ';
+
+  @override
+  String get birthProfilesDeleteConfirmTitle => 'ಈ ಪ್ರೊಫೈಲ್ ಅನ್ನು ಅಳಿಸಬೇಕೆ?';
+
+  @override
+  String birthProfilesDeleteConfirmMessage(String name) {
+    return 'ಇದು $name ಅವರ ಉಳಿಸಿದ ಜನ್ಮ ಪ್ರೊಫೈಲ್ ಅನ್ನು ಶಾಶ್ವತವಾಗಿ ತೆಗೆದುಹಾಕುತ್ತದೆ. ಇದನ್ನು ಹಿಂಪಡೆಯಲು ಸಾಧ್ಯವಿಲ್ಲ.';
+  }
+
+  @override
+  String get birthProfilesPrimaryDeleteHint =>
+      'ನಿಮ್ಮ ಸ್ವಂತ ಪ್ರೊಫೈಲ್ ಅನ್ನು ಇಲ್ಲಿ ಅಳಿಸಲಾಗುವುದಿಲ್ಲ — ಬದಲಿಗೆ ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಖಾತೆ ಅಳಿಸಿ ಬಳಸಿ.';
+
+  @override
+  String get birthProfilesEditorAddTitle => 'ಪ್ರೊಫೈಲ್ ಸೇರಿಸಿ';
+
+  @override
+  String get birthProfilesEditorEditTitle => 'ಪ್ರೊಫೈಲ್ ಸಂಪಾದಿಸಿ';
+
+  @override
+  String get birthProfilesEditorSave => 'ಪ್ರೊಫೈಲ್ ಉಳಿಸಿ';
+
+  @override
+  String get birthProfilesSaveFailed =>
+      'ಈ ಪ್ರೊಫೈಲ್ ಅನ್ನು ಉಳಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get birthProfilesDeleteFailed =>
+      'ಈ ಪ್ರೊಫೈಲ್ ಅನ್ನು ಅಳಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get birthProfilesSignInRequired =>
+      'ಕುಟುಂಬ ಮತ್ತು ಸ್ನೇಹಿತರ ಪ್ರೊಫೈಲ್‌ಗಳನ್ನು ಸೇರಿಸಲು ಸೈನ್ ಇನ್ ಮಾಡಿ.';
+
+  @override
+  String get birthProfilesEmpty => 'ಇನ್ನೂ ಯಾವುದೇ ಪ್ರೊಫೈಲ್‌ಗಳಿಲ್ಲ.';
 
   @override
   String get profileAppLanguageLabel => 'ಆ್ಯಪ್ ಭಾಷೆ';
@@ -937,6 +994,27 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get profileAiChatHistory => 'AI ಚಾಟ್ ಇತಿಹಾಸ';
+
+  @override
+  String profileAiChatHistoryCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ಸಂಭಾಷಣೆಗಳು',
+      one: '$count ಸಂಭಾಷಣೆ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get aiChatHistoryEmptyTitle => 'ಇನ್ನೂ ಯಾವುದೇ ಸಂಭಾಷಣೆಗಳಿಲ್ಲ';
+
+  @override
+  String get aiChatHistoryEmptyMessage =>
+      'ನಿಮ್ಮ ವೃತ್ತಿ, ಮದುವೆ, ಆರೋಗ್ಯ ಅಥವಾ ಸರಿಯಾದ ಮುಹೂರ್ತದ ಬಗ್ಗೆ ಋಷಿ AI ಅನ್ನು ಕೇಳಿ — ನಿಮ್ಮ ಸಂಭಾಷಣೆಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.';
+
+  @override
+  String get aiChatHistoryEmptyAction => 'ಋಷಿ AI ಅನ್ನು ಕೇಳಿ';
 
   @override
   String get profilePaymentHistory => 'ಪಾವತಿ ಇತಿಹಾಸ';
@@ -1038,6 +1116,35 @@ class AppLocalizationsKn extends AppLocalizations {
   @override
   String get accountDeletionErrorGeneric =>
       'ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get legalPrivacyPolicy => 'ಗೌಪ್ಯತಾ ನೀತಿ';
+
+  @override
+  String get legalTermsOfService => 'ಸೇವಾ ನಿಯಮಗಳು';
+
+  @override
+  String get legalRefundsCancellation => 'ಮರುಪಾವತಿ ಮತ್ತು ರದ್ದತಿ';
+
+  @override
+  String get legalAccountDataDeletion => 'ಖಾತೆ ಮತ್ತು ಡೇಟಾ ಅಳಿಸುವಿಕೆ';
+
+  @override
+  String get profileEmailSupport => 'ನಮಗೆ ಇಮೇಲ್ ಮಾಡಿ';
+
+  @override
+  String get profileEmailSupportSubtitle => 'Vedadarshii@gmail.com';
+
+  @override
+  String get supportEmailSubject => 'ವೇದದರ್ಶಿ ಬೆಂಬಲ';
+
+  @override
+  String get feedbackEmailSubject => 'ವೇದದರ್ಶಿ ಪ್ರತಿಕ್ರಿಯೆ';
+
+  @override
+  String profileInviteFriendsMessage(String link) {
+    return 'ವೇದದರ್ಶಿಗೆ ಸೇರಿ — ವೇದ ಜ್ಯೋತಿಷ್ಯ, ಪಂಚಾಂಗ ಮತ್ತು ರಾಶಿಫಲಗಳಿಗೆ ನಿಮ್ಮ ದೈನಂದಿನ ಸಂಗಾತಿ. ಇಲ್ಲಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ: $link';
+  }
 
   @override
   String get kundliSandboxBanner =>

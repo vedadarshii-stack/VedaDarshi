@@ -225,8 +225,14 @@ class _SubscriptionPaywallScreenState
                   locale: locale,
                 ),
               ),
-              const SizedBox(height: 16),
-              _FinePrint(l10n: l10n, locale: locale),
+              // Billing fine print REMOVED 25 Aug 2026 (client request). It
+              // read "Billed via Google Play · Cancel anytime · Secure with
+              // RevenueCat" — naming our payment processor to end users
+              // exposes internal vendor choice for no user benefit, and
+              // RevenueCat is an implementation detail they never need to
+              // know. The Google Play billing relationship and cancellation
+              // route are already stated in the Terms and on the Refunds
+              // page, which is where they belong.
             ],
           ),
         ),
@@ -943,23 +949,3 @@ class _PlansUnavailable extends StatelessWidget {
   }
 }
 
-/// Centred billing fine print (Figma node 23:52).
-class _FinePrint extends StatelessWidget {
-  const _FinePrint({required this.l10n, required this.locale});
-
-  final AppLocalizations l10n;
-  final Locale locale;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      l10n.billingFinePrint,
-      textAlign: TextAlign.center,
-      style: AppFonts.body(
-        locale,
-        fontSize: 10.5,
-        color: AppColors.paywallFinePrint,
-      ),
-    );
-  }
-}

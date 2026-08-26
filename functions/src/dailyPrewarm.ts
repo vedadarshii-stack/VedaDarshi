@@ -1,27 +1,48 @@
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
 import { VEDIKA_API_KEY, VEDIKA_BASE_URL, vedikaHeaders, todayKeyIST } from "./config";
+import { cacheKey } from "./vedikaCache";
 
 /**
- * THE BIG COST SAVER.
+ * THE BIG COST SAVER — AND, until 26 Aug 2026, A COMPLETE NO-OP.
  *
  * Panchang and daily/weekly/monthly horoscope are the SAME for every user
  * who shares a sign (horoscope) or a city (panchang) on a given day. Left
  * as-is, the live `vedika` proxy (index.ts) still saves repeat calls via
- * its own Firestore cache — but that cache is populated lazily by
- * whichever user happens to open the app first each day, and its TTL
- * (6h for these families, see `cacheTtlSeconds` in index.ts) means it
- * re-fetches from Vedika several times a day even for a single sign/city.
+ * its own Firestore cache (`vedikaCache`) — but that cache is populated
+ * lazily by whichever user happens to open the app first each day.
  *
- * This job instead pre-computes the day's content ONCE, proactively, at
- * 12:01 AM IST — before anyone in India is awake to open the app — and
- * writes it to a collection every signed-in user can read directly from
- * Firestore. That turns "N users × M app-opens × Vedika calls" into a
- * fixed, small number of Vedika calls per day, independent of traffic.
+ * This job pre-computes the day's content ONCE, proactively, at 12:01 AM
+ * IST — before anyone in India is awake to open the app — and writes it
+ * BOTH to `dailyHoroscopes`/`dailyPanchang` (informational, nothing in the
+ * app reads these today — `grep -rn "dailyPanchang\|dailyHoroscopes"
+ * mobile/lib` returns nothing) AND, as of 26 Aug 2026, directly into
+ * `vedikaCache` under the EXACT key `index.ts`'s proxy would compute for
+ * the same request — see `./vedikaCache`. That second write is the part
+ * that actually saves money: it is what makes the first real user's
+ * request of the day a Firestore HIT instead of a fresh, billed Vedika
+ * call.
  *
- * This file talks to Vedika DIRECTLY (not through the `vedika` proxy
- * function) because it needs GET-only, unauthenticated-by-user, fire-and-
- * forget calls on a schedule, not a per-request HTTP relay.
+ * **Until this fix, this job saved nothing.** It called Vedika directly
+ * (bypassing `vedika`'s cache entirely, by design — see below) and wrote
+ * only to the two collections nothing reads. Worse, the panchang half hit
+ * `/v2/astrology/panchang/today`, a route the app stopped calling on
+ * 21 Aug 2026 in favour of the bundle route `/v2/astrology/panchang` — so
+ * those 10 calls/day were billed against a route the app cannot even
+ * produce a matching cache key for any more. Fixed by calling the SAME
+ * route+query shape `panchang_repository.dart` uses (see
+ * `prewarmCityPanchang`) and by sourcing `PANCHANG_CITIES`' coordinates
+ * from the app's own `cities.json` (see that constant's doc comment) —
+ * hand-typed city-centre coordinates from a different source do not
+ * round-trip to the same 4-decimal cache key the app's nearest-city
+ * lookup will actually request.
+ *
+ * This file still talks to Vedika DIRECTLY rather than through the
+ * `vedika` proxy's HTTP endpoint — it needs GET-only, unauthenticated-by-
+ * user, fire-and-forget calls on a schedule, not a per-request HTTP relay
+ * — but it now writes to the SAME Firestore collection and SAME key
+ * derivation the proxy uses, so "direct" no longer means "invisible to
+ * the cache".
  */
 
 const ZODIAC_SIGNS = [
@@ -64,17 +85,34 @@ interface PrewarmCity {
   longitude: number;
 }
 
+/**
+ * Coordinates are copied VERBATIM from `mobile/assets/data/cities.json`
+ * (the GeoNames-derived dataset `AssetCityPlaceSearch().nearestCity()`
+ * snaps a device fix onto) — NOT independently sourced city-centre values.
+ *
+ * This is load-bearing, not cosmetic: `cacheKey` rounds latitude/longitude
+ * to 4 decimal places, so a pre-warmed entry is only ever found by a real
+ * request if the two sides' coordinates agree to that precision. They
+ * previously didn't — the original hand-typed values here differed from
+ * `cities.json`'s entries by up to ~0.04° (Delhi: 28.6139,77.2090 here vs.
+ * 28.6519,77.2315 in the dataset an actual Delhi user resolves to), so
+ * even a perfect cache-key implementation would have warmed a key no user
+ * could ever request. Re-derive with:
+ *   `jq '.[] | select(.c=="IN" and (.n=="Delhi" or …)) | {n,la,lo}'
+ *     mobile/assets/data/cities.json`
+ * if this list ever changes.
+ */
 const PANCHANG_CITIES: PrewarmCity[] = [
-  { slug: "delhi", name: "Delhi", latitude: 28.6139, longitude: 77.209 },
-  { slug: "mumbai", name: "Mumbai", latitude: 19.076, longitude: 72.8777 },
-  { slug: "bengaluru", name: "Bengaluru", latitude: 12.9716, longitude: 77.5946 },
-  { slug: "chennai", name: "Chennai", latitude: 13.0827, longitude: 80.2707 },
-  { slug: "kolkata", name: "Kolkata", latitude: 22.5726, longitude: 88.3639 },
-  { slug: "hyderabad", name: "Hyderabad", latitude: 17.385, longitude: 78.4867 },
-  { slug: "pune", name: "Pune", latitude: 18.5204, longitude: 73.8567 },
-  { slug: "ahmedabad", name: "Ahmedabad", latitude: 23.0225, longitude: 72.5714 },
-  { slug: "jaipur", name: "Jaipur", latitude: 26.9124, longitude: 75.7873 },
-  { slug: "lucknow", name: "Lucknow", latitude: 26.8467, longitude: 80.9462 },
+  { slug: "delhi", name: "Delhi", latitude: 28.6519, longitude: 77.2315 },
+  { slug: "mumbai", name: "Mumbai", latitude: 19.0728, longitude: 72.8826 },
+  { slug: "bengaluru", name: "Bengaluru", latitude: 12.9719, longitude: 77.5937 },
+  { slug: "chennai", name: "Chennai", latitude: 13.0878, longitude: 80.2785 },
+  { slug: "kolkata", name: "Kolkata", latitude: 22.5626, longitude: 88.363 },
+  { slug: "hyderabad", name: "Hyderabad", latitude: 17.384, longitude: 78.4564 },
+  { slug: "pune", name: "Pune", latitude: 18.5196, longitude: 73.8554 },
+  { slug: "ahmedabad", name: "Ahmedabad", latitude: 23.0258, longitude: 72.5873 },
+  { slug: "jaipur", name: "Jaipur", latitude: 26.9196, longitude: 75.7878 },
+  { slug: "lucknow", name: "Lucknow", latitude: 26.8393, longitude: 80.9231 },
 ];
 
 /** India has one timezone; every city in PANCHANG_CITIES uses it. */
@@ -126,6 +164,38 @@ async function fetchVedikaJson(
 }
 
 /**
+ * Writes a successful Vedika response into `vedikaCache` under the EXACT
+ * key `index.ts`'s proxy would compute for the same `(method, path, query,
+ * body)` — see `./vedikaCache`. `fetchedAtMs`/`payload` match that file's
+ * write shape byte-for-byte so a HIT read there cannot tell the difference
+ * between a pre-warmed entry and one it wrote itself.
+ *
+ * This is the actual cost-saving step. Without it, everything above is
+ * still just populating `dailyHoroscopes`/`dailyPanchang`, which nothing
+ * in the app reads.
+ */
+async function warmVedikaCache(
+  db: FirebaseFirestore.Firestore,
+  method: string,
+  path: string,
+  query: string,
+  body: string,
+  payload: unknown
+): Promise<void> {
+  const key = cacheKey(method, path, query, body);
+  try {
+    await db
+      .collection("vedikaCache")
+      .doc(key)
+      .set({ payload, fetchedAtMs: Date.now(), path });
+  } catch (e) {
+    // Same rule as everywhere else in this file: a cache-write failure
+    // must never take down the rest of the run.
+    console.error(`dailyPrewarm: vedikaCache write failed for key=${key} path=${path}`, e);
+  }
+}
+
+/**
  * Pre-warms all three "same for everyone" horoscope periods for ONE sign.
  *
  * Each period (daily/weekly/monthly) is fetched and written INDEPENDENTLY
@@ -154,10 +224,18 @@ async function prewarmSignHoroscope(
 ): Promise<void> {
   const docRef = db.collection("dailyHoroscopes").doc(`${dateKey}_${sign}`);
 
+  // Paths match `horoscope_repository.dart`'s `fetchDaily`/`fetchWeekly`/
+  // `fetchMonthly` exactly (no query string, no body) — see that file —
+  // so `warmVedikaCache` below writes the SAME key the app's own proxy
+  // call will compute.
+  const dailyPath = `/v2/astrology/horoscope/${sign}`;
+  const weeklyPath = `/v2/astrology/horoscope/${sign}/weekly`;
+  const monthlyPath = `/v2/astrology/horoscope/${sign}/monthly`;
+
   const [daily, weekly, monthly] = await Promise.all([
-    fetchVedikaJson(`/v2/astrology/horoscope/${sign}`),
-    fetchVedikaJson(`/v2/astrology/horoscope/${sign}/weekly`),
-    fetchVedikaJson(`/v2/astrology/horoscope/${sign}/monthly`),
+    fetchVedikaJson(dailyPath),
+    fetchVedikaJson(weeklyPath),
+    fetchVedikaJson(monthlyPath),
   ]);
 
   const update: Record<string, unknown> = {
@@ -169,6 +247,7 @@ async function prewarmSignHoroscope(
   if (daily.ok) {
     update.daily = daily.payload;
     update.dailyStatus = "ok";
+    await warmVedikaCache(db, "GET", dailyPath, "", "", daily.payload);
   } else {
     update.dailyStatus = "failed";
     console.error(`dailyPrewarm: horoscope daily failed for sign=${sign}`, daily.payload);
@@ -177,6 +256,7 @@ async function prewarmSignHoroscope(
   if (weekly.ok) {
     update.weekly = weekly.payload;
     update.weeklyStatus = "ok";
+    await warmVedikaCache(db, "GET", weeklyPath, "", "", weekly.payload);
   } else {
     update.weeklyStatus = "failed";
     console.error(`dailyPrewarm: horoscope weekly failed for sign=${sign}`, weekly.payload);
@@ -185,6 +265,7 @@ async function prewarmSignHoroscope(
   if (monthly.ok) {
     update.monthly = monthly.payload;
     update.monthlyStatus = "ok";
+    await warmVedikaCache(db, "GET", monthlyPath, "", "", monthly.payload);
   } else {
     update.monthlyStatus = "failed";
     console.error(`dailyPrewarm: horoscope monthly failed for sign=${sign}`, monthly.payload);
@@ -203,21 +284,28 @@ async function prewarmSignHoroscope(
 /**
  * Pre-warms today's panchang for ONE fixed city.
  *
- * QUERY PARAM CAVEAT: the Vedika contract excerpt this codebase has been
- * built against (see mobile/CLAUDE.md) documents
- * `/v2/astrology/panchang/today` without spelling out its query
- * parameters, because every other caller so far has only ever needed
- * "today, wherever the requesting client's device is" via the live proxy.
- * For a server-side pre-warm we must name a city explicitly, so this
- * sends `latitude`/`longitude`/`timezone` — the same field names Vedika
- * uses in every POST body elsewhere in this API (kundli, guna-milan).
- * **This has not been independently re-verified against a fresh
- * openapi.json dump for the panchang endpoint specifically.** Before
- * trusting this in production: run it once, fetch two different cities'
- * documents from `dailyPanchang`, and confirm the tithi/nakshatra data
- * genuinely differs between e.g. Delhi and Chennai — if Vedika ignores
- * these params and returns one fixed answer, every city document will be
- * identical, which would mean this needs the correct param names instead.
+ * FIXED 26 Aug 2026 — this used to call `/v2/astrology/panchang/today`
+ * with only `latitude`/`longitude`/`timezone`. Two things were wrong with
+ * that, both now corrected:
+ *
+ *  1. **Wrong route.** The app itself switched to the BUNDLE route
+ *     `/v2/astrology/panchang` on 21 Aug 2026 (see
+ *     `panchang_repository.dart`) for the sunrise/sunset/festival data it
+ *     adds. A pre-warmed `/today` entry can never be found by a request
+ *     for `/v2/astrology/panchang` — different path, different cache key,
+ *     full price either way. This job now calls the exact same route.
+ *  2. **Missing `datetime`.** Without it Vedika anchors to the SERVER's
+ *     UTC "now", which is a DIFFERENT calendar day from IST between
+ *     00:00–05:30 — exactly the failure `panchang_repository.dart`
+ *     documents fixing on the app side. `datetime` is now local noon on
+ *     `dateKey`, built the identical way `_localNoonIso` does.
+ *
+ * Query params (`datetime`, `latitude`, `longitude`, `timezone`,
+ * `include`) match `panchang_repository.dart`'s `fetch()` byte-for-byte in
+ * VALUE (param order no longer matters — `cacheKey` sorts them, see
+ * `./vedikaCache`), which is what lets `warmVedikaCache` below place this
+ * under the exact key a real user's request for the same city+day will
+ * compute.
  */
 async function prewarmCityPanchang(
   db: FirebaseFirestore.Firestore,
@@ -226,13 +314,20 @@ async function prewarmCityPanchang(
 ): Promise<void> {
   const docRef = db.collection("dailyPanchang").doc(`${dateKey}_${city.slug}`);
 
+  const path = "/v2/astrology/panchang";
   const query = new URLSearchParams({
+    datetime: `${dateKey}T12:00:00`,
     latitude: String(city.latitude),
     longitude: String(city.longitude),
     timezone: INDIA_UTC_OFFSET,
+    include: "sunrise,festivals",
   }).toString();
 
-  const result = await fetchVedikaJson("/v2/astrology/panchang/today", query);
+  const result = await fetchVedikaJson(path, query);
+
+  if (result.ok) {
+    await warmVedikaCache(db, "GET", path, query, "", result.payload);
+  }
 
   try {
     if (result.ok) {

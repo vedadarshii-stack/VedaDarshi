@@ -105,8 +105,21 @@ class PanchangRepository {
       // the unambiguous "this calendar day" anchor, and it also makes the
       // value stable for every request made during that day.
       'datetime': _localNoonIso(date),
-      'latitude': lat.toString(),
-      'longitude': lon.toString(),
+      // Rounded to 4 decimal places (~11 m) — the SAME precision
+      // [_panchangCacheKey] already rounds to for this repository's own
+      // in-memory cache, and the precision the Cloud Functions proxy's
+      // `vedikaCache` now rounds to server-side (26 Aug 2026 — see
+      // `functions/src/vedikaCache.ts`). Sending the raw, unrounded
+      // `double` here would still be caught by that server-side rounding,
+      // but keeping the two in agreement means this repository is
+      // correct on its own, not merely bailed out by the proxy — and it
+      // is the actual root cause of a real incident: an app build that
+      // sent raw GPS precision in this query minted a fresh, separately
+      // billed Vedika call on nearly every request for what should have
+      // been one cached day+location entry (see CLAUDE.md, "Vedika API
+      // integration").
+      'latitude': lat.toStringAsFixed(4),
+      'longitude': lon.toStringAsFixed(4),
       'timezone': _utcOffsetFor(tz, date),
       // sunrise -> sun/moon times; festivals -> the real festival card.
       // Both are add-on blocks on the same call, so neither costs extra.
@@ -168,8 +181,11 @@ class PanchangRepository {
         // Local wall-clock, no zone suffix — same convention as the POST
         // endpoints; `timezone` carries the offset separately.
         'datetime': _localNoonIso(now),
-        'latitude': '$lat',
-        'longitude': '$lon',
+        // Rounded for the same reason as `fetch()` above — keeps this
+        // repository's own request in agreement with the server-side
+        // cache-key rounding in `functions/src/vedikaCache.ts`.
+        'latitude': lat.toStringAsFixed(4),
+        'longitude': lon.toStringAsFixed(4),
         'timezone': tz,
       },
     );

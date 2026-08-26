@@ -26,12 +26,19 @@ dependencies:
   flutter_local_notifications: ^22.2.0
   permission_handler: ^12.0.3
   cloud_functions: ^6.3.6
+  # Opens Google Play's own order-history page for Payment History —
+  # Play owns the payment record, so the app must never try to restate it.
+  url_launcher: ^6.3.1
   purchases_flutter: ^10.8.0
   # Panchang location (21 Aug 2026). Coarse GPS only — the coordinates
   # are turned into a city name and IANA zone OFFLINE via assets/data/
   # cities.json, so no reverse-geocoding API call and no coordinates leave
   # the device.
   geolocator: ^14.0.3
+  # Invite Friends (26 Aug 2026) — opens the OS share sheet with an invite
+  # message + the Play Store link, rather than the app implementing its own
+  # sharing UI.
+  share_plus: ^13.3.0
 
 dev_dependencies:
   flutter_test:

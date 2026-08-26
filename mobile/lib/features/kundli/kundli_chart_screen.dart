@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
-import '../../core/vedika/vedika_client.dart';
 import '../../core/vedika/vedika_config.dart';
 import '../../core/widgets/app_empty_state.dart';
 import '../../l10n/app_localizations.dart';
@@ -638,19 +637,20 @@ class _ChartDataSection extends StatelessWidget {
     }
     return async.when(
       loading: () => _ChartLoadingState(l10n: l10n, locale: locale),
-      error: (error, stackTrace) => _ChartErrorState(
-        l10n: l10n,
-        locale: locale,
-        // A VedikaException's own message is already a screen-ready
-        // sentence (see that class's doc comment); anything else (a bug in
-        // our own parsing, an unexpected exception type) falls back to a
-        // generic localized message instead of leaking a raw exception
-        // string onto the screen.
-        message: error is VedikaException
-            ? error.message
-            : l10n.kundliLoadErrorMessage,
-        onRetry: onRetry,
-      ),
+      error: (error, stackTrace) {
+        // A VedikaException's own message names the vendor ("Vedika did
+        // not respond within 30s.", "Could not reach Vedika: …") and must
+        // never reach the screen — always show the app-owned localized
+        // fallback here, whatever the error's actual type. The raw text
+        // still goes to the debug console, where that's fine and useful.
+        debugPrint('KundliChartScreen (chart tab): $error');
+        return _ChartErrorState(
+          l10n: l10n,
+          locale: locale,
+          message: l10n.kundliLoadErrorMessage,
+          onRetry: onRetry,
+        );
+      },
       data: (data) => _ChartLoadedSection(
         l10n: l10n,
         locale: locale,

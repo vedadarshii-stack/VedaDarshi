@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
-import '../../core/vedika/vedika_client.dart';
 import '../../core/vedika/vedika_config.dart';
 import '../../core/widgets/app_empty_state.dart';
 import '../../l10n/app_localizations.dart';
@@ -57,13 +56,17 @@ class KundliPlanetPositionsTab extends StatelessWidget {
     }
     return async.when(
       loading: () => const _PlanetPositionsLoadingState(),
-      error: (error, stackTrace) => _PlanetPositionsErrorState(
-        l10n: l10n,
-        message: error is VedikaException
-            ? error.message
-            : l10n.kundliLoadErrorMessage,
-        onRetry: onRetry,
-      ),
+      error: (error, stackTrace) {
+        // Never render a VedikaException's own message on screen — see
+        // KundliDashaTab's identical comment. The raw text still goes to
+        // the debug console.
+        debugPrint('KundliPlanetPositionsTab: $error');
+        return _PlanetPositionsErrorState(
+          l10n: l10n,
+          message: l10n.kundliLoadErrorMessage,
+          onRetry: onRetry,
+        );
+      },
       data: (data) => _PlanetPositionsLoadedList(
         l10n: l10n,
         locale: locale,

@@ -374,14 +374,14 @@ class AppLocalizationsTe extends AppLocalizations {
   String get premiumCta => 'ప్రీమియం';
 
   @override
-  String get horoscopeSandboxBanner => 'నమూనా డేటా — వేదిక సాండ్‌బాక్స్ మోడ్';
+  String get horoscopeSandboxBanner => 'నమూనా డేటా — సాండ్‌బాక్స్ మోడ్';
 
   @override
   String get horoscopeErrorTitle => 'జాతకం లోడ్ కాలేదు';
 
   @override
   String get horoscopeErrorMessage =>
-      'వేదికను చేరుకోవడంలో సమస్య వచ్చింది. దయచేసి మీ కనెక్షన్‌ను తనిఖీ చేసి మళ్లీ ప్రయత్నించండి.';
+      'జ్యోతిష సేవను చేరుకోవడంలో సమస్య వచ్చింది. దయచేసి మీ కనెక్షన్‌ను తనిఖీ చేసి మళ్లీ ప్రయత్నించండి.';
 
   @override
   String get horoscopeRetryAction => 'మళ్లీ ప్రయత్నించండి';
@@ -408,6 +408,20 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get monthlyKeyDatesTitle => 'ఈ నెలలో ముఖ్యమైన తేదీలు';
+
+  @override
+  String get yearlySummaryTitle => 'ఈ సంవత్సర సారాంశం';
+
+  @override
+  String get yearlyScoresTitle => 'ఈ సంవత్సరం స్కోర్‌లు';
+
+  @override
+  String yearlyOverallRating(int percent) {
+    return 'మొత్తం $percent%';
+  }
+
+  @override
+  String get luckyDay => 'అదృష్ట రోజు';
 
   @override
   String get generateKundliTitle => 'కుండలి తయారు చేయండి';
@@ -812,10 +826,6 @@ class AppLocalizationsTe extends AppLocalizations {
   }
 
   @override
-  String get billingFinePrint =>
-      'Google Play ద్వారా బిల్ చేయబడింది · ఎప్పుడైనా రద్దు చేయండి · RevenueCatతో సురక్షితం';
-
-  @override
   String get articlesTitle => 'జ్ఞానం & వ్యాసాలు';
 
   @override
@@ -921,9 +931,57 @@ class AppLocalizationsTe extends AppLocalizations {
   String get profileBirthProfiles => 'జనన ప్రొఫైల్‌లు';
 
   @override
-  String profileProfileCount(String count) {
-    return '$count ప్రొఫైల్';
+  String profileProfileCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ప్రొఫైల్‌లు',
+      one: '$count ప్రొఫైల్',
+    );
+    return '$_temp0';
   }
+
+  @override
+  String get birthProfilesYouBadge => 'మీరు';
+
+  @override
+  String get birthProfilesDelete => 'తొలగించండి';
+
+  @override
+  String get birthProfilesDeleteConfirmTitle => 'ఈ ప్రొఫైల్‌ను తొలగించాలా?';
+
+  @override
+  String birthProfilesDeleteConfirmMessage(String name) {
+    return 'ఇది $name యొక్క సేవ్ చేసిన జనన ప్రొఫైల్‌ను శాశ్వతంగా తొలగిస్తుంది. దీన్ని రద్దు చేయలేరు.';
+  }
+
+  @override
+  String get birthProfilesPrimaryDeleteHint =>
+      'మీ స్వంత ప్రొఫైల్‌ను ఇక్కడ నుండి తొలగించలేరు — బదులుగా సెట్టింగ్‌లలో ఖాతాను తొలగించండి ఉపయోగించండి.';
+
+  @override
+  String get birthProfilesEditorAddTitle => 'ప్రొఫైల్ జోడించండి';
+
+  @override
+  String get birthProfilesEditorEditTitle => 'ప్రొఫైల్ సవరించండి';
+
+  @override
+  String get birthProfilesEditorSave => 'ప్రొఫైల్ సేవ్ చేయండి';
+
+  @override
+  String get birthProfilesSaveFailed =>
+      'ఈ ప్రొఫైల్‌ను సేవ్ చేయలేకపోయాము. దయచేసి మళ్లీ ప్రయత్నించండి.';
+
+  @override
+  String get birthProfilesDeleteFailed =>
+      'ఈ ప్రొఫైల్‌ను తొలగించలేకపోయాము. దయచేసి మళ్లీ ప్రయత్నించండి.';
+
+  @override
+  String get birthProfilesSignInRequired =>
+      'కుటుంబం & స్నేహితుల ప్రొఫైల్‌లను జోడించడానికి సైన్ ఇన్ చేయండి.';
+
+  @override
+  String get birthProfilesEmpty => 'ఇంకా ప్రొఫైల్‌లు లేవు.';
 
   @override
   String get profileAppLanguageLabel => 'యాప్ భాష';
@@ -939,6 +997,27 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get profileAiChatHistory => 'AI చాట్ చరిత్ర';
+
+  @override
+  String profileAiChatHistoryCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count సంభాషణలు',
+      one: '$count సంభాషణ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get aiChatHistoryEmptyTitle => 'ఇంకా సంభాషణలు లేవు';
+
+  @override
+  String get aiChatHistoryEmptyMessage =>
+      'కెరీర్, వివాహం, ఆరోగ్యం లేదా సరైన ముహూర్తం గురించి ఋషి AIని అడగండి — మీ సంభాషణలు ఇక్కడ కనిపిస్తాయి.';
+
+  @override
+  String get aiChatHistoryEmptyAction => 'ఋషి AIని అడగండి';
 
   @override
   String get profilePaymentHistory => 'చెల్లింపు చరిత్ర';
@@ -1040,6 +1119,35 @@ class AppLocalizationsTe extends AppLocalizations {
   @override
   String get accountDeletionErrorGeneric =>
       'ఏదో తప్పు జరిగింది. దయచేసి మళ్లీ ప్రయత్నించండి.';
+
+  @override
+  String get legalPrivacyPolicy => 'గోప్యతా విధానం';
+
+  @override
+  String get legalTermsOfService => 'సేవా నిబంధనలు';
+
+  @override
+  String get legalRefundsCancellation => 'వాపసు & రద్దు';
+
+  @override
+  String get legalAccountDataDeletion => 'ఖాతా & డేటా తొలగింపు';
+
+  @override
+  String get profileEmailSupport => 'మాకు ఇమెయిల్ చేయండి';
+
+  @override
+  String get profileEmailSupportSubtitle => 'Vedadarshii@gmail.com';
+
+  @override
+  String get supportEmailSubject => 'వేదదర్శి మద్దతు';
+
+  @override
+  String get feedbackEmailSubject => 'వేదదర్శి అభిప్రాయం';
+
+  @override
+  String profileInviteFriendsMessage(String link) {
+    return 'వేదదర్శిలో చేరండి — వేద జ్యోతిష్యం, పంచాంగం మరియు జాతకాలకు మీ రోజువారీ తోడు. ఇక్కడ డౌన్‌లోడ్ చేసుకోండి: $link';
+  }
 
   @override
   String get kundliSandboxBanner =>

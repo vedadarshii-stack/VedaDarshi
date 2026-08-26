@@ -25,14 +25,16 @@ import 'zodiac_sign.dart';
 /// "B3 · Horoscope — All Signs", this screen has NO bottom nav — it's a
 /// level deeper in the navigation stack and gets a back button instead.
 ///
-/// **Backed by the real Vedika API for daily/weekly/monthly** — see
+/// **Backed by the real Vedika API for all four periods** — see
 /// `horoscope_repository.dart` for the endpoints/caching and
 /// `horoscope_detail_static_data.dart`'s doc comment for exactly which UI
 /// values are genuinely sourced from Vedika (falling back to placeholder
 /// text only when a field is missing) versus which ones have no Vedika
-/// equivalent at all and stay static permanently. **Yearly has no Vedika
-/// endpoint at all** (see the `switch` below) and always renders the same
-/// permanent placeholder content regardless of which sign was tapped.
+/// equivalent at all and stay static permanently. **Yearly is a `POST` to
+/// `/v2/astrology/prediction/yearly`** — a different path family from the
+/// other three's `GET .../horoscope/{sign}[/period]` (see the `switch`
+/// below and `horoscope_repository.dart` for why an earlier investigation
+/// wrongly concluded yearly didn't exist at all).
 ///
 /// Figma only designed the Daily reading — there is no separate frame for
 /// Weekly/Monthly. Rather than invent a new screen for each, [_WeeklyBody]
@@ -121,35 +123,29 @@ class HoroscopeDetailScreen extends ConsumerWidget {
         );
 
       case HoroscopePeriod.yearly:
-        // NO VEDIKA ENDPOINT EXISTS for a yearly reading — verified live
-        // against the sandbox: `/v2/astrology/horoscope/{sign}/yearly`
-        // answers `success: true` wrapping an error payload, not a real
-        // reading (see the long comment on `horoscope_repository.dart`,
-        // which deliberately has no `fetchYearly`/`yearlyHoroscopeProvider`
-        // to watch here). So this branch never calls `ref.watch` at all —
-        // reusing [_DailyBody] with an all-null `const DailyHoroscope()`
-        // renders exactly the same permanent placeholder content every
-        // field on that body already falls back to when Vedika didn't
-        // return a value (see [HoroscopeDetailStaticData]'s doc comment).
-        // No network call, no loading/error state, and — this is the
-        // important part — NOT a fabricated yearly reading dressed up as
-        // real data.
+        final yearlyAsync = ref.watch(yearlyHoroscopeProvider(sign.id));
         return Scaffold(
           backgroundColor: AppColors.cream,
-          body: _DailyBody(
-            sign: sign,
-            horoscope: const DailyHoroscope(),
-            l10n: l10n,
-            locale: locale,
+          body: yearlyAsync.when(
+            data: (yearly) => _YearlyBody(
+              sign: sign,
+              yearly: yearly,
+              l10n: l10n,
+              locale: locale,
+            ),
+            loading: () => _LoadingState(locale: locale),
+            error: (error, stackTrace) => _ErrorState(
+              l10n: l10n,
+              locale: locale,
+              onRetry: () => ref.invalidate(yearlyHoroscopeProvider(sign.id)),
+            ),
           ),
         );
     }
   }
 }
 
-/// Loaded-state body for the Daily period (and, via an all-null
-/// [DailyHoroscope], the permanently-static Yearly period — see the
-/// `HoroscopePeriod.yearly` branch above). Split out from
+/// Loaded-state body for the Daily period. Split out from
 /// [HoroscopeDetailScreen] so [AsyncValue.when] can swap it for
 /// [_LoadingState]/[_ErrorState] without duplicating the Scaffold.
 class _DailyBody extends StatelessWidget {
@@ -554,7 +550,9 @@ class _MonthlyBody extends StatelessWidget {
                 locale: locale,
                 title: l10n.monthlyScoresTitle,
                 scores: _monthlyScores(monthly),
-                overallRatingPercent: monthly.overallRating,
+                overallRatingLabel: monthly.overallRating == null
+                    ? null
+                    : l10n.monthlyOverallRating(monthly.overallRating!),
               ),
               const SizedBox(height: 12),
               _PeriodNoteCard(
@@ -611,10 +609,313 @@ List<HoroscopeScore> _monthlyScores(MonthlyHoroscope monthly) {
   ];
 }
 
-/// One-paragraph note card shared by the Weekly ("This Week's Advice") and
-/// Monthly ("This Month's Theme") periods — same surface/border/radius
-/// container as [_PredictionCard] so it reads as part of the same design
-/// language even though there's no dedicated Figma frame for either.
+/// Loaded-state body for the Yearly period — `POST
+/// /v2/astrology/prediction/yearly` (see [YearlyHoroscope] and
+/// `horoscope_repository.dart`).
+///
+/// No Figma frame for this one either (see [_WeeklyBody]/[_MonthlyBody]).
+/// **Unlike every other period, nothing here ever falls back to
+/// [HoroscopeDetailStaticData]** — a missing field means the corresponding
+/// block is omitted entirely, never replaced with placeholder content.
+/// That rule exists because this period previously rendered an all-null
+/// `DailyHoroscope` through `_DailyBody`, which silently dressed up 100%
+/// static placeholder content as a real yearly reading (a client-reported
+/// bug — "yearly looks identical to daily"); this body must never repeat
+/// that mistake.
+///
+/// What's shown, mapped field-by-field:
+/// - [_Header]: sign glyph/name unchanged; the date chip becomes
+///   [YearlyHoroscope.formattedPeriodRange] (omitted if unparseable); the
+///   lucky-color/lucky-number/direction chips come from
+///   [YearlyHoroscope.luckyElements] via [_yearlyHeaderChips] — 0 to 3
+///   chips, each shown only when Vedika actually returned it.
+/// - "Lucky Day" / "Lucky Time" ([_YearlyLuckyTimesRow]): also from
+///   [YearlyHoroscope.luckyElements], split out of the header because the
+///   header only has room for 3 chips; the whole row is omitted if neither
+///   is present.
+/// - "This Year's Overview" ([_PeriodNoteCard]): [YearlyHoroscope.summary],
+///   omitted if null (unlike Weekly/Monthly's equivalent note cards, which
+///   fall back to a static placeholder).
+/// - "This Year's Scores" ([_ScoresCard]): [YearlyHoroscope.areas] mapped
+///   via [_yearlyScores], with [YearlyHoroscope.overallScore] as the badge.
+///   Omitted entirely if there's neither a mapped score nor an overall
+///   score to show.
+/// - Remedies ([_RemedyCard]): [YearlyHoroscope.remedies], joined by
+///   [_joinRemedies]. Omitted if empty — this is the one period where
+///   [_RemedyCard] ever shows real content instead of
+///   [HoroscopeDetailStaticData.remedy].
+/// - No mantra, no avoid-time card — Vedika's yearly response has no
+///   equivalent for either, and per the no-fallback rule above there's
+///   nothing to show in their place, so neither is part of this body.
+class _YearlyBody extends StatelessWidget {
+  const _YearlyBody({
+    required this.sign,
+    required this.yearly,
+    required this.l10n,
+    required this.locale,
+  });
+
+  final ZodiacSign sign;
+  final YearlyHoroscope yearly;
+  final AppLocalizations l10n;
+  final Locale locale;
+
+  @override
+  Widget build(BuildContext context) {
+    final lucky = yearly.luckyElements;
+    final scores = _yearlyScores(yearly);
+    final overallScore = yearly.overallScore;
+    final remedies = yearly.remedies;
+
+    return ListView(
+      padding: EdgeInsets.zero,
+      children: [
+        _Header(
+          sign: sign,
+          dateLabel: yearly.formattedPeriodRange,
+          chipsOverride: _yearlyHeaderChips(yearly, l10n, locale),
+          l10n: l10n,
+          locale: locale,
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (VedikaConfig.isSandbox) ...[
+                _SandboxBanner(l10n: l10n, locale: locale),
+                const SizedBox(height: 12),
+              ],
+              if (lucky != null &&
+                  (lucky.luckyDay != null || lucky.luckyTime != null)) ...[
+                _YearlyLuckyTimesRow(
+                  lucky: lucky,
+                  l10n: l10n,
+                  locale: locale,
+                ),
+                const SizedBox(height: 12),
+              ],
+              if (yearly.summary != null) ...[
+                _PeriodNoteCard(
+                  emoji: '🔮',
+                  title: l10n.yearlySummaryTitle,
+                  body: yearly.summary!,
+                  locale: locale,
+                ),
+                const SizedBox(height: 12),
+              ],
+              if (scores.isNotEmpty || overallScore != null) ...[
+                _ScoresCard(
+                  l10n: l10n,
+                  locale: locale,
+                  title: l10n.yearlyScoresTitle,
+                  scores: scores,
+                  overallRatingLabel: overallScore == null
+                      ? null
+                      : l10n.yearlyOverallRating(overallScore),
+                ),
+                const SizedBox(height: 12),
+              ],
+              if (remedies.isNotEmpty) ...[
+                _RemedyCard(text: _joinRemedies(remedies), locale: locale),
+                const SizedBox(height: 12),
+              ],
+              _PremiumTeaser(l10n: l10n, locale: locale),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Builds [_Header]'s `chipsOverride` for the Yearly period from
+/// [YearlyHoroscope.luckyElements] — up to 3 chips (lucky color / lucky
+/// number / direction, mirroring the other periods' header layout), each
+/// included only when Vedika actually returned it. Never padded out to 3
+/// with a placeholder — see [_YearlyBody]'s doc comment.
+List<Widget> _yearlyHeaderChips(
+  YearlyHoroscope yearly,
+  AppLocalizations l10n,
+  Locale locale,
+) {
+  final lucky = yearly.luckyElements;
+  final color = lucky?.luckyColor;
+  final number = lucky?.luckyNumber;
+  final direction = lucky?.luckyDirection;
+
+  final entries = <MapEntry<String, String>>[
+    if (color != null) MapEntry(l10n.luckyColor, color),
+    if (number != null) MapEntry(l10n.luckyNumber, number.toString()),
+    if (direction != null) MapEntry(l10n.direction, direction),
+  ];
+
+  final chips = <Widget>[];
+  for (var i = 0; i < entries.length; i++) {
+    if (i != 0) chips.add(const SizedBox(width: 10));
+    chips.add(
+      Expanded(
+        child: _HeaderChip(
+          label: entries[i].key,
+          value: entries[i].value,
+          locale: locale,
+        ),
+      ),
+    );
+  }
+  return chips;
+}
+
+/// "Lucky Day" / "Lucky Time" pair for the Yearly period — reuses the same
+/// [_TimeCard] tile [_TimesRow] uses for Daily's lucky/avoid time pair, but
+/// both tiles here are "good news" (Yearly has no avoid-time equivalent),
+/// so both use the same positive color. Only built when at least one of
+/// [YearlyLuckyElements.luckyDay]/[YearlyLuckyElements.luckyTime] is
+/// present (see [_YearlyBody]); shows just the one tile that exists if
+/// only one is.
+class _YearlyLuckyTimesRow extends StatelessWidget {
+  const _YearlyLuckyTimesRow({
+    required this.lucky,
+    required this.l10n,
+    required this.locale,
+  });
+
+  final YearlyLuckyElements lucky;
+  final AppLocalizations l10n;
+  final Locale locale;
+
+  @override
+  Widget build(BuildContext context) {
+    final tiles = <Widget>[
+      if (lucky.luckyDay != null)
+        _TimeCard(
+          background: AppColors.geoChipBg,
+          badgeIcon: Icons.event_rounded,
+          badgeLabel: l10n.luckyDay,
+          badgeColor: AppColors.tileGreenFg,
+          value: lucky.luckyDay!,
+          valueColor: AppColors.geoChipText,
+          locale: locale,
+        ),
+      if (lucky.luckyTime != null)
+        _TimeCard(
+          background: AppColors.geoChipBg,
+          badgeIcon: Icons.check_rounded,
+          badgeLabel: l10n.luckyTime,
+          badgeColor: AppColors.tileGreenFg,
+          value: lucky.luckyTime!,
+          valueColor: AppColors.geoChipText,
+          locale: locale,
+        ),
+    ];
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (var i = 0; i < tiles.length; i++) ...[
+          if (i != 0) const SizedBox(width: 10),
+          Expanded(child: tiles[i]),
+        ],
+      ],
+    );
+  }
+}
+
+/// Best-effort mapping of a [YearlyHoroscopeArea.area] label onto one of
+/// this screen's 5 fixed [HoroscopeScoreId] rows. Unlike `_sectionForTheme`
+/// above (which merges career and money into one "Career & Money"
+/// prediction card), the scores card keeps career and money as separate
+/// rows, so this needs its own keyword list.
+///
+/// **VERIFIED against a real yearly response, 26 Aug 2026.** Vedika returns
+/// exactly four areas, and all four map cleanly:
+///
+/// | Vedika `area`  | row     |
+/// |----------------|---------|
+/// | `career`       | career  |
+/// | `relationship` | love    |
+/// | `health`       | health  |
+/// | `finance`      | money   |
+///
+/// It returns **no** `luck` area, so that row is simply absent from the
+/// yearly scores card — correct, not a gap to paper over. The extra
+/// synonyms below (`work`, `romance`, `wealth`, `fortune`, …) are defensive
+/// only: they cost nothing and cover Vedika widening the vocabulary later.
+/// An area whose label matches nothing is left OUT of the card rather than
+/// guessed at, the same conservative rule `_sectionForTheme` follows.
+HoroscopeScoreId? _yearlyScoreId(String? area) {
+  switch (area?.toLowerCase()) {
+    case 'career':
+    case 'work':
+    case 'profession':
+    case 'business':
+    case 'job':
+      return HoroscopeScoreId.career;
+    case 'love':
+    case 'relationship':
+    case 'relationships':
+    case 'romance':
+    case 'family':
+    case 'marriage':
+      return HoroscopeScoreId.love;
+    case 'health':
+    case 'wellness':
+    case 'wellbeing':
+    case 'energy':
+      return HoroscopeScoreId.health;
+    case 'finance':
+    case 'wealth':
+    case 'money':
+    case 'property':
+    case 'investment':
+    case 'investments':
+      return HoroscopeScoreId.money;
+    case 'luck':
+    case 'fortune':
+    case 'general':
+    case 'overall':
+      return HoroscopeScoreId.luck;
+    default:
+      return null;
+  }
+}
+
+/// Maps [YearlyHoroscope.areas] onto the scores card's fixed 5-row shape
+/// via [_yearlyScoreId] — **never falling back to
+/// [HoroscopeDetailStaticData.scores]**, unlike `_monthlyScores`. An
+/// unmapped or missing row for Yearly is simply left out (see
+/// [_YearlyBody]'s doc comment for why this period never uses static
+/// fallbacks). If two areas map to the same row, the first one wins.
+/// Scores are clamped to 0–100 defensively — see
+/// [YearlyHoroscopeArea.score]'s doc comment on the unconfirmed scale.
+List<HoroscopeScore> _yearlyScores(YearlyHoroscope yearly) {
+  final byId = <HoroscopeScoreId, int>{};
+  for (final entry in yearly.areas) {
+    final id = _yearlyScoreId(entry.area);
+    final score = entry.score;
+    if (id == null || score == null || byId.containsKey(id)) continue;
+    byId[id] = score.clamp(0, 100);
+  }
+  return [
+    for (final id in HoroscopeScoreId.values)
+      if (byId.containsKey(id)) HoroscopeScore(id, byId[id]!),
+  ];
+}
+
+/// Joins [YearlyHoroscope.remedies] into one block for [_RemedyCard], which
+/// only has room for a single piece of text. A single remedy is shown
+/// as-is; multiple are bullet-joined.
+String _joinRemedies(List<String> remedies) {
+  if (remedies.isEmpty) return '';
+  if (remedies.length == 1) return remedies.first;
+  return remedies.map((r) => '• $r').join('\n');
+}
+
+/// One-paragraph note card shared by the Weekly ("This Week's Advice"),
+/// Monthly ("This Month's Theme") and Yearly ("This Year's Overview")
+/// periods — same surface/border/radius container as [_PredictionCard] so
+/// it reads as part of the same design language even though there's no
+/// dedicated Figma frame for any of the three.
 class _PeriodNoteCard extends StatelessWidget {
   const _PeriodNoteCard({
     required this.emoji,
@@ -937,16 +1238,18 @@ class _ErrorState extends StatelessWidget {
 /// must run under the status bar, per the design.
 ///
 /// Takes already-resolved display strings rather than a [DailyHoroscope]
-/// directly, so [_DailyBody], [_WeeklyBody] and [_MonthlyBody] can all
-/// share this one header — each period resolves its own real-value-or-
-/// placeholder fallback (see their doc comments for exactly which fields
-/// are real per period) before handing it a plain [String].
+/// directly, so [_DailyBody], [_WeeklyBody], [_MonthlyBody] and
+/// [_YearlyBody] can all share this one header — each period resolves its
+/// own real-value-or-placeholder fallback (see their doc comments for
+/// exactly which fields are real per period) before handing it a plain
+/// [String].
 class _Header extends StatelessWidget {
   const _Header({
     required this.sign,
     required this.dateLabel,
-    required this.luckyColorValue,
-    required this.luckyNumberValue,
+    this.luckyColorValue,
+    this.luckyNumberValue,
+    this.chipsOverride,
     required this.l10n,
     required this.locale,
   });
@@ -954,12 +1257,63 @@ class _Header extends StatelessWidget {
   final ZodiacSign sign;
 
   /// Already resolved to real data or a placeholder — see the class doc
-  /// comment.
-  final String dateLabel;
-  final String luckyColorValue;
-  final String luckyNumberValue;
+  /// comment. `null` omits the date line entirely rather than rendering a
+  /// blank one (used by [_YearlyBody], which never falls back to a
+  /// placeholder — see its own doc comment).
+  final String? dateLabel;
+
+  /// Ignored when [chipsOverride] is provided.
+  final String? luckyColorValue;
+  final String? luckyNumberValue;
+
+  /// When non-null, replaces the default 3-chip row (lucky color / lucky
+  /// number / direction) with these widgets instead — used by
+  /// [_YearlyBody], which has its own set of lucky fields and, per its
+  /// "omit rather than fabricate" rule, may have fewer than 3 (or none) to
+  /// show. An empty list hides the chip row entirely rather than rendering
+  /// an empty [Row].
+  final List<Widget>? chipsOverride;
   final AppLocalizations l10n;
   final Locale locale;
+
+  /// [chipsOverride] if provided, otherwise the default 3-chip row (lucky
+  /// color / lucky number / direction) every non-Yearly period uses.
+  List<Widget> get _resolvedChips {
+    final override = chipsOverride;
+    if (override != null) return override;
+    return [
+      Expanded(
+        // Reuses the existing `luckyColor` key ("Lucky Color") rather than
+        // adding a near-duplicate "Lucky Colour" key — the design's
+        // spelling difference isn't worth a second string.
+        child: _HeaderChip(
+          label: l10n.luckyColor,
+          value: luckyColorValue ?? '',
+          locale: locale,
+        ),
+      ),
+      const SizedBox(width: 10),
+      Expanded(
+        child: _HeaderChip(
+          label: l10n.luckyNumber,
+          value: luckyNumberValue ?? '',
+          locale: locale,
+        ),
+      ),
+      const SizedBox(width: 10),
+      Expanded(
+        // Direction has NO Vedika equivalent — none of the daily/
+        // weekly/monthly endpoints return a lucky direction, so this
+        // stays a permanent placeholder (see
+        // horoscope_detail_static_data.dart), not a loading gap.
+        child: _HeaderChip(
+          label: l10n.direction,
+          value: HoroscopeDetailStaticData.direction,
+          locale: locale,
+        ),
+      ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1057,55 +1411,26 @@ class _Header extends StatelessWidget {
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      dateLabel,
-                      style: AppFonts.body(
-                        locale,
-                        fontSize: 12,
-                        color: AppColors.creamText,
+                    if (dateLabel != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        dateLabel!,
+                        style: AppFonts.body(
+                          locale,
+                          fontSize: 12,
+                          color: AppColors.creamText,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                // Reuses the existing `luckyColor` key ("Lucky Color") rather
-                // than adding a near-duplicate "Lucky Colour" key — the
-                // design's spelling difference isn't worth a second string.
-                child: _HeaderChip(
-                  label: l10n.luckyColor,
-                  value: luckyColorValue,
-                  locale: locale,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _HeaderChip(
-                  label: l10n.luckyNumber,
-                  value: luckyNumberValue,
-                  locale: locale,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                // Direction has NO Vedika equivalent — none of the daily/
-                // weekly/monthly endpoints return a lucky direction, so
-                // this stays a permanent placeholder (see
-                // horoscope_detail_static_data.dart), not a loading gap.
-                child: _HeaderChip(
-                  label: l10n.direction,
-                  value: HoroscopeDetailStaticData.direction,
-                  locale: locale,
-                ),
-              ),
-            ],
-          ),
+          if (_resolvedChips.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Row(children: _resolvedChips),
+          ],
         ],
       ),
     );
@@ -1194,37 +1519,40 @@ class _HeaderChip extends StatelessWidget {
 /// [HoroscopeDetailStaticData.direction]/[HoroscopeDetailStaticData
 /// .avoidTime] below.
 ///
-/// **Real for Monthly** — Vedika's monthly response DOES return
-/// love/career/health/finance scores (see [MonthlyHoroscope]), so
-/// `_MonthlyBody` passes those in via [scores] (merged by [_monthlyScores])
-/// and [overallRatingPercent], overriding this card's own defaults.
+/// **Real for Monthly and Yearly** — Vedika's monthly response DOES return
+/// love/career/health/finance scores (see [MonthlyHoroscope]) and its
+/// yearly response returns an `areas` list (see [YearlyHoroscope]), so
+/// `_MonthlyBody`/`_YearlyBody` pass those in via [scores] (merged by
+/// `_monthlyScores`/`_yearlyScores`) and [overallRatingLabel], overriding
+/// this card's own defaults.
 class _ScoresCard extends StatelessWidget {
   const _ScoresCard({
     required this.l10n,
     required this.locale,
     this.title,
     this.scores = HoroscopeDetailStaticData.scores,
-    this.overallRatingPercent,
+    this.overallRatingLabel,
   });
 
   final AppLocalizations l10n;
   final Locale locale;
 
-  /// Defaults to [AppLocalizations.todaysScores] — `_MonthlyBody` overrides
-  /// it with [AppLocalizations.monthlyScoresTitle] so the card doesn't read
-  /// as "Today's" for a month-long reading.
+  /// Defaults to [AppLocalizations.todaysScores] — `_MonthlyBody`/
+  /// `_YearlyBody` override it so the card doesn't read as "Today's" for a
+  /// month- or year-long reading.
   final String? title;
   final List<HoroscopeScore> scores;
 
-  /// 0–100 shown as a badge next to the title. Only [MonthlyHoroscope] has
-  /// an aggregate like this (`overallRating`) — `null` on every other
-  /// period, which hides the badge entirely rather than showing a
-  /// fabricated number.
-  final int? overallRatingPercent;
+  /// Already-localized badge text shown next to the title (e.g.
+  /// `l10n.monthlyOverallRating(72)`), resolved by the caller rather than
+  /// this card, since which l10n key applies depends on the period. Only
+  /// [MonthlyHoroscope] and [YearlyHoroscope] have an aggregate like this —
+  /// `null` on every other period, which hides the badge entirely rather
+  /// than showing a fabricated number.
+  final String? overallRatingLabel;
 
   @override
   Widget build(BuildContext context) {
-    final ratingPercent = overallRatingPercent;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1248,9 +1576,9 @@ class _ScoresCard extends StatelessWidget {
                   ),
                 ),
               ),
-              if (ratingPercent != null)
+              if (overallRatingLabel != null)
                 Text(
-                  l10n.monthlyOverallRating(ratingPercent),
+                  overallRatingLabel!,
                   style: AppFonts.body(
                     locale,
                     fontSize: 11.5,
@@ -1626,12 +1954,20 @@ class _RatingDots extends StatelessWidget {
   }
 }
 
-/// Remedy card (Figma node 16:66). Permanently static — no Vedika
-/// horoscope endpoint returns a remedy, so there is nothing to fall back
-/// from (same reasoning as [_ScoresCard]).
+/// Remedy card (Figma node 16:66).
+///
+/// [text] defaults to [HoroscopeDetailStaticData.remedy] for the Daily
+/// period — permanently static there, since no daily/weekly/monthly
+/// endpoint returns a remedy (same reasoning as [_ScoresCard]).
+/// `_YearlyBody` passes Vedika's own real `remedies` instead, since the
+/// yearly response does return them.
 class _RemedyCard extends StatelessWidget {
-  const _RemedyCard({required this.locale});
+  const _RemedyCard({
+    this.text = HoroscopeDetailStaticData.remedy,
+    required this.locale,
+  });
 
+  final String text;
   final Locale locale;
 
   @override
@@ -1651,7 +1987,7 @@ class _RemedyCard extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              HoroscopeDetailStaticData.remedy,
+              text,
               style: AppFonts.body(
                 locale,
                 fontSize: 11.5,

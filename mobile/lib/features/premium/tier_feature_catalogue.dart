@@ -84,6 +84,15 @@ class TierFeatureCatalogue {
 
     return [
       l10n.tierFeatureAiQuestions(data.aiQuestionsPerDay),
+      // YEARLY IS DELIVERED — corrected 26 Aug 2026. The earlier "yearly
+      // cannot be delivered" conclusion here only checked
+      // `GET /v2/astrology/horoscope/{sign}/yearly`, which does 404; it
+      // never checked whether Vedika had a yearly reading under a
+      // different path. It does: `POST /v2/astrology/prediction/yearly`
+      // (body `{"rashi": <sign>}`), verified live and now wired via
+      // `fetchYearly`/`yearlyHoroscopeProvider` in
+      // `horoscope_repository.dart`. Restored to the ternary the pricing
+      // matrix always called for.
       data.hasYearlyHoroscope
           ? l10n.tierFeatureHoroscopeWithYearly
           : l10n.tierFeatureHoroscopeStandard,

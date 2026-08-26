@@ -23,8 +23,15 @@ import 'package:flutter/foundation.dart' show immutable;
 ///    static regardless of API state. These are real content gaps, not
 ///    loading states — see the per-field comments in
 ///    `horoscope_detail_screen.dart` for why each one can't be sourced from
-///    Vedika, the same way the Horoscope — All Signs screen documents why
-///    its Yearly chip has no API behind it.
+///    Vedika.
+///
+///    **The Yearly period does NOT use this file at all.** It has its own
+///    real Vedika endpoint (`POST /v2/astrology/prediction/yearly` — see
+///    `horoscope_repository.dart`), and `_YearlyBody` in
+///    `horoscope_detail_screen.dart` omits a block entirely rather than
+///    falling back to a constant here when a field is missing — reusing
+///    this file's fallbacks for Yearly would risk dressing up a genuinely
+///    missing yearly value as one of these Daily-period placeholders.
 abstract final class HoroscopeDetailStaticData {
   static const String date = 'Saturday, 12 July 2026';
 

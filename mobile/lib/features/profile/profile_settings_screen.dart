@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/auth/auth_providers.dart';
 import '../../core/auth/auth_service.dart';
 import '../../core/locale/locale_controller.dart';
 import '../../core/motion/app_motion.dart';
 import '../../core/notifications/push_notification_service.dart';
+import '../../core/purchases/purchases_providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../core/theme/theme_controller.dart';
@@ -19,10 +22,14 @@ import '../panchang/panchang_location_screen.dart';
 import '../premium/subscription_paywall_screen.dart';
 import '../reports/premium_reports_screen.dart';
 import '../startup/root_gate.dart';
+import '../ai/ai_chat_history_screen.dart';
+import '../ai/ai_repository.dart';
 import 'account_deletion_error_messages.dart';
 import 'account_deletion_repository.dart';
 import 'birth_profile.dart';
 import 'birth_profile_repository.dart';
+import 'birth_profiles_screen.dart';
+import 'legal_links_screen.dart';
 
 /// Which language option is offered in the APP LANGUAGE row — mirrors
 /// `language_select_screen.dart`'s private `_LanguageOption`/list. Kept as a
@@ -97,15 +104,27 @@ const List<_LanguageOption> _languageOptions = [
 ///    exactly like the language pills call `localeControllerProvider`.
 ///  - "My Reports" routes to [PremiumReportsScreen], "Restore Purchases"
 ///    routes to [SubscriptionPaywallScreen] (which has its own real restore
-///    action in its top bar), and "Notifications" routes to
-///    [NotificationsScreen] — the three destinations that already exist.
-///    Every other row (Birth profiles, Downloaded PDFs, AI Chat History,
-///    Payment History, Panchang location, Manage subscription, Privacy &
-///    security, Help & support, Refer & Earn, Invite Friends, Rate,
-///    Send Feedback) is an honest no-op — see each row's
-///    `onTap` comment for what it will eventually do. There is no
-///    "saved/bookmarked articles" row in this design to route to
-///    `ArticlesScreen` — the D5 frame simply doesn't have one.
+///    action in its top bar), "Notifications" routes to
+///    [NotificationsScreen], "Panchang location" routes to
+///    `PanchangLocationScreen`, "Birth profiles" routes to
+///    [BirthProfilesScreen] (25 Aug 2026, multi-profile support), "AI Chat
+///    History" routes to [AiChatHistoryScreen] (26 Aug 2026), and "Privacy &
+///    security" routes to [LegalLinksScreen] (26 Aug 2026) — the seven
+///    destinations that already exist. There is no "saved/bookmarked
+///    articles" row in this design to route to `ArticlesScreen` — the D5
+///    frame simply doesn't have one.
+///  - Five more rows were wired up 26 Aug 2026, each opening something
+///    outside the app rather than an in-app screen (see each row's `onTap`
+///    comment for the exact URL/action): "Manage subscription" and "Rate
+///    Vedadarshi" deep-link to Google Play, "Help & support" opens the
+///    hosted support page, "Email us" and "Send Feedback" open a `mailto:`
+///    compose screen for `Vedadarshii@gmail.com`, and "Invite Friends" opens
+///    the OS share sheet (`share_plus`) with a short invite message + the
+///    Play listing link.
+///  - "Refer & Earn" is DELIBERATELY LEFT AS `onTap: () {}` — its "Get 1
+///    month free per referral" subtitle is a promise the app cannot honour
+///    yet, and whether the referral program ships at all is an open client
+///    decision. Do not wire this row up without that decision first.
 ///
 /// ACTIVITY COUNTS, PAYMENT AND SUBSCRIPTION SUMMARY ARE DELIBERATELY BLANK
 /// (18 Aug 2026). They used to render the Figma frame's sample values —
@@ -123,10 +142,10 @@ const List<_LanguageOption> _languageOptions = [
 ///
 /// Restore a subtitle only when it is backed by a real source: purchased
 /// reports and payments from RevenueCat's `CustomerInfo` (never a
-/// client-side flag), and the AI chat count from `/users/{uid}/aiChats`,
-/// which IS now written on every successful, already-charged answer.
-/// The "Birth profiles" count above is already computed for real from
-/// `birthProfileProvider` — that is the pattern to follow.
+/// client-side flag). The "Birth profiles" count above is already computed
+/// for real from `savedBirthProfilesProvider`, and the "AI Chat History"
+/// count (26 Aug 2026) now follows the same pattern from
+/// `aiChatHistoryProvider` — see `_MenuRow`'s AI Chat History call site.
 class ProfileSettingsScreen extends ConsumerStatefulWidget {
   const ProfileSettingsScreen({super.key});
 
@@ -202,6 +221,149 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
   /// `/users/{uid}` for that uid, so deleting it after `signOut()` would be
   /// denied and this phone would keep receiving the previous account's push
   /// notifications.
+  /// Google Play's order-history page — the authoritative record of every
+  /// charge made through Play Billing.
+  ///
+  /// `LaunchMode.externalApplication` so Android hands this to the Play
+  /// Store app when it is installed (which, for an app distributed through
+  /// Play, is essentially always) instead of an in-app webview where the
+  /// user would not be signed in.
+  static final Uri _playOrderHistoryUri = Uri.parse(
+    'https://play.google.com/store/account/orderhistory',
+  );
+
+  Future<void> _openPlayOrderHistory() async {
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      final launched = await launchUrl(
+        _playOrderHistoryUri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched && mounted) {
+        // `launchUrl` returning false is a real outcome (no handler for the
+        // URL), not an exception — surface it rather than leaving the user
+        // tapping a row that silently does nothing.
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.authErrorUnknown)));
+      }
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.authErrorUnknown)));
+    }
+  }
+
+  /// Shared "open this URL externally, tell the user if it silently fails"
+  /// helper for every row wired up 26 Aug 2026 below — the exact same
+  /// pattern as [_openPlayOrderHistory] above (`LaunchMode
+  /// .externalApplication` so Android hands off to a real app rather than
+  /// an in-app webview; both a `false` return and a thrown exception are
+  /// real, user-visible failure modes, not edge cases to ignore), pulled
+  /// into one place so five new call sites don't each re-derive it.
+  Future<void> _launchExternal(Uri uri) async {
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched && mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.authErrorUnknown)));
+      }
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.authErrorUnknown)));
+    }
+  }
+
+  /// Google Play's own listing for this app. It 404s until the app is
+  /// actually published on Play — EXPECTED during development, not a bug —
+  /// both "Rate Vedadarshi" (below) and the invite-share message
+  /// (`_shareInvite`) point at it, and both start working the moment the
+  /// listing goes live with no code change needed.
+  static final Uri _playStoreListingUri = Uri.parse(
+    'https://play.google.com/store/apps/details?id=com.gosewealth.vedadarshi',
+  );
+
+  Future<void> _openPlayStoreListing() => _launchExternal(_playStoreListingUri);
+
+  /// Google Play's subscription-management page — same reasoning as
+  /// [_playOrderHistoryUri] above: Play owns the subscription record
+  /// (renewal date, price, cancellation state, refund state), so the app
+  /// must never try to restate it, only hand the user off to the page that
+  /// actually holds it. Deep-links to the SPECIFIC active subscription
+  /// (`sku`/`package` query params, per Play's documented URL scheme) when
+  /// [subscriptionStatusValueProvider] reports one, falling back to the
+  /// generic subscriptions list for a free user or before RevenueCat has
+  /// answered.
+  Future<void> _openManageSubscription() async {
+    final activeProductIds = ref
+        .read(subscriptionStatusValueProvider)
+        .activeProductIds;
+    final productId = activeProductIds.isEmpty ? null : activeProductIds.first;
+    final uri = productId == null
+        ? Uri.parse('https://play.google.com/store/account/subscriptions')
+        : Uri.https('play.google.com', '/store/account/subscriptions', {
+            'sku': productId,
+            'package': 'com.gosewealth.vedadarshi',
+          });
+    await _launchExternal(uri);
+  }
+
+  /// The hosted support page — the fourth of four published legal/support
+  /// pages alongside `LegalLinksScreen`'s three (see that screen's doc
+  /// comment); kept here rather than added to that screen because it isn't
+  /// a legal document, it's the "Help & support" row's own destination.
+  static final Uri _supportPageUri = Uri.parse(
+    'https://vedadarshi-legal.web.app/support',
+  );
+
+  Future<void> _openSupportPage() => _launchExternal(_supportPageUri);
+
+  /// Builds a `mailto:` URI with a percent-encoded subject — the standard
+  /// `url_launcher` recipe (a bare `Uri.parse('mailto:x@y?subject=...')`
+  /// would not correctly encode a subject containing spaces). Shared by the
+  /// "Email us" and "Send Feedback" rows, which differ only in subject line.
+  static Uri _supportMailtoUri(String subject) {
+    return Uri(
+      scheme: 'mailto',
+      path: 'Vedadarshii@gmail.com',
+      query: 'subject=${Uri.encodeComponent(subject)}',
+    );
+  }
+
+  Future<void> _emailSupport() async {
+    final l10n = AppLocalizations.of(context)!;
+    await _launchExternal(_supportMailtoUri(l10n.supportEmailSubject));
+  }
+
+  /// Deliberately does NOT append the app version to the feedback body —
+  /// Flutter has no built-in way to read `pubspec.yaml`'s `version` at
+  /// runtime; the standard way (`package_info_plus`) is a new dependency,
+  /// and this screen was scoped to add `share_plus` only.
+  Future<void> _sendFeedback() async {
+    final l10n = AppLocalizations.of(context)!;
+    await _launchExternal(_supportMailtoUri(l10n.feedbackEmailSubject));
+  }
+
+  /// Opens the OS share sheet with a short invite message + the Play
+  /// listing link (see [_playStoreListingUri]'s note: it 404s until the app
+  /// is published — expected, not a bug, same as the "Rate Vedadarshi" row).
+  Future<void> _shareInvite() async {
+    final l10n = AppLocalizations.of(context)!;
+    await SharePlus.instance.share(
+      ShareParams(
+        text: l10n.profileInviteFriendsMessage(_playStoreListingUri.toString()),
+      ),
+    );
+  }
+
   Future<void> _signOut() async {
     if (_isSigningOut) return;
     setState(() => _isSigningOut = true);
@@ -265,7 +427,10 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
   /// outside does nothing; the user must explicitly choose Cancel or
   /// Delete), the body spells out exactly what is destroyed, and Cancel —
   /// not Delete — is the safe default.
-  Future<void> _confirmDeleteAccount(AppLocalizations l10n, Locale locale) async {
+  Future<void> _confirmDeleteAccount(
+    AppLocalizations l10n,
+    Locale locale,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -373,9 +538,9 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
     } catch (_) {
       if (!mounted) return;
       setState(() => _isDeleting = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.accountDeletionErrorGeneric)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.accountDeletionErrorGeneric)));
     }
   }
 
@@ -386,6 +551,12 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
     final isCompact = MediaQuery.sizeOf(context).height < 840;
     final profile = ref.watch(birthProfileProvider).valueOrNull;
     final currentLocale = ref.watch(localeControllerProvider) ?? locale;
+    // `null` while loading (and stays effectively unused at 0) — see the
+    // "AI Chat History" row below for why that renders no subtitle at all.
+    final aiChatHistoryCount = ref
+        .watch(aiChatHistoryProvider)
+        .valueOrNull
+        ?.length;
 
     return Scaffold(
       backgroundColor: AppColors.cream,
@@ -396,11 +567,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
           children: [
             _ProfileHeaderCard(profile: profile, locale: locale),
             const SizedBox(height: 14),
-            _BirthProfilesRow(
-              hasProfile: profile != null,
-              l10n: l10n,
-              locale: locale,
-            ),
+            _BirthProfilesRow(l10n: l10n, locale: locale),
             const SizedBox(height: 18),
             _SectionLabel(l10n.profileAppLanguageLabel, locale: locale),
             const SizedBox(height: 10),
@@ -426,25 +593,37 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                     context,
                   ).push(fadeThroughRoute(const PremiumReportsScreen())),
                 ),
-                _MenuRow(
-                  icon: Icons.file_download_outlined,
-                  title: l10n.profileDownloadedPdfs,
-                  // No subtitle: PDF export history isn't tracked anywhere.
-                  locale: locale,
-                  // PDF export/download history isn't tracked anywhere yet.
-                  onTap: () {},
-                ),
+                // "Downloaded PDFs" ROW REMOVED 26 Aug 2026 (client request:
+                // "make all this workable or else delete it").
+                //
+                // It could not be made workable: the app has no PDF export
+                // at all. The "PDF" badges on the Reports screen are
+                // decorative, nothing is ever generated, and nothing is
+                // stored — so there is no history for this row to show and
+                // no screen it could usefully open. PDF export IS real
+                // contracted scope (Milestone 3, alongside premium reports
+                // and the AI chat); when it is built, restore this row
+                // pointing at the real download list. The
+                // `profileDownloadedPdfs` l10n string is intentionally left
+                // in all five ARB files so that restore is a one-line
+                // change.
                 _MenuRow(
                   emoji: '🔮',
                   title: l10n.profileAiChatHistory,
-                  // No subtitle for now. A REAL count is finally possible —
-                  // `/users/{uid}/aiChats` is written on every successful,
-                  // already-charged AI answer — but until that count is
-                  // actually read, showing a number would be inventing one.
+                  // A REAL count (26 Aug 2026) — `/users/{uid}/aiChats` is
+                  // written on every successful, already-charged AI answer,
+                  // and `aiChatHistoryProvider` reads it back. While it's
+                  // loading, or when there's genuinely no history yet, this
+                  // shows NO subtitle rather than "0" or a spinner — same
+                  // honesty rule as the "Birth profiles" row above.
+                  subtitle:
+                      aiChatHistoryCount == null || aiChatHistoryCount == 0
+                      ? null
+                      : l10n.profileAiChatHistoryCount(aiChatHistoryCount),
                   locale: locale,
-                  // AI chat history persistence is a listed SCOPE WATCH item
-                  // (projects/CLAUDE.md) — not built yet.
-                  onTap: () {},
+                  onTap: () => Navigator.of(
+                    context,
+                  ).push(fadeThroughRoute(const AiChatHistoryScreen())),
                 ),
                 _MenuRow(
                   emoji: '💳',
@@ -454,9 +633,20 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                   // happened, at a price that isn't even in the catalogue.
                   locale: locale,
                   isLast: true,
-                  // Payment history needs RevenueCat/Play Billing wired up
-                  // first (also a listed SCOPE WATCH item).
-                  onTap: () {},
+                  // Opens GOOGLE PLAY's own order history rather than trying
+                  // to render a payment list in-app — 26 Aug 2026, client's
+                  // own suggestion, and the correct call.
+                  //
+                  // Play is the payment processor and the system of record:
+                  // it holds the charge, the tax treatment, the refund state
+                  // and the receipt. Anything we displayed here would be a
+                  // second, lagging copy that can disagree with the real
+                  // one — and this row already shipped a fabricated
+                  // "Last: ₹1,999 · 12 Jun 2026" once, which is exactly that
+                  // failure mode. Deep-linking means the user always sees the
+                  // authoritative record, and it works today rather than
+                  // waiting on RevenueCat.
+                  onTap: _openPlayOrderHistory,
                 ),
               ],
             ),
@@ -493,9 +683,9 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                   // Now a real destination (21 Aug 2026): panchang location
                   // IS its own setting, because a daily almanac is about
                   // where the user IS while the birth city is fixed history.
-                  onTap: () => Navigator.of(context).push(
-                    fadeThroughRoute(const PanchangLocationScreen()),
-                  ),
+                  onTap: () => Navigator.of(
+                    context,
+                  ).push(fadeThroughRoute(const PanchangLocationScreen())),
                 ),
                 _MenuRow(
                   emoji: '👑',
@@ -505,25 +695,38 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                   // Entitlement must come from RevenueCat's CustomerInfo and
                   // is never asserted client-side.
                   locale: locale,
-                  // Real subscription management lives on Google Play, not
-                  // in this app — this would deep-link to the Play Store
-                  // subscription page once RevenueCat is wired up.
-                  onTap: () {},
+                  // Deep-links to Google Play's subscription management —
+                  // see `_openManageSubscription`'s doc comment for why the
+                  // app hands off rather than rendering its own copy.
+                  onTap: _openManageSubscription,
                 ),
                 _MenuRow(
                   emoji: '🔒',
                   title: l10n.profilePrivacySecurity,
                   locale: locale,
-                  // No privacy/security settings screen exists yet.
-                  onTap: () {},
+                  // Privacy Policy / Terms / Refunds / Account deletion —
+                  // see LegalLinksScreen's doc comment.
+                  onTap: () => Navigator.of(
+                    context,
+                  ).push(fadeThroughRoute(const LegalLinksScreen())),
                 ),
                 _MenuRow(
                   emoji: '💬',
                   title: l10n.profileHelpSupport,
                   locale: locale,
+                  // Opens the hosted support page.
+                  onTap: _openSupportPage,
+                ),
+                _MenuRow(
+                  emoji: '📧',
+                  title: l10n.profileEmailSupport,
+                  subtitle: l10n.profileEmailSupportSubtitle,
+                  locale: locale,
                   isLast: true,
-                  // No help/support screen exists yet.
-                  onTap: () {},
+                  // The support page above has no live chat/ticketing behind
+                  // it — this `mailto:` is the only real support channel
+                  // that exists today, so it must be reachable in one tap.
+                  onTap: _emailSupport,
                 ),
               ],
             ),
@@ -547,9 +750,9 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                   subtitle: l10n.profileInviteFriendsSubtitle,
                   locale: locale,
                   isLast: true,
-                  // Would open the OS share sheet with a referral link — no
-                  // share integration is wired up yet.
-                  onTap: () {},
+                  // Opens the OS share sheet with a short invite message +
+                  // the Play listing link — see `_shareInvite`.
+                  onTap: _shareInvite,
                 ),
               ],
             ),
@@ -562,16 +765,17 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                   emoji: '⭐',
                   title: l10n.profileRateApp,
                   locale: locale,
-                  // Would open the Play Store listing — no store-review
-                  // integration is wired up yet.
-                  onTap: () {},
+                  // Opens the Play Store listing — see
+                  // `_playStoreListingUri`'s doc comment for why this 404s
+                  // until the app is published.
+                  onTap: _openPlayStoreListing,
                 ),
                 _MenuRow(
                   emoji: '✍️',
                   title: l10n.profileSendFeedback,
                   locale: locale,
-                  // No feedback form/support email flow is wired up yet.
-                  onTap: () {},
+                  // Opens a `mailto:` compose screen — see `_sendFeedback`.
+                  onTap: _sendFeedback,
                 ),
                 _MenuRow(
                   emoji: '♻️',
@@ -588,6 +792,8 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
             _FooterActions(
               l10n: l10n,
               locale: locale,
+              isSigningOut: _isSigningOut,
+              isDeleting: _isDeleting,
               onLogOut: () => _confirmSignOut(l10n, locale),
               onDeleteAccount: () => _confirmDeleteAccount(l10n, locale),
             ),
@@ -711,32 +917,30 @@ class _ProfileHeaderCard extends StatelessWidget {
 }
 
 /// "Birth profiles" menu row (Figma node 29:12) — the count reflects the
-/// REAL saved-profile state (0 or 1); it never fabricates the design's
-/// hardcoded "2 profiles", same honesty principle as
-/// `kundli_static_data.dart`'s doc comment.
-class _BirthProfilesRow extends StatelessWidget {
-  const _BirthProfilesRow({
-    required this.hasProfile,
-    required this.l10n,
-    required this.locale,
-  });
+/// REAL saved-profile count from [savedBirthProfilesProvider] (25 Aug
+/// 2026, multi-profile support), never the design's hardcoded "2
+/// profiles", same honesty principle as `kundli_static_data.dart`'s doc
+/// comment. Loading/error states show no count rather than a wrong one.
+/// Tapping the row opens [BirthProfilesScreen].
+class _BirthProfilesRow extends ConsumerWidget {
+  const _BirthProfilesRow({required this.l10n, required this.locale});
 
-  final bool hasProfile;
   final AppLocalizations l10n;
   final Locale locale;
 
   @override
-  Widget build(BuildContext context) {
-    final count = hasProfile ? 1 : 0;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profiles = ref.watch(savedBirthProfilesProvider).valueOrNull;
+    final count = profiles?.length;
 
     return Semantics(
       button: true,
       label: l10n.profileBirthProfiles,
       child: PressableScale(
         borderRadius: BorderRadius.circular(16),
-        // Multi-profile management (family/friends) isn't built yet — see
-        // `BirthProfileRepository`'s doc comment.
-        onTap: () {},
+        onTap: () => Navigator.of(
+          context,
+        ).push(fadeThroughRoute(const BirthProfilesScreen())),
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
@@ -763,16 +967,17 @@ class _BirthProfilesRow extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Text(
-                l10n.profileProfileCount(count.toString()),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: AppFonts.body(
-                  locale,
-                  fontSize: 12,
-                  color: AppColors.hint,
+              if (count != null)
+                Text(
+                  l10n.profileProfileCount(count),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppFonts.body(
+                    locale,
+                    fontSize: 12,
+                    color: AppColors.hint,
+                  ),
                 ),
-              ),
               const SizedBox(width: 4),
               Icon(
                 Icons.arrow_forward_ios,
@@ -1053,70 +1258,126 @@ class _AppearanceRow extends ConsumerWidget {
 }
 
 /// "Log out" / "Delete account" footer (Figma node 29:69).
+///
+/// FIXED 26 Aug 2026 (client-reported: tapping "Log out" looked like it did
+/// nothing). `_isSigningOut`/`_isDeleting` were being set with `setState` in
+/// `_ProfileSettingsScreenState` all along, but this widget never accepted
+/// them, so both actions were guarded against a double-tap yet showed the
+/// user nothing while the network + Cloud Function round trip (which can
+/// take seconds) was in flight. Now each action renders a real busy state —
+/// see [_FooterActionButton] — and the OTHER action is disabled while one is
+/// running, so a user can't fire both at once either.
 class _FooterActions extends StatelessWidget {
   const _FooterActions({
     required this.l10n,
     required this.locale,
+    required this.isSigningOut,
+    required this.isDeleting,
     required this.onLogOut,
     required this.onDeleteAccount,
   });
 
   final AppLocalizations l10n;
   final Locale locale;
+  final bool isSigningOut;
+  final bool isDeleting;
   final VoidCallback onLogOut;
   final VoidCallback onDeleteAccount;
 
   @override
   Widget build(BuildContext context) {
+    final anyActionRunning = isSigningOut || isDeleting;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Semantics(
-          button: true,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(8),
-            onTap: onLogOut,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-              child: Text(
-                l10n.profileLogOut,
-                style: AppFonts.body(
-                  locale,
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.muted,
-                ),
-              ),
-            ),
-          ),
+        _FooterActionButton(
+          label: l10n.profileLogOut,
+          locale: locale,
+          color: AppColors.muted,
+          isBusy: isSigningOut,
+          // `null`, not just visually dimmed — genuinely not tappable while
+          // this or the other action is running.
+          onTap: anyActionRunning ? null : onLogOut,
         ),
         const SizedBox(width: 21),
-        Semantics(
-          button: true,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(8),
-            // Account deletion goes through the `deleteAccount` Cloud
-            // Function (24 Aug 2026) so the whole /users/{uid} subtree is
-            // removed atomically — client deletes of the account doc are
-            // forbidden by the deployed security rules (see
-            // projects/CLAUDE.md). See `_confirmDeleteAccount`/
-            // `_deleteAccount` above for the confirmation + call flow.
-            onTap: onDeleteAccount,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-              child: Text(
-                l10n.profileDeleteAccount,
-                style: AppFonts.body(
-                  locale,
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.ashubhFg,
-                ),
-              ),
+        // Account deletion goes through the `deleteAccount` Cloud
+        // Function (24 Aug 2026) so the whole /users/{uid} subtree is
+        // removed atomically — client deletes of the account doc are
+        // forbidden by the deployed security rules (see
+        // projects/CLAUDE.md). See `_confirmDeleteAccount`/
+        // `_deleteAccount` above for the confirmation + call flow.
+        _FooterActionButton(
+          label: l10n.profileDeleteAccount,
+          locale: locale,
+          color: AppColors.ashubhFg,
+          isBusy: isDeleting,
+          onTap: anyActionRunning ? null : onDeleteAccount,
+        ),
+      ],
+    );
+  }
+}
+
+/// One footer action button — small muted text (never a filled CTA, to
+/// match this footer's deliberately low-emphasis styling) that swaps its
+/// label for a same-size inline spinner while [isBusy], and dims to indicate
+/// "disabled" when [onTap] is `null` but this particular button isn't the
+/// busy one (i.e. the OTHER action is running).
+class _FooterActionButton extends StatelessWidget {
+  const _FooterActionButton({
+    required this.label,
+    required this.locale,
+    required this.color,
+    required this.isBusy,
+    required this.onTap,
+  });
+
+  final String label;
+  final Locale locale;
+  final Color color;
+  final bool isBusy;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      enabled: onTap != null,
+      label: label,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+          // Fixed-size box so the row doesn't reflow when the label swaps
+          // for the spinner.
+          child: SizedBox(
+            height: 15,
+            child: Center(
+              child: isBusy
+                  ? SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(color),
+                      ),
+                    )
+                  : Text(
+                      label,
+                      style: AppFonts.body(
+                        locale,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w500,
+                        color: onTap == null
+                            ? color.withValues(alpha: 0.4)
+                            : color,
+                      ),
+                    ),
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 }

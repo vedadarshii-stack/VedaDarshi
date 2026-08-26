@@ -7,8 +7,7 @@ import '../../core/theme/app_fonts.dart';
 import '../../core/widgets/app_radio_dot.dart';
 import '../../l10n/app_localizations.dart';
 import '../profile/birth_profile.dart';
-import '../matching/partner_details_screen.dart';
-import 'guest_profiles.dart';
+import '../profile/birth_profile_editor_screen.dart';
 import '../profile/birth_profile_repository.dart';
 import 'kundli_chart_screen.dart';
 import 'kundli_static_data.dart';
@@ -41,13 +40,26 @@ class KundliInputScreen extends ConsumerStatefulWidget {
 class _KundliInputScreenState extends ConsumerState<KundliInputScreen> {
   _ChartStyle _chartStyle = _ChartStyle.northIndian;
 
-  /// -1 = the account owner's own profile; 0..n index into
-  /// `guestProfilesProvider`.
-  int _selectedProfileIndex = -1;
+  /// `null` = the account owner's own profile; otherwise the
+  /// [SavedBirthProfile.id] of the selected family/friend profile from
+  /// [savedBirthProfilesProvider].
+  String? _selectedProfileId;
 
   void _selectChartStyle(_ChartStyle style) {
     if (style == _chartStyle) return;
     setState(() => _chartStyle = style);
+  }
+
+  /// Looks up the currently-selected family/friend profile by id — `null`
+  /// when the account owner's own profile is selected, or the id no longer
+  /// exists in [guests] (e.g. it was deleted from another screen).
+  BirthProfile? _selectedGuestProfile(List<SavedBirthProfile> guests) {
+    final id = _selectedProfileId;
+    if (id == null) return null;
+    for (final guest in guests) {
+      if (guest.id == id) return guest.profile;
+    }
+    return null;
   }
 
   @override
@@ -62,7 +74,19 @@ class _KundliInputScreenState extends ConsumerState<KundliInputScreen> {
     // loading state or render zero profile cards, so `valueOrNull` covers
     // loading/error/null with the same fallback.
     final profile = ref.watch(birthProfileProvider).valueOrNull;
-    final guests = ref.watch(guestProfilesProvider);
+    // Family/friend profiles — real and persisted since 25 Aug 2026 (see
+    // `birth_profile_repository.dart`'s `savedBirthProfilesProvider`).
+    // `birthProfileProvider` above stays untouched and still means only the
+    // account owner's own profile; this list is filtered to exclude the
+    // primary entry it already returns, so the two never show the account
+    // owner's profile twice.
+    final savedProfiles =
+        ref.watch(savedBirthProfilesProvider).valueOrNull ??
+        const <SavedBirthProfile>[];
+    final guests = [
+      for (final saved in savedProfiles)
+        if (!saved.isPrimary) saved,
+    ];
     final trimmedName = profile?.fullName.trim();
     final profileName = (trimmedName != null && trimmedName.isNotEmpty)
         ? trimmedName
@@ -101,23 +125,27 @@ class _KundliInputScreenState extends ConsumerState<KundliInputScreen> {
                       profileName: profileName,
                       profileSummary: profileSummary,
                       guests: guests,
-                      selectedIndex: _selectedProfileIndex,
-                      onSelect: (index) =>
-                          setState(() => _selectedProfileIndex = index),
+                      selectedId: _selectedProfileId,
+                      onSelect: (id) =>
+                          setState(() => _selectedProfileId = id),
                       onAdd: () async {
-                        final entered = await Navigator.of(context)
-                            .push<BirthProfile>(
-                              fadeThroughRoute(const PartnerDetailsScreen()),
+                        // Routes into the SAME add flow as the "Birth
+                        // profiles" screen (`birth_profiles_screen.dart`) —
+                        // `BirthProfileEditorScreen` persists the new
+                        // profile itself (Firestore
+                        // `/users/{uid}/birthProfiles`) and invalidates
+                        // `savedBirthProfilesProvider`, so it survives a
+                        // restart instead of living only in this session.
+                        final added = await Navigator.of(context)
+                            .push<SavedBirthProfile>(
+                              fadeThroughRoute(
+                                const BirthProfileEditorScreen(),
+                              ),
                             );
-                        if (entered == null || !mounted) return;
-                        ref
-                            .read(guestProfilesProvider.notifier)
-                            .add(entered);
+                        if (added == null || !mounted) return;
                         // Select what was just added — the user entered it
                         // to look at it.
-                        setState(
-                          () => _selectedProfileIndex = guests.length,
-                        );
+                        setState(() => _selectedProfileId = added.id);
                       },
                     ),
                     const SizedBox(height: 18),
@@ -138,10 +166,7 @@ class _KundliInputScreenState extends ConsumerState<KundliInputScreen> {
                       chartStyle: _chartStyle,
                       // null = the account owner; otherwise the family/
                       // friend selected above.
-                      subject: _selectedProfileIndex >= 0 &&
-                              _selectedProfileIndex < guests.length
-                          ? guests[_selectedProfileIndex]
-                          : null,
+                      subject: _selectedGuestProfile(guests),
                     ),
                   ],
                 ),
@@ -232,7 +257,7 @@ class _ProfileList extends StatelessWidget {
     required this.profileName,
     required this.profileSummary,
     required this.guests,
-    required this.selectedIndex,
+    required this.selectedId,
     required this.onSelect,
     required this.onAdd,
   });
@@ -242,11 +267,12 @@ class _ProfileList extends StatelessWidget {
   final String profileName;
   final String profileSummary;
 
-  /// Extra people added this session. -1 in [selectedIndex] means the
-  /// account owner's own profile.
-  final List<BirthProfile> guests;
-  final int selectedIndex;
-  final ValueChanged<int> onSelect;
+  /// Persisted family/friend profiles (25 Aug 2026 — real
+  /// `/users/{uid}/birthProfiles` documents, not a session-only list). A
+  /// `null` [selectedId] means the account owner's own profile.
+  final List<SavedBirthProfile> guests;
+  final String? selectedId;
+  final ValueChanged<String?> onSelect;
   final VoidCallback onAdd;
 
   @override
@@ -257,19 +283,20 @@ class _ProfileList extends StatelessWidget {
           name: profileName,
           summary: profileSummary,
           locale: locale,
-          isSelected: selectedIndex == -1,
-          onTap: () => onSelect(-1),
+          isSelected: selectedId == null,
+          onTap: () => onSelect(null),
         ),
-        // Family/friends added this session — 21 Aug 2026. Before this the
-        // list could only ever contain the account owner.
-        for (var i = 0; i < guests.length; i++) ...[
+        // Family/friends — persisted since 25 Aug 2026 (multi-profile
+        // support). Before that the list could only ever contain the
+        // account owner.
+        for (final guest in guests) ...[
           const SizedBox(height: 10),
           _ProfileCard(
-            name: guests[i].fullName,
-            summary: guests[i].summaryLine,
+            name: guest.profile.fullName,
+            summary: guest.profile.summaryLine,
             locale: locale,
-            isSelected: selectedIndex == i,
-            onTap: () => onSelect(i),
+            isSelected: selectedId == guest.id,
+            onTap: () => onSelect(guest.id),
           ),
         ],
         const SizedBox(height: 10),

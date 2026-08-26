@@ -81,13 +81,12 @@ class BirthProfile {
     );
   }
 
-  /// Maps this profile onto `/users/{uid}/birthProfiles/primary` (see
-  /// `lib/core/data/firestore_refs.dart`).
-  ///
-  /// `isPrimary: true` is written unconditionally — this factory only ever
-  /// produces the account owner's own profile document; a future
-  /// family/friend profile would get its own writer.
-  Map<String, dynamic> toFirestore() {
+  /// Maps this profile onto a document under `/users/{uid}/birthProfiles`
+  /// (see `lib/core/data/firestore_refs.dart`) — `/primary` for the account
+  /// owner's own profile ([isPrimary] `true`, the default), or an
+  /// auto-generated id for a family/friend profile ([isPrimary] `false`,
+  /// passed explicitly by `BirthProfileRepository.add`/`update`).
+  Map<String, dynamic> toFirestore({bool isPrimary = true}) {
     return {
       'fullName': fullName,
       'gender': gender.name,
@@ -113,7 +112,7 @@ class BirthProfile {
       'dateOfBirthYmd': _dateOnlyIso(dateOfBirth),
       'timeOfBirth': _formatTimeOfDay(timeOfBirth),
       'isBirthTimeUnknown': isBirthTimeUnknown,
-      'isPrimary': true,
+      'isPrimary': isPrimary,
       'city': {
         'name': city.name,
         'state': city.state,

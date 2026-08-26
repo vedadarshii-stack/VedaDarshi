@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/vedika/vedika_text_sanitizer.dart';
 import '../profile/birth_profile.dart';
 
 /// Birth details for ONE partner, in the exact shape Vedika's
@@ -254,8 +255,13 @@ class GunaMilanInterpretation {
   factory GunaMilanInterpretation.fromJson(Map<String, dynamic>? json) {
     if (json == null) return const GunaMilanInterpretation();
     return GunaMilanInterpretation(
-      summary: json['summary'] as String?,
-      marriageProspects: json['marriageProspects'] as String?,
+      // stripVedikaAttribution: this is the field a live "— Vedika"
+      // trailing attribution was actually observed on (26 Aug 2026, on
+      // marriageProspects) — see that function's doc comment.
+      summary: stripVedikaAttribution(json['summary'] as String?),
+      marriageProspects: stripVedikaAttribution(
+        json['marriageProspects'] as String?,
+      ),
       strengths: _stringList(json['strengths']),
       challenges: _stringList(json['challenges']),
       guidance: _stringList(json['guidance']),
@@ -414,5 +420,9 @@ class GunaMilanResult {
 
 List<String> _stringList(dynamic raw) {
   if (raw is! List) return const [];
-  return raw.whereType<String>().toList();
+  return raw
+      .whereType<String>()
+      .map(stripVedikaAttribution)
+      .whereType<String>()
+      .toList();
 }

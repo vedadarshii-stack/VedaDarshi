@@ -120,11 +120,13 @@ class _Header extends StatelessWidget {
 /// Selection is fully functional local state AND drives the horoscope
 /// CONTENT: the selected [HoroscopePeriod] is passed straight through to
 /// [HoroscopeDetailScreen] when a sign card is tapped (see [_SignCard]),
-/// which picks the matching Vedika endpoint/provider — daily, weekly and
-/// monthly are all real; yearly has no Vedika endpoint and stays static
-/// regardless of what's selected here (see `horoscope_repository.dart` and
-/// the `HoroscopePeriod.yearly` branch's doc comment in
-/// `horoscope_detail_screen.dart`).
+/// which picks the matching Vedika endpoint/provider — daily, weekly,
+/// monthly AND yearly are all real, backed by their own provider (see
+/// `horoscope_repository.dart`; yearly is a `POST` to
+/// `/v2/astrology/prediction/yearly`, a different path family from the
+/// other three — an earlier investigation wrongly concluded yearly had no
+/// endpoint at all after only the pattern-matched `GET .../yearly` path
+/// 404'd).
 class _PeriodChips extends StatelessWidget {
   const _PeriodChips({
     required this.l10n,

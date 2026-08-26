@@ -1,6 +1,7 @@
 import { onRequest } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { VEDIKA_API_KEY, VEDIKA_BASE_URL, vedikaHeaders } from "./config";
+import { cacheKey, cacheTtlSeconds } from "./vedikaCache";
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -20,38 +21,9 @@ export { deleteAccount } from "./deleteAccount";
  * client's balance.
  */
 
-/**
- * How long a cached response stays fresh, by endpoint family.
- *
- * These are what keep the bill down. Panchang and horoscope are identical
- * for every user in a location/sign for a whole day, so without caching we
- * would pay per user per screen-open instead of once per day. A natal chart
- * (kundli) and a guna-milan match never change at all for the same inputs,
- * so they are cached effectively forever.
- */
-function cacheTtlSeconds(path: string): number {
-  if (path.includes("/panchang") || path.includes("/daily/")) return 60 * 60 * 6;
-  if (path.includes("/horoscope")) return 60 * 60 * 6;
-  if (path.includes("/kundli") || path.includes("/planet-positions")) {
-    return 60 * 60 * 24 * 365;
-  }
-  if (path.includes("guna-milan") || path.includes("matching")) {
-    return 60 * 60 * 24 * 365;
-  }
-  return 60 * 60; // conservative default
-}
-
-/** Firestore document ids may not contain "/" — hash the request instead. */
-function cacheKey(method: string, path: string, query: string, body: string) {
-  const raw = `${method} ${path}?${query} ${body}`;
-  // FNV-1a: good enough to key a cache, and dependency-free.
-  let h = 0x811c9dc5;
-  for (let i = 0; i < raw.length; i++) {
-    h ^= raw.charCodeAt(i);
-    h = Math.imul(h, 0x01000193) >>> 0;
-  }
-  return `${h.toString(16)}_${raw.length}`;
-}
+// `cacheKey`/`cacheTtlSeconds` now live in ./vedikaCache — shared with
+// dailyPrewarm.ts so a pre-warmed entry and a real request always compute
+// the SAME key. See that file's doc comment for the incident this fixes.
 
 /**
  * Transparent proxy for the Vedika Intelligence API.
@@ -115,6 +87,7 @@ export const vedika = onRequest(
         const ageSeconds = (Date.now() - d.fetchedAtMs) / 1000;
         if (ageSeconds < ttl) {
           res.set("X-Vedika-Cache", "HIT");
+          res.set("X-Cache", "HIT");
           res.status(200).json(d.payload);
           return;
         }
@@ -180,6 +153,7 @@ export const vedika = onRequest(
     }
 
     res.set("X-Vedika-Cache", "MISS");
+    res.set("X-Cache", "MISS");
     res.status(upstream.status).json(payload);
   }
 );

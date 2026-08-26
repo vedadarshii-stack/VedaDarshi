@@ -10,6 +10,17 @@
 /// takes down an entire parsed response.
 library;
 
+import '../../core/vedika/vedika_text_sanitizer.dart';
+
+/// Parses one free-text prose field (a dosha `description`, a summary
+/// `overview`, …), stripping a trailing "— Vedika" vendor attribution if
+/// the API included one — see [stripVedikaAttribution]'s doc comment.
+/// `null` if [value] isn't a non-blank string.
+String? parseFreeText(dynamic value) {
+  if (value is! String) return null;
+  return stripVedikaAttribution(value);
+}
+
 /// Parses a nested JSON object with [fromJson], or `null` if [value] isn't
 /// a `Map` or [fromJson] itself throws on it.
 T? parseObj<T>(dynamic value, T Function(Map<String, dynamic>) fromJson) {
@@ -41,12 +52,16 @@ List<T> parseList<T>(
   return result;
 }
 
-/// Parses a JSON array of strings, dropping any non-string entries.
+/// Parses a JSON array of strings, dropping any non-string entries and
+/// stripping a trailing "— Vedika" vendor attribution from each one that
+/// has one — these lists (`keyStrengths`, `tips`, `remedies`, …) are
+/// exactly the kind of AI-generated prose an attribution line could land
+/// on, same as [parseFreeText]'s single-string case.
 List<String> parseStrings(dynamic value) {
   if (value is! List) return const [];
   return [
     for (final entry in value)
-      if (entry is String) entry,
+      if (entry is String) ?stripVedikaAttribution(entry),
   ];
 }
 

@@ -143,15 +143,18 @@ class _PartnerDetailsScreenState extends ConsumerState<PartnerDetailsScreen> {
   }
 
   /// RETURNS the profile rather than storing it — changed 21 Aug 2026 so
-  /// this form can serve more than one caller.
+  /// this form could serve more than one caller.
   ///
   /// It was written specifically for Gun Milan and wrote straight into
-  /// `partnerProfileProvider`. The Kundli screen's "Add family or friend"
-  /// button needs exactly the same four facts about exactly the same kind
-  /// of person, but stores them somewhere else — and the two must not share
-  /// a slot, or adding a family member would silently replace the partner
-  /// you were about to match against. Popping the value lets each caller
-  /// decide where it goes.
+  /// `partnerProfileProvider`; popping the value instead let another
+  /// caller (briefly, the Kundli screen's "Add family or friend" button)
+  /// reuse this exact form for a different destination. That second
+  /// caller moved to `birth_profile_editor_screen.dart` on 25 Aug 2026,
+  /// once family/friend profiles needed real Firestore persistence rather
+  /// than a session-only slot — this screen is Gun Milan-only again, but
+  /// is kept returning its value rather than writing straight to
+  /// `partnerProfileProvider`, since a future caller may need the same
+  /// popped-value shape this one already provides.
   void _save() {
     if (!_canSave) return;
     Navigator.of(context).pop(

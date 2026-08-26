@@ -371,14 +371,14 @@ class AppLocalizationsHi extends AppLocalizations {
   String get premiumCta => 'प्रीमियम';
 
   @override
-  String get horoscopeSandboxBanner => 'सैंपल डेटा — वेदिका सैंडबॉक्स मोड';
+  String get horoscopeSandboxBanner => 'सैंपल डेटा — सैंडबॉक्स मोड';
 
   @override
   String get horoscopeErrorTitle => 'राशिफल लोड नहीं हो सका';
 
   @override
   String get horoscopeErrorMessage =>
-      'वेदिका से जुड़ने में समस्या हुई। कृपया अपना कनेक्शन जांचें और फिर से प्रयास करें।';
+      'ज्योतिष सेवा से जुड़ने में समस्या हुई। कृपया अपना कनेक्शन जांचें और फिर से प्रयास करें।';
 
   @override
   String get horoscopeRetryAction => 'पुनः प्रयास करें';
@@ -405,6 +405,20 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get monthlyKeyDatesTitle => 'इस माह की महत्वपूर्ण तिथियां';
+
+  @override
+  String get yearlySummaryTitle => 'इस वर्ष का सारांश';
+
+  @override
+  String get yearlyScoresTitle => 'इस वर्ष के स्कोर';
+
+  @override
+  String yearlyOverallRating(int percent) {
+    return 'कुल $percent%';
+  }
+
+  @override
+  String get luckyDay => 'शुभ दिन';
 
   @override
   String get generateKundliTitle => 'कुंडली बनाएं';
@@ -807,10 +821,6 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
-  String get billingFinePrint =>
-      'Google Play के माध्यम से बिल किया गया · कभी भी रद्द करें · RevenueCat के साथ सुरक्षित';
-
-  @override
   String get articlesTitle => 'ज्ञान और लेख';
 
   @override
@@ -913,9 +923,57 @@ class AppLocalizationsHi extends AppLocalizations {
   String get profileBirthProfiles => 'जन्म प्रोफ़ाइल';
 
   @override
-  String profileProfileCount(String count) {
-    return '$count प्रोफ़ाइल';
+  String profileProfileCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count प्रोफ़ाइल',
+      one: '$count प्रोफ़ाइल',
+    );
+    return '$_temp0';
   }
+
+  @override
+  String get birthProfilesYouBadge => 'आप';
+
+  @override
+  String get birthProfilesDelete => 'हटाएं';
+
+  @override
+  String get birthProfilesDeleteConfirmTitle => 'इस प्रोफ़ाइल को हटाएं?';
+
+  @override
+  String birthProfilesDeleteConfirmMessage(String name) {
+    return 'यह $name की सहेजी गई जन्म प्रोफ़ाइल स्थायी रूप से हटा देगा। इसे पूर्ववत नहीं किया जा सकता।';
+  }
+
+  @override
+  String get birthProfilesPrimaryDeleteHint =>
+      'आपकी अपनी प्रोफ़ाइल यहां से नहीं हटाई जा सकती — इसके बजाय सेटिंग्स में खाता हटाएं का उपयोग करें।';
+
+  @override
+  String get birthProfilesEditorAddTitle => 'प्रोफ़ाइल जोड़ें';
+
+  @override
+  String get birthProfilesEditorEditTitle => 'प्रोफ़ाइल संपादित करें';
+
+  @override
+  String get birthProfilesEditorSave => 'प्रोफ़ाइल सहेजें';
+
+  @override
+  String get birthProfilesSaveFailed =>
+      'यह प्रोफ़ाइल सहेजी नहीं जा सकी। कृपया पुनः प्रयास करें।';
+
+  @override
+  String get birthProfilesDeleteFailed =>
+      'यह प्रोफ़ाइल हटाई नहीं जा सकी। कृपया पुनः प्रयास करें।';
+
+  @override
+  String get birthProfilesSignInRequired =>
+      'परिवार और मित्र प्रोफ़ाइल जोड़ने के लिए साइन इन करें।';
+
+  @override
+  String get birthProfilesEmpty => 'अभी तक कोई प्रोफ़ाइल नहीं है।';
 
   @override
   String get profileAppLanguageLabel => 'ऐप की भाषा';
@@ -931,6 +989,27 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get profileAiChatHistory => 'AI चैट इतिहास';
+
+  @override
+  String profileAiChatHistoryCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count बातचीत',
+      one: '$count बातचीत',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get aiChatHistoryEmptyTitle => 'अभी तक कोई बातचीत नहीं';
+
+  @override
+  String get aiChatHistoryEmptyMessage =>
+      'करियर, विवाह, स्वास्थ्य या सही मुहूर्त के बारे में ऋषि AI से पूछें — आपकी बातचीत यहां दिखाई देगी।';
+
+  @override
+  String get aiChatHistoryEmptyAction => 'ऋषि AI से पूछें';
 
   @override
   String get profilePaymentHistory => 'भुगतान इतिहास';
@@ -1031,6 +1110,35 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get accountDeletionErrorGeneric =>
       'कुछ गलत हो गया। कृपया पुनः प्रयास करें।';
+
+  @override
+  String get legalPrivacyPolicy => 'गोपनीयता नीति';
+
+  @override
+  String get legalTermsOfService => 'सेवा की शर्तें';
+
+  @override
+  String get legalRefundsCancellation => 'रिफ़ंड और रद्दीकरण';
+
+  @override
+  String get legalAccountDataDeletion => 'खाता और डेटा हटाना';
+
+  @override
+  String get profileEmailSupport => 'हमें ईमेल करें';
+
+  @override
+  String get profileEmailSupportSubtitle => 'Vedadarshii@gmail.com';
+
+  @override
+  String get supportEmailSubject => 'वेददर्शी सहायता';
+
+  @override
+  String get feedbackEmailSubject => 'वेददर्शी प्रतिक्रिया';
+
+  @override
+  String profileInviteFriendsMessage(String link) {
+    return 'वेददर्शी से जुड़ें — वैदिक ज्योतिष, पंचांग और राशिफल का आपका रोज़ का साथी। यहां से डाउनलोड करें: $link';
+  }
 
   @override
   String get kundliSandboxBanner =>

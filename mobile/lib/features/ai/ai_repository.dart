@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/auth/auth_providers.dart';
 import '../../core/data/firestore_refs.dart';
+import '../../core/vedika/vedika_text_sanitizer.dart';
 
 /// Region the `askAiAstrologer` Cloud Function is deployed to (see
 /// `projects/CLAUDE.md`'s Vedika API integration section — the whole
@@ -118,9 +119,16 @@ class AiChatHistoryEntry {
     final createdAtField = data['createdAt'];
     return AiChatHistoryEntry(
       question: question,
-      answer: answer,
+      // stripVedikaAttribution: defense-in-depth for history rows written
+      // before `askQuestion` started sanitizing on the way in — see that
+      // method's own comment.
+      answer: stripVedikaAttribution(answer) ?? answer,
       followUps: rawFollowUps is List
-          ? rawFollowUps.whereType<String>().toList()
+          ? rawFollowUps
+                .whereType<String>()
+                .map(stripVedikaAttribution)
+                .whereType<String>()
+                .toList()
           : const [],
       language: data['language'] as String?,
       conversationId: data['conversationId'] as String?,
@@ -194,11 +202,23 @@ class AiRepository {
       );
       final result = await callable.call(payload);
       final data = Map<String, dynamic>.from(result.data as Map);
+      final rawAnswer = data['answer'] as String;
       final rawFollowUps = data['followUps'];
       return AskAiResult(
-        answer: data['answer'] as String,
+        // stripVedikaAttribution: the answer is Vedika's own AI-generated
+        // text (client chose Vedika's AI over OpenAI, 4 Aug 2026 — see
+        // `projects/CLAUDE.md`), so it's exactly the kind of free-form
+        // prose the "— Vedika" attribution has been observed on. Falls
+        // back to the raw answer in the practically-impossible case the
+        // whole answer WAS just an attribution line, rather than ever
+        // showing an empty response.
+        answer: stripVedikaAttribution(rawAnswer) ?? rawAnswer,
         followUps: rawFollowUps is List
-            ? rawFollowUps.whereType<String>().toList()
+            ? rawFollowUps
+                  .whereType<String>()
+                  .map(stripVedikaAttribution)
+                  .whereType<String>()
+                  .toList()
             : const [],
         conversationId: data['conversationId'] as String?,
         used: (data['used'] as num).toInt(),

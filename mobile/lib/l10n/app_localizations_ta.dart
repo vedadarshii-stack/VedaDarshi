@@ -373,15 +373,14 @@ class AppLocalizationsTa extends AppLocalizations {
   String get premiumCta => 'பிரீமியம்';
 
   @override
-  String get horoscopeSandboxBanner =>
-      'மாதிரி தரவு — வேதிகா சாண்ட்பாக்ஸ் பயன்முறை';
+  String get horoscopeSandboxBanner => 'மாதிரி தரவு — சாண்ட்பாக்ஸ் பயன்முறை';
 
   @override
   String get horoscopeErrorTitle => 'ராசிபலனை ஏற்ற முடியவில்லை';
 
   @override
   String get horoscopeErrorMessage =>
-      'வேதிகாவை அணுகுவதில் சிக்கல் ஏற்பட்டது. உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.';
+      'ஜோதிட சேவையை அணுகுவதில் சிக்கல் ஏற்பட்டது. உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.';
 
   @override
   String get horoscopeRetryAction => 'மீண்டும் முயற்சிக்கவும்';
@@ -408,6 +407,20 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get monthlyKeyDatesTitle => 'இந்த மாதத்தின் முக்கிய தேதிகள்';
+
+  @override
+  String get yearlySummaryTitle => 'இந்த ஆண்டின் சுருக்கம்';
+
+  @override
+  String get yearlyScoresTitle => 'இந்த ஆண்டின் மதிப்பெண்கள்';
+
+  @override
+  String yearlyOverallRating(int percent) {
+    return 'மொத்தம் $percent%';
+  }
+
+  @override
+  String get luckyDay => 'அதிர்ஷ்ட நாள்';
 
   @override
   String get generateKundliTitle => 'ஜாதகம் உருவாக்கு';
@@ -815,10 +828,6 @@ class AppLocalizationsTa extends AppLocalizations {
   }
 
   @override
-  String get billingFinePrint =>
-      'Google Play வழியாக பில் செய்யப்படுகிறது · எப்போது வேண்டுமானாலும் ரத்து செய்யலாம் · RevenueCat மூலம் பாதுகாப்பானது';
-
-  @override
   String get articlesTitle => 'ஞானம் & கட்டுரைகள்';
 
   @override
@@ -922,9 +931,57 @@ class AppLocalizationsTa extends AppLocalizations {
   String get profileBirthProfiles => 'பிறப்பு சுயவிவரங்கள்';
 
   @override
-  String profileProfileCount(String count) {
-    return '$count சுயவிவரம்';
+  String profileProfileCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count சுயவிவரங்கள்',
+      one: '$count சுயவிவரம்',
+    );
+    return '$_temp0';
   }
+
+  @override
+  String get birthProfilesYouBadge => 'நீங்கள்';
+
+  @override
+  String get birthProfilesDelete => 'நீக்கு';
+
+  @override
+  String get birthProfilesDeleteConfirmTitle => 'இந்த சுயவிவரத்தை நீக்கவா?';
+
+  @override
+  String birthProfilesDeleteConfirmMessage(String name) {
+    return 'இது $name இன் சேமிக்கப்பட்ட பிறப்பு சுயவிவரத்தை நிரந்தரமாக நீக்கும். இதை மீட்க முடியாது.';
+  }
+
+  @override
+  String get birthProfilesPrimaryDeleteHint =>
+      'உங்கள் சொந்த சுயவிவரத்தை இங்கே நீக்க முடியாது — அதற்கு பதிலாக அமைப்புகளில் கணக்கை நீக்கு-ஐப் பயன்படுத்தவும்.';
+
+  @override
+  String get birthProfilesEditorAddTitle => 'சுயவிவரத்தைச் சேர்';
+
+  @override
+  String get birthProfilesEditorEditTitle => 'சுயவிவரத்தைத் திருத்து';
+
+  @override
+  String get birthProfilesEditorSave => 'சுயவிவரத்தைச் சேமி';
+
+  @override
+  String get birthProfilesSaveFailed =>
+      'இந்த சுயவிவரத்தைச் சேமிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get birthProfilesDeleteFailed =>
+      'இந்த சுயவிவரத்தை நீக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get birthProfilesSignInRequired =>
+      'குடும்பம் & நண்பர் சுயவிவரங்களைச் சேர்க்க உள்நுழையவும்.';
+
+  @override
+  String get birthProfilesEmpty => 'இதுவரை சுயவிவரங்கள் இல்லை.';
 
   @override
   String get profileAppLanguageLabel => 'ஆப் மொழி';
@@ -940,6 +997,27 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get profileAiChatHistory => 'AI அரட்டை வரலாறு';
+
+  @override
+  String profileAiChatHistoryCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count உரையாடல்கள்',
+      one: '$count உரையாடல்',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get aiChatHistoryEmptyTitle => 'இதுவரை உரையாடல்கள் இல்லை';
+
+  @override
+  String get aiChatHistoryEmptyMessage =>
+      'உங்கள் வேலை, திருமணம், ஆரோக்கியம் அல்லது சரியான முகூர்த்தம் பற்றி ரிஷி AI-யிடம் கேளுங்கள் — உங்கள் உரையாடல்கள் இங்கே தோன்றும்.';
+
+  @override
+  String get aiChatHistoryEmptyAction => 'ரிஷி AI-யிடம் கேளுங்கள்';
 
   @override
   String get profilePaymentHistory => 'பணம் செலுத்திய வரலாறு';
@@ -1041,6 +1119,35 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get accountDeletionErrorGeneric =>
       'ஏதோ தவறு நடந்தது. மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get legalPrivacyPolicy => 'தனியுரிமைக் கொள்கை';
+
+  @override
+  String get legalTermsOfService => 'சேவை விதிமுறைகள்';
+
+  @override
+  String get legalRefundsCancellation => 'பணத்திரும்பப் பெறுதல் & ரத்து';
+
+  @override
+  String get legalAccountDataDeletion => 'கணக்கு & தரவு நீக்கம்';
+
+  @override
+  String get profileEmailSupport => 'எங்களுக்கு மின்னஞ்சல் அனுப்பவும்';
+
+  @override
+  String get profileEmailSupportSubtitle => 'Vedadarshii@gmail.com';
+
+  @override
+  String get supportEmailSubject => 'வேததர்ஷி ஆதரவு';
+
+  @override
+  String get feedbackEmailSubject => 'வேததர்ஷி கருத்து';
+
+  @override
+  String profileInviteFriendsMessage(String link) {
+    return 'வேததர்ஷியில் சேருங்கள் — வேத ஜோதிடம், பஞ்சாங்கம் மற்றும் ராசிபலனுக்கான உங்கள் தினசரி துணை. இங்கே பதிவிறக்கவும்: $link';
+  }
 
   @override
   String get kundliSandboxBanner =>

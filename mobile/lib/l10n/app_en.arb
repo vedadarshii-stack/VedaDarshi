@@ -492,7 +492,7 @@
   "@premiumCta": {
     "description": "Call-to-action label on the premium teaser card of the Horoscope Detail screen."
   },
-  "horoscopeSandboxBanner": "Sample data — Vedika sandbox mode",
+  "horoscopeSandboxBanner": "Sample data — sandbox mode",
   "@horoscopeSandboxBanner": {
     "description": "Banner shown on the Horoscope Detail screen when the app is pointed at Vedika's sandbox, warning that the reading is fixed sample data, not the user's own."
   },
@@ -500,7 +500,7 @@
   "@horoscopeErrorTitle": {
     "description": "Title of the error state shown on the Horoscope Detail screen when the Vedika API call fails."
   },
-  "horoscopeErrorMessage": "Something went wrong reaching Vedika. Check your connection and try again.",
+  "horoscopeErrorMessage": "Something went wrong reaching the astrology service. Check your connection and try again.",
   "@horoscopeErrorMessage": {
     "description": "Message of the error state shown on the Horoscope Detail screen when the Vedika API call fails."
   },
@@ -541,6 +541,28 @@
   "monthlyKeyDatesTitle": "Key Dates This Month",
   "@monthlyKeyDatesTitle": {
     "description": "Title of the key-dates chip card on the Horoscope Detail screen's Monthly period, sourced from Vedika's monthly keyDates field."
+  },
+  "yearlySummaryTitle": "This Year's Overview",
+  "@yearlySummaryTitle": {
+    "description": "Title of the overview card on the Horoscope Detail screen's Yearly period, sourced from Vedika's yearly `summary` field."
+  },
+  "yearlyScoresTitle": "This Year's Scores",
+  "@yearlyScoresTitle": {
+    "description": "Title of the score-bars card on the Horoscope Detail screen's Yearly period (the Daily period's equivalent card uses todaysScores instead)."
+  },
+  "yearlyOverallRating": "Overall {percent}%",
+  "@yearlyOverallRating": {
+    "description": "Badge next to the scores card title on the Horoscope Detail screen's Yearly period, showing Vedika's yearly overallScore.",
+    "placeholders": {
+      "percent": {
+        "type": "int",
+        "example": "72"
+      }
+    }
+  },
+  "luckyDay": "Lucky Day",
+  "@luckyDay": {
+    "description": "Label of the lucky-day card on the Horoscope Detail screen's Yearly period, sourced from Vedika's yearly luckyElements.luckyDay field."
   },
   "generateKundliTitle": "Generate Kundli",
   "@generateKundliTitle": {
@@ -1104,10 +1126,6 @@
       }
     }
   },
-  "billingFinePrint": "Billed via Google Play · Cancel anytime · Secure with RevenueCat",
-  "@billingFinePrint": {
-    "description": "Fine-print notice at the bottom of the Subscription Paywall."
-  },
   "articlesTitle": "Wisdom & Articles",
   "@articlesTitle": {
     "description": "Header title on the Articles screen."
@@ -1266,15 +1284,69 @@
   "@profileBirthProfiles": {
     "description": "Title of the birth-profiles menu row on the Profile & Settings screen."
   },
-  "profileProfileCount": "{count} profile",
+  "profileProfileCount": "{count, plural, one{{count} profile} other{{count} profiles}}",
   "@profileProfileCount": {
-    "description": "Subtitle of the birth-profiles menu row on the Profile & Settings screen, naming how many saved profiles exist.",
+    "description": "Subtitle of the birth-profiles menu row on the Profile & Settings screen, naming how many saved profiles exist (25 Aug 2026: now a real count that can be more than 1, since multi-profile support landed).",
     "placeholders": {
       "count": {
-        "type": "String",
+        "type": "int",
         "example": "1"
       }
     }
+  },
+  "birthProfilesYouBadge": "You",
+  "@birthProfilesYouBadge": {
+    "description": "Small badge shown next to the account owner's own profile on the Birth Profiles screen, distinguishing it from family/friend profiles."
+  },
+  "birthProfilesDelete": "Delete",
+  "@birthProfilesDelete": {
+    "description": "Label of the delete action for a family/friend profile on the Birth Profiles screen — used both in the per-card overflow menu and as the confirming action in the delete confirmation dialog."
+  },
+  "birthProfilesDeleteConfirmTitle": "Delete this profile?",
+  "@birthProfilesDeleteConfirmTitle": {
+    "description": "Title of the confirmation dialog shown before deleting a family/friend birth profile."
+  },
+  "birthProfilesDeleteConfirmMessage": "This permanently removes {name}'s saved birth profile. This cannot be undone.",
+  "@birthProfilesDeleteConfirmMessage": {
+    "description": "Body message of the confirmation dialog shown before deleting a family/friend birth profile.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Ananya"
+      }
+    }
+  },
+  "birthProfilesPrimaryDeleteHint": "Your own profile can't be deleted here — use Delete Account in Settings instead.",
+  "@birthProfilesPrimaryDeleteHint": {
+    "description": "Explains why the account owner's own (primary) profile has no delete option on the Birth Profiles screen; also shown if the repository's defensive guard against deleting the primary profile is ever hit."
+  },
+  "birthProfilesEditorAddTitle": "Add Profile",
+  "@birthProfilesEditorAddTitle": {
+    "description": "AppBar title of the birth-profile editor screen when adding a brand-new family/friend profile."
+  },
+  "birthProfilesEditorEditTitle": "Edit Profile",
+  "@birthProfilesEditorEditTitle": {
+    "description": "AppBar title of the birth-profile editor screen when editing an existing saved profile."
+  },
+  "birthProfilesEditorSave": "Save Profile",
+  "@birthProfilesEditorSave": {
+    "description": "Label of the save CTA on the birth-profile editor screen (used for both adding and editing)."
+  },
+  "birthProfilesSaveFailed": "Couldn't save this profile. Please try again.",
+  "@birthProfilesSaveFailed": {
+    "description": "Generic error snackbar shown when saving a birth profile fails for a reason other than being signed out, and also shown as the Birth Profiles screen's error-state message if the saved-profiles list fails to load."
+  },
+  "birthProfilesDeleteFailed": "Couldn't delete this profile. Please try again.",
+  "@birthProfilesDeleteFailed": {
+    "description": "Generic error snackbar shown when deleting a family/friend birth profile fails for a reason other than being signed out."
+  },
+  "birthProfilesSignInRequired": "Sign in to add family & friend profiles.",
+  "@birthProfilesSignInRequired": {
+    "description": "Error snackbar shown when adding, editing or deleting a family/friend birth profile fails because there is no signed-in user to save it against."
+  },
+  "birthProfilesEmpty": "No profiles yet.",
+  "@birthProfilesEmpty": {
+    "description": "Shown on the Birth Profiles screen if the saved-profiles list loads successfully but is empty (should-be-impossible in practice, since the account owner's own profile is required to reach this screen)."
   },
   "profileAppLanguageLabel": "APP LANGUAGE",
   "@profileAppLanguageLabel": {
@@ -1294,7 +1366,29 @@
   },
   "profileAiChatHistory": "AI Chat History",
   "@profileAiChatHistory": {
-    "description": "Title of the AI Chat History menu row on the Profile & Settings screen."
+    "description": "Title of the AI Chat History menu row on the Profile & Settings screen. Also reused as the AI Chat History screen's own AppBar title (26 Aug 2026)."
+  },
+  "profileAiChatHistoryCount": "{count, plural, one{{count} conversation} other{{count} conversations}}",
+  "@profileAiChatHistoryCount": {
+    "description": "Subtitle of the AI Chat History menu row on the Profile & Settings screen, naming how many saved AI conversations exist (26 Aug 2026). Omitted entirely while loading or when zero — see the row's onTap comment.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "aiChatHistoryEmptyTitle": "No conversations yet",
+  "@aiChatHistoryEmptyTitle": {
+    "description": "Empty-state title on the AI Chat History screen when the signed-in user has no saved AI conversations."
+  },
+  "aiChatHistoryEmptyMessage": "Ask Rishi AI about your career, marriage, health or the right muhurat — your conversations will appear here.",
+  "@aiChatHistoryEmptyMessage": {
+    "description": "Empty-state supporting message under aiChatHistoryEmptyTitle on the AI Chat History screen."
+  },
+  "aiChatHistoryEmptyAction": "Ask Rishi AI",
+  "@aiChatHistoryEmptyAction": {
+    "description": "Empty-state action button label on the AI Chat History screen, opening the AI Astrologer chat."
   },
   "profilePaymentHistory": "Payment History",
   "@profilePaymentHistory": {
@@ -1423,6 +1517,48 @@
   "accountDeletionErrorGeneric": "Something went wrong. Please try again.",
   "@accountDeletionErrorGeneric": {
     "description": "Fallback error shown on the Profile & Settings screen for any deleteAccount failure not otherwise classified (e.g. HttpsError code internal)."
+  },
+  "legalPrivacyPolicy": "Privacy Policy",
+  "@legalPrivacyPolicy": {
+    "description": "Title of the Privacy Policy row on the Privacy & security (Legal Links) screen — opens https://vedadarshi-legal.web.app/privacy externally."
+  },
+  "legalTermsOfService": "Terms of Service",
+  "@legalTermsOfService": {
+    "description": "Title of the Terms of Service row on the Privacy & security (Legal Links) screen — opens https://vedadarshi-legal.web.app/terms externally."
+  },
+  "legalRefundsCancellation": "Refunds & Cancellation",
+  "@legalRefundsCancellation": {
+    "description": "Title of the Refunds & Cancellation row on the Privacy & security (Legal Links) screen — opens https://vedadarshi-legal.web.app/refunds externally."
+  },
+  "legalAccountDataDeletion": "Account & Data Deletion",
+  "@legalAccountDataDeletion": {
+    "description": "Title of the Account & Data Deletion row on the Privacy & security (Legal Links) screen — opens https://vedadarshi-legal.web.app/delete-account externally. Kept easy to find per Google Play policy on discoverable account-deletion instructions."
+  },
+  "profileEmailSupport": "Email us",
+  "@profileEmailSupport": {
+    "description": "Title of the Email us menu row on the Profile & Settings screen, next to Help & support — opens a mailto: compose screen, the only real support channel that exists."
+  },
+  "profileEmailSupportSubtitle": "Vedadarshii@gmail.com",
+  "@profileEmailSupportSubtitle": {
+    "description": "Subtitle of the Email us menu row on the Profile & Settings screen — the literal support email address, unchanged across locales."
+  },
+  "supportEmailSubject": "Vedadarshi support",
+  "@supportEmailSubject": {
+    "description": "Pre-filled subject line of the mailto: email opened by the Email us row on the Profile & Settings screen."
+  },
+  "feedbackEmailSubject": "Vedadarshi feedback",
+  "@feedbackEmailSubject": {
+    "description": "Pre-filled subject line of the mailto: email opened by the Send Feedback row on the Profile & Settings screen."
+  },
+  "profileInviteFriendsMessage": "Join me on Vedadarshi, your daily companion for Vedic astrology, Panchang and horoscopes. Download it here: {link}",
+  "@profileInviteFriendsMessage": {
+    "description": "Text shared to the OS share sheet by the Invite Friends menu row on the Profile & Settings screen.",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "example": "https://play.google.com/store/apps/details?id=com.gosewealth.vedadarshi"
+      }
+    }
   },
   "kundliSandboxBanner": "Sample chart — not calculated from your birth details",
   "@kundliSandboxBanner": {

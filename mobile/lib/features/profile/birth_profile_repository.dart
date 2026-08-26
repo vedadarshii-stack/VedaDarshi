@@ -20,16 +20,66 @@ const String _prefsKey = 'birth_profile';
 /// decision (`RootGate`) indefinitely on a bad connection.
 const Duration _remoteLoadTimeout = Duration(seconds: 8);
 
+/// One saved profile paired with its Firestore document id — the shape
+/// [BirthProfileRepository.loadAll] returns. `id == primaryProfileId`
+/// ("primary") is always the account owner's own profile; anything else is
+/// a family/friend profile with an auto-generated id.
+class SavedBirthProfile {
+  const SavedBirthProfile({required this.id, required this.profile});
+
+  final String id;
+  final BirthProfile profile;
+
+  bool get isPrimary => id == primaryProfileId;
+}
+
+/// Why a [BirthProfileRepository.add]/[BirthProfileRepository.update]/
+/// [BirthProfileRepository.delete] call could not complete — thrown so the
+/// UI can show a specific message via `birthProfileFailureMessage`, instead
+/// of the operation either silently doing nothing or crashing with a raw
+/// exception. Mirrors `AccountDeletionErrorCode`'s split in
+/// `account_deletion_repository.dart`.
+enum BirthProfileFailureReason {
+  /// No signed-in uid (Firebase not ready, or a genuinely signed-out
+  /// session). Unlike the primary profile, a family/friend profile has no
+  /// local cache to fall back to — there is nowhere to persist it without a
+  /// uid, so the call fails rather than pretending to succeed.
+  notSignedIn,
+
+  /// [BirthProfileRepository.delete] was called with [primaryProfileId] —
+  /// refused unconditionally. The primary profile is what `RootGate` routes
+  /// on; deleting it here would strand the signed-in user. The only way to
+  /// remove the account owner's own profile is full account deletion
+  /// (`account_deletion_repository.dart`).
+  cannotDeletePrimary,
+}
+
+/// The single exception type [BirthProfileRepository.add]/[update]/[delete]
+/// throw — same "typed exception, never a raw platform error" convention as
+/// `AccountDeletionException`/`AuthException` elsewhere in this codebase.
+class BirthProfileFailure implements Exception {
+  const BirthProfileFailure(this.reason);
+
+  final BirthProfileFailureReason reason;
+
+  @override
+  String toString() => 'BirthProfileFailure(${reason.name})';
+}
+
 /// Persists the signed-in user's [BirthProfile], offline-first:
 /// [SharedPreferences] is the LOCAL CACHE and always the fast path, with
 /// Cloud Firestore layered on top for cross-device / reinstall durability
 /// once the user is signed in (`/users/{uid}/birthProfiles/primary` — see
 /// `lib/core/data/firestore_refs.dart`).
 ///
-/// Only a single (the account owner's own) profile is supported here —
-/// multi-profile support for family/friends is a follow-up, per the M1
-/// data-layer plan (the profile document already carries `isPrimary: true`
-/// in anticipation of that).
+/// The account owner's own profile (`load`/`save`, always
+/// [primaryProfileId]) keeps the offline-first treatment documented on
+/// [load]/[save] below. Family/friend profiles (`loadAll`/`add`/`update`/
+/// `delete`, added 25 Aug 2026) have NO local cache — there was never one
+/// built for them, and unlike the primary profile there is no
+/// `RootGate`-on-startup reason to need one — so those calls talk to
+/// Firestore directly and are awaited (see [add]'s doc comment for why that
+/// trade-off is deliberately the opposite of [save]'s).
 ///
 /// Every dependency is injected so nothing in this class hard-references a
 /// Firebase singleton at construction time (mirrors `AuthService`'s
@@ -76,12 +126,17 @@ class BirthProfileRepository {
     }
   }
 
-  DocumentReference<Map<String, dynamic>> _primaryDocFor(String uid) {
+  CollectionReference<Map<String, dynamic>> _profilesCollectionFor(
+    String uid,
+  ) {
     return _firestore()
         .collection(usersCollection)
         .doc(uid)
-        .collection(birthProfilesCollection)
-        .doc(primaryProfileId);
+        .collection(birthProfilesCollection);
+  }
+
+  DocumentReference<Map<String, dynamic>> _primaryDocFor(String uid) {
+    return _profilesCollectionFor(uid).doc(primaryProfileId);
   }
 
   /// Loads the saved profile, or `null` if none was ever saved (locally or
@@ -166,6 +221,123 @@ class BirthProfileRepository {
     }
   }
 
+  /// Loads EVERY saved profile for the signed-in user — the account
+  /// owner's own ([primaryProfileId]) plus any family/friend profiles —
+  /// with the primary ALWAYS sorted first.
+  ///
+  /// No uid (Firebase not ready, or a genuinely signed-out session):
+  /// returns just the primary profile from the LOCAL cache if one exists
+  /// (same fallback [load] itself uses), and nothing else — family/friend
+  /// profiles have no local cache, so without a uid they are simply
+  /// unavailable rather than throwing.
+  ///
+  /// Never throws — a remote fetch failure (offline, timeout, permission
+  /// error) is logged and swallowed, same never-throw-to-the-UI contract as
+  /// [load], falling back to whatever was already collected (the primary
+  /// profile, if any).
+  Future<List<SavedBirthProfile>> loadAll() async {
+    final primary = await load();
+    final result = <SavedBirthProfile>[
+      if (primary != null)
+        SavedBirthProfile(id: primaryProfileId, profile: primary),
+    ];
+
+    final uid = _safeUid();
+    if (uid == null) return result;
+
+    try {
+      final snapshot = await _profilesCollectionFor(
+        uid,
+      ).get().timeout(_remoteLoadTimeout);
+      for (final doc in snapshot.docs) {
+        if (doc.id == primaryProfileId) continue; // already added above
+        final profile = BirthProfile.tryFromFirestore(doc.data());
+        if (profile != null) {
+          result.add(SavedBirthProfile(id: doc.id, profile: profile));
+        }
+      }
+    } catch (e) {
+      debugPrint('BirthProfileRepository.loadAll: remote fetch failed: $e');
+      // Fall back to whatever's already in `result` — never throw to the UI.
+    }
+    return result;
+  }
+
+  /// Creates a NEW family/friend profile and returns its generated document
+  /// id. Always a fresh Firestore auto-id, so this can never collide with
+  /// or overwrite [primaryProfileId] — there is no code path here that
+  /// could target that id.
+  ///
+  /// AWAITS the Firestore write, deliberately unlike [save]'s fire-and-
+  /// forget primary-profile sync: a family/friend profile has no local
+  /// cache to fall back on, so not awaiting would report success to the
+  /// caller before the write had actually happened (and silently lose the
+  /// profile if it then failed). The editor screen shows its own saving
+  /// state while this runs.
+  ///
+  /// Throws [BirthProfileFailure] with
+  /// [BirthProfileFailureReason.notSignedIn] when there is no uid — there
+  /// is nowhere to persist a family/friend profile without one.
+  Future<String> add(BirthProfile profile) async {
+    final uid = _safeUid();
+    if (uid == null) {
+      throw const BirthProfileFailure(BirthProfileFailureReason.notSignedIn);
+    }
+    final docRef = _profilesCollectionFor(uid).doc();
+    await docRef.set(profile.toFirestore(isPrimary: false));
+    return docRef.id;
+  }
+
+  /// Updates an existing profile by id.
+  ///
+  /// Updating [primaryProfileId] forwards to [save] — the account owner's
+  /// own profile keeps EXACTLY its documented offline-first behaviour
+  /// (instant local-cache write, fire-and-forget Firestore sync); this
+  /// method changes nothing about that path.
+  ///
+  /// Updating any OTHER id awaits the Firestore write directly, for the
+  /// same reason [add] does, and throws [BirthProfileFailure] with
+  /// [BirthProfileFailureReason.notSignedIn] when there is no uid.
+  Future<void> update(String id, BirthProfile profile) async {
+    if (id == primaryProfileId) {
+      await save(profile);
+      return;
+    }
+    final uid = _safeUid();
+    if (uid == null) {
+      throw const BirthProfileFailure(BirthProfileFailureReason.notSignedIn);
+    }
+    await _profilesCollectionFor(uid)
+        .doc(id)
+        .set(profile.toFirestore(isPrimary: false), SetOptions(merge: true));
+  }
+
+  /// Deletes a family/friend profile by id.
+  ///
+  /// Refuses to delete [primaryProfileId] UNCONDITIONALLY — throws
+  /// [BirthProfileFailure] with
+  /// [BirthProfileFailureReason.cannotDeletePrimary] before even checking
+  /// for a uid. The primary profile is what `RootGate` routes on; deleting
+  /// it would strand the signed-in user on the next cold start. The UI
+  /// (`birth_profiles_screen.dart`) must hide/disable the delete affordance
+  /// for the primary profile entirely — this is the defensive backstop, not
+  /// the only guard.
+  ///
+  /// Otherwise throws [BirthProfileFailure] with
+  /// [BirthProfileFailureReason.notSignedIn] when there is no uid.
+  Future<void> delete(String id) async {
+    if (id == primaryProfileId) {
+      throw const BirthProfileFailure(
+        BirthProfileFailureReason.cannotDeletePrimary,
+      );
+    }
+    final uid = _safeUid();
+    if (uid == null) {
+      throw const BirthProfileFailure(BirthProfileFailureReason.notSignedIn);
+    }
+    await _profilesCollectionFor(uid).doc(id).delete();
+  }
+
   /// Deletes the cached local profile.
   ///
   /// Sign-out MUST call this (and invalidate [birthProfileProvider] /
@@ -218,4 +390,27 @@ final birthProfileProvider = FutureProvider<BirthProfile?>((ref) {
 final hasBirthProfileProvider = FutureProvider<bool>((ref) async {
   final profile = await ref.watch(birthProfileProvider.future);
   return profile != null;
+});
+
+/// Every saved profile for the current user — the account owner's own
+/// profile plus any family/friend profiles, primary always first. Backs
+/// `birth_profiles_screen.dart`'s list and `kundli_input_screen.dart`'s
+/// profile picker.
+///
+/// A [FutureProvider] (not a [StreamProvider]) to match [birthProfileProvider]'s
+/// existing pattern exactly: this app already has an established
+/// invalidate-on-mutation convention (every write site above and in
+/// `birth_details_screen.dart`/`profile_settings_screen.dart` calls
+/// `ref.invalidate(birthProfileProvider)` after a change, never relying on
+/// a live snapshot listener), and a real-time listener here would add a
+/// standing Firestore subscription — and its billed reads — for a screen
+/// that isn't multi-device-collaborative. Anything that calls
+/// [BirthProfileRepository.add]/[BirthProfileRepository.update]/
+/// [BirthProfileRepository.delete] MUST `ref.invalidate` this provider, or
+/// the birth-profiles list and the Kundli input screen keep showing stale
+/// data.
+final savedBirthProfilesProvider = FutureProvider<List<SavedBirthProfile>>((
+  ref,
+) {
+  return ref.watch(birthProfileRepositoryProvider).loadAll();
 });

@@ -1,23 +1,33 @@
-/// Immutable models for the Vedika `/v2/astrology/horoscope/{sign}` family
-/// of endpoints (daily / weekly / monthly — **yearly does not exist**, see
-/// `horoscope_repository.dart`).
+/// Immutable models for Vedika's horoscope reading endpoints: the
+/// `/v2/astrology/horoscope/{sign}` family (daily / weekly / monthly) and
+/// `/v2/astrology/prediction/yearly` (yearly — a different path family, see
+/// `horoscope_repository.dart` for why that matters and why the yearly
+/// reading is a `POST`, not a `GET`).
 ///
-/// `VedikaClient.get` already unwraps the `{success, data, …}` envelope, so
-/// every `fromJson` here parses the inner `data` map directly. Vedika does
-/// not document any field as guaranteed-present, and the sandbox is
-/// separately known to serve one fixed sample chart regardless of what's
-/// requested (see `VedikaConfig.isSandbox`) — so EVERY field below is
-/// nullable and parsed defensively (wrong type / missing key both become
-/// `null`, never a thrown exception). Screens must be able to render
+/// `VedikaClient.get`/`.post` already unwrap the `{success, data, …}`
+/// envelope, so every `fromJson` here parses the inner `data` map directly.
+/// Vedika does not document any field as guaranteed-present, and the
+/// sandbox is separately known to serve one fixed sample chart regardless
+/// of what's requested (see `VedikaConfig.isSandbox`) — so EVERY field
+/// below is nullable and parsed defensively (wrong type / missing key both
+/// become `null`, never a thrown exception). Screens must be able to render
 /// sensibly with every field null.
 ///
-/// Shapes were verified live against the sandbox 1 Aug 2026, e.g.:
+/// Shapes were verified live: daily/weekly/monthly against the sandbox
+/// 1 Aug 2026, e.g.:
 /// ```
 /// curl -s "https://api.vedika.io/sandbox/v2/astrology/horoscope/leo" | python3 -m json.tool
+/// ```
+/// yearly against production 26 Aug 2026, e.g.:
+/// ```
+/// curl -s -X POST "https://api.vedika.io/v2/astrology/prediction/yearly" \
+///   -H "Content-Type: application/json" -d '{"rashi": "leo"}' | python3 -m json.tool
 /// ```
 library;
 
 import 'package:flutter/foundation.dart' show immutable;
+
+import '../../core/vedika/vedika_text_sanitizer.dart';
 
 /// One day's reading for a sign — `GET /v2/astrology/horoscope/{sign}`.
 ///
@@ -306,6 +316,174 @@ class MonthlyHoroscope {
   }
 }
 
+/// One life-area score within a [YearlyHoroscope.areas] list.
+@immutable
+class YearlyHoroscopeArea {
+  const YearlyHoroscopeArea({this.area, this.score});
+
+  factory YearlyHoroscopeArea.fromJson(Map<String, dynamic> json) {
+    return YearlyHoroscopeArea(
+      area: _asString(json['area']),
+      score: _asInt(json['score']),
+    );
+  }
+
+  /// Vedika's own free-text label for this life area, e.g. `'career'`,
+  /// `'health'` — not guaranteed to be one of this app's fixed
+  /// [HoroscopeScoreId] values. The Horoscope Detail screen's Yearly period
+  /// maps it onto the app's fixed 5-row scores card by keyword (see
+  /// `_yearlyScoreId` in `horoscope_detail_screen.dart`), the same
+  /// conservative "map only an unambiguous fit, otherwise drop it" rule
+  /// `_sectionForTheme` already uses for the Daily period's theme.
+  final String? area;
+
+  /// Deliberately NOT clamped here — models parse, they don't reshape. The
+  /// 0–100 scale is assumed (matching [YearlyHoroscope.overallScore] and
+  /// [MonthlyHoroscope.overallRating]) but wasn't separately confirmed
+  /// live, so the screen clamps defensively when it builds a score bar from
+  /// this value.
+  final int? score;
+}
+
+/// [YearlyHoroscope.luckyElements] — see that field's doc comment for which
+/// of the response's lucky fields this deliberately leaves out.
+@immutable
+class YearlyLuckyElements {
+  const YearlyLuckyElements({
+    this.luckyColor,
+    this.luckyDay,
+    this.luckyDirection,
+    this.luckyNumber,
+    this.luckyTime,
+  });
+
+  factory YearlyLuckyElements.fromJson(Map<String, dynamic> json) {
+    return YearlyLuckyElements(
+      luckyColor: _asString(json['luckyColor']),
+      luckyDay: _asString(json['luckyDay']),
+      luckyDirection: _asString(json['luckyDirection']),
+      luckyNumber: _asInt(json['luckyNumber']),
+      luckyTime: _asString(json['luckyTime']),
+    );
+  }
+
+  final String? luckyColor;
+
+  /// e.g. `'Monday'` — rendered verbatim (English) same as
+  /// [DailyHoroscope.theme]; no translation pipeline for it.
+  final String? luckyDay;
+  final String? luckyDirection;
+  final int? luckyNumber;
+
+  /// Raw string, rendered as-is. Unlike [DailyHoroscope.luckyTime], this
+  /// isn't documented as a `"HH:mm-HH:mm"` range, so there's no
+  /// `formattedLuckyTime`-style reformatting here — reformatting an unknown
+  /// shape risks mangling it worse than showing it verbatim.
+  final String? luckyTime;
+}
+
+/// `POST /v2/astrology/prediction/yearly` — one year's reading for a sign,
+/// body `{"rashi": <lowercase English sign name>}`. See
+/// `horoscope_repository.dart` for the endpoint, why it's a `POST` unlike
+/// the daily/weekly/monthly `GET`s, and the correction to the earlier
+/// (wrong) "yearly doesn't exist" conclusion.
+///
+/// Verified live 26 Aug 2026. The full response is considerably richer than
+/// what's modelled here — the Horoscope Detail screen's Yearly period only
+/// needs a period range, an overview, per-area scores, lucky elements and
+/// remedies, so that's all this parses. Deliberately NOT modelled:
+/// - `predictions` (a map keyed by domain → `{score, sentiment, text}`) —
+///   duplicates [areas]' scores in a keyed-map shape that adds parsing
+///   complexity without giving the screen anything [areas] doesn't already.
+/// - `transitSummary`, `quote`, `rashi`, `rashiLord`, `dasha` — not
+///   rendered by the Yearly period; `dasha` in particular already has a
+///   dedicated home on the Kundli screen's Vimshottari Dasha tab, so
+///   duplicating it here would be redundant, not just unused.
+/// - [YearlyLuckyElements] leaves out `secondaryDirection` — the response
+///   has a second, lower-priority direction alongside `luckyDirection`, but
+///   the screen only has room for one direction chip (the same 3-chip
+///   header the Daily period uses), so the primary one wins and the
+///   secondary is dropped rather than parsed and never used.
+/// - each [areas] entry's `description`/`sentiment` — the reused score-bar
+///   widget only has room for a label + a percentage, the same shape
+///   [MonthlyHoroscope]'s scores already use.
+@immutable
+class YearlyHoroscope {
+  const YearlyHoroscope({
+    this.periodStart,
+    this.periodEnd,
+    this.summary,
+    this.overallScore,
+    this.areas = const [],
+    this.luckyElements,
+    this.remedies = const [],
+  });
+
+  factory YearlyHoroscope.fromJson(Map<String, dynamic> json) {
+    final rawAreas = json['areas'];
+    final rawLucky = json['luckyElements'];
+    return YearlyHoroscope(
+      periodStart: _asString(json['periodStart']),
+      periodEnd: _asString(json['periodEnd']),
+      summary: _asString(json['summary']),
+      overallScore: _asInt(json['overallScore']),
+      areas: rawAreas is List
+          ? rawAreas
+                .whereType<Map>()
+                .map(
+                  (e) => YearlyHoroscopeArea.fromJson(
+                    Map<String, dynamic>.from(e),
+                  ),
+                )
+                .toList(growable: false)
+          : const [],
+      luckyElements: rawLucky is Map
+          ? YearlyLuckyElements.fromJson(Map<String, dynamic>.from(rawLucky))
+          : null,
+      remedies: _asStringList(json['remedies']),
+    );
+  }
+
+  /// ISO `yyyy-MM-dd` — Vedika computes a rolling 12 months from the
+  /// request date, not a fixed calendar year, so this is normally "today".
+  final String? periodStart;
+
+  /// ISO `yyyy-MM-dd`, one year after [periodStart].
+  final String? periodEnd;
+
+  /// Free-text year-ahead overview — Vedika's one real yearly narrative,
+  /// the equivalent of [WeeklyHoroscope.advice]/
+  /// [MonthlyHoroscope.monthlyTheme] for this period.
+  final String? summary;
+
+  /// 0–100, same assumed convention as [MonthlyHoroscope.overallRating]
+  /// (see the scale caveat on [YearlyHoroscopeArea.score]).
+  final int? overallScore;
+
+  final List<YearlyHoroscopeArea> areas;
+  final YearlyLuckyElements? luckyElements;
+
+  /// Vedika's `remedies` field shape isn't pinned down by the OpenAPI
+  /// summary (a single string and a list of strings are both plausible for
+  /// a field named this way) — [_asStringList] accepts either.
+  final List<String> remedies;
+
+  /// [periodStart]–[periodEnd] formatted like `"26 Aug 2026 – 26 Aug 2027"`
+  /// — fixed English, same convention as [DailyHoroscope.formattedDate]
+  /// (see its doc comment for why). Returns `null` if either date is
+  /// missing or unparseable.
+  String? get formattedPeriodRange {
+    final start = periodStart == null
+        ? null
+        : DateTime.tryParse(periodStart!);
+    final end = periodEnd == null ? null : DateTime.tryParse(periodEnd!);
+    if (start == null || end == null) return null;
+    String fmt(DateTime d) =>
+        '${d.day} ${_monthNames[d.month - 1].substring(0, 3)} ${d.year}';
+    return '${fmt(start)} – ${fmt(end)}';
+  }
+}
+
 const List<String> _weekdayNames = [
   'Monday',
   'Tuesday',
@@ -331,10 +509,15 @@ const List<String> _monthNames = [
   'December',
 ];
 
+// Every string field in this file (sign names, dates, lucky colors, AND the
+// free-text theme/prediction/advice/monthlyTheme/summary fields alike) is
+// parsed through this one function, so [stripVedikaAttribution] runs here
+// once rather than at each individual free-text field — see that
+// function's doc comment for why it's safe to apply unconditionally.
 String? _asString(dynamic value) {
   if (value == null) return null;
-  if (value is String) return value.isEmpty ? null : value;
-  return value.toString();
+  if (value is String) return stripVedikaAttribution(value);
+  return stripVedikaAttribution(value.toString());
 }
 
 int? _asInt(dynamic value) {
@@ -343,4 +526,19 @@ int? _asInt(dynamic value) {
   if (value is num) return value.toInt();
   if (value is String) return int.tryParse(value);
   return null;
+}
+
+/// Accepts either a single non-empty string or a list of them — see
+/// [YearlyHoroscope.remedies]' doc comment for why both shapes are handled.
+/// Anything else (missing key, wrong type, empty list) becomes `const []`.
+List<String> _asStringList(dynamic value) {
+  if (value == null) return const [];
+  if (value is String) return value.isEmpty ? const [] : [value];
+  if (value is List) {
+    return value
+        .whereType<String>()
+        .where((s) => s.isNotEmpty)
+        .toList(growable: false);
+  }
+  return const [];
 }

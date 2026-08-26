@@ -791,7 +791,7 @@ abstract class AppLocalizations {
   /// Banner shown on the Horoscope Detail screen when the app is pointed at Vedika's sandbox, warning that the reading is fixed sample data, not the user's own.
   ///
   /// In en, this message translates to:
-  /// **'Sample data — Vedika sandbox mode'**
+  /// **'Sample data — sandbox mode'**
   String get horoscopeSandboxBanner;
 
   /// Title of the error state shown on the Horoscope Detail screen when the Vedika API call fails.
@@ -803,7 +803,7 @@ abstract class AppLocalizations {
   /// Message of the error state shown on the Horoscope Detail screen when the Vedika API call fails.
   ///
   /// In en, this message translates to:
-  /// **'Something went wrong reaching Vedika. Check your connection and try again.'**
+  /// **'Something went wrong reaching the astrology service. Check your connection and try again.'**
   String get horoscopeErrorMessage;
 
   /// Retry button label on the Horoscope Detail screen's error state.
@@ -853,6 +853,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Key Dates This Month'**
   String get monthlyKeyDatesTitle;
+
+  /// Title of the overview card on the Horoscope Detail screen's Yearly period, sourced from Vedika's yearly `summary` field.
+  ///
+  /// In en, this message translates to:
+  /// **'This Year\'s Overview'**
+  String get yearlySummaryTitle;
+
+  /// Title of the score-bars card on the Horoscope Detail screen's Yearly period (the Daily period's equivalent card uses todaysScores instead).
+  ///
+  /// In en, this message translates to:
+  /// **'This Year\'s Scores'**
+  String get yearlyScoresTitle;
+
+  /// Badge next to the scores card title on the Horoscope Detail screen's Yearly period, showing Vedika's yearly overallScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall {percent}%'**
+  String yearlyOverallRating(int percent);
+
+  /// Label of the lucky-day card on the Horoscope Detail screen's Yearly period, sourced from Vedika's yearly luckyElements.luckyDay field.
+  ///
+  /// In en, this message translates to:
+  /// **'Lucky Day'**
+  String get luckyDay;
 
   /// Heading of the Kundli — New Chart screen.
   ///
@@ -1574,12 +1598,6 @@ abstract class AppLocalizations {
   /// **'Start Premium — {price}'**
   String startPremium(String price);
 
-  /// Fine-print notice at the bottom of the Subscription Paywall.
-  ///
-  /// In en, this message translates to:
-  /// **'Billed via Google Play · Cancel anytime · Secure with RevenueCat'**
-  String get billingFinePrint;
-
   /// Header title on the Articles screen.
   ///
   /// In en, this message translates to:
@@ -1760,11 +1778,83 @@ abstract class AppLocalizations {
   /// **'Birth profiles'**
   String get profileBirthProfiles;
 
-  /// Subtitle of the birth-profiles menu row on the Profile & Settings screen, naming how many saved profiles exist.
+  /// Subtitle of the birth-profiles menu row on the Profile & Settings screen, naming how many saved profiles exist (25 Aug 2026: now a real count that can be more than 1, since multi-profile support landed).
   ///
   /// In en, this message translates to:
-  /// **'{count} profile'**
-  String profileProfileCount(String count);
+  /// **'{count, plural, one{{count} profile} other{{count} profiles}}'**
+  String profileProfileCount(int count);
+
+  /// Small badge shown next to the account owner's own profile on the Birth Profiles screen, distinguishing it from family/friend profiles.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get birthProfilesYouBadge;
+
+  /// Label of the delete action for a family/friend profile on the Birth Profiles screen — used both in the per-card overflow menu and as the confirming action in the delete confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get birthProfilesDelete;
+
+  /// Title of the confirmation dialog shown before deleting a family/friend birth profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this profile?'**
+  String get birthProfilesDeleteConfirmTitle;
+
+  /// Body message of the confirmation dialog shown before deleting a family/friend birth profile.
+  ///
+  /// In en, this message translates to:
+  /// **'This permanently removes {name}\'s saved birth profile. This cannot be undone.'**
+  String birthProfilesDeleteConfirmMessage(String name);
+
+  /// Explains why the account owner's own (primary) profile has no delete option on the Birth Profiles screen; also shown if the repository's defensive guard against deleting the primary profile is ever hit.
+  ///
+  /// In en, this message translates to:
+  /// **'Your own profile can\'t be deleted here — use Delete Account in Settings instead.'**
+  String get birthProfilesPrimaryDeleteHint;
+
+  /// AppBar title of the birth-profile editor screen when adding a brand-new family/friend profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Profile'**
+  String get birthProfilesEditorAddTitle;
+
+  /// AppBar title of the birth-profile editor screen when editing an existing saved profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get birthProfilesEditorEditTitle;
+
+  /// Label of the save CTA on the birth-profile editor screen (used for both adding and editing).
+  ///
+  /// In en, this message translates to:
+  /// **'Save Profile'**
+  String get birthProfilesEditorSave;
+
+  /// Generic error snackbar shown when saving a birth profile fails for a reason other than being signed out, and also shown as the Birth Profiles screen's error-state message if the saved-profiles list fails to load.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save this profile. Please try again.'**
+  String get birthProfilesSaveFailed;
+
+  /// Generic error snackbar shown when deleting a family/friend birth profile fails for a reason other than being signed out.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t delete this profile. Please try again.'**
+  String get birthProfilesDeleteFailed;
+
+  /// Error snackbar shown when adding, editing or deleting a family/friend birth profile fails because there is no signed-in user to save it against.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to add family & friend profiles.'**
+  String get birthProfilesSignInRequired;
+
+  /// Shown on the Birth Profiles screen if the saved-profiles list loads successfully but is empty (should-be-impossible in practice, since the account owner's own profile is required to reach this screen).
+  ///
+  /// In en, this message translates to:
+  /// **'No profiles yet.'**
+  String get birthProfilesEmpty;
 
   /// Uppercased section label above the language chip row on the Profile & Settings screen.
   ///
@@ -1790,11 +1880,35 @@ abstract class AppLocalizations {
   /// **'Downloaded PDFs'**
   String get profileDownloadedPdfs;
 
-  /// Title of the AI Chat History menu row on the Profile & Settings screen.
+  /// Title of the AI Chat History menu row on the Profile & Settings screen. Also reused as the AI Chat History screen's own AppBar title (26 Aug 2026).
   ///
   /// In en, this message translates to:
   /// **'AI Chat History'**
   String get profileAiChatHistory;
+
+  /// Subtitle of the AI Chat History menu row on the Profile & Settings screen, naming how many saved AI conversations exist (26 Aug 2026). Omitted entirely while loading or when zero — see the row's onTap comment.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} conversation} other{{count} conversations}}'**
+  String profileAiChatHistoryCount(int count);
+
+  /// Empty-state title on the AI Chat History screen when the signed-in user has no saved AI conversations.
+  ///
+  /// In en, this message translates to:
+  /// **'No conversations yet'**
+  String get aiChatHistoryEmptyTitle;
+
+  /// Empty-state supporting message under aiChatHistoryEmptyTitle on the AI Chat History screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask Rishi AI about your career, marriage, health or the right muhurat — your conversations will appear here.'**
+  String get aiChatHistoryEmptyMessage;
+
+  /// Empty-state action button label on the AI Chat History screen, opening the AI Astrologer chat.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask Rishi AI'**
+  String get aiChatHistoryEmptyAction;
 
   /// Title of the Payment History menu row on the Profile & Settings screen.
   ///
@@ -1987,6 +2101,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Something went wrong. Please try again.'**
   String get accountDeletionErrorGeneric;
+
+  /// Title of the Privacy Policy row on the Privacy & security (Legal Links) screen — opens https://vedadarshi-legal.web.app/privacy externally.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get legalPrivacyPolicy;
+
+  /// Title of the Terms of Service row on the Privacy & security (Legal Links) screen — opens https://vedadarshi-legal.web.app/terms externally.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service'**
+  String get legalTermsOfService;
+
+  /// Title of the Refunds & Cancellation row on the Privacy & security (Legal Links) screen — opens https://vedadarshi-legal.web.app/refunds externally.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunds & Cancellation'**
+  String get legalRefundsCancellation;
+
+  /// Title of the Account & Data Deletion row on the Privacy & security (Legal Links) screen — opens https://vedadarshi-legal.web.app/delete-account externally. Kept easy to find per Google Play policy on discoverable account-deletion instructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Account & Data Deletion'**
+  String get legalAccountDataDeletion;
+
+  /// Title of the Email us menu row on the Profile & Settings screen, next to Help & support — opens a mailto: compose screen, the only real support channel that exists.
+  ///
+  /// In en, this message translates to:
+  /// **'Email us'**
+  String get profileEmailSupport;
+
+  /// Subtitle of the Email us menu row on the Profile & Settings screen — the literal support email address, unchanged across locales.
+  ///
+  /// In en, this message translates to:
+  /// **'Vedadarshii@gmail.com'**
+  String get profileEmailSupportSubtitle;
+
+  /// Pre-filled subject line of the mailto: email opened by the Email us row on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Vedadarshi support'**
+  String get supportEmailSubject;
+
+  /// Pre-filled subject line of the mailto: email opened by the Send Feedback row on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Vedadarshi feedback'**
+  String get feedbackEmailSubject;
+
+  /// Text shared to the OS share sheet by the Invite Friends menu row on the Profile & Settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Join me on Vedadarshi, your daily companion for Vedic astrology, Panchang and horoscopes. Download it here: {link}'**
+  String profileInviteFriendsMessage(String link);
 
   /// Non-negotiable banner on the Kundli Chart screen shown whenever the app is pointed at Vedika's sandbox, which always returns one fixed sample chart regardless of the birth details sent.
   ///
