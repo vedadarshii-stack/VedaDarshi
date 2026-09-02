@@ -596,9 +596,9 @@
   "@chartSouthLayout": {
     "description": "Subtitle of the South Indian chart-style card on the Kundli — New Chart screen."
   },
-  "kundliCalcNote": "Calculations use Swiss Ephemeris with Lahiri Ayanamsa",
+  "kundliCalcNote": "Vedic sidereal chart with Lahiri Ayanamsa — includes planetary positions, Vimshottari dasha, dosha checks and predictions",
   "@kundliCalcNote": {
-    "description": "Info note on the Kundli — New Chart screen explaining the calculation engine used."
+    "description": "Kundli input screen note. Rewritten 2 Sep 2026: the old text claimed \"Swiss Ephemeris\", which we cannot verify and the client says is wrong for Vedika. Lahiri Ayanamsa IS confirmed by the API response."
   },
   "generateKundli": "Generate Kundli",
   "@generateKundli": {
@@ -880,11 +880,11 @@
   "@askAboutYourStars": {
     "description": "Placeholder hint text in the message input field on the AI Astrologer chat screen."
   },
-  "upgradeUnlimited": "Upgrade for unlimited questions",
+  "upgradeUnlimited": "Upgrade for more questions",
   "@upgradeUnlimited": {
     "description": "Label of the upgrade link under the input bar on the AI Astrologer chat screen. A ✨ emoji prefix is appended in code, not stored in this string."
   },
-  "aiErrorQuotaExceeded": "You've reached today's free question limit. Upgrade for unlimited AI questions.",
+  "aiErrorQuotaExceeded": "You've reached today's free question limit. Upgrade for more daily questions.",
   "@aiErrorQuotaExceeded": {
     "description": "Error shown on the AI Astrologer chat screen when the askAiAstrologer callable fails with HttpsError code resource-exhausted (daily free-question quota used up)."
   },
@@ -916,7 +916,7 @@
   "@goPremium": {
     "description": "Bold headline inside the Go Premium banner on the Premium Reports screen."
   },
-  "goPremiumSubtitle": "Unlock all {total} reports + unlimited AI questions",
+  "goPremiumSubtitle": "Unlock all {total} reports + more daily AI questions",
   "@goPremiumSubtitle": {
     "description": "Subtitle inside the Go Premium banner on the Premium Reports screen, naming the total number of reports in the full catalogue.",
     "placeholders": {
@@ -1026,7 +1026,7 @@
   "@vedadarshiPremium": {
     "description": "Heading of the Subscription Paywall's hero section, naming the premium product."
   },
-  "premiumTagline": "Unlimited cosmic guidance, one simple plan",
+  "premiumTagline": "Deeper cosmic guidance, one simple plan",
   "@premiumTagline": {
     "description": "Subtitle under the heading in the Subscription Paywall's hero section."
   },
@@ -1943,5 +1943,245 @@
   "authErrorUserNotFound": "No account found with that email address.",
   "@authErrorUserNotFound": {
     "description": "Error message shown when no account exists for the entered email address."
+  },
+  "rahuKaalLabel": "Rahu Kaal",
+  "@rahuKaalLabel": {
+    "description": "Label of the Rahu Kaal tile in Home's \"Today at a glance\" grid — the day's inauspicious window, from /v2/astrology/inauspicious-period."
+  },
+  "aiWhoseChart": "Whose chart?",
+  "@aiWhoseChart": {
+    "description": "Title of the bottom sheet on the AI Astrologer screen that picks which saved birth chart the AI should reason about."
+  },
+  "aiChartFor": "Chart: {name}",
+  "@aiChartFor": {
+    "description": "Chip on the AI Astrologer header showing which saved profile's chart the AI is currently using.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "matchDetailedTitle": "What each koota means for you",
+  "@matchDetailedTitle": {
+    "description": "Heading of the per-koota detail section on the Gun Milan result screen, shown as a premium glimpse."
+  },
+  "matchDetailedSubtitle": "Unlock all 8 koota readings, with remedies",
+  "@matchDetailedSubtitle": {
+    "description": "Line above the upgrade button on the Gun Milan result screen saying what unlocking gives."
+  },
+  "matchDetailedCta": "Unlock the full reading",
+  "@matchDetailedCta": {
+    "description": "Upgrade button on the Gun Milan result screen's premium glimpse."
+  },
+  "kundliHousesTitle": "Your houses",
+  "@kundliHousesTitle": {
+    "description": "Heading of the house-by-house section on the Kundli Predictions tab."
+  },
+  "kundliYogasTitle": "Yogas in your chart",
+  "@kundliYogasTitle": {
+    "description": "Heading of the yogas section on the Kundli Predictions tab."
+  },
+  "kundliPredictionsCta": "Unlock your full reading",
+  "@kundliPredictionsCta": {
+    "description": "Upgrade button on the Kundli Predictions tab's premium glimpse."
+  },
+  "kundliPredictionsSubtitle": "All 12 house readings and every yoga in your chart",
+  "@kundliPredictionsSubtitle": {
+    "description": "Line above the upgrade button on the Kundli Predictions tab saying what unlocking gives."
+  },
+  "reportComplete": "Complete Life Report",
+  "@reportComplete": {
+    "description": "Premium report copy (added 2 Sep 2026)."
+  },
+  "reportCompleteDesc": "Your whole chart in one reading — lagna, yogas and all 12 houses",
+  "@reportCompleteDesc": {
+    "description": "Premium report copy (added 2 Sep 2026)."
+  },
+  "reportSectionOverview": "Overview",
+  "@reportSectionOverview": {
+    "description": "Premium report copy (added 2 Sep 2026)."
+  },
+  "reportSectionHighlights": "Key findings",
+  "@reportSectionHighlights": {
+    "description": "Premium report copy (added 2 Sep 2026)."
+  },
+  "reportSectionTiming": "Timing",
+  "@reportSectionTiming": {
+    "description": "Premium report copy (added 2 Sep 2026)."
+  },
+  "reportSectionGuidance": "Guidance",
+  "@reportSectionGuidance": {
+    "description": "Premium report copy (added 2 Sep 2026)."
+  },
+  "reportSectionRemedies": "Remedies",
+  "@reportSectionRemedies": {
+    "description": "Premium report copy (added 2 Sep 2026)."
+  },
+  "reportSectionStrengths": "Strengths",
+  "@reportSectionStrengths": {
+    "description": "Premium report copy (added 2 Sep 2026)."
+  },
+  "reportSectionChallenges": "Watch out for",
+  "@reportSectionChallenges": {
+    "description": "Premium report copy (added 2 Sep 2026)."
+  },
+  "reportGlimpseCta": "Unlock the full report",
+  "@reportGlimpseCta": {
+    "description": "Premium report copy (added 2 Sep 2026)."
+  },
+  "reportGlimpseSubtitle": "Every section, in full, for your own birth chart",
+  "@reportGlimpseSubtitle": {
+    "description": "Premium report copy (added 2 Sep 2026)."
+  },
+  "reportEmptyMessage": "This report isn't available for your chart right now. Please try again.",
+  "@reportEmptyMessage": {
+    "description": "Premium report copy (added 2 Sep 2026)."
+  },
+  "kundliDoshaMangalPresentFrom": "Mangal Dosha — Mars sits in a dosha house counted from {refs}",
+  "@kundliDoshaMangalPresentFrom": {
+    "description": "Kundli dosha banner, rewritten 2 Sep 2026 to name MARS explicitly and to state cancellation.",
+    "placeholders": {
+      "refs": {
+        "type": "String"
+      }
+    }
+  },
+  "kundliDoshaMangalCancelledFrom": "Mangal Dosha from {refs}, but cancelled in your chart",
+  "@kundliDoshaMangalCancelledFrom": {
+    "description": "Kundli dosha banner, rewritten 2 Sep 2026 to name MARS explicitly and to state cancellation.",
+    "placeholders": {
+      "refs": {
+        "type": "String"
+      }
+    }
+  },
+  "kundliDoshaRefLagna": "Lagna",
+  "@kundliDoshaRefLagna": {
+    "description": "Kundli dosha banner, rewritten 2 Sep 2026 to name MARS explicitly and to state cancellation."
+  },
+  "kundliDoshaRefMoon": "Moon",
+  "@kundliDoshaRefMoon": {
+    "description": "Kundli dosha banner, rewritten 2 Sep 2026 to name MARS explicitly and to state cancellation."
+  },
+  "kundliDoshaRefVenus": "Venus",
+  "@kundliDoshaRefVenus": {
+    "description": "Kundli dosha banner, rewritten 2 Sep 2026 to name MARS explicitly and to state cancellation."
+  },
+  "muhuratAbhijit": "Abhijit Muhurat",
+  "@muhuratAbhijit": {
+    "description": "Muhurat window name. Moved out of PanchangStaticData into l10n 2 Sep 2026 — these were hardcoded English and stayed English in every locale."
+  },
+  "muhuratRahuKaal": "Rahu Kaal",
+  "@muhuratRahuKaal": {
+    "description": "Muhurat window name. Moved out of PanchangStaticData into l10n 2 Sep 2026 — these were hardcoded English and stayed English in every locale."
+  },
+  "muhuratYamaganda": "Yamaganda",
+  "@muhuratYamaganda": {
+    "description": "Muhurat window name. Moved out of PanchangStaticData into l10n 2 Sep 2026 — these were hardcoded English and stayed English in every locale."
+  },
+  "muhuratGulikaKaal": "Gulika Kaal",
+  "@muhuratGulikaKaal": {
+    "description": "Muhurat window name. Moved out of PanchangStaticData into l10n 2 Sep 2026 — these were hardcoded English and stayed English in every locale."
+  },
+  "muhuratBrahma": "Brahma Muhurta",
+  "@muhuratBrahma": {
+    "description": "Muhurat window name. Moved out of PanchangStaticData into l10n 2 Sep 2026 — these were hardcoded English and stayed English in every locale."
+  },
+  "askAiButton": "Ask Rishi AI about this",
+  "@askAiButton": {
+    "description": "Ask Rishi AI entry point, added 2 Sep 2026 on client request."
+  },
+  "askAiSeedPlanets": "Explain what the planet positions in my birth chart mean.",
+  "@askAiSeedPlanets": {
+    "description": "Ask Rishi AI entry point, added 2 Sep 2026 on client request."
+  },
+  "askAiSeedDasha": "What does my current Vimshottari dasha period mean for me?",
+  "@askAiSeedDasha": {
+    "description": "Ask Rishi AI entry point, added 2 Sep 2026 on client request."
+  },
+  "askAiSeedPredictions": "Explain the yogas and house predictions in my birth chart.",
+  "@askAiSeedPredictions": {
+    "description": "Ask Rishi AI entry point, added 2 Sep 2026 on client request."
+  },
+  "askAiSeedMatching": "Explain our Gun Milan compatibility score and what it means for us.",
+  "@askAiSeedMatching": {
+    "description": "Ask Rishi AI entry point, added 2 Sep 2026 on client request."
+  },
+  "lblLagna": "Lagna",
+  "@lblLagna": {
+    "description": "Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale."
+  },
+  "lblRashi": "Rashi",
+  "@lblRashi": {
+    "description": "Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale."
+  },
+  "lblCareerHouse": "Career house",
+  "@lblCareerHouse": {
+    "description": "Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale."
+  },
+  "lblCareerLord": "Career lord",
+  "@lblCareerLord": {
+    "description": "Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale."
+  },
+  "lblPartnershipHouse": "Partnership house",
+  "@lblPartnershipHouse": {
+    "description": "Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale."
+  },
+  "lblPartnershipLord": "Partnership lord",
+  "@lblPartnershipLord": {
+    "description": "Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale."
+  },
+  "lblVenus": "Venus",
+  "@lblVenus": {
+    "description": "Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale."
+  },
+  "lblMahadasha": "Mahadasha",
+  "@lblMahadasha": {
+    "description": "Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale."
+  },
+  "lblAntardasha": "Antardasha",
+  "@lblAntardasha": {
+    "description": "Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale."
+  },
+  "lblPhase": "Phase",
+  "@lblPhase": {
+    "description": "Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale."
+  },
+  "lblMantra": "Mantra",
+  "@lblMantra": {
+    "description": "Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale."
+  },
+  "lblSetting": "Setting",
+  "@lblSetting": {
+    "description": "Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale."
+  },
+  "lblDayToWear": "Day to wear",
+  "@lblDayToWear": {
+    "description": "Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale."
+  },
+  "lblLifePath": "Life path",
+  "@lblLifePath": {
+    "description": "Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale."
+  },
+  "lblDestiny": "Destiny",
+  "@lblDestiny": {
+    "description": "Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale."
+  },
+  "lblSoulUrge": "Soul urge",
+  "@lblSoulUrge": {
+    "description": "Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale."
+  },
+  "lblPersonality": "Personality",
+  "@lblPersonality": {
+    "description": "Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale."
+  },
+  "lblHouseN": "House {n}",
+  "@lblHouseN": {
+    "description": "Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale.",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
   }
 }

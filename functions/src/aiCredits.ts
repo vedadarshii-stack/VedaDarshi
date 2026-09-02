@@ -180,13 +180,49 @@ interface VedikaBirthDetails {
  * has its own string literals because there is no shared source of truth
  * across the two runtimes — keep them in sync by hand if either changes.
  */
-function birthProfileRef(uid: string) {
+function birthProfileRef(uid: string, profileId: string = "primary") {
   return admin
     .firestore()
     .collection("users")
     .doc(uid)
     .collection("birthProfiles")
-    .doc("primary");
+    .doc(profileId);
+}
+
+/**
+ * Validates a client-supplied profile id before it is used as a document id.
+ *
+ * ADDED 2 Sep 2026 for the AI Astrologer's multi-profile support (asking
+ * about a family member's chart, a paid feature).
+ *
+ * **The id is the only part of the read path the client controls**, so it is
+ * checked rather than trusted. It cannot escape the caller's own subtree —
+ * the collection is always `/users/{auth.uid}/birthProfiles`, and the uid
+ * comes from the verified token, never the request — but a value containing
+ * `/` would still let a caller reach a nested path inside their own tree, and
+ * an empty string throws deep inside the SDK. So: no slashes, no `.`/`..`,
+ * non-empty, and length-capped to what a Firestore auto-id can be.
+ *
+ * Note this deliberately does NOT check that the profile is one the user is
+ * "allowed" to ask about beyond that: every document under their own
+ * `birthProfiles` collection is theirs by construction.
+ */
+function safeProfileId(raw: unknown): string {
+  if (raw === undefined || raw === null) return "primary";
+  if (typeof raw !== "string") {
+    throw new HttpsError("invalid-argument", "profileId must be a string.");
+  }
+  const id = raw.trim();
+  if (
+    id.length === 0 ||
+    id.length > 128 ||
+    id.includes("/") ||
+    id === "." ||
+    id === ".."
+  ) {
+    throw new HttpsError("invalid-argument", "profileId is not a valid id.");
+  }
+  return id;
 }
 
 /**
@@ -269,8 +305,11 @@ function buildBirthDateComponents(
  * profile can never get an answer anyway, so failing here must not cost
  * them one of their scarce, tier-limited daily questions.
  */
-async function resolveBirthDetails(uid: string): Promise<VedikaBirthDetails> {
-  const snap = await birthProfileRef(uid).get();
+async function resolveBirthDetails(
+  uid: string,
+  profileId: string = "primary"
+): Promise<VedikaBirthDetails> {
+  const snap = await birthProfileRef(uid, profileId).get();
   const data = snap.data();
 
   const dateOfBirth = data?.dateOfBirth;
@@ -291,7 +330,9 @@ async function resolveBirthDetails(uid: string): Promise<VedikaBirthDetails> {
   if (!isValid) {
     throw new HttpsError(
       "failed-precondition",
-      "Save your birth details first — the AI astrologer needs your birth chart to answer questions."
+      profileId === "primary"
+        ? "Save your birth details first — the AI astrologer needs your birth chart to answer questions."
+        : "That saved profile is missing its birth details, so the AI astrologer can't read its chart."
     );
   }
 
@@ -491,10 +532,23 @@ export const askAiAstrologer = onCall(
         ? (request.data.conversationId as string)
         : undefined;
 
+    // Which saved chart to reason about. Defaults to the account owner's
+    // own `primary` profile, which is what every caller sent before
+    // multi-profile AI existed — so an older app build keeps working
+    // unchanged. Validated, never used raw: see safeProfileId.
+    //
+    // NOT gated here. Entitlement is enforced in the app, because the gate
+    // is a paywall (a selling decision), not a security boundary — every
+    // profile under /users/{uid}/birthProfiles already belongs to the
+    // caller, so asking about one costs them their own daily credit and
+    // exposes nothing. If that ever needs to be a hard limit, the check
+    // belongs here, against RevenueCat, not against a client-sent flag.
+    const profileId = safeProfileId(request.data?.profileId);
+
     // ---- 0. BIRTH DETAILS ------------------------------------------------
     // Resolved BEFORE reserving a credit — see resolveBirthDetails' doc
     // comment for why.
-    const birthDetails = await resolveBirthDetails(uid);
+    const birthDetails = await resolveBirthDetails(uid, profileId);
 
     const dateKey = todayKeyIST();
 

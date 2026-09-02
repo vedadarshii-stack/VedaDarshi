@@ -109,6 +109,44 @@ export function cacheTtlSeconds(path: string): number {
   if (path.includes("guna-milan") || path.includes("matching")) {
     return 60 * 60 * 24 * 365;
   }
+
+  // Premium reports, added 2 Sep 2026 when the Reports screen started
+  // actually fetching them. These are the MOST EXPENSIVE calls in the whole
+  // app — `/v2/reports/complete` bills $0.07, roughly 5x a normal call,
+  // measured against the live balance — and they fell to the 1-hour default
+  // below, so re-opening a report card the next day re-billed it. Splitting
+  // them by what the answer actually depends on:
+  //
+  //  - NATAL-ONLY reports are pure functions of the birth details, exactly
+  //    like a kundli, so they are cached for a year. `complete`,
+  //    `birth-chart-report`, `career-report` and `marriage-report` describe
+  //    houses, lords and yogas; the gemstone remedy follows natal planet
+  //    strength; numerology follows the birth date. None of these change
+  //    tomorrow.
+  //  - TRANSIT-DEPENDENT reports fall through to the 24-hour tier further
+  //    down. Sade Sati is defined BY Saturn's current transit, wealth-timing
+  //    keys off the active dasha and transit summary, and health-report's
+  //    healing periods reference Jupiter's transit. Caching those for a year
+  //    would serve a stale verdict long after it stopped being true, which
+  //    is a correctness bug, not a saving.
+  if (
+    path.includes("/reports/complete") ||
+    path.includes("/reports/birth-chart-report") ||
+    path.includes("/reports/career-report") ||
+    path.includes("/reports/marriage-report") ||
+    path.includes("/remedies/gemstone") ||
+    path.includes("/numerology/")
+  ) {
+    return 60 * 60 * 24 * 365;
+  }
+  if (
+    path.includes("/reports/health-report") ||
+    path.includes("/sade-sati") ||
+    path.includes("/finance/")
+  ) {
+    return 60 * 60 * 24;
+  }
+
   return 60 * 60; // conservative default
 }
 

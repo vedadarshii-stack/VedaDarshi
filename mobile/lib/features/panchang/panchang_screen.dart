@@ -7,6 +7,7 @@ import '../../core/theme/app_fonts.dart';
 import '../../core/vedika/vedika_config.dart';
 import '../../core/widgets/app_bottom_nav.dart';
 import '../../core/widgets/app_empty_state.dart';
+import '../../core/astrology/astro_terms.dart';
 import '../../l10n/app_localizations.dart';
 import 'muhurat_timings_screen.dart';
 import 'panchang_data.dart';
@@ -79,12 +80,24 @@ String _masaPakshaLine(PanchangData? data) {
 /// worse than showing none). Tithi does carry a real
 /// `percentageRemaining`, and Nakshatra a real `pada`, so those two use
 /// that instead.
-List<PanchangElement> _elementsFrom(PanchangData? data, AppLocalizations l10n) {
+List<PanchangElement> _elementsFrom(
+  PanchangData? data,
+  AppLocalizations l10n,
+  Locale locale,
+) {
   final fallback = PanchangStaticData.elements;
   if (data == null) return fallback;
 
-  final tithiName = data.tithi?.name;
-  final tithiPaksha = data.tithi?.paksha;
+  // Vedika returns these five as Latin transliteration and ignores every
+  // language parameter (verified on production 2 Sep 2026), so they are
+  // translated locally from the closed vocabulary — see
+  // `core/astrology/astro_terms.dart`. Anything not in that table falls
+  // through as the English Vedika sent, never as a guess.
+  String? term(String? value, AstroTermKind kind) =>
+      localizeAstroTerm(value, kind, locale);
+
+  final tithiName = term(data.tithi?.name, AstroTermKind.tithi);
+  final tithiPaksha = term(data.tithi?.paksha, AstroTermKind.paksha);
   final String tithiValue;
   if (tithiName == null) {
     tithiValue = fallback[0].value;
@@ -102,58 +115,88 @@ List<PanchangElement> _elementsFrom(PanchangData? data, AppLocalizations l10n) {
     PanchangElement(PanchangElementId.tithi, tithiValue, tithiTill),
     PanchangElement(
       PanchangElementId.nakshatra,
-      data.nakshatra?.name ?? fallback[1].value,
+      term(data.nakshatra?.name, AstroTermKind.nakshatra) ??
+          fallback[1].value,
       pada == null ? null : l10n.panchangPada(pada),
     ),
     PanchangElement(
       PanchangElementId.yoga,
-      data.yoga?.name ?? fallback[2].value,
+      term(data.yoga?.name, AstroTermKind.yoga) ?? fallback[2].value,
       null,
     ),
     PanchangElement(
       PanchangElementId.karana,
-      data.karana?.name ?? fallback[3].value,
+      term(data.karana?.name, AstroTermKind.karana) ?? fallback[3].value,
       null,
     ),
     PanchangElement(
       PanchangElementId.vaar,
-      data.vara?.name ?? fallback[4].value,
+      term(data.vara?.name, AstroTermKind.vara) ?? fallback[4].value,
       null,
     ),
   ];
 }
 
 /// The muhurat cards that are backed by REAL data. Possibly just one.
+/// Builds the muhurat grid from the day's real windows.
 ///
-/// REWRITTEN 22 Aug 2026 — it used to always return four, padding Abhijit
-/// Muhurat, Yamaganda and Gulika Kaal with [PanchangStaticData.muhurats]'
-/// fixed times so the 2x2 grid always filled.
+/// ALL FOUR CARDS ARE LIVE as of 2 Sep 2026 (client: "rahu kal and
+/// yamaganda are basic things"). They come from
+/// `POST /v2/astrology/inauspicious-period` via [inauspiciousPeriodsProvider]
+/// — see [InauspiciousPeriods]'s doc comment for why that is a separate
+/// call from `/v2/daily/muhurta`.
 ///
-/// Those three are now DROPPED rather than faked, because there is no
-/// source for them that can be trusted:
+/// ## What changed, and why the old objection no longer applies
 ///
-///  - `/v2/daily/muhurta`, the endpoint this screen calls, does not return
-///    them at all — only `rahu_kaal`, `choghadiya` and `hora`.
-///  - The `/v2/astrology/panchang` bundle DOES return them, and every one
-///    is corrupt: `end` before `start` on all three (abhijit
-///    00:53 -> 00:09, yamaganda 04:39 -> 03:16, gulika 01:54 -> 00:31,
-///    measured 21 Aug 2026). That is the same upstream defect that made
-///    Rahu Kaal render as an impossible "06:55 - 05:33 PM" before its own
-///    fix, so the data cannot simply be swapped in.
+/// Three of these cards used to be dropped rather than faked. The reason
+/// was sound: `/v2/daily/muhurta` does not return them at all, and the
+/// `/v2/astrology/panchang` bundle's copies were CORRUPT — `end` before
+/// `start` on all three (abhijit 00:53 -> 00:09, yamaganda 04:39 -> 03:16,
+/// gulika 01:54 -> 00:31, measured 21 Aug 2026). A muhurat is a window
+/// people plan around, so a wrong one is not a harmless placeholder, it is
+/// bad advice.
 ///
-/// A muhurat is a window a user PLANS AROUND — they will avoid signing a
-/// contract during Yamaganda or start something during Abhijit. A fixed
-/// time that never changes with the day or the place is not a placeholder
-/// in any harmless sense; it is advice, and it is wrong. Showing one real
-/// window is better than four where three are invented.
+/// The new endpoint returns all four correctly ordered — verified live for
+/// 2 Sep 2026: abhijit 06:25:41->07:15:00, gulika 05:17:52->06:50:21,
+/// rahu 06:50:21->08:22:50, yamaganda 02:12:54->03:45:23 — and its Rahu
+/// Kaal matches `/v2/daily/muhurta`'s to the second, so the two sources
+/// cannot disagree on screen.
 ///
-/// Restore them when Vedika's timestamps are valid: the shape is already
-/// modelled, so it is a parse away.
-List<Muhurat> _muhuratsFrom(MuhurtaData? muhurta) {
-  final rahuRange = muhurta?.rahuKaal?.formattedRange;
-  if (rahuRange == null) return const [];
-  final rahuTemplate = PanchangStaticData.muhurats[1];
-  return [Muhurat(rahuTemplate.name, rahuRange, rahuTemplate.kind)];
+/// **The corrupt-data guard is still in force.** Every range goes through
+/// [RahuKaal.formattedRange], which returns null when `end` is not after
+/// `start`. So if Vedika regresses, that card silently disappears rather
+/// than rendering an impossible window. Keep it that way — an absent card
+/// is recoverable, wrong advice is not.
+///
+/// Names and colour treatments still come from [PanchangStaticData.muhurats]
+/// because those are UI copy, not data: Abhijit stays `shubh`, Rahu Kaal
+/// and Yamaganda `ashubh`, Gulika `caution`. Only the TIMES are live.
+List<Muhurat> _muhuratsFrom(InauspiciousPeriods? periods, AppLocalizations l10n) {
+  if (periods == null) return const [];
+  // Names come from l10n as of 2 Sep 2026, not `PanchangStaticData.muhurats`
+  // — those were hardcoded English and therefore stayed English in Hindi,
+  // Telugu, Tamil and Kannada, part of what the client reported as
+  // *"many things showing in English only even when we select other
+  // language"*.
+  //
+  // Brahma Muhurta is new here too, on client request. It is AUSPICIOUS
+  // (`shubh`), like Abhijit — rendering the pre-dawn devotional window in
+  // the warning tone the three inauspicious ones use would tell people to
+  // avoid the best hour of their day.
+  final windows = <(String, RahuKaal?, MuhuratKind)>[
+    (l10n.muhuratBrahma, periods.brahmaMuhurta, MuhuratKind.shubh),
+    (l10n.muhuratAbhijit, periods.abhijitMuhurta, MuhuratKind.shubh),
+    (l10n.muhuratRahuKaal, periods.rahuKaal, MuhuratKind.ashubh),
+    (l10n.muhuratYamaganda, periods.yamaganda, MuhuratKind.ashubh),
+    (l10n.muhuratGulikaKaal, periods.gulikaKaal, MuhuratKind.caution),
+  ];
+  return [
+    for (final (name, window, kind) in windows)
+      // A window whose end is not after its start is dropped, not rendered
+      // as an impossible range — Vedika does occasionally return one (a
+      // negative `durationMinutes` was observed live on Abhijit).
+      if (window?.formattedRange case final range?) Muhurat(name, range, kind),
+  ];
 }
 
 /// Panchang — daily Vedic almanac, per the approved Figma "B2 · Panchang"
@@ -231,11 +274,19 @@ class _PanchangScreenState extends ConsumerState<PanchangScreen> {
     final panchangAsync = ref.watch(panchangDataProvider(request));
     // Same location as the panchang request — Rahu Kaal is sunrise/sunset
     // derived and therefore location-dependent (21 Aug 2026).
-    final muhurtaAsync = ref.watch(
-      muhurtaDataProvider((
+    // The muhurat GRID now comes from `inauspiciousPeriodsProvider`, which
+    // is the only source that returns Yamaganda, Gulika and Abhijit (see
+    // `_muhuratsFrom`). `/v2/daily/muhurta` is still fetched elsewhere for
+    // choghadiya, but this screen no longer needs it.
+    final periodsAsync = ref.watch(
+      inauspiciousPeriodsProvider((
         lat: request.lat,
         lon: request.lon,
         tz: request.tz,
+        // The SELECTED date, not today — stepping the date now moves the
+        // muhurat windows with the header. See
+        // `PanchangRepository.fetchInauspiciousPeriods`.
+        date: _selectedDate,
       )),
     );
 
@@ -266,8 +317,8 @@ class _PanchangScreenState extends ConsumerState<PanchangScreen> {
               data: (data) => _PanchangBody(
                 l10n: l10n,
                 locale: locale,
-                elements: _elementsFrom(data, l10n),
-                muhurats: _muhuratsFrom(muhurtaAsync.valueOrNull),
+                elements: _elementsFrom(data, l10n, locale),
+                muhurats: _muhuratsFrom(periodsAsync.valueOrNull, l10n),
                 sunTimes: data.sunTimes,
                 guidance: data.guidance,
                 festivalToday: data.festivalToday,
@@ -1517,21 +1568,14 @@ Future<void> _showFestivalDetails(
                   ),
                 ),
               ],
-              if (festival.source != null && festival.source!.isNotEmpty) ...[
-                const SizedBox(height: 18),
-                // Shown as plain text, not a tappable link: opening an
-                // external browser is a bigger action than this sheet
-                // implies, and the app has no url_launcher dependency. The
-                // attribution is the point.
-                Text(
-                  festival.source!,
-                  style: AppFonts.body(
-                    locale,
-                    fontSize: 10.5,
-                    color: AppColors.hint,
-                  ),
-                ),
-              ],
+              // REMOVED 2 Sep 2026 on client instruction: *"in festival
+              // section it's showing dirkpanchang link please don't show
+              // that link"*. Vedika populates `source` with a URL on
+              // drikpanchang.com — a rival panchang site — so this rendered
+              // a competitor's address inside our own festival card. The
+              // field is still PARSED (`PanchangFestival.source`), just not
+              // shown; it stays useful for debugging where a contested
+              // festival date came from.
             ],
           ),
         ),

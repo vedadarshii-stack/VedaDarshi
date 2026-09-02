@@ -6,6 +6,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../core/vedika/vedika_config.dart';
 import '../../core/widgets/app_bottom_nav.dart';
+import '../../core/astrology/astro_terms.dart';
 import '../../l10n/app_localizations.dart';
 import '../ai/ai_astrologer_screen.dart';
 import '../articles/article_detail_screen.dart';
@@ -164,10 +165,22 @@ List<GlanceTile> _glanceTilesFrom({
   required MuhurtaData? muhurta,
   required PanchangData? panchang,
   required int? luckyNumber,
+  required InauspiciousPeriods? periods,
+  required Locale locale,
 }) {
   final muhuratRange = _nextGoodMuhuratRange(muhurta?.choghadiya);
+  // Rahu Kaal — the day's inauspicious window, from the same call that
+  // fills the Panchang tab's muhurat grid. Null-safe by construction:
+  // `formattedRange` returns null when Vedika sends `end` before `start`,
+  // so a corrupt window drops the tile rather than rendering nonsense.
+  final rahuKaalRange = periods?.rahuKaal?.formattedRange;
   final luckyColor = panchang?.vara?.luckyColor;
-  final planet = panchang?.vara?.lord;
+  // The weekday lord is a graha name Vedika sends in English ("Mercury").
+  final planet = localizeAstroTerm(
+    panchang?.vara?.lord,
+    AstroTermKind.graha,
+    locale,
+  );
   // "Direction" on this tile means the AUSPICIOUS way to travel, so it is
   // the first safe direction — NOT `disha_shool.direction`, which is the
   // direction to avoid. Rendering the inauspicious one under a bare
@@ -192,6 +205,20 @@ List<GlanceTile> _glanceTilesFrom({
         ? GlanceTile(GlanceTileId.todaysPlanet, planet)
         : staticById[GlanceTileId.todaysPlanet]!,
     if (muhuratRange != null) GlanceTile(GlanceTileId.muhurat, muhuratRange),
+    // The five muhurat windows, in the order a day runs: the pre-dawn
+    // Brahma Muhurta, midday Abhijit, then the three to avoid. Each is
+    // dropped individually when its window is missing or malformed, so a
+    // partial response shrinks the grid instead of emptying it.
+    if (periods?.brahmaMuhurta?.formattedRange case final range?)
+      GlanceTile(GlanceTileId.brahmaMuhurta, range),
+    if (periods?.abhijitMuhurta?.formattedRange case final range?)
+      GlanceTile(GlanceTileId.abhijit, range),
+    if (rahuKaalRange != null)
+      GlanceTile(GlanceTileId.rahuKaal, rahuKaalRange),
+    if (periods?.yamaganda?.formattedRange case final range?)
+      GlanceTile(GlanceTileId.yamaganda, range),
+    if (periods?.gulikaKaal?.formattedRange case final range?)
+      GlanceTile(GlanceTileId.gulikaKaal, range),
   ];
 }
 
@@ -298,6 +325,26 @@ class HomeDashboardScreen extends ConsumerWidget {
           )),
         )
         .valueOrNull;
+    // Rahu Kaal / Yamaganda etc. — same location as the panchang request,
+    // for the same reason muhurta is: these windows derive from
+    // sunrise/sunset and so vary by place.
+    final livePeriods = ref
+        .watch(
+          inauspiciousPeriodsProvider((
+            lat: panchangRequest.lat,
+            lon: panchangRequest.lon,
+            tz: panchangRequest.tz,
+            // Home always shows today; only Panchang has a date stepper.
+            //
+            // TRUNCATED TO THE CALENDAR DAY on purpose. A raw
+            // `DateTime.now()` here would be a different value on every
+            // rebuild, so the provider FAMILY KEY would change every frame —
+            // a new provider instance and a fresh billed fetch each time,
+            // not just a cache miss.
+            date: _todayDate(),
+          )),
+        )
+        .valueOrNull;
 
     // Lucky Number — ADDED 24 Aug 2026, replacing a constant "3, 9" shown to
     // every user on every day. Reuses `userZodiacSignProvider` (the same
@@ -349,6 +396,7 @@ class HomeDashboardScreen extends ConsumerWidget {
               muhurta: liveMuhurta,
               panchang: livePanchang,
               luckyNumber: luckyNumber,
+              periods: livePeriods,
             ),
             const SizedBox(height: 14),
             // _RemedyCard REMOVED entirely (not just its mantra half) when
@@ -720,14 +768,21 @@ class _PanchangHeroCard extends StatelessWidget {
     // endpoint this app calls, so they remain documented placeholders rather
     // than a loading state.
     final fallback = HomeStaticData.panchang;
-    final tithiName = live?.tithi?.name;
-    final tithiPaksha = live?.tithi?.paksha;
+    // Translated locally from the closed vocabulary, exactly as the Panchang
+    // tab does — Vedika sends these in Latin transliteration whatever
+    // language is requested. See `core/astrology/astro_terms.dart`.
+    String? term(String? value, AstroTermKind kind) =>
+        localizeAstroTerm(value, kind, locale);
+
+    final tithiName = term(live?.tithi?.name, AstroTermKind.tithi);
+    final tithiPaksha = term(live?.tithi?.paksha, AstroTermKind.paksha);
     final tithi = tithiName == null
         ? pending
         : (tithiPaksha == null ? tithiName : '$tithiPaksha $tithiName');
-    final nakshatra = live?.nakshatra?.name ?? pending;
-    final yoga = live?.yoga?.name ?? pending;
-    final karana = live?.karana?.name ?? pending;
+    final nakshatra =
+        term(live?.nakshatra?.name, AstroTermKind.nakshatra) ?? pending;
+    final yoga = term(live?.yoga?.name, AstroTermKind.yoga) ?? pending;
+    final karana = term(live?.karana?.name, AstroTermKind.karana) ?? pending;
 
     // The date line is always today's real date — unlike the other fields
     // above, this one never falls back to the frozen mock date in
@@ -1041,6 +1096,28 @@ _GlanceTileMeta _glanceMeta(GlanceTileId id, AppLocalizations l10n) {
       return _GlanceTileMeta(l10n.todaysPlanet, '🪐', AppColors.tilePurpleBg);
     case GlanceTileId.muhurat:
       return _GlanceTileMeta(l10n.muhurat, '⏰', AppColors.genderSelectedBg);
+    // Rahu Kaal is the INAUSPICIOUS window, so it gets the ashubh tint —
+    // never the same treatment as Muhurat above, which is the auspicious
+    // one. Rendering them alike would invert the advice, the same trap the
+    // Direction tile documents.
+    case GlanceTileId.rahuKaal:
+      return _GlanceTileMeta(l10n.muhuratRahuKaal, '⚠️', AppColors.ashubhBg);
+    // Yamaganda is inauspicious like Rahu Kaal; Gulika is the milder
+    // "caution" one, matching the Panchang grid's own three-way split.
+    case GlanceTileId.yamaganda:
+      return _GlanceTileMeta(l10n.muhuratYamaganda, '⚠️', AppColors.ashubhBg);
+    case GlanceTileId.gulikaKaal:
+      return _GlanceTileMeta(l10n.muhuratGulikaKaal, '🌗', AppColors.mantraBg);
+    // AUSPICIOUS — same calm treatment as Muhurat above, deliberately NOT
+    // the ashubh tint the three windows to avoid carry.
+    case GlanceTileId.abhijit:
+      return _GlanceTileMeta(
+        l10n.muhuratAbhijit,
+        '☀️',
+        AppColors.genderSelectedBg,
+      );
+    case GlanceTileId.brahmaMuhurta:
+      return _GlanceTileMeta(l10n.muhuratBrahma, '🪔', AppColors.geoChipBg);
   }
 }
 
@@ -1064,6 +1141,7 @@ class _GlanceSection extends StatelessWidget {
     required this.muhurta,
     required this.panchang,
     required this.luckyNumber,
+    required this.periods,
   });
 
   final AppLocalizations l10n;
@@ -1081,6 +1159,11 @@ class _GlanceSection extends StatelessWidget {
   /// tile — see `HomeDashboardScreen.build`.
   final int? luckyNumber;
 
+  /// The day's Rahu Kaal / Yamaganda / Gulika / Abhijit windows. Only Rahu
+  /// Kaal is rendered in this grid; the full set fills the Panchang tab's
+  /// muhurat cards.
+  final InauspiciousPeriods? periods;
+
   static const int _columns = 3;
   static const double _spacing = 10;
 
@@ -1090,6 +1173,8 @@ class _GlanceSection extends StatelessWidget {
       muhurta: muhurta,
       panchang: panchang,
       luckyNumber: luckyNumber,
+      periods: periods,
+      locale: locale,
     );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2210,4 +2295,11 @@ class _DailyQuoteCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Today with the time component stripped — a stable key for
+/// [inauspiciousPeriodsProvider]. See its call site above.
+DateTime _todayDate() {
+  final now = DateTime.now();
+  return DateTime(now.year, now.month, now.day);
 }

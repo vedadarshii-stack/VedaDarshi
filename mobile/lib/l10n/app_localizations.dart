@@ -926,10 +926,10 @@ abstract class AppLocalizations {
   /// **'Grid layout'**
   String get chartSouthLayout;
 
-  /// Info note on the Kundli — New Chart screen explaining the calculation engine used.
+  /// Kundli input screen note. Rewritten 2 Sep 2026: the old text claimed "Swiss Ephemeris", which we cannot verify and the client says is wrong for Vedika. Lahiri Ayanamsa IS confirmed by the API response.
   ///
   /// In en, this message translates to:
-  /// **'Calculations use Swiss Ephemeris with Lahiri Ayanamsa'**
+  /// **'Vedic sidereal chart with Lahiri Ayanamsa — includes planetary positions, Vimshottari dasha, dosha checks and predictions'**
   String get kundliCalcNote;
 
   /// Label of the CTA button on the Kundli — New Chart screen that generates the chart. The 🪔 emoji suffix is appended in code, not stored in this string.
@@ -1313,13 +1313,13 @@ abstract class AppLocalizations {
   /// Label of the upgrade link under the input bar on the AI Astrologer chat screen. A ✨ emoji prefix is appended in code, not stored in this string.
   ///
   /// In en, this message translates to:
-  /// **'Upgrade for unlimited questions'**
+  /// **'Upgrade for more questions'**
   String get upgradeUnlimited;
 
   /// Error shown on the AI Astrologer chat screen when the askAiAstrologer callable fails with HttpsError code resource-exhausted (daily free-question quota used up).
   ///
   /// In en, this message translates to:
-  /// **'You\'ve reached today\'s free question limit. Upgrade for unlimited AI questions.'**
+  /// **'You\'ve reached today\'s free question limit. Upgrade for more daily questions.'**
   String get aiErrorQuotaExceeded;
 
   /// Error shown on the AI Astrologer chat screen when the askAiAstrologer callable fails with HttpsError code failed-precondition (no birth profile saved yet).
@@ -1367,7 +1367,7 @@ abstract class AppLocalizations {
   /// Subtitle inside the Go Premium banner on the Premium Reports screen, naming the total number of reports in the full catalogue.
   ///
   /// In en, this message translates to:
-  /// **'Unlock all {total} reports + unlimited AI questions'**
+  /// **'Unlock all {total} reports + more daily AI questions'**
   String goPremiumSubtitle(String total);
 
   /// Label of the pill CTA inside the Go Premium banner on the Premium Reports screen.
@@ -1505,7 +1505,7 @@ abstract class AppLocalizations {
   /// Subtitle under the heading in the Subscription Paywall's hero section.
   ///
   /// In en, this message translates to:
-  /// **'Unlimited cosmic guidance, one simple plan'**
+  /// **'Deeper cosmic guidance, one simple plan'**
   String get premiumTagline;
 
   /// Per-tier feature line on the Subscription Paywall's plan cards, naming the daily AI Astrologer question cap for that tier (includes the free daily question — never phrase this as unlimited, no tier is).
@@ -2623,6 +2623,336 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No account found with that email address.'**
   String get authErrorUserNotFound;
+
+  /// Label of the Rahu Kaal tile in Home's "Today at a glance" grid — the day's inauspicious window, from /v2/astrology/inauspicious-period.
+  ///
+  /// In en, this message translates to:
+  /// **'Rahu Kaal'**
+  String get rahuKaalLabel;
+
+  /// Title of the bottom sheet on the AI Astrologer screen that picks which saved birth chart the AI should reason about.
+  ///
+  /// In en, this message translates to:
+  /// **'Whose chart?'**
+  String get aiWhoseChart;
+
+  /// Chip on the AI Astrologer header showing which saved profile's chart the AI is currently using.
+  ///
+  /// In en, this message translates to:
+  /// **'Chart: {name}'**
+  String aiChartFor(String name);
+
+  /// Heading of the per-koota detail section on the Gun Milan result screen, shown as a premium glimpse.
+  ///
+  /// In en, this message translates to:
+  /// **'What each koota means for you'**
+  String get matchDetailedTitle;
+
+  /// Line above the upgrade button on the Gun Milan result screen saying what unlocking gives.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock all 8 koota readings, with remedies'**
+  String get matchDetailedSubtitle;
+
+  /// Upgrade button on the Gun Milan result screen's premium glimpse.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock the full reading'**
+  String get matchDetailedCta;
+
+  /// Heading of the house-by-house section on the Kundli Predictions tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Your houses'**
+  String get kundliHousesTitle;
+
+  /// Heading of the yogas section on the Kundli Predictions tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Yogas in your chart'**
+  String get kundliYogasTitle;
+
+  /// Upgrade button on the Kundli Predictions tab's premium glimpse.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock your full reading'**
+  String get kundliPredictionsCta;
+
+  /// Line above the upgrade button on the Kundli Predictions tab saying what unlocking gives.
+  ///
+  /// In en, this message translates to:
+  /// **'All 12 house readings and every yoga in your chart'**
+  String get kundliPredictionsSubtitle;
+
+  /// Premium report copy (added 2 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'Complete Life Report'**
+  String get reportComplete;
+
+  /// Premium report copy (added 2 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'Your whole chart in one reading — lagna, yogas and all 12 houses'**
+  String get reportCompleteDesc;
+
+  /// Premium report copy (added 2 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get reportSectionOverview;
+
+  /// Premium report copy (added 2 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'Key findings'**
+  String get reportSectionHighlights;
+
+  /// Premium report copy (added 2 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'Timing'**
+  String get reportSectionTiming;
+
+  /// Premium report copy (added 2 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'Guidance'**
+  String get reportSectionGuidance;
+
+  /// Premium report copy (added 2 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'Remedies'**
+  String get reportSectionRemedies;
+
+  /// Premium report copy (added 2 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'Strengths'**
+  String get reportSectionStrengths;
+
+  /// Premium report copy (added 2 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'Watch out for'**
+  String get reportSectionChallenges;
+
+  /// Premium report copy (added 2 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock the full report'**
+  String get reportGlimpseCta;
+
+  /// Premium report copy (added 2 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'Every section, in full, for your own birth chart'**
+  String get reportGlimpseSubtitle;
+
+  /// Premium report copy (added 2 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'This report isn\'t available for your chart right now. Please try again.'**
+  String get reportEmptyMessage;
+
+  /// Kundli dosha banner, rewritten 2 Sep 2026 to name MARS explicitly and to state cancellation.
+  ///
+  /// In en, this message translates to:
+  /// **'Mangal Dosha — Mars sits in a dosha house counted from {refs}'**
+  String kundliDoshaMangalPresentFrom(String refs);
+
+  /// Kundli dosha banner, rewritten 2 Sep 2026 to name MARS explicitly and to state cancellation.
+  ///
+  /// In en, this message translates to:
+  /// **'Mangal Dosha from {refs}, but cancelled in your chart'**
+  String kundliDoshaMangalCancelledFrom(String refs);
+
+  /// Kundli dosha banner, rewritten 2 Sep 2026 to name MARS explicitly and to state cancellation.
+  ///
+  /// In en, this message translates to:
+  /// **'Lagna'**
+  String get kundliDoshaRefLagna;
+
+  /// Kundli dosha banner, rewritten 2 Sep 2026 to name MARS explicitly and to state cancellation.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon'**
+  String get kundliDoshaRefMoon;
+
+  /// Kundli dosha banner, rewritten 2 Sep 2026 to name MARS explicitly and to state cancellation.
+  ///
+  /// In en, this message translates to:
+  /// **'Venus'**
+  String get kundliDoshaRefVenus;
+
+  /// Muhurat window name. Moved out of PanchangStaticData into l10n 2 Sep 2026 — these were hardcoded English and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Abhijit Muhurat'**
+  String get muhuratAbhijit;
+
+  /// Muhurat window name. Moved out of PanchangStaticData into l10n 2 Sep 2026 — these were hardcoded English and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Rahu Kaal'**
+  String get muhuratRahuKaal;
+
+  /// Muhurat window name. Moved out of PanchangStaticData into l10n 2 Sep 2026 — these were hardcoded English and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Yamaganda'**
+  String get muhuratYamaganda;
+
+  /// Muhurat window name. Moved out of PanchangStaticData into l10n 2 Sep 2026 — these were hardcoded English and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Gulika Kaal'**
+  String get muhuratGulikaKaal;
+
+  /// Muhurat window name. Moved out of PanchangStaticData into l10n 2 Sep 2026 — these were hardcoded English and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Brahma Muhurta'**
+  String get muhuratBrahma;
+
+  /// Ask Rishi AI entry point, added 2 Sep 2026 on client request.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask Rishi AI about this'**
+  String get askAiButton;
+
+  /// Ask Rishi AI entry point, added 2 Sep 2026 on client request.
+  ///
+  /// In en, this message translates to:
+  /// **'Explain what the planet positions in my birth chart mean.'**
+  String get askAiSeedPlanets;
+
+  /// Ask Rishi AI entry point, added 2 Sep 2026 on client request.
+  ///
+  /// In en, this message translates to:
+  /// **'What does my current Vimshottari dasha period mean for me?'**
+  String get askAiSeedDasha;
+
+  /// Ask Rishi AI entry point, added 2 Sep 2026 on client request.
+  ///
+  /// In en, this message translates to:
+  /// **'Explain the yogas and house predictions in my birth chart.'**
+  String get askAiSeedPredictions;
+
+  /// Ask Rishi AI entry point, added 2 Sep 2026 on client request.
+  ///
+  /// In en, this message translates to:
+  /// **'Explain our Gun Milan compatibility score and what it means for us.'**
+  String get askAiSeedMatching;
+
+  /// Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Lagna'**
+  String get lblLagna;
+
+  /// Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Rashi'**
+  String get lblRashi;
+
+  /// Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Career house'**
+  String get lblCareerHouse;
+
+  /// Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Career lord'**
+  String get lblCareerLord;
+
+  /// Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Partnership house'**
+  String get lblPartnershipHouse;
+
+  /// Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Partnership lord'**
+  String get lblPartnershipLord;
+
+  /// Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Venus'**
+  String get lblVenus;
+
+  /// Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Mahadasha'**
+  String get lblMahadasha;
+
+  /// Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Antardasha'**
+  String get lblAntardasha;
+
+  /// Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Phase'**
+  String get lblPhase;
+
+  /// Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Mantra'**
+  String get lblMantra;
+
+  /// Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Setting'**
+  String get lblSetting;
+
+  /// Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Day to wear'**
+  String get lblDayToWear;
+
+  /// Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Life path'**
+  String get lblLifePath;
+
+  /// Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Destiny'**
+  String get lblDestiny;
+
+  /// Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Soul urge'**
+  String get lblSoulUrge;
+
+  /// Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Personality'**
+  String get lblPersonality;
+
+  /// Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'House {n}'**
+  String lblHouseN(int n);
 }
 
 class _AppLocalizationsDelegate

@@ -7,11 +7,12 @@ import '../../core/theme/app_fonts.dart';
 import '../../core/vedika/vedika_config.dart';
 import '../../core/widgets/app_empty_state.dart';
 import '../../l10n/app_localizations.dart';
-import '../premium/subscription_paywall_screen.dart';
 import '../profile/birth_profile.dart';
 import '../profile/birth_profile_repository.dart';
 import 'kundli_chart_static_data.dart';
 import 'kundli_dasha_tab.dart';
+import '../../core/widgets/ask_ai_button.dart';
+import 'kundli_predictions_tab.dart';
 import 'kundli_data.dart';
 import 'kundli_dosha_data.dart';
 import 'kundli_planet_positions_tab.dart';
@@ -31,7 +32,7 @@ enum KundliChartStyle { northIndian, southIndian }
 /// Predictions isn't a member here: it stays permanently premium-gated and
 /// pushes the paywall instead of ever becoming "selected" content, so it
 /// has no corresponding screen state.
-enum _KundliTab { chart, planetPositions, dasha }
+enum _KundliTab { chart, planetPositions, dasha, predictions }
 
 /// Kundli Chart — per the approved Figma "B6 · Kundli Chart" (node 18:2)
 /// concept.
@@ -163,6 +164,13 @@ class _KundliChartScreenState extends ConsumerState<KundliChartScreen> {
         ? ref.watch(kundliDashaProvider(request))
         : null;
 
+    // Same lazy pattern: only fetched once the Predictions tab is actually
+    // opened, so a user who never taps it is never billed for the call.
+    final predictionsAsync =
+        (request != null && _selectedTab == _KundliTab.predictions)
+        ? ref.watch(kundliPredictionsProvider(request))
+        : null;
+
     return Scaffold(
       backgroundColor: AppColors.cream,
       body: SafeArea(
@@ -224,7 +232,32 @@ class _KundliChartScreenState extends ConsumerState<KundliChartScreen> {
                       ? null
                       : () => ref.invalidate(kundliDashaProvider(request)),
                 ),
+                _KundliTab.predictions => KundliPredictionsTab(
+                  l10n: l10n,
+                  locale: locale,
+                  predictionsAsync: predictionsAsync,
+                  onRetry: request == null
+                      ? null
+                      : () =>
+                            ref.invalidate(kundliPredictionsProvider(request)),
+                ),
               },
+              // Ask AI — on the three interpretive tabs only (2 Sep 2026,
+              // client request). Deliberately NOT on the Chart tab: that one
+              // is the diagram itself, and the question a user has there is
+              // about what a house or planet MEANS, which is exactly what
+              // the Planet Positions tab's button already asks.
+              if (_selectedTab != _KundliTab.chart) ...[
+                const SizedBox(height: 18),
+                AskAiButton(
+                  locale: locale,
+                  question: switch (_selectedTab) {
+                    _KundliTab.planetPositions => l10n.askAiSeedPlanets,
+                    _KundliTab.dasha => l10n.askAiSeedDasha,
+                    _ => l10n.askAiSeedPredictions,
+                  },
+                ),
+              ],
             ],
           ),
         ),
@@ -412,14 +445,13 @@ class _SectionTabs extends StatelessWidget {
           _TabPill(
             label: '${l10n.tabPredictions} 👑',
             locale: locale,
-            isSelected: false,
-            // Still premium-gated with no entitlement source (RevenueCat
-            // unwired — see `projects/CLAUDE.md`), so this opens the
-            // paywall rather than ever becoming a selectable tab; there is
-            // no `_KundliTab.predictions` state to switch to.
-            onTap: () => Navigator.of(
-              context,
-            ).push(fadeThroughRoute(const SubscriptionPaywallScreen())),
+            isSelected: selected == _KundliTab.predictions,
+            // A REAL TAB since 2 Sep 2026. It used to open the paywall
+            // directly and show nothing at all — asking the user to pay for
+            // a reading they had never seen. Now the tab renders the actual
+            // natal reading and the paywall sits PARTWAY THROUGH it (see
+            // `PremiumGlimpse`), so what is being sold is visible first.
+            onTap: () => onSelect(_KundliTab.predictions),
           ),
         ],
       ),
@@ -1207,17 +1239,42 @@ class _DoshaVerdict {
     );
   }
 
+  /// REWRITTEN 2 Sep 2026 — this used to render Vedika's own `description`
+  /// verbatim, and the client reported it as a bug. They were right, twice
+  /// over:
+  ///
+  /// 1. **It read as though Venus caused the dosha.** Vedika's sentence is
+  ///    *"Mangal Dosha present from: Lagna (house 8), Venus (house 12)"* —
+  ///    it never says the word MARS. Lagna/Moon/Venus are the three
+  ///    REFERENCE POINTS a Manglik check is counted from; the planet in the
+  ///    dosha house is always Mars. Naming only the reference points made
+  ///    it look like a Venus dosha.
+  /// 2. **It ignored `is_cancelled`.** The same live response carried
+  ///    `is_cancelled: true`, `has_exception: true`, `severity: "Mild"`,
+  ///    `percentage: 12` — Vedika saying the dosha is cancelled — while the
+  ///    banner announced a bare "Mangal Dosha present". Telling someone
+  ///    they are Manglik when the chart says otherwise is not a cosmetic
+  ///    bug: people make marriage decisions on this.
+  ///
+  /// So the text is now composed from the STRUCTURED fields, which also
+  /// makes it translatable — Vedika's prose is English-only in every locale.
   static String _mangalText(MangalDosha? mangal, AppLocalizations l10n) {
     if (mangal?.hasDosha == null) return l10n.kundliValueUnavailable;
-    // Prefer Vedika's own personalized verdict sentence when present — see
-    // `MangalDosha.description`'s doc comment for why this field (unlike
-    // Kaal Sarp's) IS a real personalized verdict, safe to render directly
-    // rather than templating our own wording.
-    final description = mangal!.description?.trim();
-    if (description != null && description.isNotEmpty) return description;
-    return mangal.hasDosha!
-        ? l10n.kundliDoshaMangalPresent
-        : l10n.kundliDoshaMangalAbsent;
+    if (!mangal!.hasDosha!) return l10n.kundliDoshaMangalAbsent;
+
+    final refs = <String>[
+      if (mangal.doshaFromLagna == true) l10n.kundliDoshaRefLagna,
+      if (mangal.doshaFromMoon == true) l10n.kundliDoshaRefMoon,
+      if (mangal.doshaFromVenus == true) l10n.kundliDoshaRefVenus,
+    ];
+    // No reference point flagged → we cannot say WHERE it is counted from,
+    // so fall back to the plain verdict rather than naming an empty list.
+    if (refs.isEmpty) return l10n.kundliDoshaMangalPresent;
+
+    final joined = refs.join(', ');
+    return mangal.isCancelled
+        ? l10n.kundliDoshaMangalCancelledFrom(joined)
+        : l10n.kundliDoshaMangalPresentFrom(joined);
   }
 
   static String _kaalSarpText(KaalSarpDosha? kaalSarp, AppLocalizations l10n) {

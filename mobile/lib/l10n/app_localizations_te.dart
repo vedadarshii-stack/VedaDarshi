@@ -449,7 +449,7 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get kundliCalcNote =>
-      'గణనలు స్విస్ ఎఫెమెరిస్ మరియు లాహిరి అయనాంశను ఉపయోగిస్తాయి';
+      'లాహిరి అయనాంశంతో వైదిక నిరయన జాతకం — గ్రహ స్థానాలు, వింశోత్తరి దశ, దోష పరిశీలన మరియు అంచనాలతో';
 
   @override
   String get generateKundli => 'కుండలి తయారు చేయండి';
@@ -657,11 +657,11 @@ class AppLocalizationsTe extends AppLocalizations {
   String get askAboutYourStars => 'మీ నక్షత్రాల గురించి అడగండి…';
 
   @override
-  String get upgradeUnlimited => 'అపరిమిత ప్రశ్నల కోసం అప్‌గ్రేడ్ చేయండి';
+  String get upgradeUnlimited => 'మరిన్ని ప్రశ్నల కోసం అప్‌గ్రేడ్ చేయండి';
 
   @override
   String get aiErrorQuotaExceeded =>
-      'మీ ఈరోజు ఉచిత ప్రశ్నల పరిమితి పూర్తయింది. అపరిమిత AI ప్రశ్నల కోసం అప్‌గ్రేడ్ చేయండి.';
+      'మీ ఈరోజు ఉచిత ప్రశ్నల పరిమితి పూర్తయింది. ప్రతిరోజూ మరిన్ని ప్రశ్నల కోసం అప్‌గ్రేడ్ చేయండి.';
 
   @override
   String get aiErrorBirthDetailsMissing =>
@@ -690,7 +690,7 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String goPremiumSubtitle(String total) {
-    return 'అన్ని $total నివేదికలు + అపరిమిత AI ప్రశ్నలను అన్‌లాక్ చేయండి';
+    return 'అన్ని $total నివేదికలు + ప్రతిరోజూ మరిన్ని AI ప్రశ్నలను అన్‌లాక్ చేయండి';
   }
 
   @override
@@ -764,7 +764,7 @@ class AppLocalizationsTe extends AppLocalizations {
   String get vedadarshiPremium => 'Vedadarshi ప్రీమియం';
 
   @override
-  String get premiumTagline => 'అపరిమిత విశ్వ మార్గదర్శకత్వం, ఒక సరళమైన ప్లాన్';
+  String get premiumTagline => 'లోతైన విశ్వ మార్గదర్శకత్వం, ఒక సరళమైన ప్లాన్';
 
   @override
   String tierFeatureAiQuestions(int count) {
@@ -1446,4 +1446,186 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get authErrorUserNotFound => 'ఆ ఇమెయిల్ చిరునామాతో ఖాతా కనుగొనబడలేదు.';
+
+  @override
+  String get rahuKaalLabel => 'రాహు కాలం';
+
+  @override
+  String get aiWhoseChart => 'ఎవరి జాతకం?';
+
+  @override
+  String aiChartFor(String name) {
+    return 'జాతకం: $name';
+  }
+
+  @override
+  String get matchDetailedTitle => 'ప్రతి కూటం మీకు ఏమి సూచిస్తుంది';
+
+  @override
+  String get matchDetailedSubtitle =>
+      'మొత్తం 8 కూట విశ్లేషణలు, పరిహారాలతో అన్‌లాక్ చేయండి';
+
+  @override
+  String get matchDetailedCta => 'పూర్తి విశ్లేషణను అన్‌లాక్ చేయండి';
+
+  @override
+  String get kundliHousesTitle => 'మీ భావాలు';
+
+  @override
+  String get kundliYogasTitle => 'మీ జాతకంలోని యోగాలు';
+
+  @override
+  String get kundliPredictionsCta => 'మీ పూర్తి విశ్లేషణను అన్‌లాక్ చేయండి';
+
+  @override
+  String get kundliPredictionsSubtitle =>
+      'మొత్తం 12 భావాల విశ్లేషణ మరియు జాతకంలోని అన్ని యోగాలు';
+
+  @override
+  String get reportComplete => 'సంపూర్ణ జీవిత నివేదిక';
+
+  @override
+  String get reportCompleteDesc =>
+      'మీ మొత్తం జాతకం ఒకే పఠనంలో — లగ్నం, యోగాలు మరియు 12 భావాలు';
+
+  @override
+  String get reportSectionOverview => 'సారాంశం';
+
+  @override
+  String get reportSectionHighlights => 'ముఖ్య అంశాలు';
+
+  @override
+  String get reportSectionTiming => 'సమయం';
+
+  @override
+  String get reportSectionGuidance => 'మార్గదర్శకం';
+
+  @override
+  String get reportSectionRemedies => 'పరిహారాలు';
+
+  @override
+  String get reportSectionStrengths => 'బలాలు';
+
+  @override
+  String get reportSectionChallenges => 'జాగ్రత్త వహించండి';
+
+  @override
+  String get reportGlimpseCta => 'పూర్తి నివేదికను తెరవండి';
+
+  @override
+  String get reportGlimpseSubtitle =>
+      'మీ స్వంత జన్మ జాతకానికి ప్రతి విభాగం, పూర్తిగా';
+
+  @override
+  String get reportEmptyMessage =>
+      'ఈ నివేదిక ప్రస్తుతం మీ జాతకానికి అందుబాటులో లేదు. దయచేసి మళ్లీ ప్రయత్నించండి.';
+
+  @override
+  String kundliDoshaMangalPresentFrom(String refs) {
+    return 'మంగళ దోషం — $refs నుండి లెక్కించగా కుజుడు దోష భావంలో ఉన్నాడు';
+  }
+
+  @override
+  String kundliDoshaMangalCancelledFrom(String refs) {
+    return '$refs నుండి మంగళ దోషం, కానీ మీ జాతకంలో ఇది రద్దైంది';
+  }
+
+  @override
+  String get kundliDoshaRefLagna => 'లగ్నం';
+
+  @override
+  String get kundliDoshaRefMoon => 'చంద్రుడు';
+
+  @override
+  String get kundliDoshaRefVenus => 'శుక్రుడు';
+
+  @override
+  String get muhuratAbhijit => 'అభిజిత్ ముహూర్తం';
+
+  @override
+  String get muhuratRahuKaal => 'రాహు కాలం';
+
+  @override
+  String get muhuratYamaganda => 'యమగండం';
+
+  @override
+  String get muhuratGulikaKaal => 'గుళిక కాలం';
+
+  @override
+  String get muhuratBrahma => 'బ్రహ్మ ముహూర్తం';
+
+  @override
+  String get askAiButton => 'దీని గురించి ఋషి AIని అడగండి';
+
+  @override
+  String get askAiSeedPlanets =>
+      'నా జన్మ జాతకంలో గ్రహ స్థానాల అర్థం ఏమిటో వివరించండి.';
+
+  @override
+  String get askAiSeedDasha =>
+      'నా ప్రస్తుత వింశోత్తరి దశ నాకు ఏమి సూచిస్తుంది?';
+
+  @override
+  String get askAiSeedPredictions =>
+      'నా జాతకంలోని యోగాలు మరియు భావ ఫలితాలను వివరించండి.';
+
+  @override
+  String get askAiSeedMatching =>
+      'మా గుణ మిలన్ స్కోరు మరియు అది మాకు ఏమి సూచిస్తుందో వివరించండి.';
+
+  @override
+  String get lblLagna => 'లగ్నం';
+
+  @override
+  String get lblRashi => 'రాశి';
+
+  @override
+  String get lblCareerHouse => 'కర్మ భావం';
+
+  @override
+  String get lblCareerLord => 'కర్మాధిపతి';
+
+  @override
+  String get lblPartnershipHouse => 'సప్తమ భావం';
+
+  @override
+  String get lblPartnershipLord => 'సప్తమాధిపతి';
+
+  @override
+  String get lblVenus => 'శుక్రుడు';
+
+  @override
+  String get lblMahadasha => 'మహాదశ';
+
+  @override
+  String get lblAntardasha => 'అంతర్దశ';
+
+  @override
+  String get lblPhase => 'దశ';
+
+  @override
+  String get lblMantra => 'మంత్రం';
+
+  @override
+  String get lblSetting => 'లోహం';
+
+  @override
+  String get lblDayToWear => 'ధరించే రోజు';
+
+  @override
+  String get lblLifePath => 'జీవన మార్గం';
+
+  @override
+  String get lblDestiny => 'విధి';
+
+  @override
+  String get lblSoulUrge => 'ఆత్మ కోరిక';
+
+  @override
+  String get lblPersonality => 'వ్యక్తిత్వం';
+
+  @override
+  String lblHouseN(int n) {
+    return 'భావం $n';
+  }
 }

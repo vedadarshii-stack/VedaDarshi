@@ -26,6 +26,8 @@ class PanchangRepository {
   // contract (it's simply "today's" muhurta), so it needs only a
   // single cached value — invalidated when the calendar day changes,
   // in case the app is left open overnight.
+  InauspiciousPeriods? _inauspiciousCache;
+  String? _inauspiciousCacheKey;
   MuhurtaData? _muhurtaCache;
   String? _muhurtaCacheDateKey;
 
@@ -165,6 +167,64 @@ class PanchangRepository {
   ///
   /// Cached per day AND per location, because the answer now genuinely
   /// depends on both.
+  /// The day's inauspicious/auspicious windows — Rahu Kaal, Yamaganda,
+  /// Gulika Kaal and Abhijit Muhurat — plus real sunrise/sunset.
+  ///
+  /// `POST /v2/astrology/inauspicious-period`. See
+  /// [InauspiciousPeriods]'s doc comment for why this is a second call
+  /// rather than more fields on [fetchMuhurta] (that endpoint simply does
+  /// not return Yamaganda, Gulika or Abhijit — verified live).
+  ///
+  /// Same day+location in-memory cache key as [fetchMuhurta]: these windows
+  /// are fixed for a calendar day at a location, so one call per day per
+  /// city is all that is ever needed. Coordinates are rounded to 4dp for
+  /// the same reason they are there — so GPS jitter cannot produce a fresh
+  /// billed call for what is the same place.
+  /// The day's Rahu Kaal / Yamaganda / Gulika / Abhijit / Brahma windows.
+  ///
+  /// **Endpoint changed 2 Sep 2026** from `/v2/astrology/inauspicious-period`
+  /// to `/v2/astrology/brahma-muhurta`. The latter returns a strict SUPERSET
+  /// — the same four windows in the same shape, plus `brahmaMuhurta` and
+  /// `durmuhurta` — so the client's request for a Brahma Muhurta card costs
+  /// no extra call and no extra billing. Verified field-by-field against
+  /// live responses before switching.
+  ///
+  /// **[date] became a real parameter at the same time, and that was a bug
+  /// fix, not a feature.** This used to stamp `DateTime.now()` unconditionally
+  /// and cache on today's calendar day, so the Panchang date stepper moved
+  /// the header while every muhurat window below it stayed on today's
+  /// values. That is exactly what the client reported as *"Rahu kal it's not
+  /// changing for every day"* — making the values live had fixed only half
+  /// of it. Verified the endpoint genuinely varies by date: for Hyderabad,
+  /// Rahu Kaal moves 06:47–08:20 on 2 Sep to 03:40–05:13 on 5 Sep (UTC),
+  /// which is correct — Rahu Kaal is keyed to the weekday.
+  Future<InauspiciousPeriods> fetchInauspiciousPeriods({
+    required double lat,
+    required double lon,
+    required String tz,
+    required DateTime date,
+  }) async {
+    final key = '${_isoDate(date)}|${lat.toStringAsFixed(4)}|'
+        '${lon.toStringAsFixed(4)}|$tz';
+    final cached = _inauspiciousCache;
+    if (cached != null && _inauspiciousCacheKey == key) return cached;
+
+    final json = await _client.post(
+      '/v2/astrology/brahma-muhurta',
+      body: {
+        'datetime': _localNoonIso(date),
+        'latitude': double.parse(lat.toStringAsFixed(4)),
+        'longitude': double.parse(lon.toStringAsFixed(4)),
+        'timezone': _utcOffsetFor(tz, date),
+      },
+    );
+    final parsed =
+        InauspiciousPeriods.fromJson(json) ?? const InauspiciousPeriods();
+    _inauspiciousCache = parsed;
+    _inauspiciousCacheKey = key;
+    return parsed;
+  }
+
   Future<MuhurtaData> fetchMuhurta({
     required double lat,
     required double lon,
@@ -288,4 +348,24 @@ final muhurtaDataProvider =
       return ref
           .watch(panchangRepositoryProvider)
           .fetchMuhurta(lat: request.lat, lon: request.lon, tz: request.tz);
+    });
+
+/// One location AND one calendar day. Separate from [MuhurtaRequest]
+/// specifically because the date is part of the key here — see
+/// [PanchangRepository.fetchInauspiciousPeriods] for the bug that caused.
+typedef PeriodsRequest = ({double lat, double lon, String tz, DateTime date});
+
+/// The day's Rahu Kaal / Yamaganda / Gulika / Abhijit / Brahma Muhurta
+/// windows for one location on one DATE — feeds the Panchang muhurat grid
+/// and Home's muhurat tiles.
+final inauspiciousPeriodsProvider =
+    FutureProvider.family<InauspiciousPeriods, PeriodsRequest>((ref, request) {
+      return ref
+          .watch(panchangRepositoryProvider)
+          .fetchInauspiciousPeriods(
+            lat: request.lat,
+            lon: request.lon,
+            tz: request.tz,
+            date: request.date,
+          );
     });

@@ -28,7 +28,20 @@ import 'ai_topics.dart';
 /// follow-up suggestions now come from the backend, and the durable
 /// question/answer history is read back from Firestore on open.
 class AiAstrologerScreen extends ConsumerStatefulWidget {
-  const AiAstrologerScreen({super.key});
+  const AiAstrologerScreen({super.key, this.initialQuestion});
+
+  /// Pre-fills the input box when the screen opens.
+  ///
+  /// ADDED 2 Sep 2026 for the client's *"add ask ai for any details so that
+  /// if anyone get any doubt they can simply ask ai"* — the Kundli tabs and
+  /// the Gun Milan result now carry an Ask AI button that arrives here with
+  /// a question already typed.
+  ///
+  /// It PRE-FILLS and does not auto-send, matching what the topic chips on
+  /// this screen already do. Auto-sending would spend one of a free user's
+  /// single daily question before they had a chance to edit it — and the
+  /// whole point is that they wanted to ask something of their own.
+  final String? initialQuestion;
 
   @override
   ConsumerState<AiAstrologerScreen> createState() => _AiAstrologerScreenState();
@@ -57,6 +70,19 @@ class _AiAstrologerScreenState extends ConsumerState<AiAstrologerScreen> {
   /// visit is not safe to resume (see `ai_repository.dart`'s
   /// `AiChatHistoryEntry` doc comment).
   String? _conversationId;
+
+  /// Which saved chart the AI reasons about. `null` = the account owner's
+  /// own `primary` profile.
+  ///
+  /// Asking about a FAMILY MEMBER's chart is a PAID feature (client, 2 Sep
+  /// 2026), so this only ever leaves null for a subscriber — see
+  /// `_openProfilePicker`, which shows the paywall instead of the picker
+  /// when the user has no paid entitlement.
+  ///
+  /// Reset to null whenever the conversation is cleared, so a follow-up can
+  /// never silently inherit a chart the user thinks they have switched away
+  /// from.
+  String? _selectedProfileId;
 
   /// Free-question usage/limit from the most recent `askQuestion` response.
   /// `null` until the first response of this session — the header pill is
@@ -112,6 +138,14 @@ class _AiAstrologerScreenState extends ConsumerState<AiAstrologerScreen> {
       ChatMessage(role: ChatRole.assistant, text: l10n.aiGreeting(userName)),
     );
 
+    // Seeded here rather than in initState for the same inherited-widget
+    // reason as the greeting, and inside the `_seeded` guard so a locale or
+    // theme change cannot overwrite what the user has since typed.
+    final seedQuestion = widget.initialQuestion?.trim();
+    if (seedQuestion != null && seedQuestion.isNotEmpty) {
+      _inputController.text = seedQuestion;
+    }
+
     // Kept with the greeting (rather than in initState) so ordering is
     // explicit: the greeting is in `_messages` before the awaited history
     // is appended after it.
@@ -157,6 +191,113 @@ class _AiAstrologerScreenState extends ConsumerState<AiAstrologerScreen> {
         curve: Curves.easeOutCubic,
       );
     });
+  }
+
+  /// Display name of the chart currently selected — the account owner's own
+  /// profile unless one was picked. Falls back to the generic label rather
+  /// than a fabricated name when nothing has loaded yet.
+  String _activeProfileName(AppLocalizations l10n) {
+    final saved = ref.watch(savedBirthProfilesProvider).valueOrNull ?? const [];
+    for (final entry in saved) {
+      final isActive = _selectedProfileId == null
+          ? entry.isPrimary
+          : entry.id == _selectedProfileId;
+      if (isActive) return entry.profile.fullName;
+    }
+    return ref.watch(birthProfileProvider).valueOrNull?.fullName ??
+        HomeStaticData.fallbackUserName;
+  }
+
+  /// Opens the "whose chart?" picker — or the paywall, for a free user.
+  ///
+  /// PAID FEATURE (client, 2 Sep 2026): asking Rishi AI about a family
+  /// member's chart requires a subscription. A free user tapping the chip
+  /// gets the upgrade screen instead of the picker, which is the point —
+  /// the chip is the upsell surface, so it stays visible and tappable
+  /// rather than being hidden or greyed out.
+  ///
+  /// Gated on [SubscriptionStatus.hasPaidAccess], i.e. the Bronze
+  /// entitlement — the LOWEST paid tier. Never on a product id, and never
+  /// on a Firestore flag the client could write. See
+  /// `subscription_tier.dart`'s doc comment.
+  ///
+  /// NOTE: until the account's Play payments profile is fixed, nobody can
+  /// hold an entitlement, so this correctly shows the paywall to everyone
+  /// including the developers. That is the gate working, not a bug.
+  /// UNGATED 2 Sep 2026 on the client's explicit reversal.
+  ///
+  /// This originally showed the paywall to anyone without a paid tier —
+  /// their own first instruction ("that is only premium feature right").
+  /// They then changed their mind: *"Add for free user also pradeep so that
+  /// may lead to ai pack purchase"*. The reasoning is sound — asking about a
+  /// family member is what makes someone run out of free questions, so
+  /// putting the paywall in FRONT of it removes the very thing that drives
+  /// the purchase. The quota is still enforced server-side, so a free user
+  /// picking three profiles still only gets their one question a day.
+  Future<void> _openProfilePicker() async {
+    final saved = ref.read(savedBirthProfilesProvider).valueOrNull ?? const [];
+    if (!mounted || saved.isEmpty) return;
+
+    final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context);
+    final chosen = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Text(
+              l10n.aiWhoseChart,
+              style: AppFonts.heading(
+                locale,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: AppColors.ink,
+              ),
+            ),
+            const SizedBox(height: 8),
+            for (final entry in saved)
+              ListTile(
+                title: Text(
+                  entry.profile.fullName,
+                  style: AppFonts.body(
+                    locale,
+                    fontSize: 14,
+                    color: AppColors.ink,
+                  ),
+                ),
+                subtitle: Text(
+                  entry.profile.summaryLine,
+                  style: AppFonts.body(
+                    locale,
+                    fontSize: 11,
+                    color: AppColors.muted,
+                  ),
+                ),
+                trailing: (entry.isPrimary
+                        ? _selectedProfileId == null
+                        : _selectedProfileId == entry.id)
+                    ? Icon(Icons.check_rounded, color: AppColors.saffron)
+                    : null,
+                // The account owner's own profile is sent as null, not as
+                // the literal "primary" — that keeps the request identical
+                // to what pre-multi-profile builds sent.
+                onTap: () => Navigator.of(
+                  sheetContext,
+                ).pop(entry.isPrimary ? '' : entry.id),
+              ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+    if (chosen == null || !mounted) return;
+    setState(() => _selectedProfileId = chosen.isEmpty ? null : chosen);
   }
 
   /// Sends the message bar's current text.
@@ -217,6 +358,7 @@ class _AiAstrologerScreenState extends ConsumerState<AiAstrologerScreen> {
             question: trimmed,
             language: locale.languageCode,
             conversationId: _conversationId,
+            profileId: _selectedProfileId,
           );
       if (!mounted) return;
       setState(() {
@@ -273,6 +415,17 @@ class _AiAstrologerScreenState extends ConsumerState<AiAstrologerScreen> {
       body: Column(
         children: [
           _Header(l10n: l10n, locale: locale, used: _used, limit: _limit),
+          // WHOSE CHART chip — always visible, always tappable. For a free
+          // user the tap opens the paywall rather than the picker (see
+          // `_openProfilePicker`), which is deliberate: this row IS the
+          // upsell, so hiding or disabling it would remove the only place
+          // the feature is discoverable.
+          _ChartForChip(
+            l10n: l10n,
+            locale: locale,
+            name: _activeProfileName(l10n),
+            onTap: _openProfilePicker,
+          ),
           Expanded(
             child: _ChatArea(
               l10n: l10n,
@@ -1101,19 +1254,107 @@ class _InputBar extends StatelessWidget {
                   onTap: () => Navigator.of(
                     context,
                   ).push(fadeThroughRoute(const SubscriptionPaywallScreen())),
-                  child: Text(
-                    '✨ ${l10n.upgradeUnlimited}',
-                    textAlign: TextAlign.center,
-                    style: AppFonts.body(
-                      locale,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.mantraLabel,
+                  // TAP TARGET, not just text — 2 Sep 2026, client reported
+                  // this "should go to the subscription page". It always
+                  // did: the handler below has pushed
+                  // `SubscriptionPaywallScreen` since it was written. The
+                  // real fault was that the tappable area was a bare 11px
+                  // `Text` line with no padding — roughly 14dp tall, well
+                  // under the 48dp minimum touch target, so most taps
+                  // simply missed it and the screen appeared to do nothing.
+                  // The padding below is what makes the destination
+                  // reachable; do not shrink it back to hug the text.
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    child: Text(
+                      '✨ ${l10n.upgradeUnlimited}',
+                      textAlign: TextAlign.center,
+                      style: AppFonts.body(
+                        locale,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.mantraLabel,
+                      ),
                     ),
                   ),
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+/// Small pill under the AI header naming whose chart is in use.
+class _ChartForChip extends StatelessWidget {
+  const _ChartForChip({
+    required this.l10n,
+    required this.locale,
+    required this.name,
+    required this.onTap,
+  });
+
+  final AppLocalizations l10n;
+  final Locale locale;
+  final String name;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Semantics(
+          button: true,
+          child: Material(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(999),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: onTap,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceAlt,
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: AppColors.cardBorder),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        l10n.aiChartFor(name),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppFonts.body(
+                          locale,
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.muted,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.expand_more_rounded,
+                      size: 16,
+                      color: AppColors.muted,
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ),

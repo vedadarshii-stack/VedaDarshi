@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/vedika/vedika_client.dart';
 import '../profile/birth_profile.dart';
 import 'kundli_dasha_data.dart';
+import 'kundli_predictions_data.dart';
 import 'kundli_data.dart';
 import 'kundli_dosha_data.dart';
 
@@ -117,6 +118,7 @@ class KundliRepository {
   final Map<KundliRequest, KundliData> _cache = {};
   final Map<KundliRequest, AllDoshasData> _doshasCache = {};
   final Map<KundliRequest, VimshottariDashaData> _dashaCache = {};
+  final Map<KundliRequest, KundliPredictions> _predictionsCache = {};
 
   Future<KundliData> fetch({
     required DateTime datetime,
@@ -200,6 +202,37 @@ class KundliRepository {
     return parsed;
   }
 
+  /// The natal reading behind the Predictions tab —
+  /// `POST /v2/reports/birth-chart-report`.
+  ///
+  /// Same in-memory cache keyed by [KundliRequest] as [fetchDasha]: a natal
+  /// reading never changes for the same birth details, so this is one
+  /// billed call per chart per app session (and the proxy caches it for a
+  /// year on top of that, alongside the other chart-class endpoints).
+  Future<KundliPredictions> fetchPredictions({
+    required DateTime datetime,
+    required double lat,
+    required double lon,
+    required String tzOffset,
+  }) async {
+    final request = KundliRequest(
+      datetime: datetime,
+      latitude: lat,
+      longitude: lon,
+      tzOffset: tzOffset,
+    );
+    final cached = _predictionsCache[request];
+    if (cached != null) return cached;
+
+    final data = await _client.post(
+      '/v2/reports/birth-chart-report',
+      body: _requestBody(request),
+    );
+    final parsed = KundliPredictions.fromJson(data);
+    _predictionsCache[request] = parsed;
+    return parsed;
+  }
+
   /// The `{datetime, latitude, longitude, timezone}` body every one of
   /// these `/v2/astrology/*` endpoints takes, built from [request] the same
   /// way for all three so they never drift apart.
@@ -265,6 +298,20 @@ final kundliDashaProvider =
       return ref
           .watch(kundliRepositoryProvider)
           .fetchDasha(
+            datetime: request.datetime,
+            lat: request.latitude,
+            lon: request.longitude,
+            tzOffset: request.tzOffset,
+          );
+    });
+
+/// The natal reading for [request]'s birth parameters — feeds the Kundli
+/// Predictions tab's premium glimpse.
+final kundliPredictionsProvider =
+    FutureProvider.family<KundliPredictions, KundliRequest>((ref, request) {
+      return ref
+          .watch(kundliRepositoryProvider)
+          .fetchPredictions(
             datetime: request.datetime,
             lat: request.latitude,
             lon: request.longitude,

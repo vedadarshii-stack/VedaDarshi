@@ -447,7 +447,7 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get kundliCalcNote =>
-      'ಲೆಕ್ಕಾಚಾರಗಳು ಸ್ವಿಸ್ ಎಫೆಮೆರಿಸ್ ಮತ್ತು ಲಾಹಿರಿ ಅಯನಾಂಶವನ್ನು ಬಳಸುತ್ತವೆ';
+      'ಲಾಹಿರಿ ಅಯನಾಂಶದೊಂದಿಗೆ ವೈದಿಕ ನಿರಯನ ಜಾತಕ — ಗ್ರಹ ಸ್ಥಾನಗಳು, ವಿಂಶೋತ್ತರಿ ದಶಾ, ದೋಷ ಪರಿಶೀಲನೆ ಮತ್ತು ಭವಿಷ್ಯವಾಣಿ ಸೇರಿದಂತೆ';
 
   @override
   String get generateKundli => 'ಕುಂಡಲಿ ರಚಿಸಿ';
@@ -654,11 +654,11 @@ class AppLocalizationsKn extends AppLocalizations {
   String get askAboutYourStars => 'ನಿಮ್ಮ ನಕ್ಷತ್ರಗಳ ಬಗ್ಗೆ ಕೇಳಿ…';
 
   @override
-  String get upgradeUnlimited => 'ಅಪರಿಮಿತ ಪ್ರಶ್ನೆಗಳಿಗಾಗಿ ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ';
+  String get upgradeUnlimited => 'ಹೆಚ್ಚಿನ ಪ್ರಶ್ನೆಗಳಿಗಾಗಿ ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ';
 
   @override
   String get aiErrorQuotaExceeded =>
-      'ಇಂದಿನ ಉಚಿತ ಪ್ರಶ್ನೆಗಳ ಮಿತಿ ಮುಗಿದಿದೆ. ಅಪರಿಮಿತ AI ಪ್ರಶ್ನೆಗಳಿಗಾಗಿ ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ.';
+      'ಇಂದಿನ ಉಚಿತ ಪ್ರಶ್ನೆಗಳ ಮಿತಿ ಮುಗಿದಿದೆ. ಪ್ರತಿದಿನ ಹೆಚ್ಚಿನ ಪ್ರಶ್ನೆಗಳಿಗಾಗಿ ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ.';
 
   @override
   String get aiErrorBirthDetailsMissing =>
@@ -687,7 +687,7 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String goPremiumSubtitle(String total) {
-    return 'ಎಲ್ಲಾ $total ವರದಿಗಳು + ಅಪರಿಮಿತ AI ಪ್ರಶ್ನೆಗಳನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಿ';
+    return 'ಎಲ್ಲಾ $total ವರದಿಗಳು + ಪ್ರತಿದಿನ ಹೆಚ್ಚಿನ AI ಪ್ರಶ್ನೆಗಳನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಿ';
   }
 
   @override
@@ -761,7 +761,7 @@ class AppLocalizationsKn extends AppLocalizations {
   String get vedadarshiPremium => 'Vedadarshi ಪ್ರೀಮಿಯಂ';
 
   @override
-  String get premiumTagline => 'ಅಪರಿಮಿತ ವಿಶ್ವ ಮಾರ್ಗದರ್ಶನ, ಒಂದೇ ಸರಳ ಯೋಜನೆ';
+  String get premiumTagline => 'ಆಳವಾದ ವಿಶ್ವ ಮಾರ್ಗದರ್ಶನ, ಒಂದೇ ಸರಳ ಯೋಜನೆ';
 
   @override
   String tierFeatureAiQuestions(int count) {
@@ -1440,4 +1440,186 @@ class AppLocalizationsKn extends AppLocalizations {
   @override
   String get authErrorUserNotFound =>
       'ಆ ಇಮೇಲ್ ವಿಳಾಸದೊಂದಿಗೆ ಯಾವುದೇ ಖಾತೆ ಕಂಡುಬಂದಿಲ್ಲ.';
+
+  @override
+  String get rahuKaalLabel => 'ರಾಹು ಕಾಲ';
+
+  @override
+  String get aiWhoseChart => 'ಯಾರ ಕುಂಡಲಿ?';
+
+  @override
+  String aiChartFor(String name) {
+    return 'ಕುಂಡಲಿ: $name';
+  }
+
+  @override
+  String get matchDetailedTitle => 'ಪ್ರತಿ ಕೂಟವು ನಿಮಗೆ ಏನು ಸೂಚಿಸುತ್ತದೆ';
+
+  @override
+  String get matchDetailedSubtitle =>
+      'ಎಲ್ಲಾ 8 ಕೂಟ ವಿಶ್ಲೇಷಣೆಗಳನ್ನು ಪರಿಹಾರಗಳೊಂದಿಗೆ ಅನ್‌ಲಾಕ್ ಮಾಡಿ';
+
+  @override
+  String get matchDetailedCta => 'ಪೂರ್ಣ ವಿಶ್ಲೇಷಣೆಯನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಿ';
+
+  @override
+  String get kundliHousesTitle => 'ನಿಮ್ಮ ಭಾವಗಳು';
+
+  @override
+  String get kundliYogasTitle => 'ನಿಮ್ಮ ಕುಂಡಲಿಯ ಯೋಗಗಳು';
+
+  @override
+  String get kundliPredictionsCta => 'ನಿಮ್ಮ ಪೂರ್ಣ ವಿಶ್ಲೇಷಣೆಯನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಿ';
+
+  @override
+  String get kundliPredictionsSubtitle =>
+      'ಎಲ್ಲಾ 12 ಭಾವಗಳ ವಿಶ್ಲೇಷಣೆ ಮತ್ತು ಕುಂಡಲಿಯ ಎಲ್ಲಾ ಯೋಗಗಳು';
+
+  @override
+  String get reportComplete => 'ಸಂಪೂರ್ಣ ಜೀವನ ವರದಿ';
+
+  @override
+  String get reportCompleteDesc =>
+      'ನಿಮ್ಮ ಸಂಪೂರ್ಣ ಜಾತಕ ಒಂದೇ ಓದಿನಲ್ಲಿ — ಲಗ್ನ, ಯೋಗಗಳು ಮತ್ತು 12 ಭಾವಗಳು';
+
+  @override
+  String get reportSectionOverview => 'ಸಾರಾಂಶ';
+
+  @override
+  String get reportSectionHighlights => 'ಮುಖ್ಯ ಅಂಶಗಳು';
+
+  @override
+  String get reportSectionTiming => 'ಸಮಯ';
+
+  @override
+  String get reportSectionGuidance => 'ಮಾರ್ಗದರ್ಶನ';
+
+  @override
+  String get reportSectionRemedies => 'ಪರಿಹಾರಗಳು';
+
+  @override
+  String get reportSectionStrengths => 'ಸಾಮರ್ಥ್ಯಗಳು';
+
+  @override
+  String get reportSectionChallenges => 'ಗಮನಿಸಬೇಕಾದವು';
+
+  @override
+  String get reportGlimpseCta => 'ಪೂರ್ಣ ವರದಿಯನ್ನು ತೆರೆಯಿರಿ';
+
+  @override
+  String get reportGlimpseSubtitle =>
+      'ನಿಮ್ಮ ಸ್ವಂತ ಜನ್ಮ ಜಾತಕಕ್ಕಾಗಿ ಪ್ರತಿ ವಿಭಾಗವೂ, ಪೂರ್ಣವಾಗಿ';
+
+  @override
+  String get reportEmptyMessage =>
+      'ಈ ವರದಿ ಸದ್ಯಕ್ಕೆ ನಿಮ್ಮ ಜಾತಕಕ್ಕೆ ಲಭ್ಯವಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String kundliDoshaMangalPresentFrom(String refs) {
+    return 'ಮಂಗಳ ದೋಷ — $refs ಇಂದ ಎಣಿಸಿದಾಗ ಕುಜ ದೋಷ ಭಾವದಲ್ಲಿದ್ದಾನೆ';
+  }
+
+  @override
+  String kundliDoshaMangalCancelledFrom(String refs) {
+    return '$refs ಇಂದ ಮಂಗಳ ದೋಷ, ಆದರೆ ನಿಮ್ಮ ಜಾತಕದಲ್ಲಿ ಇದು ರದ್ದಾಗಿದೆ';
+  }
+
+  @override
+  String get kundliDoshaRefLagna => 'ಲಗ್ನ';
+
+  @override
+  String get kundliDoshaRefMoon => 'ಚಂದ್ರ';
+
+  @override
+  String get kundliDoshaRefVenus => 'ಶುಕ್ರ';
+
+  @override
+  String get muhuratAbhijit => 'ಅಭಿಜಿತ್ ಮುಹೂರ್ತ';
+
+  @override
+  String get muhuratRahuKaal => 'ರಾಹು ಕಾಲ';
+
+  @override
+  String get muhuratYamaganda => 'ಯಮಗಂಡ';
+
+  @override
+  String get muhuratGulikaKaal => 'ಗುಳಿಕ ಕಾಲ';
+
+  @override
+  String get muhuratBrahma => 'ಬ್ರಹ್ಮ ಮುಹೂರ್ತ';
+
+  @override
+  String get askAiButton => 'ಇದರ ಬಗ್ಗೆ ಋಷಿ AI ಅನ್ನು ಕೇಳಿ';
+
+  @override
+  String get askAiSeedPlanets =>
+      'ನನ್ನ ಜನ್ಮ ಜಾತಕದಲ್ಲಿ ಗ್ರಹ ಸ್ಥಾನಗಳ ಅರ್ಥವೇನೆಂದು ವಿವರಿಸಿ.';
+
+  @override
+  String get askAiSeedDasha =>
+      'ನನ್ನ ಪ್ರಸ್ತುತ ವಿಂಶೋತ್ತರಿ ದಶಾ ನನಗೆ ಏನನ್ನು ಸೂಚಿಸುತ್ತದೆ?';
+
+  @override
+  String get askAiSeedPredictions =>
+      'ನನ್ನ ಜಾತಕದ ಯೋಗಗಳು ಮತ್ತು ಭಾವ ಫಲಗಳನ್ನು ವಿವರಿಸಿ.';
+
+  @override
+  String get askAiSeedMatching =>
+      'ನಮ್ಮ ಗುಣ ಮಿಲನ್ ಅಂಕ ಮತ್ತು ಅದು ನಮಗೆ ಏನನ್ನು ಸೂಚಿಸುತ್ತದೆ ಎಂದು ವಿವರಿಸಿ.';
+
+  @override
+  String get lblLagna => 'ಲಗ್ನ';
+
+  @override
+  String get lblRashi => 'ರಾಶಿ';
+
+  @override
+  String get lblCareerHouse => 'ಕರ್ಮ ಭಾವ';
+
+  @override
+  String get lblCareerLord => 'ಕರ್ಮಾಧಿಪತಿ';
+
+  @override
+  String get lblPartnershipHouse => 'ಸಪ್ತಮ ಭಾವ';
+
+  @override
+  String get lblPartnershipLord => 'ಸಪ್ತಮಾಧಿಪತಿ';
+
+  @override
+  String get lblVenus => 'ಶುಕ್ರ';
+
+  @override
+  String get lblMahadasha => 'ಮಹಾದಶಾ';
+
+  @override
+  String get lblAntardasha => 'ಅಂತರ್ದಶಾ';
+
+  @override
+  String get lblPhase => 'ಹಂತ';
+
+  @override
+  String get lblMantra => 'ಮಂತ್ರ';
+
+  @override
+  String get lblSetting => 'ಲೋಹ';
+
+  @override
+  String get lblDayToWear => 'ಧರಿಸುವ ದಿನ';
+
+  @override
+  String get lblLifePath => 'ಜೀವನ ಪಥ';
+
+  @override
+  String get lblDestiny => 'ವಿಧಿ';
+
+  @override
+  String get lblSoulUrge => 'ಆತ್ಮ ಬಯಕೆ';
+
+  @override
+  String get lblPersonality => 'ವ್ಯಕ್ತಿತ್ವ';
+
+  @override
+  String lblHouseN(int n) {
+    return 'ಭಾವ $n';
+  }
 }

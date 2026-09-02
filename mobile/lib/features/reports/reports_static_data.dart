@@ -44,6 +44,17 @@ abstract final class ReportsStaticData {
   /// The 7 reports shown in the design, in the exact order approved in
   /// Figma node 22:14.
   static final List<AstrologyReport> reports = [
+    // ADDED 2 Sep 2026 — the client reported the Complete Report as missing
+    // from this screen. It is first because it is the widest reading (the
+    // whole chart) and the one the other six are subsets of.
+    AstrologyReport(
+      id: 'complete',
+      emoji: '📜',
+      tileBg: AppColors.mantraBg,
+      tileFg: AppColors.tileGoldFg,
+      readMinutes: 25,
+      access: ReportAccess.premium,
+    ),
     AstrologyReport(
       id: 'career',
       emoji: '💼',
@@ -103,9 +114,9 @@ abstract final class ReportsStaticData {
   ];
 
   /// Total reports the finished catalogue will offer (the banner promises
-  /// "all 9 reports" and the footer says "+2 more"). Only 7 are approved in
-  /// the current design — the remaining 2 arrive with the real Vedika API
-  /// catalogue. Kept as one constant so the banner/footer copy can never
-  /// drift out of sync with [reports].length.
+  /// "all 9 reports" and the footer says "+n more"). 8 are now live — the
+  /// 7 approved in Figma plus the Complete Life Report added 2 Sep 2026.
+  /// Kept as one constant so the banner/footer copy can never drift out of
+  /// sync with [reports].length.
   static const int totalReports = 9;
 }

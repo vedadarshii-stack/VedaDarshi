@@ -753,3 +753,90 @@ class PanchangFestival {
         .toList();
   }
 }
+
+/// The day's inauspicious and auspicious time-windows, from
+/// `POST /v2/astrology/inauspicious-period`.
+///
+/// ADDED 2 Sep 2026, client: *"add yamaganda somewhere in panchang as rahu
+/// kal and yamaganda are basic things"*.
+///
+/// ## Why a second call when `/v2/daily/muhurta` already gives Rahu Kaal
+///
+/// Because `/v2/daily/muhurta` returns ONLY `choghadiya`, `hora` and
+/// `rahu_kaal` — verified against a live response. It has no Yamaganda, no
+/// Gulika and no Abhijit, so the Panchang screen's other three muhurat
+/// cards could not be filled from it at any price. `_muhuratsFrom` had
+/// therefore been dropping them entirely rather than showing invented
+/// times, which was right but left the screen showing one card of four.
+///
+/// This endpoint returns all four in one request, plus real sunrise/sunset,
+/// so one added call replaces six placeholder values. Its `rahuKaal` was
+/// checked against `/v2/daily/muhurta`'s for the same day and location and
+/// they agree exactly (06:50:21–08:22:50Z on 2 Sep 2026), so the two
+/// sources cannot contradict each other on screen.
+///
+/// Still fetched separately rather than replacing the muhurta call: the
+/// Muhurat glance tile on Home needs `choghadiya`, which only that endpoint
+/// returns.
+@immutable
+class InauspiciousPeriods {
+  const InauspiciousPeriods({
+    this.rahuKaal,
+    this.yamaganda,
+    this.gulikaKaal,
+    this.abhijitMuhurta,
+    this.brahmaMuhurta,
+    this.sunrise,
+    this.sunset,
+  });
+
+  /// Inauspicious — avoid starting anything.
+  final RahuKaal? rahuKaal;
+
+  /// Inauspicious. Vedika spells the field `yamaghanta`; the app uses the
+  /// more common Indian spelling "Yamaganda" in the UI.
+  final RahuKaal? yamaganda;
+
+  /// Inauspicious, milder than the other two — rendered as `caution`.
+  final RahuKaal? gulikaKaal;
+
+  /// The one AUSPICIOUS window here — do not render it with the same
+  /// treatment as the three above, or the screen tells people to avoid the
+  /// best part of their day.
+  final RahuKaal? abhijitMuhurta;
+
+  /// The pre-dawn devotional window, ~96 to ~48 minutes before sunrise.
+  ///
+  /// ADDED 2 Sep 2026 on client request. It arrives from
+  /// `/v2/astrology/brahma-muhurta`, which returns a SUPERSET of
+  /// `/v2/astrology/inauspicious-period` — same four windows plus this one
+  /// and `durmuhurta` — so the repository switched endpoints rather than
+  /// making a second billed call.
+  ///
+  /// AUSPICIOUS, like [abhijitMuhurta]: never render it in the warning tone
+  /// the three inauspicious windows use.
+  final RahuKaal? brahmaMuhurta;
+
+
+  final DateTime? sunrise;
+  final DateTime? sunset;
+
+  /// Every window is nested one level deeper than the muhurta endpoint's:
+  /// `{"rahuKaal": {"period": {"start": …, "end": …}}}`. [RahuKaal.fromJson]
+  /// already reads `start`/`end`, so unwrap `period` before handing it over
+  /// rather than duplicating that parser.
+  static InauspiciousPeriods? fromJson(Map<String, dynamic>? json) {
+    if (json == null) return null;
+    RahuKaal? period(String key) =>
+        RahuKaal.fromJson(_map(_map(json[key])?['period']));
+    return InauspiciousPeriods(
+      rahuKaal: period('rahuKaal'),
+      yamaganda: period('yamaghanta'),
+      gulikaKaal: period('gulikaKaal'),
+      abhijitMuhurta: period('abhijitMuhurta'),
+      brahmaMuhurta: period('brahmaMuhurta'),
+      sunrise: _dateTime(json['sunrise']),
+      sunset: _dateTime(json['sunset']),
+    );
+  }
+}

@@ -8,6 +8,8 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../core/vedika/vedika_config.dart';
 import '../../core/widgets/app_empty_state.dart';
+import '../../core/widgets/ask_ai_button.dart';
+import '../../core/widgets/premium_glimpse.dart';
 import '../../l10n/app_localizations.dart';
 import '../premium/subscription_paywall_screen.dart';
 import '../profile/birth_profile_repository.dart';
@@ -303,7 +305,33 @@ class _ResultContent extends StatelessWidget {
                 _RemediesBanner(locale: locale, remedies: result.remedies),
               ],
               const SizedBox(height: 10),
+              // PER-KOOTA DETAIL as a premium glimpse — 2 Sep 2026,
+              // client: "for detailed description show glimpse and call to
+              // action for taking subscription".
+              //
+              // The content is REAL and already in hand: Vedika returns
+              // `interpretation`, `significance` and `tips` for every koota
+              // in the same guna-milan response the grid above is built
+              // from. It was parsed but never rendered, so this costs no
+              // extra call — it surfaces content the client is already
+              // paying Vedika for.
+              if (result.gunas.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                _DetailedReadingGlimpse(
+                  l10n: l10n,
+                  locale: locale,
+                  gunas: result.gunas,
+                ),
+              ],
+              const SizedBox(height: 10),
               _ReportCta(l10n: l10n, locale: locale),
+              // Ask AI, 2 Sep 2026 on client request — placed AFTER the
+              // subscription CTA so it reads as the free alternative to it,
+              // not as competition for it. A compatibility score is the one
+              // screen in this app people most want to argue with, so a
+              // "ask about this" door matters here more than anywhere.
+              const SizedBox(height: 10),
+              AskAiButton(locale: locale, question: l10n.askAiSeedMatching),
               const SizedBox(height: 10),
               _FooterHint(l10n: l10n, locale: locale),
             ],
@@ -1176,6 +1204,105 @@ class _MissingPartnerScaffold extends StatelessWidget {
             style: AppFonts.body(locale, fontSize: 14, color: AppColors.muted),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// The per-koota reading, shown as a [PremiumGlimpse].
+///
+/// Renders the SAME eight kootas the grid above scores, but with Vedika's
+/// prose for each — what the koota measures, what this couple's score means,
+/// and its remedial tips. The glimpse cuts off partway through the first
+/// koota, so the user reads something genuinely useful and specific to their
+/// own match before being asked to pay.
+class _DetailedReadingGlimpse extends StatelessWidget {
+  const _DetailedReadingGlimpse({
+    required this.l10n,
+    required this.locale,
+    required this.gunas,
+  });
+
+  final AppLocalizations l10n;
+  final Locale locale;
+  final List<GunaMilanGuna> gunas;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        border: Border.all(color: AppColors.cardBorder),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.matchDetailedTitle,
+            style: AppFonts.heading(
+              locale,
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: AppColors.ink,
+            ),
+          ),
+          const SizedBox(height: 10),
+          PremiumGlimpse(
+            locale: locale,
+            ctaLabel: l10n.matchDetailedCta,
+            subtitle: l10n.matchDetailedSubtitle,
+            onUpgrade: () => Navigator.of(
+              context,
+            ).push(fadeThroughRoute(const SubscriptionPaywallScreen())),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final guna in gunas) ...[
+                  if (guna.name case final name?)
+                    Text(
+                      name,
+                      style: AppFonts.body(
+                        locale,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.ink,
+                      ),
+                    ),
+                  // Vedika's own English prose — rendered as-is regardless
+                  // of app locale, the same documented gap as every other
+                  // free-text field from this API.
+                  if (guna.interpretation case final text?) ...[
+                    const SizedBox(height: 3),
+                    Text(
+                      text,
+                      style: AppFonts.body(
+                        locale,
+                        fontSize: 12,
+                        color: AppColors.muted,
+                      ),
+                    ),
+                  ],
+                  for (final tip in guna.tips) ...[
+                    const SizedBox(height: 3),
+                    Text(
+                      '• $tip',
+                      style: AppFonts.body(
+                        locale,
+                        fontSize: 11.5,
+                        color: AppColors.muted,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+                ],
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

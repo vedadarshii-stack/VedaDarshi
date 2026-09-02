@@ -54,6 +54,9 @@ class DailyHoroscope {
     this.compatibleSign,
     this.moonPhase,
     this.moonPhaseEffect,
+    this.overallScore,
+    this.areas = const {},
+    this.remedies = const [],
   });
 
   factory DailyHoroscope.fromJson(Map<String, dynamic> json) {
@@ -70,6 +73,9 @@ class DailyHoroscope {
       compatibleSign: _asString(json['compatibleSign']),
       moonPhase: _asString(json['moonPhase']),
       moonPhaseEffect: _asString(json['moonPhaseEffect']),
+      overallScore: _asInt(json['overallScore']),
+      areas: HoroscopeAreaReading.parseMap(json['predictions']),
+      remedies: _asStringList(json['remedies']),
     );
   }
 
@@ -110,6 +116,32 @@ class DailyHoroscope {
   final String? compatibleSign;
   final String? moonPhase;
   final String? moonPhaseEffect;
+
+  /// 0–100 overall score for the day.
+  ///
+  /// ADDED 2 Sep 2026. The client reported *"in horoscope page scores are
+  /// not changing… daily they are showing the same"* — correct, because the
+  /// scores card was still [HoroscopeDetailStaticData.scores], a hardcoded
+  /// 85/72/80/65/90.
+  ///
+  /// ⚠️ **The reason it was static is now obsolete, and that is the lesson.**
+  /// This model was written against the SANDBOX, whose daily response
+  /// genuinely carried one theme, one 1–5 rating and one paragraph — so
+  /// `CLAUDE.md` recorded "no daily equivalent" for per-area scores and the
+  /// card stayed placeholder. **Production returns far more**: `predictions`
+  /// with career/finance/health/relationship (each score + sentiment + text
+  /// + tip), plus `overallScore` and `remedies`. Re-check every other
+  /// "the API doesn't have it" note in this repo against production before
+  /// trusting it.
+  final int? overallScore;
+
+  /// Per-life-area readings, keyed by Vedika's own area name — observed:
+  /// `career`, `finance`, `health`, `relationship`.
+  final Map<String, HoroscopeAreaReading> areas;
+
+  /// Vedika's remedy suggestions for the day. English-only, like all its
+  /// free text.
+  final List<String> remedies;
 
   /// [date] formatted like `"Saturday, 12 July 2026"` — fixed English
   /// weekday/month names, not localized per app language. This matches the
@@ -154,6 +186,53 @@ class DailyHoroscope {
 }
 
 /// One day within a [WeeklyHoroscope.days] list.
+/// One life-area reading inside [DailyHoroscope.areas].
+///
+/// ADDED 2 Sep 2026 — see [DailyHoroscope.overallScore] for why this was
+/// missing until now.
+@immutable
+class HoroscopeAreaReading {
+  const HoroscopeAreaReading({this.score, this.sentiment, this.text, this.tip});
+
+  final int? score;
+
+  /// Vedika's own word: `positive`, `neutral`, `challenging`.
+  final String? sentiment;
+
+  /// The paragraph for this area. English-only regardless of app locale.
+  final String? text;
+
+  /// A one-line actionable suggestion.
+  final String? tip;
+
+  factory HoroscopeAreaReading.fromJson(Map<String, dynamic> json) {
+    return HoroscopeAreaReading(
+      score: _asInt(json['score']),
+      sentiment: _asString(json['sentiment']),
+      text: _asString(json['text']),
+      tip: _asString(json['tip']),
+    );
+  }
+
+  /// Parses Vedika's `predictions` object — a MAP keyed by area name, not a
+  /// list — into area → reading. Unknown keys are kept as-is rather than
+  /// filtered against a fixed enum, so a new area Vedika starts returning
+  /// shows up instead of being silently dropped.
+  static Map<String, HoroscopeAreaReading> parseMap(dynamic value) {
+    if (value is! Map) return const {};
+    final out = <String, HoroscopeAreaReading>{};
+    for (final entry in value.entries) {
+      final key = entry.key;
+      final raw = entry.value;
+      if (key is String && raw is Map<String, dynamic>) {
+        out[key] = HoroscopeAreaReading.fromJson(raw);
+      }
+    }
+    return out;
+  }
+}
+
+
 @immutable
 class WeeklyHoroscopeDay {
   const WeeklyHoroscopeDay({this.dayOffset, this.rating, this.theme});

@@ -173,20 +173,7 @@ class _DailyBody extends StatelessWidget {
     // or it keeps the same placeholder it always had. (For the Yearly
     // period, `horoscope.theme`/`.prediction`/`.rating` are all null, so
     // every card below falls through to its static placeholder.)
-    final realSection = _sectionForTheme(horoscope.theme);
-    final predictions = [
-      for (final staticPrediction in HoroscopeDetailStaticData.predictions)
-        if (realSection == staticPrediction.id &&
-            horoscope.prediction != null &&
-            horoscope.rating != null)
-          HoroscopePrediction(
-            staticPrediction.id,
-            horoscope.rating!.clamp(0, 5).toInt(),
-            horoscope.prediction!,
-          )
-        else
-          staticPrediction,
-    ];
+    final predictions = _dailyPredictions(horoscope);
 
     return ListView(
       padding: EdgeInsets.zero,
@@ -216,7 +203,11 @@ class _DailyBody extends StatelessWidget {
                 _SandboxBanner(l10n: l10n, locale: locale),
                 const SizedBox(height: 12),
               ],
-              _ScoresCard(l10n: l10n, locale: locale),
+              _ScoresCard(
+                l10n: l10n,
+                locale: locale,
+                scores: _dailyScores(horoscope),
+              ),
               const SizedBox(height: 12),
               _TimesRow(horoscope: horoscope, l10n: l10n, locale: locale),
               const SizedBox(height: 12),
@@ -575,6 +566,89 @@ class _MonthlyBody extends StatelessWidget {
       ],
     );
   }
+}
+
+/// Builds the three daily prediction cards from Vedika's real per-area
+/// readings.
+///
+/// REWRITTEN 2 Sep 2026, same root cause as [_dailyScores]. The old version
+/// matched the single `theme` string against one of the three cards, so
+/// **at most one card could ever be real and on most days none were** — the
+/// other two showed invented placeholder prose about Jupiter and Venus. That
+/// is the worst failure mode in this app: fabricated astrology presented as
+/// the user's own reading.
+///
+/// Production's `predictions` object carries career / relationship / health
+/// / finance, each with its own paragraph, tip and score, so all three cards
+/// are now genuinely this user's. A card whose area is missing still falls
+/// back to its placeholder rather than vanishing — but that path should now
+/// be rare, and it is the only remaining static prose here.
+List<HoroscopePrediction> _dailyPredictions(DailyHoroscope daily) {
+  const areaFor = {
+    HoroscopeSectionId.career: 'career',
+    HoroscopeSectionId.love: 'relationship',
+    HoroscopeSectionId.health: 'health',
+  };
+  return [
+    for (final placeholder in HoroscopeDetailStaticData.predictions)
+      _realPrediction(daily, placeholder, areaFor[placeholder.id]) ??
+          placeholder,
+  ];
+}
+
+HoroscopePrediction? _realPrediction(
+  DailyHoroscope daily,
+  HoroscopePrediction placeholder,
+  String? area,
+) {
+  if (area == null) return null;
+  final reading = daily.areas[area];
+  final text = reading?.text?.trim();
+  if (text == null || text.isEmpty) return null;
+  // Vedika scores 0–100; the card draws 0–5 dots. Round rather than
+  // truncate, so an 81 reads as 4 dots and not 4-with-a-rounding-loss.
+  final score = reading?.score;
+  final rating = score == null
+      ? placeholder.rating
+      : (score / 20).round().clamp(0, 5);
+  // The tip is a genuinely useful extra line Vedika returns and nothing
+  // rendered before — appended rather than dropped.
+  final tip = reading?.tip?.trim();
+  final body = tip == null || tip.isEmpty ? text : '$text\n\n$tip';
+  return HoroscopePrediction(placeholder.id, rating, body);
+}
+
+/// Maps [DailyHoroscope]'s real per-area scores onto the scores card's fixed
+/// 5-row shape.
+///
+/// ADDED 2 Sep 2026 — the client reported the scores never changed. They
+/// never did: this card rendered [HoroscopeDetailStaticData.scores]
+/// verbatim, a hardcoded 85/72/80/65/90, on every sign on every day.
+///
+/// **All five rows are real here**, which is better than `_monthlyScores`
+/// manages — Vedika's monthly response has no luck score, but the daily one
+/// carries `overallScore`, so `luck` maps to that rather than falling back
+/// to a placeholder. The name mapping is Vedika's vocabulary to ours:
+/// `relationship` → love, `finance` → money.
+///
+/// Any area Vedika omits still falls back to the static value, so a partial
+/// response degrades row by row instead of emptying the card.
+List<HoroscopeScore> _dailyScores(DailyHoroscope daily) {
+  final fallback = {
+    for (final s in HoroscopeDetailStaticData.scores) s.id: s.percent,
+  };
+  int score(String area, HoroscopeScoreId id) =>
+      daily.areas[area]?.score ?? fallback[id]!;
+  return [
+    HoroscopeScore(HoroscopeScoreId.career, score('career', HoroscopeScoreId.career)),
+    HoroscopeScore(HoroscopeScoreId.love, score('relationship', HoroscopeScoreId.love)),
+    HoroscopeScore(HoroscopeScoreId.health, score('health', HoroscopeScoreId.health)),
+    HoroscopeScore(HoroscopeScoreId.money, score('finance', HoroscopeScoreId.money)),
+    HoroscopeScore(
+      HoroscopeScoreId.luck,
+      daily.overallScore ?? fallback[HoroscopeScoreId.luck]!,
+    ),
+  ];
 }
 
 /// Merges [MonthlyHoroscope]'s 4 real category scores into the "Today's
@@ -1045,34 +1119,6 @@ class _KeyDatesCard extends StatelessWidget {
   }
 }
 
-/// Maps Vedika's free-text [DailyHoroscope.theme] onto one of the screen's
-/// 3 fixed prediction categories, or `null` when it doesn't fit any of
-/// them (most themes don't — Vedika's vocabulary includes things like
-/// `'spirituality'`, `'creativity'`, `'travel'` that have no home in this
-/// design). Deliberately conservative: only mapped when the fit is
-/// unambiguous, never guessed.
-HoroscopeSectionId? _sectionForTheme(String? theme) {
-  switch (theme?.toLowerCase()) {
-    case 'career':
-    case 'wealth':
-    case 'finance':
-    case 'money':
-    case 'business':
-    case 'work':
-      return HoroscopeSectionId.career;
-    case 'love':
-    case 'relationships':
-    case 'romance':
-    case 'family':
-      return HoroscopeSectionId.love;
-    case 'health':
-    case 'wellness':
-    case 'energy':
-      return HoroscopeSectionId.health;
-    default:
-      return null;
-  }
-}
 
 /// Small "Sample data" notice shown only when [VedikaConfig.isSandbox] is
 /// true, so a tester never mistakes the sandbox's fixed sample chart for a

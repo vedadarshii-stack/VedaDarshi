@@ -143,7 +143,34 @@ class HomePanchangData {
 /// Identifies which l10n label, emoji and tile color a [GlanceTile] should
 /// render with — the widget layer owns that presentation mapping since
 /// labels are UI chrome (l10n), not placeholder data.
-enum GlanceTileId { luckyNumber, luckyColor, direction, todaysPlanet, muhurat }
+enum GlanceTileId {
+  luckyNumber,
+  luckyColor,
+  direction,
+  todaysPlanet,
+  muhurat,
+
+  /// The day's INAUSPICIOUS window. Added 2 Sep 2026 at the client's
+  /// request to fill the grid's empty cell — Rahu Kaal and Yamaganda are
+  /// the two windows Indian users check daily, and the grid had a gap.
+  rahuKaal,
+
+  /// The remaining four muhurat windows, added later the same day when the
+  /// client asked for the full set on Home as well as in Panchang:
+  /// *"add few tabs to the existing ones at today at a glance for abhijit
+  /// muhuurat, raahu kaalam, yamaganda, gulika kalam, bramha muhurtha"*.
+  ///
+  /// They all come from ONE call (`/v2/astrology/brahma-muhurta`) that Home
+  /// already makes, so the full set costs nothing extra.
+  ///
+  /// ⚠️ Two of these are AUSPICIOUS ([abhijit], [brahmaMuhurta]) and two are
+  /// not ([yamaganda], [gulikaKaal]). They must never share a tint — see
+  /// `_glanceTileMeta`.
+  abhijit,
+  yamaganda,
+  gulikaKaal,
+  brahmaMuhurta,
+}
 
 /// One tile in the "Today at a glance" grid.
 @immutable

@@ -6,6 +6,8 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../l10n/app_localizations.dart';
 import '../premium/subscription_paywall_screen.dart';
+import 'report_detail_screen.dart';
+import 'report_labels.dart';
 import 'reports_static_data.dart';
 
 /// Premium Reports, per the approved Figma "C4 · Premium Reports"
@@ -225,50 +227,6 @@ class _GoPremiumBanner extends StatelessWidget {
   }
 }
 
-/// Resolves the l10n title for an [AstrologyReport.id].
-String _reportTitle(String id, AppLocalizations l10n) {
-  switch (id) {
-    case 'career':
-      return l10n.reportCareer;
-    case 'marriage':
-      return l10n.reportMarriage;
-    case 'wealth':
-      return l10n.reportWealth;
-    case 'health':
-      return l10n.reportHealth;
-    case 'sadeSati':
-      return l10n.reportSadeSati;
-    case 'gemstone':
-      return l10n.reportGemstone;
-    case 'numerology':
-      return l10n.reportNumerology;
-    default:
-      return id;
-  }
-}
-
-/// Resolves the l10n description for an [AstrologyReport.id].
-String _reportDescription(String id, AppLocalizations l10n) {
-  switch (id) {
-    case 'career':
-      return l10n.reportCareerDesc;
-    case 'marriage':
-      return l10n.reportMarriageDesc;
-    case 'wealth':
-      return l10n.reportWealthDesc;
-    case 'health':
-      return l10n.reportHealthDesc;
-    case 'sadeSati':
-      return l10n.reportSadeSatiDesc;
-    case 'gemstone':
-      return l10n.reportGemstoneDesc;
-    case 'numerology':
-      return l10n.reportNumerologyDesc;
-    default:
-      return '';
-  }
-}
-
 /// One report row card (Figma node 22:14 + meta row 53:2).
 class _ReportCard extends StatelessWidget {
   const _ReportCard({
@@ -283,20 +241,21 @@ class _ReportCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = _reportTitle(report.id, l10n);
+    final title = reportTitle(report.id, l10n);
 
     return Semantics(
       button: true,
       label: title,
       child: PressableScale(
         borderRadius: BorderRadius.circular(16),
-        // Premium reports open the paywall. Free reports are still a no-op:
-        // the report viewer itself doesn't exist yet.
-        onTap: report.access == ReportAccess.premium
-            ? () => Navigator.of(
-                context,
-              ).push(fadeThroughRoute(const SubscriptionPaywallScreen()))
-            : () {},
+        // EVERY card now opens the report itself (2 Sep 2026). It used to
+        // send premium cards straight to the paywall and free cards nowhere
+        // at all — the client asked for a real sample glimpse instead, so
+        // the paywall now sits PARTWAY THROUGH the reading rather than in
+        // front of it. See `ReportDetailScreen`.
+        onTap: () => Navigator.of(
+          context,
+        ).push(fadeThroughRoute(ReportDetailScreen(report: report))),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
@@ -339,7 +298,7 @@ class _ReportCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 1),
                     Text(
-                      _reportDescription(report.id, l10n),
+                      reportDescription(report.id, l10n),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: AppFonts.body(

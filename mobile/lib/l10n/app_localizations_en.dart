@@ -445,7 +445,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get kundliCalcNote =>
-      'Calculations use Swiss Ephemeris with Lahiri Ayanamsa';
+      'Vedic sidereal chart with Lahiri Ayanamsa — includes planetary positions, Vimshottari dasha, dosha checks and predictions';
 
   @override
   String get generateKundli => 'Generate Kundli';
@@ -652,11 +652,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get askAboutYourStars => 'Ask about your stars…';
 
   @override
-  String get upgradeUnlimited => 'Upgrade for unlimited questions';
+  String get upgradeUnlimited => 'Upgrade for more questions';
 
   @override
   String get aiErrorQuotaExceeded =>
-      'You\'ve reached today\'s free question limit. Upgrade for unlimited AI questions.';
+      'You\'ve reached today\'s free question limit. Upgrade for more daily questions.';
 
   @override
   String get aiErrorBirthDetailsMissing =>
@@ -684,7 +684,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String goPremiumSubtitle(String total) {
-    return 'Unlock all $total reports + unlimited AI questions';
+    return 'Unlock all $total reports + more daily AI questions';
   }
 
   @override
@@ -758,7 +758,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get vedadarshiPremium => 'Vedadarshi Premium';
 
   @override
-  String get premiumTagline => 'Unlimited cosmic guidance, one simple plan';
+  String get premiumTagline => 'Deeper cosmic guidance, one simple plan';
 
   @override
   String tierFeatureAiQuestions(int count) {
@@ -1434,4 +1434,186 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get authErrorUserNotFound =>
       'No account found with that email address.';
+
+  @override
+  String get rahuKaalLabel => 'Rahu Kaal';
+
+  @override
+  String get aiWhoseChart => 'Whose chart?';
+
+  @override
+  String aiChartFor(String name) {
+    return 'Chart: $name';
+  }
+
+  @override
+  String get matchDetailedTitle => 'What each koota means for you';
+
+  @override
+  String get matchDetailedSubtitle =>
+      'Unlock all 8 koota readings, with remedies';
+
+  @override
+  String get matchDetailedCta => 'Unlock the full reading';
+
+  @override
+  String get kundliHousesTitle => 'Your houses';
+
+  @override
+  String get kundliYogasTitle => 'Yogas in your chart';
+
+  @override
+  String get kundliPredictionsCta => 'Unlock your full reading';
+
+  @override
+  String get kundliPredictionsSubtitle =>
+      'All 12 house readings and every yoga in your chart';
+
+  @override
+  String get reportComplete => 'Complete Life Report';
+
+  @override
+  String get reportCompleteDesc =>
+      'Your whole chart in one reading — lagna, yogas and all 12 houses';
+
+  @override
+  String get reportSectionOverview => 'Overview';
+
+  @override
+  String get reportSectionHighlights => 'Key findings';
+
+  @override
+  String get reportSectionTiming => 'Timing';
+
+  @override
+  String get reportSectionGuidance => 'Guidance';
+
+  @override
+  String get reportSectionRemedies => 'Remedies';
+
+  @override
+  String get reportSectionStrengths => 'Strengths';
+
+  @override
+  String get reportSectionChallenges => 'Watch out for';
+
+  @override
+  String get reportGlimpseCta => 'Unlock the full report';
+
+  @override
+  String get reportGlimpseSubtitle =>
+      'Every section, in full, for your own birth chart';
+
+  @override
+  String get reportEmptyMessage =>
+      'This report isn\'t available for your chart right now. Please try again.';
+
+  @override
+  String kundliDoshaMangalPresentFrom(String refs) {
+    return 'Mangal Dosha — Mars sits in a dosha house counted from $refs';
+  }
+
+  @override
+  String kundliDoshaMangalCancelledFrom(String refs) {
+    return 'Mangal Dosha from $refs, but cancelled in your chart';
+  }
+
+  @override
+  String get kundliDoshaRefLagna => 'Lagna';
+
+  @override
+  String get kundliDoshaRefMoon => 'Moon';
+
+  @override
+  String get kundliDoshaRefVenus => 'Venus';
+
+  @override
+  String get muhuratAbhijit => 'Abhijit Muhurat';
+
+  @override
+  String get muhuratRahuKaal => 'Rahu Kaal';
+
+  @override
+  String get muhuratYamaganda => 'Yamaganda';
+
+  @override
+  String get muhuratGulikaKaal => 'Gulika Kaal';
+
+  @override
+  String get muhuratBrahma => 'Brahma Muhurta';
+
+  @override
+  String get askAiButton => 'Ask Rishi AI about this';
+
+  @override
+  String get askAiSeedPlanets =>
+      'Explain what the planet positions in my birth chart mean.';
+
+  @override
+  String get askAiSeedDasha =>
+      'What does my current Vimshottari dasha period mean for me?';
+
+  @override
+  String get askAiSeedPredictions =>
+      'Explain the yogas and house predictions in my birth chart.';
+
+  @override
+  String get askAiSeedMatching =>
+      'Explain our Gun Milan compatibility score and what it means for us.';
+
+  @override
+  String get lblLagna => 'Lagna';
+
+  @override
+  String get lblRashi => 'Rashi';
+
+  @override
+  String get lblCareerHouse => 'Career house';
+
+  @override
+  String get lblCareerLord => 'Career lord';
+
+  @override
+  String get lblPartnershipHouse => 'Partnership house';
+
+  @override
+  String get lblPartnershipLord => 'Partnership lord';
+
+  @override
+  String get lblVenus => 'Venus';
+
+  @override
+  String get lblMahadasha => 'Mahadasha';
+
+  @override
+  String get lblAntardasha => 'Antardasha';
+
+  @override
+  String get lblPhase => 'Phase';
+
+  @override
+  String get lblMantra => 'Mantra';
+
+  @override
+  String get lblSetting => 'Setting';
+
+  @override
+  String get lblDayToWear => 'Day to wear';
+
+  @override
+  String get lblLifePath => 'Life path';
+
+  @override
+  String get lblDestiny => 'Destiny';
+
+  @override
+  String get lblSoulUrge => 'Soul urge';
+
+  @override
+  String get lblPersonality => 'Personality';
+
+  @override
+  String lblHouseN(int n) {
+    return 'House $n';
+  }
 }

@@ -182,10 +182,19 @@ class AiRepository {
   /// timeout would abort a perfectly good in-progress answer purely because
   /// it took longer than a minute — 120s here matches what the backend is
   /// actually allowed to take, not an arbitrary round number.
+  /// [profileId] selects WHICH saved birth chart the AI reasons about —
+  /// the account owner's own (`null`, the default) or a family/friend
+  /// profile from `/users/{uid}/birthProfiles`.
+  ///
+  /// Only the id travels, never the birth details: the Cloud Function reads
+  /// the document itself, so the client cannot ask the AI about a chart the
+  /// user has not saved. Omitted entirely when null, so the function falls
+  /// back to `primary` exactly as it did before multi-profile existed.
   Future<AskAiResult> askQuestion({
     required String question,
     required String language,
     String? conversationId,
+    String? profileId,
   }) async {
     final payload = <String, dynamic>{
       'question': question,
@@ -193,6 +202,7 @@ class AiRepository {
       // Omit the key entirely when null — the fixed request contract does
       // not use an explicit `null` to mean "no conversation yet".
       'conversationId': ?conversationId,
+      'profileId': ?profileId,
     };
 
     try {

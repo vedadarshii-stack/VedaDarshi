@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/astrology/astro_terms.dart';
 import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
@@ -207,8 +208,16 @@ class _PlanetPositionRow extends StatelessWidget {
     // of app locale — same documented gap as the chart's stat cards and
     // `_SummaryBanner` (see `projects/CLAUDE.md`'s Vedika integration
     // notes). Only the surrounding chip/label copy below is localized.
-    final displayName = planet.name ?? planet.vedicName ?? code?.name;
-    final sign = planet.sign;
+    // Planet and sign names arrive from Vedika in English regardless of the
+    // requested language, so both are translated locally from the closed
+    // vocabulary — see `core/astrology/astro_terms.dart`. `vedicName` is
+    // already Sanskrit-in-Latin ("Budha"), which the same table covers.
+    final displayName = localizeAstroTerm(
+      planet.name ?? planet.vedicName ?? code?.name,
+      AstroTermKind.graha,
+      locale,
+    );
+    final sign = localizeAstroTerm(planet.sign, AstroTermKind.rashi, locale);
     final degree = planet.degree;
     final nakshatraName = planet.nakshatra?.name;
     final pada = planet.nakshatra?.pada;
