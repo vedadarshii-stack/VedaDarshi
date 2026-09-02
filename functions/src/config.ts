@@ -19,6 +19,32 @@ import { defineSecret, defineString } from "firebase-functions/params";
 export const VEDIKA_API_KEY = defineSecret("VEDIKA_API_KEY");
 
 /**
+ * RevenueCat SECRET API key, used only by `deleteAccount` to remove a
+ * customer's purchase records when they delete their account.
+ *
+ * ⚠️ **This is NOT the `goog_…` public SDK key that ships in the app.** This
+ * one can read and DELETE every subscriber's data, so it must never appear
+ * in `mobile/.env` (which is bundled into the APK as plain text and is
+ * trivially extractable) or in `functions/.env` (which is uploaded verbatim
+ * at deploy time). Secret Manager only:
+ *
+ *   firebase functions:secrets:set REVENUECAT_SECRET_API_KEY
+ *
+ * Scope it to customer read + delete in the RevenueCat dashboard — nothing
+ * here needs project-wide write.
+ */
+export const REVENUECAT_SECRET_API_KEY = defineSecret(
+  "REVENUECAT_SECRET_API_KEY"
+);
+
+/**
+ * RevenueCat project id, used to build the V2 customer-delete URL. Not a
+ * secret — it is visible in the dashboard URL — so it lives here as a plain
+ * constant rather than in Secret Manager.
+ */
+export const REVENUECAT_PROJECT_ID = "proj0503f814";
+
+/**
  * Where Vedika calls go. Defaults to the FREE sandbox
  * (`https://api.vedika.io/sandbox`) so this backend is deployable and
  * usable TODAY, before the client has a paid Vedika plan / real API key.

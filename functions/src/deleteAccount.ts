@@ -1,5 +1,9 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import {
+  REVENUECAT_PROJECT_ID,
+  REVENUECAT_SECRET_API_KEY,
+} from "./config";
 
 /**
  * Permanently deletes the signed-in user's account and all their data.
@@ -46,10 +50,87 @@ import * as admin from "firebase-admin";
 const FIRESTORE_DELETE_TIMEOUT_MESSAGE =
   "Could not delete your account data. Nothing was removed — please try again.";
 
+/**
+ * Top-level collection recording RevenueCat customers we failed to delete.
+ *
+ * Deliberately NOT under `/users/{uid}` — that whole subtree is about to be
+ * erased, so a record written there would delete itself moments later. This
+ * is the sweep list: each doc is a customer whose Firebase account is gone
+ * but whose purchase records may still exist at RevenueCat.
+ *
+ * Nothing consumes it yet. It exists so the gap is VISIBLE and fixable
+ * rather than silent — an operator can list it and retry by hand, and a
+ * sweeper job can be written later. An empty collection means nothing has
+ * failed.
+ */
+const ORPHANED_RC_COLLECTION = "orphanedRevenueCatCustomers";
+
+/**
+ * Deletes the customer's RevenueCat records.
+ *
+ * ADDED 2 Sep 2026, closing a real gap: the app aliases the RevenueCat
+ * app-user id onto the Firebase uid (`subscriptionStatusProvider` calls
+ * `logIn(uid)`), so before this, deleting an account left purchase history
+ * and subscriber attributes behind, keyed to a uid that no longer resolved.
+ * For a feature whose entire purpose is honouring a Play data-deletion
+ * promise, that was a hole.
+ *
+ * **Tries V2 first, falls back to V1.** RevenueCat's dashboard can mint
+ * either a scoped V2 key or a legacy all-access V1 key and they are not
+ * interchangeable across API versions, so rather than pinning this to
+ * whichever kind happened to be created, it attempts the modern endpoint and
+ * retries on the legacy one when the key is rejected as unauthorized. That
+ * makes the function work with either key without anyone having to remember
+ * which was issued.
+ *
+ * Returns true on success (INCLUDING 404 — a customer who never opened the
+ * paywall simply does not exist at RevenueCat, which is not a failure).
+ */
+async function deleteRevenueCatCustomer(uid: string): Promise<boolean> {
+  const key = REVENUECAT_SECRET_API_KEY.value();
+  if (!key) {
+    console.warn("deleteAccount: no RevenueCat key configured", { uid });
+    return false;
+  }
+
+  const attempts = [
+    `https://api.revenuecat.com/v2/projects/${REVENUECAT_PROJECT_ID}/customers/${encodeURIComponent(uid)}`,
+    `https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(uid)}`,
+  ];
+
+  let lastStatus = 0;
+  for (const url of attempts) {
+    try {
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${key}`,
+          "Content-Type": "application/json",
+        },
+      });
+      // 404 = no such customer. Idempotent success, not an error.
+      if (response.ok || response.status === 404) return true;
+      lastStatus = response.status;
+      // Only an auth rejection is worth retrying on the other API version;
+      // anything else (429, 5xx) would fail the same way twice.
+      if (response.status !== 401 && response.status !== 403) break;
+    } catch (e) {
+      console.error("deleteAccount: RevenueCat request threw", { uid }, e);
+      return false;
+    }
+  }
+  console.error("deleteAccount: RevenueCat delete failed", {
+    uid,
+    lastStatus,
+  });
+  return false;
+}
+
 export const deleteAccount = onCall(
   {
     region: "asia-south1",
     timeoutSeconds: 120,
+    secrets: [REVENUECAT_SECRET_API_KEY],
   },
   async (request) => {
     // uid comes ONLY from the verified auth token — never from
@@ -63,6 +144,29 @@ export const deleteAccount = onCall(
     const startedAtMs = Date.now();
     const db = admin.firestore();
     const userDocRef = db.collection("users").doc(uid);
+
+    // ---- 0. REVENUECAT: before anything irreversible --------------------
+    //
+    // Ordered FIRST on purpose. At this point nothing has been destroyed, so
+    // a failure here is recoverable and the user is still signed in.
+    //
+    // But a RevenueCat outage must NOT block someone from deleting their
+    // account — the right to delete cannot depend on a third party being up.
+    // So a failure is recorded for sweeping and the deletion continues,
+    // rather than either aborting or being silently swallowed.
+    const revenueCatDeleted = await deleteRevenueCatCustomer(uid);
+    if (!revenueCatDeleted) {
+      try {
+        await db.collection(ORPHANED_RC_COLLECTION).doc(uid).set({
+          uid,
+          failedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      } catch (e) {
+        // Even the bookkeeping is best-effort — it must never be the reason
+        // an account deletion fails.
+        console.error("deleteAccount: could not record RC orphan", { uid }, e);
+      }
+    }
 
     // ---- 1. FIRESTORE: enumerate + recursively delete -------------------
     let subcollectionNames: string[] = [];
@@ -115,9 +219,14 @@ export const deleteAccount = onCall(
 
     console.log("deleteAccount: completed", {
       uid,
+      revenueCatDeleted,
       elapsedMs: Date.now() - startedAtMs,
     });
 
-    return { success: true };
+    // `success` reports the ACCOUNT deletion, which did happen. RevenueCat
+    // is reported separately rather than folded in — the client shows the
+    // same confirmation either way (the account really is gone), but the
+    // caller and the logs can tell the difference.
+    return { success: true, revenueCatDeleted };
   }
 );
