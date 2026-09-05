@@ -18,6 +18,7 @@ const db = admin.firestore();
 export { dailyPrewarm } from "./dailyPrewarm";
 export { askAiAstrologer } from "./aiCredits";
 export { deleteAccount } from "./deleteAccount";
+export { revenueCatWebhook } from "./revenueCatWebhook";
 
 /**
  * The paid Vedika API key is imported from ./config (see that file for

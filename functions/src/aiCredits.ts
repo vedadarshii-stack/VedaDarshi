@@ -63,27 +63,47 @@ function usageDocRef(uid: string, dateKey: string) {
 /**
  * Resolves how many AI questions this user gets today.
  *
- * TODO(entitlements): should come from the user's RevenueCat entitlement
- * — Bronze=2, Silver=4, Gold=7, Platinum=10 per the Access Control Matrix
- * in mobile/CLAUDE.md — most likely synced onto /users/{uid} by a
- * RevenueCat webhook (a trusted SERVER process), not read from RevenueCat
- * on every call. Whatever field ends up holding that tier, it MUST be
- * writable only by the Admin SDK / a verified webhook handler, never by
- * the client — mobile/CLAUDE.md is explicit that "[RevenueCat]
- * entitlement ... is NEVER mirrored into a Firestore field the client can
- * write". `aiDailyCreditLimitOverride` below is a placeholder for exactly
- * that future field; the Firestore rule for /users/{uid} already lets the
- * client write to its OWN document, so if this field is added for real,
- * the rules must be tightened to carve it out (e.g. via a
- * request.resource.data.diff() check) the same way this file's aiUsage
- * subcollection rule below carves that out.
+ * WIRED TO REAL ENTITLEMENTS 5 Sep 2026, replacing the `TODO(entitlements)`
+ * that used to sit here.
+ *
+ * Reads `/entitlements/{uid}.aiDailyLimit`, written only by
+ * `revenueCatWebhook` via the Admin SDK. That collection is `allow write: if
+ * false` in the security rules, so unlike the old placeholder it cannot be
+ * raised by the user editing their own document.
+ *
+ * Order of precedence, and each step is deliberate:
+ *
+ *  1. **`aiDailyCreditLimitOverride` on /users/{uid}** — kept as a manual
+ *     lever for support ("give this tester 20/day"). Still carved out of the
+ *     client's own write in the rules, so it remains a staff-only field.
+ *  2. **The webhook-written entitlement** — the real answer for paying users.
+ *  3. **The free default** — for anyone with no entitlement document, which
+ *     is every user who has never subscribed. A MISSING document means free,
+ *     never an error: the webhook only writes when something changes, so
+ *     absence is the normal state for most people.
+ *
+ * ⚠️ Never fall back to a PAID limit when the lookup fails. A Firestore
+ * outage must degrade someone to the free tier, not hand everyone Platinum.
  */
 async function resolveDailyLimit(uid: string): Promise<number> {
-  const snap = await admin.firestore().collection("users").doc(uid).get();
-  const override = snap.data()?.aiDailyCreditLimitOverride;
-  if (typeof override === "number" && override > 0) {
-    return override;
+  const db = admin.firestore();
+
+  try {
+    const userSnap = await db.collection("users").doc(uid).get();
+    const override = userSnap.data()?.aiDailyCreditLimitOverride;
+    if (typeof override === "number" && override > 0) return override;
+  } catch (e) {
+    console.warn("resolveDailyLimit: override lookup failed", { uid }, e);
   }
+
+  try {
+    const entSnap = await db.collection("entitlements").doc(uid).get();
+    const limit = entSnap.data()?.aiDailyLimit;
+    if (typeof limit === "number" && limit > 0) return limit;
+  } catch (e) {
+    console.warn("resolveDailyLimit: entitlement lookup failed", { uid }, e);
+  }
+
   return DEFAULT_FREE_DAILY_AI_LIMIT;
 }
 

@@ -1,0 +1,30 @@
+[debug] [2026-09-05T10:52:25.958Z] ----------------------------------------------------------------------
+[debug] [2026-09-05T10:52:25.960Z] Command:       /Users/pradeepkumar/.nvm/versions/node/v22.19.0/bin/node /Users/pradeepkumar/.nvm/versions/node/v22.19.0/bin/firebase deploy --only functions:revenueCatWebhook
+[debug] [2026-09-05T10:52:25.960Z] CLI Version:   14.17.0
+[debug] [2026-09-05T10:52:25.960Z] Platform:      darwin
+[debug] [2026-09-05T10:52:25.960Z] Node Version:  v22.19.0
+[debug] [2026-09-05T10:52:25.960Z] Time:          Sat Sep 05 2026 16:22:25 GMT+0530 (India Standard Time)
+[debug] [2026-09-05T10:52:25.960Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-09-05T10:52:26.057Z] Field "/hosting" in "firebase.json" is possibly invalid: must be object
+[debug] [2026-09-05T10:52:26.057Z] Object "/hosting/1/headers/0" in "firebase.json" is missing required property: {"missingProperty":"glob"}
+[debug] [2026-09-05T10:52:26.057Z] Object "/hosting/1/headers/0" in "firebase.json" has unknown property: {"additionalProperty":"comment"}
+[debug] [2026-09-05T10:52:26.057Z] Object "/hosting/1/headers/0" in "firebase.json" is missing required property: {"missingProperty":"regex"}
+[debug] [2026-09-05T10:52:26.057Z] Field "/hosting/1/headers/0" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[debug] [2026-09-05T10:52:26.057Z] Object "/hosting/1" in "firebase.json" is missing required property: {"missingProperty":"site"}
+[debug] [2026-09-05T10:52:26.057Z] Field "/hosting/1" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[debug] [2026-09-05T10:52:26.057Z] Field "/hosting" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[debug] [2026-09-05T10:52:26.059Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-09-05T10:52:26.059Z] > authorizing via signed-in user (ppradeepd@gmail.com)
+[debug] [2026-09-05T10:52:26.059Z] [iam] checking project vedadarshi-20989 for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2026-09-05T10:52:26.059Z] Checked if tokens are valid: true, expires at: 1788607315848
+[debug] [2026-09-05T10:52:26.059Z] Checked if tokens are valid: true, expires at: 1788607315848
+[debug] [2026-09-05T10:52:26.060Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/vedadarshi-20989:testIamPermissions [none]
+[debug] [2026-09-05T10:52:26.060Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/vedadarshi-20989:testIamPermissions x-goog-quota-user=projects/vedadarshi-20989
+[debug] [2026-09-05T10:52:26.060Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/vedadarshi-20989:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2026-09-05T10:52:27.568Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/vedadarshi-20989:testIamPermissions 200
+[debug] [2026-09-05T10:52:27.568Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/vedadarshi-20989:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2026-09-05T10:52:27.569Z] Checked if tokens are valid: true, expires at: 1788607315848
+[debug] [2026-09-05T10:52:27.569Z] Checked if tokens are valid: true, expires at: 1788607315848
+[debug] [2026-09-05T10:52:27.569Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/vedadarshi-20989/serviceAccounts/vedadarshi-20989@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2026-09-05T10:52:27.569Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/vedadarshi-20989/serviceAccounts/vedadarshi-20989@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}

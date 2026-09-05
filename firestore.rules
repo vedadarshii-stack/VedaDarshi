@@ -136,6 +136,28 @@ service cloud.firestore {
     // ---- App end-users (UNCHANGED from the previously deployed rules) ----
 
     // Account document: /users/{uid}
+    // ---- ENTITLEMENTS (added 5 Sep 2026) -------------------------------
+    //
+    // The user's paid tier, written ONLY by `revenueCatWebhook` through the
+    // Admin SDK, which bypasses these rules entirely.
+    //
+    // `allow read` lets the app show the right badge without a round trip to
+    // RevenueCat. `allow write: if false` is the whole point: this is the one
+    // place the backend can TRUST a tier from. A user who could write here
+    // could grant themselves Platinum by editing one field, which is exactly
+    // why the entitlement does not live on /users/{uid} — that document is
+    // client-writable by design.
+    //
+    // Deliberately a SEPARATE top-level collection rather than a carved-out
+    // field: a carve-out has to be re-verified every time the user document
+    // gains a field, and one missed `diff()` silently reopens the hole.
+    // "Nobody can write this collection" needs no maintenance.
+    match /entitlements/{userId} {
+      allow get: if isOwner(userId);
+      // No `list` — a client must never enumerate who is paying.
+      allow write: if false;
+    }
+
     match /users/{userId} {
       allow get: if isOwner(userId);
       // No `list` — a client must never be able to enumerate users.

@@ -45,6 +45,19 @@ export const REVENUECAT_SECRET_API_KEY = defineSecret(
 export const REVENUECAT_PROJECT_ID = "proj0503f814";
 
 /**
+ * Shared secret RevenueCat sends as the `Authorization` header on every
+ * webhook.
+ *
+ * The webhook endpoint is PUBLIC — RevenueCat has to be able to reach it —
+ * so this value is the only thing preventing a stranger from POSTing a
+ * forged event and granting themselves Platinum. Treat it exactly like the
+ * API keys: Secret Manager only, never `.env`.
+ *
+ *   firebase functions:secrets:set REVENUECAT_WEBHOOK_AUTH
+ */
+export const REVENUECAT_WEBHOOK_AUTH = defineSecret("REVENUECAT_WEBHOOK_AUTH");
+
+/**
  * Where Vedika calls go. Defaults to the FREE sandbox
  * (`https://api.vedika.io/sandbox`) so this backend is deployable and
  * usable TODAY, before the client has a paid Vedika plan / real API key.
