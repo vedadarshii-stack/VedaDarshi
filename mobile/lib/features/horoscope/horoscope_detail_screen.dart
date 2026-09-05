@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/astrology/astro_terms.dart';
 import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
@@ -182,9 +183,16 @@ class _DailyBody extends StatelessWidget {
           sign: sign,
           // Real when Vedika returned a parseable `date`, otherwise the
           // placeholder — never blank. (Always the placeholder on Yearly.)
-          dateLabel: horoscope.formattedDate ?? HoroscopeDetailStaticData.date,
+          dateLabel:
+              horoscope.formattedDateIn(locale) ??
+              HoroscopeDetailStaticData.date,
           luckyColorValue:
-              horoscope.luckyColor ?? HoroscopeDetailStaticData.luckyColor,
+              localizeAstroTerm(
+                horoscope.luckyColor,
+                AstroTermKind.colour,
+                locale,
+              ) ??
+              HoroscopeDetailStaticData.luckyColor,
           luckyNumberValue:
               horoscope.luckyNumber?.toString() ??
               HoroscopeDetailStaticData.luckyNumber,
@@ -821,7 +829,12 @@ List<Widget> _yearlyHeaderChips(
   final entries = <MapEntry<String, String>>[
     if (color != null) MapEntry(l10n.luckyColor, color),
     if (number != null) MapEntry(l10n.luckyNumber, number.toString()),
-    if (direction != null) MapEntry(l10n.direction, direction),
+    if (direction != null)
+      MapEntry(
+        l10n.direction,
+        localizeAstroTerm(direction, AstroTermKind.direction, locale) ??
+            direction,
+      ),
   ];
 
   final chips = <Widget>[];
@@ -1354,7 +1367,13 @@ class _Header extends StatelessWidget {
         // horoscope_detail_static_data.dart), not a loading gap.
         child: _HeaderChip(
           label: l10n.direction,
-          value: HoroscopeDetailStaticData.direction,
+          value:
+              localizeAstroTerm(
+                HoroscopeDetailStaticData.direction,
+                AstroTermKind.direction,
+                locale,
+              ) ??
+              HoroscopeDetailStaticData.direction,
           locale: locale,
         ),
       ),
@@ -1447,7 +1466,19 @@ class _Header extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      '${sign.sanskritName} · ${sign.englishName}',
+                      // LOCALISED 4 Sep 2026. In English this reads
+                      // "Kumbha · Aquarius" — the Sanskrit name plus the
+                      // familiar one. In another locale that second half is
+                      // the only English word on the screen, so the sign is
+                      // shown in the user's own script instead.
+                      locale.languageCode == 'en'
+                          ? '${sign.sanskritName} · ${sign.englishName}'
+                          : (localizeAstroTerm(
+                                  sign.englishName,
+                                  AstroTermKind.rashi,
+                                  locale,
+                                ) ??
+                                sign.sanskritName),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppFonts.heading(

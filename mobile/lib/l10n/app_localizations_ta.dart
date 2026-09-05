@@ -1631,4 +1631,110 @@ class AppLocalizationsTa extends AppLocalizations {
   String lblHouseN(int n) {
     return 'பாவம் $n';
   }
+
+  @override
+  String get aiFollowUpDasha => 'என் தற்போதைய தசையின் பொருள் என்ன?';
+
+  @override
+  String get aiFollowUpCareer => 'என் தொழில் வாய்ப்புகள் எப்படி உள்ளன?';
+
+  @override
+  String get aiFollowUpRemedies =>
+      'என் ஜாதகத்திற்கு எந்த பரிகாரங்கள் பொருந்தும்?';
+
+  @override
+  String get aiFollowUpHealth =>
+      'என் ஆரோக்கியம் குறித்து ஜாதகம் என்ன கூறுகிறது?';
+
+  @override
+  String get panchangMasaLabel => 'மாதம்';
+
+  @override
+  String get panchangPakshaLabel => 'பட்சம்';
+
+  @override
+  String dashaCurrentSentence(String planet) {
+    return 'நீங்கள் $planet மகாதசையில் உள்ளீர்கள்';
+  }
+
+  @override
+  String panchangAdviceComposed(
+    String quality,
+    String tithi,
+    String paksha,
+    String nakshatra,
+    String yoga,
+  ) {
+    return 'இன்று $quality. $tithi திதி ($paksha பட்சம்), $nakshatra நட்சத்திரம் மற்றும் $yoga யோகம்.';
+  }
+
+  @override
+  String get choghadiyaBestForKaal =>
+      'எதிரிகளை வெல்லுதல் அல்லது தாந்த்ரீக செயல்கள் போன்ற சிறப்பு நோக்கங்களுக்கு மட்டும்';
+
+  @override
+  String get choghadiyaBestForShubh =>
+      'மத சடங்குகள், கல்வி, நிதித் திட்டமிடல் மற்றும் பெரியோரைச் சந்தித்தல்';
+
+  @override
+  String get choghadiyaBestForRog =>
+      'அறுவை சிகிச்சைகள், போட்டி நடவடிக்கைகள் மற்றும் சவால்களை எதிர்கொள்ளுதல்';
+
+  @override
+  String get choghadiyaBestForUdveg =>
+      'அரசு பணிகள், அதிகாரிகளைச் சந்தித்தல் மற்றும் நிர்வாகப் பணிகள்';
+
+  @override
+  String get choghadiyaBestForChar =>
+      'பயணங்கள், வாகனம் வாங்குதல் மற்றும் தற்காலிக ஏற்பாடுகள்';
+
+  @override
+  String get choghadiyaBestForLabh =>
+      'வணிக ஒப்பந்தங்கள், நிதி பரிவர்த்தனைகள், வர்த்தகம் மற்றும் தொழில் நகர்வுகள்';
+
+  @override
+  String get choghadiyaBestForAmrit =>
+      'அனைத்து சுப காரியங்கள், குறிப்பாக புதிய முயற்சிகள், திருமணங்கள் மற்றும் முக்கிய விழாக்கள்';
+
+  @override
+  String get notifDailyHoroscopeTitle => 'உங்கள் இன்றைய ராசிபலன் தயார்';
+
+  @override
+  String get notifDailyHoroscopeBody =>
+      'இன்றைய பலன் காத்திருக்கிறது — பார்க்க தட்டவும்.';
+
+  @override
+  String get notifSawanSomvarTitle => 'நாளை சாவன் சோமவார்';
+
+  @override
+  String get notifSawanSomvarBody =>
+      'சிவபெருமான் விரத நாள். சடங்குகள், முகூர்த்தம் மற்றும் விரத விதிகளைக் காண்க.';
+
+  @override
+  String get notifRishiAiReplyTitle => 'ரிஷி AI பதிலளித்தது';
+
+  @override
+  String get notifRishiAiReplyBody =>
+      'உங்கள் கேள்விக்கான பதில் அரட்டையில் காத்திருக்கிறது.';
+
+  @override
+  String get notifRahuKaalAlertTitle => 'ராகு காலம் எச்சரிக்கை';
+
+  @override
+  String get notifRahuKaalAlertBody =>
+      'இன்றைய ராகு காலத்தில் புதிதாக எதையும் தொடங்க வேண்டாம்.';
+
+  @override
+  String get notifPremiumOfferTitle => 'பிரீமியத்தைத் திறக்கவும்';
+
+  @override
+  String get notifPremiumOfferBody =>
+      'திட்டங்களையும் ஒவ்வொன்றில் உள்ளதையும் காண்க.';
+
+  @override
+  String get notifNewArticleTitle => 'புதிய கட்டுரை வெளியிடப்பட்டது';
+
+  @override
+  String get notifNewArticleBody =>
+      'உங்களுக்கான ஞானத்தில் புதிய கட்டுரை சேர்க்கப்பட்டுள்ளது.';
 }

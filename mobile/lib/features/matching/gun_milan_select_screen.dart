@@ -48,12 +48,30 @@ class _GunMilanSelectScreenState extends ConsumerState<GunMilanSelectScreen> {
     // same fallback (same pattern as the Kundli input screen).
     final profile = ref.watch(birthProfileProvider).valueOrNull;
     final trimmedName = profile?.fullName.trim();
-    final groomName = (trimmedName != null && trimmedName.isNotEmpty)
+    final ownName = (trimmedName != null && trimmedName.isNotEmpty)
         ? trimmedName
         : GunMilanStaticData.fallbackGroomName;
-    final groomSummary = profile != null
+    final ownSummary = profile != null
         ? profile.summaryLine
         : GunMilanStaticData.fallbackGroomSummary;
+
+    // WHICH SIDE THE USER'S OWN PROFILE FILLS (fixed 4 Sep 2026,
+    // client-reported: "even if for female details it's automatically coming
+    // to groom profile").
+    //
+    // This screen used to hardcode the signed-in user as the GROOM, so a
+    // woman running a match saw herself labelled 🤵 Groom and was asked to
+    // pick a bride. Gun Milan is asymmetric — the koota scoring genuinely
+    // depends on which chart is male and which is female — so this is not
+    // only an insulting label, it feeds the WRONG chart into the male slot
+    // and produces a wrong score.
+    //
+    // `Gender.other` keeps the groom slot: the API takes exactly `male` and
+    // `female` (`boy`/`girl` are rejected), so a third option has to map to
+    // one of them, and defaulting to the existing behaviour is the least
+    // surprising choice. Worth revisiting with the client — the honest fix
+    // is letting the user choose which side they occupy.
+    final userIsBride = profile?.gender == Gender.female;
 
     return Scaffold(
       backgroundColor: AppColors.cream,
@@ -79,16 +97,27 @@ class _GunMilanSelectScreenState extends ConsumerState<GunMilanSelectScreen> {
                     const SizedBox(height: 18),
                     _IntroText(l10n: l10n, locale: locale),
                     const SizedBox(height: 18),
-                    _GroomCard(
+                    // Each card keeps its own JOB — one shows the signed-in
+                    // user, the other picks a partner — and only the ROLE
+                    // LABEL swaps. Swapping the widgets instead would move
+                    // the partner-picker's tap handler onto the user's own
+                    // profile, which is not what "she is the bride" means.
+                    _OwnProfileCard(
                       l10n: l10n,
                       locale: locale,
-                      name: groomName,
-                      summary: groomSummary,
+                      name: ownName,
+                      summary: ownSummary,
+                      isBride: userIsBride,
                     ),
                     const SizedBox(height: 18),
                     _HeartDivider(locale: locale),
                     const SizedBox(height: 18),
-                    _BrideCard(l10n: l10n, locale: locale),
+                    _PartnerCard(
+                      l10n: l10n,
+                      locale: locale,
+                      // The partner takes whichever role the user does not.
+                      isBride: !userIsBride,
+                    ),
                     const Spacer(),
                     _PrivacyNote(l10n: l10n, locale: locale),
                     const SizedBox(height: 12),
@@ -230,19 +259,25 @@ class _RoleBadge extends StatelessWidget {
   }
 }
 
-/// GROOM card (Figma node 19:9) — the signed-in user's own saved profile.
-class _GroomCard extends StatelessWidget {
-  const _GroomCard({
+/// The signed-in user's own saved profile (Figma node 19:9).
+///
+/// RENAMED from `_GroomCard` 4 Sep 2026: it was never really "the groom
+/// card", it was "the user card" that happened to always say Groom. A woman
+/// running a match was labelled 🤵 Groom, which the client reported.
+class _OwnProfileCard extends StatelessWidget {
+  const _OwnProfileCard({
     required this.l10n,
     required this.locale,
     required this.name,
     required this.summary,
+    required this.isBride,
   });
 
   final AppLocalizations l10n;
   final Locale locale;
   final String name;
   final String summary;
+  final bool isBride;
 
   @override
   Widget build(BuildContext context) {
@@ -253,9 +288,9 @@ class _GroomCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _RoleBadge(
-            text: '🤵 ${l10n.groom}',
-            background: AppColors.tileBlueBg,
-            foreground: AppColors.tileBlueFg,
+            text: isBride ? '👰 ${l10n.bride}' : '🤵 ${l10n.groom}',
+            background: isBride ? AppColors.tilePinkBg : AppColors.tileBlueBg,
+            foreground: isBride ? AppColors.tilePinkFg : AppColors.tileBlueFg,
             locale: locale,
           ),
           const SizedBox(height: 10),
@@ -381,11 +416,16 @@ class _HeartDivider extends StatelessWidget {
 /// BRIDE card (Figma node 19:22) — an intentional EMPTY STATE, since
 /// multi-profile support (family/friends) isn't built yet. The whole card is
 /// tappable, but currently a no-op — see [GunMilanStaticData]'s doc comment.
-class _BrideCard extends ConsumerWidget {
-  const _BrideCard({required this.l10n, required this.locale});
+class _PartnerCard extends ConsumerWidget {
+  const _PartnerCard({
+    required this.l10n,
+    required this.locale,
+    required this.isBride,
+  });
 
   final AppLocalizations l10n;
   final Locale locale;
+  final bool isBride;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -413,9 +453,13 @@ class _BrideCard extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _RoleBadge(
-                text: '👰 ${l10n.bride}',
-                background: AppColors.tilePinkBg,
-                foreground: AppColors.tilePinkFg,
+                text: isBride ? '👰 ${l10n.bride}' : '🤵 ${l10n.groom}',
+                background: isBride
+                    ? AppColors.tilePinkBg
+                    : AppColors.tileBlueBg,
+                foreground: isBride
+                    ? AppColors.tilePinkFg
+                    : AppColors.tileBlueFg,
                 locale: locale,
               ),
               const SizedBox(height: 10),

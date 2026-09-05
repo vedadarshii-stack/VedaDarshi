@@ -1622,4 +1622,107 @@ class AppLocalizationsKn extends AppLocalizations {
   String lblHouseN(int n) {
     return 'ಭಾವ $n';
   }
+
+  @override
+  String get aiFollowUpDasha => 'ನನ್ನ ಪ್ರಸ್ತುತ ದಶೆಯ ಅರ್ಥವೇನು?';
+
+  @override
+  String get aiFollowUpCareer => 'ನನ್ನ ವೃತ್ತಿ ಅವಕಾಶಗಳು ಹೇಗಿವೆ?';
+
+  @override
+  String get aiFollowUpRemedies => 'ನನ್ನ ಜಾತಕಕ್ಕೆ ಯಾವ ಪರಿಹಾರಗಳು ಸೂಕ್ತ?';
+
+  @override
+  String get aiFollowUpHealth => 'ನನ್ನ ಆರೋಗ್ಯದ ಬಗ್ಗೆ ಜಾತಕ ಏನು ಹೇಳುತ್ತದೆ?';
+
+  @override
+  String get panchangMasaLabel => 'ಮಾಸ';
+
+  @override
+  String get panchangPakshaLabel => 'ಪಕ್ಷ';
+
+  @override
+  String dashaCurrentSentence(String planet) {
+    return 'ನೀವು $planet ಮಹಾದಶೆಯಲ್ಲಿ ಇದ್ದೀರಿ';
+  }
+
+  @override
+  String panchangAdviceComposed(
+    String quality,
+    String tithi,
+    String paksha,
+    String nakshatra,
+    String yoga,
+  ) {
+    return 'ಇಂದು $quality. $tithi ತಿಥಿ ($paksha ಪಕ್ಷ), $nakshatra ನಕ್ಷತ್ರ ಮತ್ತು $yoga ಯೋಗ.';
+  }
+
+  @override
+  String get choghadiyaBestForKaal =>
+      'ಶತ್ರು ನಿವಾರಣೆ ಅಥವಾ ತಾಂತ್ರಿಕ ಕಾರ್ಯಗಳಂತಹ ನಿರ್ದಿಷ್ಟ ಉದ್ದೇಶಗಳಿಗೆ ಮಾತ್ರ';
+
+  @override
+  String get choghadiyaBestForShubh =>
+      'ಧಾರ್ಮಿಕ ಸಮಾರಂಭಗಳು, ಶಿಕ್ಷಣ, ಆರ್ಥಿಕ ಯೋಜನೆ ಮತ್ತು ಹಿರಿಯರನ್ನು ಭೇಟಿಯಾಗುವುದು';
+
+  @override
+  String get choghadiyaBestForRog =>
+      'ಶಸ್ತ್ರಚಿಕಿತ್ಸೆಗಳು, ಸ್ಪರ್ಧಾತ್ಮಕ ಚಟುವಟಿಕೆಗಳು ಮತ್ತು ಸವಾಲುಗಳನ್ನು ಎದುರಿಸುವುದು';
+
+  @override
+  String get choghadiyaBestForUdveg =>
+      'ಸರ್ಕಾರಿ ಕೆಲಸ, ಅಧಿಕಾರಿಗಳ ಭೇಟಿ ಮತ್ತು ಆಡಳಿತಾತ್ಮಕ ಕಾರ್ಯಗಳು';
+
+  @override
+  String get choghadiyaBestForChar =>
+      'ಪ್ರಯಾಣ, ವಾಹನ ಖರೀದಿ ಮತ್ತು ತಾತ್ಕಾಲಿಕ ವ್ಯವಸ್ಥೆಗಳು';
+
+  @override
+  String get choghadiyaBestForLabh =>
+      'ವ್ಯಾಪಾರ ಒಪ್ಪಂದಗಳು, ಹಣಕಾಸು ವಹಿವಾಟುಗಳು, ವ್ಯಾಪಾರ ಮತ್ತು ವೃತ್ತಿ ನಿರ್ಧಾರಗಳು';
+
+  @override
+  String get choghadiyaBestForAmrit =>
+      'ಎಲ್ಲಾ ಶುಭ ಕಾರ್ಯಗಳು, ವಿಶೇಷವಾಗಿ ಹೊಸ ಉದ್ಯಮಗಳು, ವಿವಾಹಗಳು ಮತ್ತು ಪ್ರಮುಖ ಸಮಾರಂಭಗಳು';
+
+  @override
+  String get notifDailyHoroscopeTitle => 'ನಿಮ್ಮ ಇಂದಿನ ರಾಶಿಫಲ ಸಿದ್ಧವಾಗಿದೆ';
+
+  @override
+  String get notifDailyHoroscopeBody =>
+      'ಇಂದಿನ ಫಲ ಕಾಯುತ್ತಿದೆ — ನೋಡಲು ಟ್ಯಾಪ್ ಮಾಡಿ.';
+
+  @override
+  String get notifSawanSomvarTitle => 'ನಾಳೆ ಶ್ರಾವಣ ಸೋಮವಾರ';
+
+  @override
+  String get notifSawanSomvarBody =>
+      'ಶಿವನ ಉಪವಾಸ ದಿನ. ಆಚರಣೆಗಳು, ಮುಹೂರ್ತ ಮತ್ತು ವ್ರತ ನಿಯಮಗಳನ್ನು ನೋಡಿ.';
+
+  @override
+  String get notifRishiAiReplyTitle => 'ಋಷಿ AI ಉತ್ತರಿಸಿದೆ';
+
+  @override
+  String get notifRishiAiReplyBody =>
+      'ನಿಮ್ಮ ಪ್ರಶ್ನೆಗೆ ಉತ್ತರ ಚಾಟ್‌ನಲ್ಲಿ ಕಾಯುತ್ತಿದೆ.';
+
+  @override
+  String get notifRahuKaalAlertTitle => 'ರಾಹು ಕಾಲ ಎಚ್ಚರಿಕೆ';
+
+  @override
+  String get notifRahuKaalAlertBody =>
+      'ಇಂದಿನ ರಾಹು ಕಾಲದಲ್ಲಿ ಹೊಸದನ್ನು ಪ್ರಾರಂಭಿಸಬೇಡಿ.';
+
+  @override
+  String get notifPremiumOfferTitle => 'ಪ್ರೀಮಿಯಂ ಅನ್‌ಲಾಕ್ ಮಾಡಿ';
+
+  @override
+  String get notifPremiumOfferBody =>
+      'ಯೋಜನೆಗಳು ಮತ್ತು ಪ್ರತಿಯೊಂದರಲ್ಲಿ ಏನಿದೆ ಎಂದು ನೋಡಿ.';
+
+  @override
+  String get notifNewArticleTitle => 'ಹೊಸ ಲೇಖನ ಪ್ರಕಟವಾಗಿದೆ';
+
+  @override
+  String get notifNewArticleBody => 'ನಿಮಗಾಗಿ ಜ್ಞಾನದಲ್ಲಿ ಹೊಸ ಲೇಖನ ಸೇರಿಸಲಾಗಿದೆ.';
 }

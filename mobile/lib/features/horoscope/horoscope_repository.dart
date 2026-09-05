@@ -1,5 +1,9 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/vedika/response_store.dart';
 import '../../core/vedika/vedika_client.dart';
 import 'horoscope_data.dart';
 import 'zodiac_sign.dart';
@@ -49,16 +53,38 @@ class HoroscopeRepository {
   final Map<String, MonthlyHoroscope> _monthlyCache = {};
   final Map<String, YearlyHoroscope> _yearlyCache = {};
 
+  /// The DAILY horoscope, persisted on device per calendar day (4 Sep 2026).
+  ///
+  /// Only `daily` is persisted, deliberately. It is the one Home blocks on
+  /// at every launch, so it is where the saved round trip is actually felt.
+  /// Weekly and monthly are ROLLING windows (verified: weekly returns
+  /// `periodStart today → today+7`), so a stored copy would be wrong the
+  /// next day, and they are opened rarely enough that a live fetch — already
+  /// deduplicated server-side by the single-flight lock — is the right cost.
   Future<DailyHoroscope> fetchDaily(String signId) async {
     final key = _cacheKey(signId, 'daily');
     final cached = _dailyCache[key];
     if (cached != null) return cached;
+
+    final dayKey = dayKeyFor(DateTime.now());
+    final storeKey = 'horoscope_daily_$signId';
+    final stored = await VedikaResponseStore.instance.read(storeKey, dayKey);
+    if (stored != null) {
+      try {
+        final horoscope = DailyHoroscope.fromJson(stored);
+        _dailyCache[key] = horoscope;
+        return horoscope;
+      } catch (e) {
+        debugPrint('horoscope: stored payload unusable, refetching ($e)');
+      }
+    }
 
     final data = await _client.get(
       '/v2/astrology/horoscope/${_apiSign(signId)}',
     );
     final horoscope = DailyHoroscope.fromJson(data);
     _dailyCache[key] = horoscope;
+    unawaited(VedikaResponseStore.instance.write(storeKey, dayKey, data));
     return horoscope;
   }
 

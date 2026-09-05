@@ -355,9 +355,10 @@ class _NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Semantics(
       button: true,
-      label: item.title,
+      label: _notifTitle(item, l10n),
       child: PressableScale(
         borderRadius: BorderRadius.circular(16),
         onTap: onTap,
@@ -400,7 +401,7 @@ class _NotificationCard extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            item.title,
+                            _notifTitle(item, l10n),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: AppFonts.body(
@@ -431,7 +432,7 @@ class _NotificationCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      item.body,
+                      _notifBody(item, l10n),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: AppFonts.body(
@@ -517,3 +518,48 @@ class _EmptyState extends StatelessWidget {
     );
   }
 }
+
+/// Localised title/body for a placeholder notification.
+///
+/// ADDED 4 Sep 2026 — the client saw this whole screen in English.
+///
+/// ⚠️ **These notifications are FABRICATED.** `notifications_static_data.dart`
+/// is placeholder UI standing in for a feature that does not exist: there is
+/// no FCM send path (see the push-notifications section of
+/// `projects/CLAUDE.md`) and no store of received notifications, so nothing
+/// here was ever actually delivered to the user. Translating them makes them
+/// readable, NOT real — a user reading "Your daily horoscope is ready ·
+/// 7:00 AM" will reasonably believe they received it.
+///
+/// **This screen must be wired to real data (or emptied) before launch.**
+///
+/// One item was rewritten rather than translated: `premium-offer` said
+/// *"Get yearly at ₹1,999 — save 44%"*. That price is not what the catalogue
+/// sells — it is the same fabricated figure that got `subscription_static_
+/// data.dart` deleted (prices come only from `StoreProduct.priceString`).
+/// Translating a false price into five languages would have multiplied the
+/// problem, so the copy is now price-free.
+String _notifTitle(NotificationItem item, AppLocalizations l10n) {
+  return switch (item.id) {
+    'daily-horoscope' => l10n.notifDailyHoroscopeTitle,
+    'sawan-somvar' => l10n.notifSawanSomvarTitle,
+    'rishi-ai-reply' => l10n.notifRishiAiReplyTitle,
+    'rahu-kaal-alert' => l10n.notifRahuKaalAlertTitle,
+    'premium-offer' => l10n.notifPremiumOfferTitle,
+    'new-article' => l10n.notifNewArticleTitle,
+    _ => item.title,
+  };
+}
+
+String _notifBody(NotificationItem item, AppLocalizations l10n) {
+  return switch (item.id) {
+    'daily-horoscope' => l10n.notifDailyHoroscopeBody,
+    'sawan-somvar' => l10n.notifSawanSomvarBody,
+    'rishi-ai-reply' => l10n.notifRishiAiReplyBody,
+    'rahu-kaal-alert' => l10n.notifRahuKaalAlertBody,
+    'premium-offer' => l10n.notifPremiumOfferBody,
+    'new-article' => l10n.notifNewArticleBody,
+    _ => item.body,
+  };
+}
+

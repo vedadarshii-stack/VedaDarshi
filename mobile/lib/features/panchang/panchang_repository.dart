@@ -1,6 +1,10 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../core/vedika/response_store.dart';
 import '../../core/vedika/vedika_client.dart';
 import 'panchang_data.dart';
 
@@ -65,6 +69,25 @@ class PanchangRepository {
     final cacheKey = _panchangCacheKey(date, lat, lon);
     final cached = _panchangCache[cacheKey];
     if (cached != null) return cached;
+
+    // ON-DEVICE, day-scoped (4 Sep 2026). The proxy already makes this free
+    // in money terms after the day's first caller; this makes it free in
+    // TIME for every launch after the first, and lets Home render offline.
+    // Memory first, disk second, network last.
+    final dayKey = dayKeyFor(date);
+    final stored = await VedikaResponseStore.instance.read(cacheKey, dayKey);
+    if (stored != null) {
+      try {
+        final data = PanchangData.fromJson(stored);
+        _panchangCache[cacheKey] = data;
+        return data;
+      } catch (e) {
+        // A stored payload that no longer parses (an app update changed the
+        // model, or the write was truncated) must not be fatal — fall
+        // through and re-fetch rather than failing the screen.
+        debugPrint('panchang: stored payload unusable, refetching ($e)');
+      }
+    }
 
     // The BUNDLE route, not /today or /{date} — switched 21 Aug 2026.
     //
@@ -131,6 +154,9 @@ class PanchangRepository {
     final json = await _client.get(path, query: query);
     final data = PanchangData.fromJson(json);
     _panchangCache[cacheKey] = data;
+    // Fire-and-forget: persisting is an optimisation for NEXT launch, so it
+    // must never delay returning data to this one.
+    unawaited(VedikaResponseStore.instance.write(cacheKey, dayKey, json));
     return data;
   }
 

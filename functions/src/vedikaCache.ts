@@ -1,3 +1,5 @@
+import { todayKeyIST } from "./config";
+
 /**
  * Shared cache-key + TTL logic for the Firestore `vedikaCache` collection.
  *
@@ -99,11 +101,74 @@ export function normalizeQuery(query: string): string {
  * risk to what the route already tolerated before this change, without
  * assuming the deprecated route ever becomes day-safe.
  */
-export function cacheTtlSeconds(path: string): number {
+export function cacheTtlSeconds(path: string, body = ""): number {
+  // A request that names an explicit CALENDAR DATE is immutable: the panchang
+  // and the muhurat windows for 10 Sep 2026 are the same facts whenever you
+  // ask, before or after the fact. So once fetched, it never needs fetching
+  // again.
+  //
+  // ADDED 4 Sep 2026. This is the client's "rolling 7-day window" request,
+  // solved from the other end: rather than PRE-fetching a week for every city
+  // (which is days x cities calls of mostly-unread data), we cache whatever
+  // date a user actually opens, for a month. The first person to step to a
+  // date pays once; everyone after that is free, and the date-stepper on the
+  // Panchang screen stops re-billing entirely.
+  //
+  // 30 days rather than a year only because a stale far-future entry is worth
+  // less than the storage it occupies; the data itself never changes.
+  const datedDay =
+    /\d{4}-\d{2}-\d{2}/.test(path) || /\d{4}-\d{2}-\d{2}/.test(body);
+  const isDayFacts =
+    path.includes("/panchang") ||
+    path.includes("muhurta") ||
+    path.includes("muhurat") ||
+    path.includes("inauspicious-period") ||
+    path.includes("/daily/");
+  if (datedDay && isDayFacts) return 60 * 60 * 24 * 30;
+
   if (path.endsWith("/panchang/today")) return 60 * 60 * 6;
-  if (path.includes("/panchang") || path.includes("/daily/")) return 60 * 60 * 24;
+  // Muhurat windows are day+location facts, exactly like panchang. Added
+  // 4 Sep 2026: `/v2/astrology/brahma-muhurta` became the muhurat source on
+  // 2 Sep but no tier ever matched it, so it fell to the 1-hour default and
+  // re-billed every hour for data that is fixed for the whole day.
+  if (
+    path.includes("/panchang") ||
+    path.includes("/daily/") ||
+    path.includes("muhurta") ||
+    path.includes("muhurat") ||
+    path.includes("inauspicious-period")
+  ) {
+    return 60 * 60 * 24;
+  }
   if (path.includes("/horoscope")) return 60 * 60 * 24;
   if (path.includes("/kundli") || path.includes("/planet-positions")) {
+    return 60 * 60 * 24 * 365;
+  }
+
+  // Doshas: FIXED AT BIRTH. A chart either carries Mangal/Kaal Sarp/Pitru
+  // dosha or it does not — that is decided by the natal positions and never
+  // changes, so this is as immutable as the kundli itself.
+  if (path.includes("/all-doshas") || path.includes("-dosha")) {
+    return 60 * 60 * 24 * 365;
+  }
+
+  // Vimshottari dasha: FULLY IMMUTABLE as of 4 Sep 2026, so cached like the
+  // kundli it derives from.
+  //
+  // It was 30 days until the client made the point that a dasha timeline is
+  // fixed at birth and only the "which period is running now" marker depends
+  // on today. They were right, and the app now DERIVES that marker locally
+  // from each period's start/end dates instead of reading Vedika's
+  // `is_current` flag (see `kundli_dasha_data.dart::_spansNow`). With the one
+  // date-dependent field gone, nothing in the payload can go stale — it is a
+  // pure function of the birth moment, exactly like the chart.
+  //
+  // This also makes the marker MORE correct, not just cheaper: it is
+  // recomputed on every read rather than frozen at fetch time, so it stays
+  // right across a dasha boundary instead of drifting until the cache
+  // expires. (Same reasoning already applied to `guidance.time_remaining`,
+  // which was observed 441 days stale.)
+  if (path.includes("vimshottari") || path.includes("/dasha")) {
     return 60 * 60 * 24 * 365;
   }
   if (path.includes("guna-milan") || path.includes("matching")) {
@@ -157,8 +222,59 @@ export function cacheTtlSeconds(path: string): number {
  * the one function every caller must go through — never hash a raw query
  * string directly, or the normalization is defeated for that caller alone.
  */
-export function cacheKey(method: string, path: string, query: string, body: string): string {
-  const raw = `${method} ${path}?${normalizeQuery(query)} ${body}`;
+/**
+ * Matches an ISO calendar date anywhere in a path or body, e.g.
+ * `/v2/astrology/panchang/2026-09-05` or `{"datetime":"1990-05-15T10:30:00"}`.
+ */
+const ISO_DATE = /\d{4}-\d{2}-\d{2}/;
+
+/**
+ * The calendar day a cache entry belongs to, or `""` when the request does
+ * not need one.
+ *
+ * ADDED 4 Sep 2026, fixing a real staleness risk. `cacheKey` hashes only
+ * method + path + query + body, so `/v2/astrology/horoscope/leo` produced the
+ * SAME key on Monday and Tuesday — nothing but a rolling 24h timer separated
+ * them. It worked only because `dailyPrewarm` happened to overwrite the entry
+ * at 00:01 IST, the same moment the timer expired. A late or failed prewarm
+ * meant users were served YESTERDAY's horoscope — which is exactly the
+ * "daily they are showing the same" bug the client reported.
+ *
+ * With the day in the key, a new day is a DIFFERENT key: an automatic miss
+ * and a fresh fetch. Correctness no longer depends on a cron being punctual.
+ *
+ * Two guards decide when a day scope applies, and both matter:
+ *
+ *  1. **Only when the request does not already pin a date.** A request for
+ *     `/panchang/2026-09-05`, or a POST carrying `"datetime":"1990-05-15…"`,
+ *     is already self-scoping. Stamping today's date on top would mint a new
+ *     key every day for the same requested date — turning a permanent cache
+ *     hit into a daily billed miss. That would make the bill WORSE, which is
+ *     the opposite of the point.
+ *
+ *  2. **Only when the TTL is a day or less.** That is the signal we already
+ *     use to say "this varies by day". Anything we chose to cache for 30
+ *     days or a year (kundli, doshas, dasha, natal reports) is immutable by
+ *     definition, and day-scoping it would re-bill it every 24 hours.
+ *
+ * IST because the whole product is India-first and `dailyPrewarm` already
+ * runs on `Asia/Kolkata` — the two must agree on when "tomorrow" starts or
+ * the prewarm would write a key nobody reads.
+ */
+export function dayScope(path: string, body: string, ttlSeconds: number): string {
+  if (ttlSeconds > 60 * 60 * 24) return "";
+  if (ISO_DATE.test(path) || ISO_DATE.test(body)) return "";
+  return todayKeyIST();
+}
+
+export function cacheKey(
+  method: string,
+  path: string,
+  query: string,
+  body: string,
+  scope = ""
+): string {
+  const raw = `${method} ${path}?${normalizeQuery(query)} ${body}${scope ? ` @${scope}` : ""}`;
   // FNV-1a: good enough to key a cache, and dependency-free.
   let h = 0x811c9dc5;
   for (let i = 0; i < raw.length; i++) {
@@ -166,4 +282,122 @@ export function cacheKey(method: string, path: string, query: string, body: stri
     h = Math.imul(h, 0x01000193) >>> 0;
   }
   return `${h.toString(16)}_${raw.length}`;
+}
+
+/**
+ * How long a single-flight lock is honoured before other callers may steal
+ * it. Must comfortably exceed a normal Vedika round trip (a full kundli is
+ * not fast) but stay well under the proxy's own 60s timeout, so a crashed
+ * holder cannot wedge a key for the life of the function instance.
+ */
+const LOCK_TTL_MS = 25_000;
+
+/** How long a waiter will poll for the winner's result before giving up. */
+const LOCK_WAIT_MS = 12_000;
+const LOCK_POLL_MS = 400;
+
+/**
+ * Tries to become the single caller allowed to fetch `key` from Vedika.
+ *
+ * BUILT 4 Sep 2026 at the client's request: *"preventing duplicate API calls
+ * when multiple users request the same missing data simultaneously"*.
+ *
+ * ## The problem it solves
+ *
+ * Cache misses are correlated, not random. If `dailyPrewarm` fails, then at
+ * 7am every user opening the app misses the SAME horoscope key at the same
+ * moment — 200 users meant up to 200 identical billed calls for one answer.
+ * The cache only helps AFTER the first response lands; until then there is
+ * nothing to hit.
+ *
+ * ## Why a Firestore transaction
+ *
+ * Cloud Functions scale horizontally, so an in-process mutex would only
+ * deduplicate within one instance. The lock has to live where every instance
+ * can see it, and it has to be won atomically — two instances reading "no
+ * lock" and both writing one would defeat the whole point. A transaction
+ * gives us compare-and-set across instances.
+ *
+ * ## Failure behaviour: always favour the user
+ *
+ * Every failure path returns `true` (proceed to fetch). A lock is a COST
+ * optimisation; it must never be the reason a user sees an error. If
+ * Firestore is unavailable we spend a little extra money and serve the
+ * request, rather than saving money and failing.
+ */
+export async function acquireFetchLock(
+  db: FirebaseFirestore.Firestore,
+  key: string
+): Promise<boolean> {
+  const ref = db.collection("vedikaLocks").doc(key);
+  try {
+    return await db.runTransaction(async (tx) => {
+      const snap = await tx.get(ref);
+      const heldUntil = snap.exists
+        ? (snap.data()?.heldUntilMs as number | undefined)
+        : undefined;
+      // A lock past its expiry is stolen, not respected — otherwise a
+      // function instance that died mid-fetch would block this key until
+      // someone noticed.
+      if (typeof heldUntil === "number" && heldUntil > Date.now()) return false;
+      tx.set(ref, {
+        heldUntilMs: Date.now() + LOCK_TTL_MS,
+        // A released lock is deleted immediately, but a CRASHED holder
+        // leaves its document behind — the expiry check above lets others
+        // steal it, yet nothing ever removes it. This field lets the
+        // Firestore TTL policy sweep those orphans. One hour, generously
+        // past LOCK_TTL_MS, so a live lock is never deleted mid-use.
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+      });
+      return true;
+    });
+  } catch (e) {
+    console.warn("vedikaLocks: acquire failed, proceeding unlocked", e);
+    return true;
+  }
+}
+
+/** Releases a lock. Best-effort — an expiry already bounds the damage. */
+export async function releaseFetchLock(
+  db: FirebaseFirestore.Firestore,
+  key: string
+): Promise<void> {
+  try {
+    await db.collection("vedikaLocks").doc(key).delete();
+  } catch (e) {
+    console.warn("vedikaLocks: release failed (expiry will clear it)", e);
+  }
+}
+
+/**
+ * Waits for whoever holds the lock to publish a fresh cache entry.
+ *
+ * Returns the payload if it appears within [LOCK_WAIT_MS], else `null` — and
+ * `null` means "go fetch it yourself". A waiter must NEVER block
+ * indefinitely: if the winner crashed, everyone waiting on it would hang and
+ * the user would see a timeout instead of their horoscope. Bounded waiting
+ * degrades to the old behaviour (an extra billed call) rather than to a
+ * broken screen.
+ */
+export async function awaitFreshEntry(
+  db: FirebaseFirestore.Firestore,
+  key: string,
+  ttlSeconds: number
+): Promise<unknown | null> {
+  const deadline = Date.now() + LOCK_WAIT_MS;
+  const ref = db.collection("vedikaCache").doc(key);
+  while (Date.now() < deadline) {
+    await new Promise((r) => setTimeout(r, LOCK_POLL_MS));
+    try {
+      const snap = await ref.get();
+      if (!snap.exists) continue;
+      const d = snap.data()!;
+      const ageSeconds = (Date.now() - d.fetchedAtMs) / 1000;
+      if (ageSeconds < ttlSeconds) return d.payload;
+    } catch {
+      // Ignore and keep polling until the deadline; a transient read failure
+      // is not a reason to give up early.
+    }
+  }
+  return null;
 }

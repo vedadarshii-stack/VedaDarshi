@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/astrology/astro_terms.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../l10n/app_localizations.dart';
 import 'panchang_data.dart';
 import 'panchang_location.dart';
 import 'panchang_repository.dart';
-import 'panchang_static_data.dart';
 
 /// Full choghadiya timetable for today — day and night — plus Rahu Kaal.
 ///
@@ -198,8 +198,11 @@ class _RahuCard extends StatelessWidget {
               children: [
                 Text(
                   // Same label the Panchang tab's Rahu Kaal card uses, so
-                  // the two screens name it identically.
-                  PanchangStaticData.muhurats[1].name,
+                  // the two screens name it identically — which is now the
+                  // l10n key, not `PanchangStaticData.muhurats[1].name`.
+                  // That constant is hardcoded ENGLISH and was the last
+                  // English string left on this screen (4 Sep 2026).
+                  l10n.muhuratRahuKaal,
                   style: AppFonts.body(
                     locale,
                     fontSize: 13,
@@ -230,6 +233,39 @@ class _RahuCard extends StatelessWidget {
 /// normalised from Vedika's own `vpiType` — never inferred from the window's
 /// name. A window whose quality Vedika omitted gets a neutral grey dot and
 /// no claim, rather than being guessed into a colour.
+/// What a choghadiya period is suited for, in the app's language.
+///
+/// TRANSLATED 4 Sep 2026, after a second client screenshot. I had recorded
+/// this as "Vedika prose, English-only" and moved on — **that was wrong.**
+/// Reading the actual rendered screen showed the same seven strings
+/// repeating: `Labh` carries the identical description at 01:51 PM and again
+/// at 06:28 PM, as does `Kaal`. It is not free prose at all, it is a CLOSED
+/// SET of seven — one fixed line per period type — and therefore perfectly
+/// translatable.
+///
+/// The lesson worth keeping: "the API returns prose" is a claim to CHECK, not
+/// to assume. Repetition across a rendered list is the tell.
+///
+/// These are the standard classical meanings of the seven choghadiya, so
+/// translating them reports the same thing in another language — it does not
+/// author new astrology, which is the line this codebase holds elsewhere.
+///
+/// Returns null for an unrecognised period so the caller falls back to
+/// Vedika's own English rather than showing nothing.
+String? _bestForText(ChoghadiyaPeriod period, AppLocalizations l10n) {
+  final name = period.name?.toLowerCase().replaceAll(RegExp(r'[^a-z]'), '');
+  return switch (name) {
+    'kaal' || 'kala' => l10n.choghadiyaBestForKaal,
+    'shubh' || 'shubha' => l10n.choghadiyaBestForShubh,
+    'rog' || 'roga' => l10n.choghadiyaBestForRog,
+    'udveg' || 'udvega' => l10n.choghadiyaBestForUdveg,
+    'char' || 'chara' => l10n.choghadiyaBestForChar,
+    'labh' || 'labha' => l10n.choghadiyaBestForLabh,
+    'amrit' || 'amrita' => l10n.choghadiyaBestForAmrit,
+    _ => null,
+  };
+}
+
 class _PeriodTile extends StatelessWidget {
   const _PeriodTile({
     required this.period,
@@ -277,7 +313,17 @@ class _PeriodTile extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        period.name ?? '—',
+                        // The seven choghadiya names are a closed set, so
+                        // they translate (4 Sep 2026 — the client saw
+                        // "Kaal / Shubh / Rog…" in English on an otherwise
+                        // Telugu screen). See `_bestForText` for why the
+                        // description below translates too.
+                        localizeAstroTerm(
+                              period.name,
+                              AstroTermKind.choghadiya,
+                              locale,
+                            ) ??
+                            '—',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppFonts.body(
@@ -302,7 +348,7 @@ class _PeriodTile extends StatelessWidget {
                 if (period.bestFor != null && period.bestFor!.isNotEmpty) ...[
                   const SizedBox(height: 3),
                   Text(
-                    period.bestFor!,
+                    _bestForText(period, l10n) ?? period.bestFor!,
                     style: AppFonts.body(
                       locale,
                       fontSize: 11.5,

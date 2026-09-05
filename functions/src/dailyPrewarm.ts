@@ -1,7 +1,7 @@
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
 import { VEDIKA_API_KEY, VEDIKA_BASE_URL, vedikaHeaders, todayKeyIST } from "./config";
-import { cacheKey } from "./vedikaCache";
+import { cacheKey, cacheTtlSeconds, dayScope } from "./vedikaCache";
 
 /**
  * THE BIG COST SAVER — AND, until 26 Aug 2026, A COMPLETE NO-OP.
@@ -182,12 +182,23 @@ async function warmVedikaCache(
   body: string,
   payload: unknown
 ): Promise<void> {
-  const key = cacheKey(method, path, query, body);
+  // MUST match the proxy's key exactly, including the day scope — a prewarm
+  // that writes a key nobody reads is pure waste, and that has bitten this
+  // file before (see its header). Both sides call the same two helpers with
+  // the same inputs, which is what keeps them honest.
+  const ttl = cacheTtlSeconds(path, body);
+  const key = cacheKey(method, path, query, body, dayScope(path, body, ttl));
   try {
     await db
       .collection("vedikaCache")
       .doc(key)
-      .set({ payload, fetchedAtMs: Date.now(), path });
+      .set({
+        payload,
+        fetchedAtMs: Date.now(),
+        path,
+        // Matches the proxy's stamp so both writers agree — see index.ts.
+        expiresAt: new Date(Date.now() + (ttl + 86400) * 1000),
+      });
   } catch (e) {
     // Same rule as everywhere else in this file: a cache-write failure
     // must never take down the rest of the run.
@@ -196,7 +207,30 @@ async function warmVedikaCache(
 }
 
 /**
- * Pre-warms all three "same for everyone" horoscope periods for ONE sign.
+ * Pre-warms the DAILY horoscope for ONE sign.
+ *
+ * ## Weekly and monthly are NOT pre-warmed (4 Sep 2026)
+ *
+ * They used to be, costing 24 calls/day — more than half the entire prewarm
+ * budget — for data most users never open. Two facts made that indefensible:
+ *
+ *  1. **They are ROLLING windows, not calendar periods.** Verified live:
+ *     weekly returns `periodStart 2026-09-04 → periodEnd 2026-09-11`,
+ *     monthly `→ 2026-10-04`. Both anchor on the request date, so they
+ *     genuinely change every day and cannot be cached for a week or a month.
+ *     Pre-warming them therefore costs a fresh call per sign PER DAY, forever.
+ *  2. **The single-flight lock made pre-warming them pointless.** An
+ *     on-demand miss now costs exactly ONE upstream call no matter how many
+ *     users hit it simultaneously (see `acquireFetchLock`), so the only thing
+ *     pre-warming buys is that the very first viewer of the day doesn't wait
+ *     ~1s. That is not worth ~$8-13/month.
+ *
+ * Net effect: the fixed daily budget drops from ~46 calls to ~22. Weekly and
+ * monthly still work — the first person to open one for their sign pays a
+ * single call, and everyone else that day reads the cache.
+ *
+ * Bring them back only if telemetry shows the tabs are opened heavily enough
+ * that the first-viewer latency matters; it is a one-line change either way.
  *
  * Each period (daily/weekly/monthly) is fetched and written INDEPENDENTLY
  * with its own explicit `<period>Status` flag, rather than folding a
@@ -221,7 +255,7 @@ async function prewarmSignHoroscope(
   db: FirebaseFirestore.Firestore,
   dateKey: string,
   sign: string
-): Promise<void> {
+): Promise<boolean> {
   const docRef = db.collection("dailyHoroscopes").doc(`${dateKey}_${sign}`);
 
   // Paths match `horoscope_repository.dart`'s `fetchDaily`/`fetchWeekly`/
@@ -229,14 +263,8 @@ async function prewarmSignHoroscope(
   // so `warmVedikaCache` below writes the SAME key the app's own proxy
   // call will compute.
   const dailyPath = `/v2/astrology/horoscope/${sign}`;
-  const weeklyPath = `/v2/astrology/horoscope/${sign}/weekly`;
-  const monthlyPath = `/v2/astrology/horoscope/${sign}/monthly`;
 
-  const [daily, weekly, monthly] = await Promise.all([
-    fetchVedikaJson(dailyPath),
-    fetchVedikaJson(weeklyPath),
-    fetchVedikaJson(monthlyPath),
-  ]);
+  const daily = await fetchVedikaJson(dailyPath);
 
   const update: Record<string, unknown> = {
     date: dateKey,
@@ -253,24 +281,6 @@ async function prewarmSignHoroscope(
     console.error(`dailyPrewarm: horoscope daily failed for sign=${sign}`, daily.payload);
   }
 
-  if (weekly.ok) {
-    update.weekly = weekly.payload;
-    update.weeklyStatus = "ok";
-    await warmVedikaCache(db, "GET", weeklyPath, "", "", weekly.payload);
-  } else {
-    update.weeklyStatus = "failed";
-    console.error(`dailyPrewarm: horoscope weekly failed for sign=${sign}`, weekly.payload);
-  }
-
-  if (monthly.ok) {
-    update.monthly = monthly.payload;
-    update.monthlyStatus = "ok";
-    await warmVedikaCache(db, "GET", monthlyPath, "", "", monthly.payload);
-  } else {
-    update.monthlyStatus = "failed";
-    console.error(`dailyPrewarm: horoscope monthly failed for sign=${sign}`, monthly.payload);
-  }
-
   try {
     await docRef.set(update, { merge: true });
   } catch (e) {
@@ -279,6 +289,11 @@ async function prewarmSignHoroscope(
     // specifically so one bad apple never takes the other 11 down with it.
     console.error(`dailyPrewarm: Firestore write failed for sign=${sign}`, e);
   }
+  // Reports whether the UPSTREAM fetch succeeded, which is what actually
+  // determines if the cache is warm. A Firestore write failure is logged
+  // above but does not change this: `warmVedikaCache` already ran, so the
+  // proxy will still serve a hit.
+  return daily.ok;
 }
 
 /**
@@ -386,8 +401,10 @@ export const dailyPrewarm = onSchedule(
     const db = admin.firestore();
     const dateKey = todayKeyIST();
 
-    // 12 signs × 3 periods = 36 Vedika calls, ONCE, for every user of the
-    // app that day — see the cost comment at the top of this file.
+    // 12 signs × DAILY only = 12 Vedika calls, ONCE, for every user of the
+    // app that day. Weekly and monthly are deliberately on-demand — see
+    // `prewarmSignHoroscope` for why pre-warming them was 24 wasted calls
+    // a day.
     const horoscopeResults = await Promise.allSettled(
       ZODIAC_SIGNS.map((sign) => prewarmSignHoroscope(db, dateKey, sign))
     );
@@ -398,21 +415,45 @@ export const dailyPrewarm = onSchedule(
       PANCHANG_CITIES.map((city) => prewarmCityPanchang(db, dateKey, city))
     );
 
-    const horoscopeFailures = horoscopeResults.filter((r) => r.status === "rejected").length;
-    const panchangFailures = panchangResults.filter((r) => r.status === "rejected").length;
-    if (horoscopeFailures > 0 || panchangFailures > 0) {
-      // Promise.allSettled already means a rejection here is unexpected —
-      // prewarmSignHoroscope/prewarmCityPanchang both catch their own
-      // errors internally. Reaching this branch means something threw
-      // outside those try/catches, which is worth a loud log even though
-      // it does not fail the scheduled invocation as a whole.
+    // Counts REAL failures, not just thrown promises. Both helpers catch
+    // their own errors, so `rejected` alone would have reported a clean run
+    // even when every single upstream call had failed — which is exactly the
+    // silent failure this health record exists to expose.
+    const signsOk = horoscopeResults.filter(
+      (r) => r.status === "fulfilled" && r.value === true
+    ).length;
+    const signsFailed = ZODIAC_SIGNS.length - signsOk;
+    const citiesFailed = panchangResults.filter((r) => r.status === "rejected").length;
+
+    // A prewarm failure used to be invisible: a log line nobody reads, and
+    // an app that silently falls back to live (billed) calls all day. This
+    // writes the outcome where it can be queried and alerted on.
+    //
+    // `healthy` is the field to watch: false means the day's cache is cold
+    // and every user is paying for live fetches.
+    try {
+      await db.collection("prewarmRuns").doc(dateKey).set({
+        dateKey,
+        signsOk,
+        signsFailed,
+        citiesFailed,
+        healthy: signsFailed === 0 && citiesFailed === 0,
+        finishedAtMs: Date.now(),
+      });
+    } catch (e) {
+      console.error("dailyPrewarm: could not write health record", e);
+    }
+
+    if (signsFailed > 0 || citiesFailed > 0) {
+      // console.error so it surfaces in Cloud Logging's error bucket and can
+      // drive a log-based alert without any extra infrastructure.
       console.error(
-        `dailyPrewarm: ${horoscopeFailures} sign(s) and ${panchangFailures} cit(ies) had unexpected top-level failures for ${dateKey}`
+        `dailyPrewarm: DEGRADED for ${dateKey} — ${signsFailed}/${ZODIAC_SIGNS.length} signs and ${citiesFailed}/${PANCHANG_CITIES.length} cities failed. Users will incur live billed calls today.`
       );
     }
 
     console.log(
-      `dailyPrewarm: completed for ${dateKey} — ${ZODIAC_SIGNS.length} signs, ${PANCHANG_CITIES.length} cities`
+      `dailyPrewarm: completed for ${dateKey} — ${signsOk}/${ZODIAC_SIGNS.length} signs, ${PANCHANG_CITIES.length - citiesFailed}/${PANCHANG_CITIES.length} cities`
     );
   }
 );

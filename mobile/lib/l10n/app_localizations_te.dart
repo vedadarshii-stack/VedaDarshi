@@ -1628,4 +1628,108 @@ class AppLocalizationsTe extends AppLocalizations {
   String lblHouseN(int n) {
     return 'భావం $n';
   }
+
+  @override
+  String get aiFollowUpDasha => 'నా ప్రస్తుత దశ అర్థం ఏమిటి?';
+
+  @override
+  String get aiFollowUpCareer => 'నా వృత్తి అవకాశాలు ఎలా ఉన్నాయి?';
+
+  @override
+  String get aiFollowUpRemedies => 'నా జాతకానికి ఏ పరిహారాలు సరిపోతాయి?';
+
+  @override
+  String get aiFollowUpHealth => 'నా ఆరోగ్యం గురించి నా జాతకం ఏమి చెబుతుంది?';
+
+  @override
+  String get panchangMasaLabel => 'మాసం';
+
+  @override
+  String get panchangPakshaLabel => 'పక్షం';
+
+  @override
+  String dashaCurrentSentence(String planet) {
+    return 'మీరు $planet మహాదశలో ఉన్నారు';
+  }
+
+  @override
+  String panchangAdviceComposed(
+    String quality,
+    String tithi,
+    String paksha,
+    String nakshatra,
+    String yoga,
+  ) {
+    return 'ఈరోజు $quality. $tithi తిథి ($paksha పక్షం), $nakshatra నక్షత్రం మరియు $yoga యోగం.';
+  }
+
+  @override
+  String get choghadiyaBestForKaal =>
+      'శత్రు నివారణ లేదా తాంత్రిక కార్యాల వంటి ప్రత్యేక ప్రయోజనాలకు మాత్రమే';
+
+  @override
+  String get choghadiyaBestForShubh =>
+      'మత కార్యక్రమాలు, విద్య, ఆర్థిక ప్రణాళిక మరియు పెద్దలను కలవడం';
+
+  @override
+  String get choghadiyaBestForRog =>
+      'శస్త్రచికిత్సలు, పోటీ కార్యకలాపాలు మరియు సవాళ్లను ఎదుర్కోవడం';
+
+  @override
+  String get choghadiyaBestForUdveg =>
+      'ప్రభుత్వ పనులు, అధికారులను కలవడం మరియు పరిపాలనా కార్యాలు';
+
+  @override
+  String get choghadiyaBestForChar =>
+      'ప్రయాణాలు, వాహన కొనుగోలు మరియు తాత్కాలిక ఏర్పాట్లు';
+
+  @override
+  String get choghadiyaBestForLabh =>
+      'వ్యాపార ఒప్పందాలు, ఆర్థిక లావాదేవీలు, వాణిజ్యం మరియు వృత్తి నిర్ణయాలు';
+
+  @override
+  String get choghadiyaBestForAmrit =>
+      'అన్ని శుభ కార్యాలు, ముఖ్యంగా కొత్త ప్రారంభాలు, వివాహాలు మరియు ముఖ్య వేడుకలు';
+
+  @override
+  String get notifDailyHoroscopeTitle => 'మీ ఈరోజు రాశిఫలం సిద్ధంగా ఉంది';
+
+  @override
+  String get notifDailyHoroscopeBody =>
+      'ఈరోజు మీ ఫలితం సిద్ధంగా ఉంది — చూడటానికి నొక్కండి.';
+
+  @override
+  String get notifSawanSomvarTitle => 'రేపు శ్రావణ సోమవారం';
+
+  @override
+  String get notifSawanSomvarBody =>
+      'శివుని ఉపవాస దినం. ఆచారాలు, ముహూర్తం మరియు వ్రత నియమాలు చూడండి.';
+
+  @override
+  String get notifRishiAiReplyTitle => 'ఋషి AI బదులిచ్చింది';
+
+  @override
+  String get notifRishiAiReplyBody =>
+      'మీ ప్రశ్నకు సమాధానం చాట్‌లో సిద్ధంగా ఉంది.';
+
+  @override
+  String get notifRahuKaalAlertTitle => 'రాహు కాలం హెచ్చరిక';
+
+  @override
+  String get notifRahuKaalAlertBody =>
+      'ఈరోజు రాహు కాలంలో కొత్త పనులు ప్రారంభించవద్దు.';
+
+  @override
+  String get notifPremiumOfferTitle => 'ప్రీమియం అన్‌లాక్ చేయండి';
+
+  @override
+  String get notifPremiumOfferBody =>
+      'ప్లాన్‌లు మరియు ప్రతిదానిలో ఏమి ఉందో చూడండి.';
+
+  @override
+  String get notifNewArticleTitle => 'కొత్త వ్యాసం ప్రచురితమైంది';
+
+  @override
+  String get notifNewArticleBody =>
+      'మీ కోసం జ్ఞానంలో కొత్త వ్యాసం చేర్చబడింది.';
 }

@@ -25,6 +25,10 @@
 /// ```
 library;
 
+import 'dart:ui';
+
+import '../../core/astrology/astro_terms.dart';
+
 import 'package:flutter/foundation.dart' show immutable;
 
 import '../../core/vedika/vedika_text_sanitizer.dart';
@@ -150,11 +154,18 @@ class DailyHoroscope {
   /// regardless of the active locale; see the TYPOGRAPHY/localization notes
   /// in the project's top-level CLAUDE.md. Returns `null` if [date] is
   /// missing or unparseable, so callers can fall back to placeholder text.
-  String? get formattedDate {
+  /// LOCALISED 4 Sep 2026 — this rendered "Friday, 4 September 2026" in
+  /// English on an otherwise Telugu header, the same leak the Panchang date
+  /// line had. Digits stay Latin; only the weekday and month names change.
+  String? formattedDateIn(Locale locale) {
     final parsed = date == null ? null : DateTime.tryParse(date!);
     if (parsed == null) return null;
-    return '${_weekdayNames[parsed.weekday - 1]}, ${parsed.day} '
-        '${_monthNames[parsed.month - 1]} ${parsed.year}';
+    final weekday = _weekdayNames[parsed.weekday - 1];
+    final month = _monthNames[parsed.month - 1];
+    return '${localizeAstroTerm(weekday, AstroTermKind.gregorianWeekday, locale) ?? weekday}, '
+        '${parsed.day} '
+        '${localizeAstroTerm(month, AstroTermKind.gregorianMonth, locale) ?? month} '
+        '${parsed.year}';
   }
 
   /// [luckyTime] reformatted from Vedika's 24-hour range into the app's

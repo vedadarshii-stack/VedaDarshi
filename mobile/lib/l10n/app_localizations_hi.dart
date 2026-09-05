@@ -1612,4 +1612,108 @@ class AppLocalizationsHi extends AppLocalizations {
   String lblHouseN(int n) {
     return 'भाव $n';
   }
+
+  @override
+  String get aiFollowUpDasha => 'मेरी वर्तमान दशा का क्या अर्थ है?';
+
+  @override
+  String get aiFollowUpCareer => 'मेरे करियर की संभावनाएँ कैसी हैं?';
+
+  @override
+  String get aiFollowUpRemedies =>
+      'मेरी कुंडली के लिए कौन से उपाय उपयुक्त हैं?';
+
+  @override
+  String get aiFollowUpHealth =>
+      'मेरी कुंडली मेरे स्वास्थ्य के बारे में क्या कहती है?';
+
+  @override
+  String get panchangMasaLabel => 'मास';
+
+  @override
+  String get panchangPakshaLabel => 'पक्ष';
+
+  @override
+  String dashaCurrentSentence(String planet) {
+    return 'आप $planet महादशा में हैं';
+  }
+
+  @override
+  String panchangAdviceComposed(
+    String quality,
+    String tithi,
+    String paksha,
+    String nakshatra,
+    String yoga,
+  ) {
+    return 'आज $quality है। $tithi तिथि ($paksha पक्ष), $nakshatra नक्षत्र और $yoga योग।';
+  }
+
+  @override
+  String get choghadiyaBestForKaal =>
+      'केवल शत्रु-नाश या तांत्रिक कार्यों जैसे विशेष प्रयोजनों के लिए';
+
+  @override
+  String get choghadiyaBestForShubh =>
+      'धार्मिक अनुष्ठान, शिक्षा, आर्थिक योजना और बड़ों से भेंट';
+
+  @override
+  String get choghadiyaBestForRog =>
+      'शल्य चिकित्सा, प्रतिस्पर्धी कार्य और चुनौतियों का सामना';
+
+  @override
+  String get choghadiyaBestForUdveg =>
+      'सरकारी कार्य, अधिकारियों से भेंट और प्रशासनिक कार्य';
+
+  @override
+  String get choghadiyaBestForChar => 'यात्रा, वाहन खरीद और अस्थायी व्यवस्थाएँ';
+
+  @override
+  String get choghadiyaBestForLabh =>
+      'व्यापारिक सौदे, वित्तीय लेन-देन, व्यापार और करियर संबंधी कदम';
+
+  @override
+  String get choghadiyaBestForAmrit =>
+      'सभी शुभ कार्य, विशेषकर नए उपक्रम, विवाह और महत्वपूर्ण संस्कार';
+
+  @override
+  String get notifDailyHoroscopeTitle => 'आपका दैनिक राशिफल तैयार है';
+
+  @override
+  String get notifDailyHoroscopeBody =>
+      'आज का फल आपकी प्रतीक्षा में है — देखने के लिए टैप करें।';
+
+  @override
+  String get notifSawanSomvarTitle => 'कल सावन सोमवार है';
+
+  @override
+  String get notifSawanSomvarBody =>
+      'भगवान शिव का व्रत दिवस। अनुष्ठान, मुहूर्त और व्रत नियम देखें।';
+
+  @override
+  String get notifRishiAiReplyTitle => 'ऋषि AI ने उत्तर दिया';
+
+  @override
+  String get notifRishiAiReplyBody =>
+      'आपके प्रश्न का उत्तर चैट में प्रतीक्षा कर रहा है।';
+
+  @override
+  String get notifRahuKaalAlertTitle => 'राहु काल सूचना';
+
+  @override
+  String get notifRahuKaalAlertBody =>
+      'आज के राहु काल में कोई नया कार्य आरंभ न करें।';
+
+  @override
+  String get notifPremiumOfferTitle => 'प्रीमियम अनलॉक करें';
+
+  @override
+  String get notifPremiumOfferBody => 'योजनाएँ और उनमें शामिल सुविधाएँ देखें।';
+
+  @override
+  String get notifNewArticleTitle => 'नया लेख प्रकाशित';
+
+  @override
+  String get notifNewArticleBody =>
+      'आपके लिए ज्ञान में एक नया लेख जोड़ा गया है।';
 }

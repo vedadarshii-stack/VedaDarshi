@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/astrology/astro_terms.dart';
 import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
@@ -127,7 +128,11 @@ class _YogaRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = yoga.name;
+    // Yoga names are a closed Sanskrit vocabulary, so they translate — the
+    // client saw "Malavya Yoga" in English above an otherwise Telugu screen.
+    // The MEANING below stays English: that is free prose from Vedika and
+    // no local table can touch it.
+    final name = localizeYogaName(yoga.name, locale);
     if (name == null) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),

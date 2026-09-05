@@ -234,6 +234,45 @@ class _AiAstrologerScreenState extends ConsumerState<AiAstrologerScreen> {
   /// putting the paywall in FRONT of it removes the very thing that drives
   /// the purchase. The quota is still enforced server-side, so a free user
   /// picking three profiles still only gets their one question a day.
+  /// The follow-up chips to show under an answer.
+  ///
+  /// FIXED 4 Sep 2026, client-reported. Vedika localises the ANSWER — ask in
+  /// Tamil and the reading comes back in Tamil — but its
+  /// `followUpSuggestions` come back in **English regardless of the language
+  /// we send**. Verified directly against the live AI endpoint: a `ta`
+  /// request returned a Tamil answer alongside English suggestions like
+  /// *"Which career fields align with your chart?"*.
+  ///
+  /// An English chip sitting under a Tamil answer is not just untidy, it is
+  /// unusable for a user who does not read English — and tapping it would
+  /// send an English question. So non-English locales get our own localised
+  /// questions instead.
+  ///
+  /// The trade is deliberate and worth naming: Vedika's suggestions are
+  /// CONTEXTUAL (they follow from the specific answer), ours are generic. For
+  /// an English reader, contextual beats generic, so English keeps the
+  /// backend's. For everyone else a generic question they can actually read
+  /// beats a contextual one they cannot.
+  ///
+  /// Revisit if Vedika starts localising the field — then this whole helper
+  /// collapses back to returning [backend].
+  List<String> _localizedFollowUps(
+    List<String> backend,
+    Locale locale,
+    AppLocalizations l10n,
+  ) {
+    // No answer yet means no chips — never substitute our own into an empty
+    // state, or the row would appear before the user has asked anything.
+    if (backend.isEmpty) return const [];
+    if (locale.languageCode == 'en') return backend;
+    return [
+      l10n.aiFollowUpDasha,
+      l10n.aiFollowUpCareer,
+      l10n.aiFollowUpRemedies,
+      l10n.aiFollowUpHealth,
+    ];
+  }
+
   Future<void> _openProfilePicker() async {
     final saved = ref.read(savedBirthProfilesProvider).valueOrNull ?? const [];
     if (!mounted || saved.isEmpty) return;
@@ -435,7 +474,7 @@ class _AiAstrologerScreenState extends ConsumerState<AiAstrologerScreen> {
               // — once history has loaded or the user has sent a message,
               // showing them alongside real answers would be clutter.
               showTopics: _messages.length <= 1,
-              followUps: _followUps,
+              followUps: _localizedFollowUps(_followUps, locale, l10n),
               isSending: _isSending,
               scrollController: _scrollController,
               onChipTap: _handleChipTap,

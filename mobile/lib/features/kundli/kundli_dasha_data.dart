@@ -188,6 +188,22 @@ class DashaGuidance {
 /// its own [antarDashas] sub-periods (same shape, one level shallower:
 /// Vedika does not send a third level of nesting inside these, unlike
 /// [CurrentDasha] which goes maha → antar → pratyantar for "now" only).
+/// Whether [start, end) contains today.
+///
+/// Half-open on purpose: a dasha's end date is the next one's start date, so
+/// an inclusive end would mark TWO periods current on the changeover day.
+///
+/// Returns false when either bound is missing or unparseable — an unknown
+/// period must not claim to be the running one. That is the safe direction:
+/// the UI merely loses a highlight, rather than highlighting the wrong dasha.
+bool _spansNow(String? start, String? end) {
+  final s = start == null ? null : DateTime.tryParse(start);
+  final e = end == null ? null : DateTime.tryParse(end);
+  if (s == null || e == null) return false;
+  final now = DateTime.now();
+  return !now.isBefore(s) && now.isBefore(e);
+}
+
 @immutable
 class DashaPeriod {
   const DashaPeriod({
@@ -233,7 +249,28 @@ class DashaPeriod {
       durationYears: parseDouble(json['duration_years']),
       dignity: json['dignity'] as String?,
       dignityStrength: parseDouble(json['dignity_strength']),
-      isCurrent: (json['is_current'] as bool?) ?? false,
+      // NOT read from Vedika's `is_current` (4 Sep 2026).
+      //
+      // That flag is the ONLY date-dependent value in an otherwise immutable
+      // payload: a dasha timeline is fixed at birth and never changes, but
+      // which period is *running* advances as time passes. Trusting the flag
+      // meant the whole response had to be treated as perishable, so it could
+      // only be cached for 30 days instead of forever.
+      //
+      // Deriving it from `start_date`/`end_date` — which ARE fixed at birth —
+      // makes the payload genuinely immutable AND the marker permanently
+      // correct, because it is recomputed on every read rather than frozen at
+      // fetch time. That is the client's own point: separate what is fixed at
+      // birth from what depends on today's date.
+      //
+      // There is precedent: we already ignore `guidance.time_remaining` for
+      // the same class of reason — it was observed 441 days stale, computed
+      // at some build date rather than per request. Vedika's date-relative
+      // fields are not trustworthy; its birth-relative ones are.
+      isCurrent: _spansNow(
+        json['start_date'] as String?,
+        json['end_date'] as String?,
+      ),
       antarDashas: parseList(json['antar_dasha'], DashaPeriod.fromJson),
     );
   }

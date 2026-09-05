@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/astrology/astro_terms.dart';
 import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
@@ -736,9 +737,27 @@ class _ChartLoadedSection extends StatelessWidget {
         _StatCardsRow(
           l10n: l10n,
           locale: locale,
-          lagna: data.ascendant?.sign ?? l10n.kundliValueUnavailable,
-          rashi: data.moonSign ?? l10n.kundliValueUnavailable,
-          nakshatra: data.nakshatra ?? l10n.kundliValueUnavailable,
+          // Localised 4 Sep 2026 — the LABELS were translated but these
+          // three VALUES stayed English ("Sagittarius · Sagittarius · Mula")
+          // on an otherwise Telugu screen, which is the most prominent leak
+          // on the Chart tab.
+          lagna:
+              localizeAstroTerm(
+                data.ascendant?.sign,
+                AstroTermKind.rashi,
+                locale,
+              ) ??
+              l10n.kundliValueUnavailable,
+          rashi:
+              localizeAstroTerm(data.moonSign, AstroTermKind.rashi, locale) ??
+              l10n.kundliValueUnavailable,
+          nakshatra:
+              localizeAstroTerm(
+                data.nakshatra,
+                AstroTermKind.nakshatra,
+                locale,
+              ) ??
+              l10n.kundliValueUnavailable,
         ),
         // [_DoshaOrSummaryBanner] renders nothing (and adds no extra gap)
         // when there is genuinely no dosha verdict AND no summary overview

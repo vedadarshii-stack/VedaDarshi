@@ -174,7 +174,11 @@ List<GlanceTile> _glanceTilesFrom({
   // `formattedRange` returns null when Vedika sends `end` before `start`,
   // so a corrupt window drops the tile rather than rendering nonsense.
   final rahuKaalRange = periods?.rahuKaal?.formattedRange;
-  final luckyColor = panchang?.vara?.luckyColor;
+  final luckyColor = localizeAstroTerm(
+    panchang?.vara?.luckyColor,
+    AstroTermKind.colour,
+    locale,
+  );
   // The weekday lord is a graha name Vedika sends in English ("Mercury").
   final planet = localizeAstroTerm(
     panchang?.vara?.lord,
@@ -186,7 +190,9 @@ List<GlanceTile> _glanceTilesFrom({
   // direction to avoid. Rendering the inauspicious one under a bare
   // "Direction" label would invert the advice.
   final safe = panchang?.dishaShool?.safeDirections;
-  final direction = (safe != null && safe.isNotEmpty) ? safe.first : null;
+  final direction = (safe != null && safe.isNotEmpty)
+      ? localizeAstroTerm(safe.first, AstroTermKind.direction, locale)
+      : null;
 
   final staticById = {
     for (final tile in HomeStaticData.glanceTiles) tile.id: tile,

@@ -82,6 +82,33 @@ enum AstroTermKind {
   graha,
   masa,
   paksha,
+
+  /// Gregorian month names, for the Panchang date line. Distinct from
+  /// [masa], which is the LUNAR month — the two never coincide and must not
+  /// share a table.
+  gregorianMonth,
+
+  /// Gregorian weekday names. Shares its English keys with [vara] but kept
+  /// separate so a change to one cannot silently alter the other.
+  gregorianWeekday,
+
+  /// Lucky-colour names. A small closed set in practice — Vedika returns
+  /// plain colour words ("Crimson", "Indigo", "Orange").
+  colour,
+
+  /// Compass directions, for the "Direction" glance tile and lucky
+  /// direction.
+  direction,
+
+  /// The seven choghadiya period names (Amrit, Shubh, Labh, Char, Rog, Kaal,
+  /// Udveg). A fixed classical set, so fully translatable — unlike the
+  /// one-line descriptions Vedika ships alongside them.
+  choghadiya,
+
+  /// Vedika's overall-auspiciousness verdict words ("Good", "Excellent",
+  /// "Challenging"). A small closed set, unlike the prose sentence that
+  /// accompanies them.
+  quality,
 }
 
 /// Returns [term] in [locale]'s script, or [term] unchanged when the language
@@ -93,9 +120,64 @@ String? localizeAstroTerm(String? term, AstroTermKind kind, Locale locale) {
   if (term == null) return null;
   final trimmed = term.trim();
   if (trimmed.isEmpty) return trimmed;
-  final table = _tableFor(kind)[_normalize(trimmed)];
-  return table?.forLanguage(locale.languageCode) ?? trimmed;
+
+  final direct = _tableFor(kind)[_normalize(trimmed)];
+  if (direct != null) {
+    return direct.forLanguage(locale.languageCode) ?? trimmed;
+  }
+
+  // COMPOUND VALUES (added 4 Sep 2026). Vedika returns lucky colours and
+  // directions as phrases — "Black or Blue", "White or Pink", "North-East" —
+  // and a whole-string lookup misses every one of them. The client saw
+  // exactly that: a lone "Black or Blue" sitting in an otherwise Telugu
+  // glance grid.
+  //
+  // Only attempted for the small word-list vocabularies. A nakshatra or yoga
+  // name can legitimately contain a separator ("Budha-Aditya"), and splitting
+  // those would produce nonsense, so they keep the strict whole-string match
+  // above.
+  if (kind == AstroTermKind.colour || kind == AstroTermKind.direction) {
+    final joined = _localizeCompound(trimmed, kind, locale);
+    if (joined != null) return joined;
+  }
+  return trimmed;
 }
+
+/// Translates each word of a phrase like "Black or Blue", preserving the
+/// connector. Returns null unless EVERY part is known — a half-translated
+/// "నలుపు or Blue" would look broken, so it is better to leave the original
+/// English intact and add the missing row to the table.
+String? _localizeCompound(String value, AstroTermKind kind, Locale locale) {
+  final table = _tableFor(kind);
+  final match = RegExp(
+    r'^(.+?)\s*(or|and|/|-|&)\s*(.+)$',
+    caseSensitive: false,
+  ).firstMatch(value);
+  if (match == null) return null;
+
+  final left = table[_normalize(match.group(1)!)]?.forLanguage(
+    locale.languageCode,
+  );
+  final right = table[_normalize(match.group(3)!)]?.forLanguage(
+    locale.languageCode,
+  );
+  if (left == null || right == null) return null;
+
+  final connector = match.group(2)!.toLowerCase();
+  // "/" and "-" are punctuation and stay as-is; "or"/"and" are words and get
+  // translated via the same table so the phrase reads naturally.
+  final joiner = switch (connector) {
+    'or' => _connectorOr.forLanguage(locale.languageCode) ?? 'or',
+    'and' => _connectorAnd.forLanguage(locale.languageCode) ?? 'and',
+    _ => connector,
+  };
+  return connector == '/' || connector == '-'
+      ? '$left$joiner$right'
+      : '$left $joiner $right';
+}
+
+const _T _connectorOr = _T('या', 'లేదా', 'அல்லது', 'ಅಥವಾ');
+const _T _connectorAnd = _T('और', 'మరియు', 'மற்றும்', 'ಮತ್ತು');
 
 Map<String, _T> _tableFor(AstroTermKind kind) => switch (kind) {
   AstroTermKind.nakshatra => _nakshatra,
@@ -107,6 +189,12 @@ Map<String, _T> _tableFor(AstroTermKind kind) => switch (kind) {
   AstroTermKind.graha => _graha,
   AstroTermKind.masa => _masa,
   AstroTermKind.paksha => _paksha,
+  AstroTermKind.gregorianMonth => _gmonth,
+  AstroTermKind.gregorianWeekday => _vara,
+  AstroTermKind.colour => _colour,
+  AstroTermKind.direction => _direction,
+  AstroTermKind.choghadiya => _choghadiya,
+  AstroTermKind.quality => _quality,
 };
 
 /// Lowercase, alphanumerics only — see the class doc on why matching is not
@@ -271,3 +359,241 @@ const Map<String, _T> _paksha = {
   'krishna': _T('कृष्ण', 'కృష్ణ', 'கிருஷ்ண', 'ಕೃಷ್ಣ'),
 };
 
+
+const Map<String, _T> _gmonth = {
+  'january': _T('जनवरी', 'జనవరి', 'ஜனவரி', 'ಜನವರಿ'),
+  'february': _T('फ़रवरी', 'ఫిబ్రవరి', 'பிப்ரவரி', 'ಫೆಬ್ರವರಿ'),
+  'march': _T('मार्च', 'మార్చి', 'மார்ச்', 'ಮಾರ್ಚ್'),
+  'april': _T('अप्रैल', 'ఏప్రిల్', 'ஏப்ரல்', 'ಏಪ್ರಿಲ್'),
+  'may': _T('मई', 'మే', 'மே', 'ಮೇ'),
+  'june': _T('जून', 'జూన్', 'ஜூன்', 'ಜೂನ್'),
+  'july': _T('जुलाई', 'జూలై', 'ஜூலை', 'ಜುಲೈ'),
+  'august': _T('अगस्त', 'ఆగస్టు', 'ஆகஸ்ட்', 'ಆಗಸ್ಟ್'),
+  'september': _T('सितंबर', 'సెప్టెంబర్', 'செப்டம்பர்', 'ಸೆಪ್ಟೆಂಬರ್'),
+  'october': _T('अक्टूबर', 'అక్టోబర్', 'அக்டோபர்', 'ಅಕ್ಟೋಬರ್'),
+  'november': _T('नवंबर', 'నవంబర్', 'நவம்பர்', 'ನವೆಂಬರ್'),
+  'december': _T('दिसंबर', 'డిసెంబర్', 'டிசம்பர்', 'ಡಿಸೆಂಬರ್'),
+};
+
+/// Native-script name for a yoga, e.g. `"Gaja Kesari Yoga"` →
+/// `"గజ కేసరి యోగం"`.
+///
+/// BUILT 4 Sep 2026 from a client screenshot: the Kundli Predictions glimpse
+/// rendered its chrome in Telugu but every yoga heading in English.
+///
+/// ## Why this needs its own function rather than another table row
+///
+/// Vedika's yoga names are COMPOUND, and only part of each is translatable.
+/// Sampled across three real charts, they come in these shapes:
+///
+/// ```
+/// Gaja Kesari Yoga
+/// Dhana Yoga (2-11)
+/// Raja Yoga Conjunction (10L+5L: Saturn+Mercury in 7H)
+/// Neecha Bhanga Raja Yoga (Jupiter — dispositor Saturn in kendra (H7))
+/// Duryoga
+/// ```
+///
+/// So it splits into three parts and treats each correctly:
+///
+///  1. **The parenthetical qualifier is left ALONE.** It is chart notation —
+///     house numbers, lord abbreviations, planet names — not prose. `(2-11)`
+///     means the same in every language, and `(10L+5L: Saturn+Mercury in 7H)`
+///     is the shorthand an astrologer reads. Translating it would be wrong
+///     even where possible, and mangling it would be worse.
+///  2. **The base name is looked up** in [_yoga] — a closed classical
+///     vocabulary, exactly like the nakshatras.
+///  3. **The word "Yoga" itself is translated** and re-appended, since it is
+///     a common noun in all five languages.
+///
+/// An unknown yoga falls through UNCHANGED, same rule as every other term:
+/// English is honest, an invented Sanskrit transliteration is not.
+String? localizeYogaName(String? name, Locale locale) {
+  if (name == null) return null;
+  final trimmed = name.trim();
+  if (trimmed.isEmpty || locale.languageCode == 'en') return trimmed;
+
+  final paren = trimmed.indexOf('(');
+  final head = (paren == -1 ? trimmed : trimmed.substring(0, paren)).trim();
+  final tail = paren == -1 ? '' : ' ${trimmed.substring(paren).trim()}';
+
+  // Whole-string match first — it catches single-word names like "Duryoga"
+  // where "Yoga" is fused into the term and must not be split off.
+  final whole = _yogaName[_normalize(head)]?.forLanguage(locale.languageCode);
+  if (whole != null) return '$whole$tail';
+
+  // Otherwise: "<base> Yoga" → "<localized base> <localized 'yoga'>".
+  final lower = head.toLowerCase();
+  if (!lower.endsWith('yoga')) return trimmed;
+  final base = head.substring(0, head.length - 4).trim();
+  final localizedBase = _yogaName[_normalize(base)]?.forLanguage(
+    locale.languageCode,
+  );
+  if (localizedBase == null) return trimmed;
+  final yogaWord = _yogaName['yoga']!.forLanguage(locale.languageCode)!;
+  return '$localizedBase $yogaWord$tail';
+}
+
+/// Classical yoga vocabulary. Keys are the BASE name with any trailing
+/// "Yoga" and parenthetical removed — see [localizeYogaName].
+///
+/// Covers every name observed across sampled real charts plus the standard
+/// classical set (the five Pancha Mahapurusha yogas, the Moon yogas, the
+/// Raja/Dhana families). Add a row when a new one shows in English.
+const Map<String, _T> _yogaName = {
+  'yoga': _T('योग', 'యోగం', 'யோகம்', 'ಯೋಗ'),
+  // Pancha Mahapurusha
+  'ruchaka': _T('रुचक', 'రుచక', 'ருசக', 'ರುಚಕ'),
+  'bhadra': _T('भद्र', 'భద్ర', 'பத்ர', 'ಭದ್ರ'),
+  'hamsa': _T('हंस', 'హంస', 'ஹம்ஸ', 'ಹಂಸ'),
+  'malavya': _T('मालव्य', 'మాలవ్య', 'மாலவ்ய', 'ಮಾಲವ್ಯ'),
+  'sasa': _T('शश', 'శశ', 'சச', 'ಶಶ'),
+  // Moon-based
+  'gajakesari': _T('गज केसरी', 'గజ కేసరి', 'கஜ கேசரி', 'ಗಜ ಕೇಸರಿ'),
+  'sunapha': _T('सुनफा', 'సునఫ', 'சுனபா', 'ಸುನಫ'),
+  'anapha': _T('अनफा', 'అనఫ', 'அனபா', 'ಅನಫ'),
+  'durudhara': _T('दुरुधरा', 'దురుధర', 'துருதரா', 'ದುರುಧರ'),
+  'kemadruma': _T('केमद्रुम', 'కేమద్రుమ', 'கேமத்ரும', 'ಕೇಮದ್ರುಮ'),
+  'chandramangala': _T('चंद्र मंगल', 'చంద్ర మంగళ', 'சந்திர மங்கள', 'ಚಂದ್ರ ಮಂಗಳ'),
+  'adhi': _T('अधि', 'అధి', 'அதி', 'ಅಧಿ'),
+  // Sun-based
+  'veshi': _T('वेशी', 'వేశి', 'வேசி', 'ವೇಶಿ'),
+  'voshi': _T('वोशी', 'వోశి', 'வோசி', 'ವೋಶಿ'),
+  'ubhayachari': _T('उभयचरी', 'ఉభయచరి', 'உபயசாரி', 'ಉಭಯಚರಿ'),
+  'budhaaditya': _T('बुध-आदित्य', 'బుధ-ఆదిత్య', 'புத-ஆதித்ய', 'ಬುಧ-ಆದಿತ್ಯ'),
+  // Raja / Dhana families
+  'raja': _T('राज', 'రాజ', 'ராஜ', 'ರಾಜ'),
+  'dhana': _T('धन', 'ధన', 'தன', 'ಧನ'),
+  'neechabhangaraja': _T(
+    'नीच भंग राज',
+    'నీచ భంగ రాజ',
+    'நீச பங்க ராஜ',
+    'ನೀಚ ಭಂಗ ರಾಜ',
+  ),
+  'vipreetaraja': _T('विपरीत राज', 'విపరీత రాజ', 'விபரீத ராஜ', 'ವಿಪರೀತ ರಾಜ'),
+  'viparitaraja': _T('विपरीत राज', 'విపరీత రాజ', 'விபரீத ராஜ', 'ವಿಪರೀತ ರಾಜ'),
+  'sunapharaja': _T('सुनफा राज', 'సునఫ రాజ', 'சுனபா ராஜ', 'ಸುನಫ ರಾಜ'),
+  'dharmakarmadhipati': _T(
+    'धर्म-कर्माधिपति',
+    'ధర్మ-కర్మాధిపతి',
+    'தர்ம-கர்மாதிபதி',
+    'ಧರ್ಮ-ಕರ್ಮಾಧಿಪತಿ',
+  ),
+  'rajayogaconjunction': _T(
+    'राज योग युति',
+    'రాజ యోగ యుతి',
+    'ராஜ யோக சேர்க்கை',
+    'ರಾಜ ಯೋಗ ಸಂಯೋಗ',
+  ),
+  'rajayogamutualaspect': _T(
+    'राज योग परस्पर दृष्टि',
+    'రాజ యోగ పరస్పర దృష్టి',
+    'ராஜ யோக பரஸ்பர பார்வை',
+    'ರಾಜ ಯೋಗ ಪರಸ್ಪರ ದೃಷ್ಟಿ',
+  ),
+  'rajayogaparivartana': _T(
+    'राज योग परिवर्तन',
+    'రాజ యోగ పరివర్తన',
+    'ராஜ யோக பரிவர்த்தன',
+    'ರಾಜ ಯೋಗ ಪರಿವರ್ತನ',
+  ),
+  'parivartana': _T('परिवर्तन', 'పరివర్తన', 'பரிவர்த்தன', 'ಪರಿವರ್ತನ'),
+  // Benefic / malefic singles
+  'amala': _T('अमल', 'అమల', 'அமல', 'ಅಮಲ'),
+  'akriti': _T('आकृति', 'ఆకృతి', 'ஆகிருதி', 'ಆಕೃತಿ'),
+  'ardhachandra': _T('अर्धचंद्र', 'అర్ధచంద్ర', 'அர்த்தசந்திர', 'ಅರ್ಧಚಂದ್ರ'),
+  'dama': _T('दम', 'దమ', 'தம', 'ದಮ'),
+  'duryoga': _T('दुर्योग', 'దుర్యోగం', 'துர்யோகம்', 'ದುರ್ಯೋಗ'),
+  'grahan': _T('ग्रहण', 'గ్రహణ', 'கிரகண', 'ಗ್ರಹಣ'),
+  'harsha': _T('हर्ष', 'హర్ష', 'ஹர்ஷ', 'ಹರ್ಷ'),
+  'indu': _T('इंदु', 'ఇందు', 'இந்து', 'ಇಂದು'),
+  'kahala': _T('कहल', 'కహల', 'கஹல', 'ಕಹಲ'),
+  'lakshmi': _T('लक्ष्मी', 'లక్ష్మి', 'லக்ஷ்மி', 'ಲಕ್ಷ್ಮಿ'),
+  'mridanga': _T('मृदंग', 'మృదంగ', 'மிருதங்க', 'ಮೃದಂಗ'),
+  'nirbhagya': _T('निर्भाग्य', 'నిర్భాగ్య', 'நிர்பாக்ய', 'ನಿರ್ಭಾಗ್ಯ'),
+  'pushkala': _T('पुष्कल', 'పుష్కల', 'புஷ்கல', 'ಪುಷ್ಕಲ'),
+  'saraswati': _T('सरस्वती', 'సరస్వతి', 'சரஸ்வதி', 'ಸರಸ್ವತಿ'),
+  'shakata': _T('शकट', 'శకట', 'சகட', 'ಶಕಟ'),
+  'shapit': _T('शापित', 'శాపిత', 'சாபித', 'ಶಾಪಿತ'),
+  'subhakartari': _T('शुभकर्तरी', 'శుభకర్తరి', 'சுபகர்த்தரி', 'ಶುಭಕರ್ತರಿ'),
+  'vasumati': _T('वसुमती', 'వసుమతి', 'வசுமதி', 'ವಸುಮತಿ'),
+  'veena': _T('वीणा', 'వీణ', 'வீணை', 'ವೀಣಾ'),
+  'mahabhagya': _T('महाभाग्य', 'మహాభాగ్య', 'மகாபாக்ய', 'ಮಹಾಭಾಗ್ಯ'),
+  'chandra': _T('चंद्र', 'చంద్ర', 'சந்திர', 'ಚಂದ್ರ'),
+  'budha': _T('बुध', 'బుధ', 'புத', 'ಬುಧ'),
+  'guru': _T('गुरु', 'గురు', 'குரு', 'ಗುರು'),
+  'shukra': _T('शुक्र', 'శుక్ర', 'சுக்ர', 'ಶುಕ್ರ'),
+  'kesari': _T('केसरी', 'కేసరి', 'கேசரி', 'ಕೇಸರಿ'),
+  'akhandasamrajya': _T(
+    'अखंड साम्राज्य',
+    'అఖండ సామ్రాజ్య',
+    'அகண்ட சாம்ராஜ்ய',
+    'ಅಖಂಡ ಸಾಮ್ರಾಜ್ಯ',
+  ),
+};
+
+const Map<String, _T> _colour = {
+  'red': _T('लाल', 'ఎరుపు', 'சிவப்பு', 'ಕೆಂಪು'),
+  'crimson': _T('क्रिमसन', 'ఎరుపు', 'கருஞ்சிவப்பு', 'ಕಡುಕೆಂಪು'),
+  'maroon': _T('मैरून', 'మెరూన్', 'மெரூன்', 'ಮರೂನ್'),
+  'orange': _T('नारंगी', 'నారింజ', 'ஆரஞ்சு', 'ಕಿತ್ತಳೆ'),
+  'saffron': _T('केसरिया', 'కాషాయం', 'காவி', 'ಕೇಸರಿ'),
+  'yellow': _T('पीला', 'పసుపు', 'மஞ்சள்', 'ಹಳದಿ'),
+  'gold': _T('सुनहरा', 'బంగారు', 'தங்கம்', 'ಚಿನ್ನ'),
+  'green': _T('हरा', 'ఆకుపచ్చ', 'பச்சை', 'ಹಸಿರು'),
+  'blue': _T('नीला', 'నీలం', 'நீலம்', 'ನೀಲಿ'),
+  'indigo': _T('जामुनी नीला', 'ఇండిగో', 'கருநீலம்', 'ಇಂಡಿಗೊ'),
+  'violet': _T('बैंगनी', 'ఊదా', 'ஊதா', 'ನೇರಳೆ'),
+  'purple': _T('बैंगनी', 'ఊదా', 'ஊதா', 'ನೇರಳೆ'),
+  'pink': _T('गुलाबी', 'గులాబీ', 'இளஞ்சிவப்பு', 'ಗುಲಾಬಿ'),
+  'white': _T('सफ़ेद', 'తెలుపు', 'வெள்ளை', 'ಬಿಳಿ'),
+  'black': _T('काला', 'నలుపు', 'கருப்பு', 'ಕಪ್ಪು'),
+  'grey': _T('धूसर', 'బూడిద', 'சாம்பல்', 'ಬೂದು'),
+  'gray': _T('धूसर', 'బూడిద', 'சாம்பல்', 'ಬೂದು'),
+  'brown': _T('भूरा', 'గోధుమ', 'பழுப்பு', 'ಕಂದು'),
+  'silver': _T('चाँदी', 'వెండి', 'வெள்ளி', 'ಬೆಳ್ಳಿ'),
+  'cream': _T('क्रीम', 'క్రీమ్', 'கிரீம்', 'ಕ್ರೀಮ್'),
+};
+
+const Map<String, _T> _direction = {
+  'east': _T('पूर्व', 'తూర్పు', 'கிழக்கு', 'ಪೂರ್ವ'),
+  'west': _T('पश्चिम', 'పడమర', 'மேற்கு', 'ಪಶ್ಚಿಮ'),
+  'north': _T('उत्तर', 'ఉత్తరం', 'வடக்கு', 'ಉತ್ತರ'),
+  'south': _T('दक्षिण', 'దక్షిణం', 'தெற்கு', 'ದಕ್ಷಿಣ'),
+  'northeast': _T('ईशान', 'ఈశాన్యం', 'வடகிழக்கு', 'ಈಶಾನ್ಯ'),
+  'northwest': _T('वायव्य', 'వాయవ్యం', 'வடமேற்கு', 'ವಾಯುವ್ಯ'),
+  'southeast': _T('आग्नेय', 'ఆగ్నేయం', 'தென்கிழக்கு', 'ಆಗ್ನೇಯ'),
+  'southwest': _T('नैऋत्य', 'నైరుతి', 'தென்மேற்கு', 'ನೈಋತ್ಯ'),
+};
+
+const Map<String, _T> _choghadiya = {
+  'amrit': _T('अमृत', 'అమృత', 'அமிர்த', 'ಅಮೃತ'),
+  'amrita': _T('अमृत', 'అమృత', 'அமிர்த', 'ಅಮೃತ'),
+  'shubh': _T('शुभ', 'శుభ', 'சுப', 'ಶುಭ'),
+  'shubha': _T('शुभ', 'శుభ', 'சுப', 'ಶುಭ'),
+  'labh': _T('लाभ', 'లాభ', 'லாப', 'ಲಾಭ'),
+  'labha': _T('लाभ', 'లాభ', 'லாப', 'ಲಾಭ'),
+  'char': _T('चर', 'చర', 'சர', 'ಚರ'),
+  'chara': _T('चर', 'చర', 'சர', 'ಚರ'),
+  'rog': _T('रोग', 'రోగ', 'ரோக', 'ರೋಗ'),
+  'roga': _T('रोग', 'రోగ', 'ரோக', 'ರೋಗ'),
+  'kaal': _T('काल', 'కాల', 'கால', 'ಕಾಲ'),
+  'kala': _T('काल', 'కాల', 'கால', 'ಕಾಲ'),
+  'udveg': _T('उद्वेग', 'ఉద్వేగ', 'உத்வேக', 'ಉದ್ವೇಗ'),
+  'udvega': _T('उद्वेग', 'ఉద్వేగ', 'உத்வேக', 'ಉದ್ವೇಗ'),
+};
+
+const Map<String, _T> _quality = {
+  'excellent': _T('उत्तम', 'అత్యుత్తమం', 'மிகச் சிறந்தது', 'ಅತ್ಯುತ್ತಮ'),
+  'verygood': _T('बहुत अच्छा', 'చాలా మంచిది', 'மிக நல்லது', 'ತುಂಬಾ ಒಳ್ಳೆಯದು'),
+  'good': _T('अच्छा', 'మంచిది', 'நல்லது', 'ಒಳ್ಳೆಯದು'),
+  'favorable': _T('अनुकूल', 'అనుకూలం', 'சாதகமானது', 'ಅನುಕೂಲಕರ'),
+  'favourable': _T('अनुकूल', 'అనుకూలం', 'சாதகமானது', 'ಅನುಕೂಲಕರ'),
+  'average': _T('सामान्य', 'సాధారణం', 'சராசரி', 'ಸಾಧಾರಣ'),
+  'neutral': _T('तटस्थ', 'తటస్థం', 'நடுநிலை', 'ತಟಸ್ಥ'),
+  'moderate': _T('मध्यम', 'మధ్యస్థం', 'மிதமானது', 'ಮಧ್ಯಮ'),
+  'challenging': _T('चुनौतीपूर्ण', 'సవాలుతో కూడినది', 'சவாலானது', 'ಸವಾಲಿನ'),
+  'difficult': _T('कठिन', 'కష్టం', 'கடினமானது', 'ಕಠಿಣ'),
+  'inauspicious': _T('अशुभ', 'అశుభం', 'அசுபம்', 'ಅಶುಭ'),
+  'auspicious': _T('शुभ', 'శుభం', 'சுபம்', 'ಶುಭ'),
+};

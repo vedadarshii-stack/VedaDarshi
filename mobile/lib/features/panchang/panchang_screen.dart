@@ -48,11 +48,30 @@ const List<String> _monthNames = [
   'December',
 ];
 
-/// Formats [date] as "Saturday, 12 July 2026" without the `intl` package —
-/// the panchang date stepper below only ever needs this one fixed format.
-String _formatPanchangDate(DateTime date) {
-  final weekday = _weekdayNames[date.weekday - 1];
-  final month = _monthNames[date.month - 1];
+/// Formats [date] as "Saturday, 12 July 2026", in [locale]'s script.
+///
+/// LOCALISED 4 Sep 2026 — the client saw "Wednesday, 2 September 2026" sitting
+/// in English above a fully Tamil screen. The weekday and month names now go
+/// through the same term table as every other astrology word; the DIGITS stay
+/// Latin, which is what all five locales use in practice.
+///
+/// Still no `intl` dependency: the table already had to exist for vara names,
+/// so twelve month rows was cheaper than initialising locale date data.
+String _formatPanchangDate(DateTime date, Locale locale) {
+  final weekday =
+      localizeAstroTerm(
+        _weekdayNames[date.weekday - 1],
+        AstroTermKind.gregorianWeekday,
+        locale,
+      ) ??
+      _weekdayNames[date.weekday - 1];
+  final month =
+      localizeAstroTerm(
+        _monthNames[date.month - 1],
+        AstroTermKind.gregorianMonth,
+        locale,
+      ) ??
+      _monthNames[date.month - 1];
   return '$weekday, ${date.day} $month ${date.year}';
 }
 
@@ -61,11 +80,27 @@ String _formatPanchangDate(DateTime date) {
 /// [PanchangStaticData.masaPaksha] whenever either half is missing —
 /// matching the same "don't show a value the API didn't actually give us"
 /// rule the rest of this screen follows.
-String _masaPakshaLine(PanchangData? data) {
-  final masa = data?.masa?.name;
-  final paksha = data?.tithi?.paksha;
+String _masaPakshaLine(
+  PanchangData? data,
+  AppLocalizations l10n,
+  Locale locale,
+) {
+  final masa = localizeAstroTerm(
+    data?.masa?.name,
+    AstroTermKind.masa,
+    locale,
+  );
+  final paksha = localizeAstroTerm(
+    data?.tithi?.paksha,
+    AstroTermKind.paksha,
+    locale,
+  );
   if (masa == null || paksha == null) return PanchangStaticData.masaPaksha;
-  return '$masa Masa · $paksha Paksha';
+  // The NAMES come from the term table; the words "Masa" and "Paksha"
+  // themselves are l10n — both halves were English before (4 Sep 2026), which
+  // is what the client saw as "Bhadrapada Masa · Krishna Paksha" above an
+  // otherwise Tamil screen.
+  return '$masa ${l10n.panchangMasaLabel} · $paksha ${l10n.panchangPakshaLabel}';
 }
 
 /// Builds the 5 Panchang-elements rows (Tithi/Nakshatra/Yoga/Karana/Vaar)
@@ -199,6 +234,64 @@ List<Muhurat> _muhuratsFrom(InauspiciousPeriods? periods, AppLocalizations l10n)
   ];
 }
 
+/// The spiritual-advice card's body text.
+///
+/// COMPOSED LOCALLY for non-English locales (4 Sep 2026, client-reported:
+/// this card was the last big English block on the Panchang screen).
+///
+/// Vedika's `guidance.summary` is a rich English sentence — *"Today offers
+/// generally positive energies. The Navami tithi (Krishna Paksha) combined
+/// with Mrigashira nakshatra and Vajra yoga (neutral) creates the prevailing
+/// cosmic atmosphere…"* — and it is English on every language parameter.
+///
+/// But almost everything IN it is data we already hold in structured, and
+/// therefore translatable, form: the tithi, paksha, nakshatra and yoga are
+/// the same values rendered in the elements grid above, and
+/// `overallAuspiciousness` is a single verdict word from a small closed set.
+/// So a non-English locale gets those facts composed into its own language
+/// rather than a paragraph it cannot read.
+///
+/// ⚠️ **What is deliberately LOST: Vedika's editorial advice.** Their
+/// sentence ends with guidance like *"Saturday teaches patience and
+/// discipline — honour commitments and clear karmic debts"*, which is
+/// authored content, not derivable from any structured field. It is dropped
+/// rather than invented: **writing our own spiritual advice would be
+/// fabricating astrology**, which is the one thing this codebase refuses to
+/// do everywhere else. If the client wants that guidance in five languages
+/// it has to be authored (by them or by Vedika), not generated here.
+///
+/// English keeps Vedika's full original — it is richer, and it is already in
+/// the right language.
+String _adviceText(
+  PanchangGuidance? guidance,
+  PanchangData? data,
+  AppLocalizations l10n,
+  Locale locale,
+) {
+  final summary = guidance?.summary;
+  if (locale.languageCode == 'en') {
+    return summary ?? PanchangStaticData.advice;
+  }
+
+  String? t(String? v, AstroTermKind k) => localizeAstroTerm(v, k, locale);
+  final quality = t(guidance?.overallAuspiciousness, AstroTermKind.quality);
+  final tithi = t(data?.tithi?.name, AstroTermKind.tithi);
+  final paksha = t(data?.tithi?.paksha, AstroTermKind.paksha);
+  final nakshatra = t(data?.nakshatra?.name, AstroTermKind.nakshatra);
+  final yoga = t(data?.yoga?.name, AstroTermKind.yoga);
+
+  // All five parts must be present, or the sentence would read with gaps.
+  // Falling back to Vedika's English is better than a broken one.
+  if (quality == null ||
+      tithi == null ||
+      paksha == null ||
+      nakshatra == null ||
+      yoga == null) {
+    return summary ?? PanchangStaticData.advice;
+  }
+  return l10n.panchangAdviceComposed(quality, tithi, paksha, nakshatra, yoga);
+}
+
 /// Panchang — daily Vedic almanac, per the approved Figma "B2 · Panchang"
 /// (node 14:2) concept.
 ///
@@ -299,7 +392,7 @@ class _PanchangScreenState extends ConsumerState<PanchangScreen> {
             locale: locale,
             isCompact: isCompact,
             selectedDate: _selectedDate,
-            masaPaksha: _masaPakshaLine(panchangAsync.valueOrNull),
+            masaPaksha: _masaPakshaLine(panchangAsync.valueOrNull, l10n, locale),
             // Name the city the coordinates above actually belong to.
             locationName: city.name,
             onPrevious: _goToPreviousDay,
@@ -321,6 +414,7 @@ class _PanchangScreenState extends ConsumerState<PanchangScreen> {
                 muhurats: _muhuratsFrom(periodsAsync.valueOrNull, l10n),
                 sunTimes: data.sunTimes,
                 guidance: data.guidance,
+                panchang: data,
                 festivalToday: data.festivalToday,
               ),
               loading: () => _PanchangLoadingView(l10n: l10n, locale: locale),
@@ -352,6 +446,7 @@ class _PanchangBody extends StatelessWidget {
     required this.sunTimes,
     required this.guidance,
     required this.festivalToday,
+    required this.panchang,
   });
 
   final AppLocalizations l10n;
@@ -365,6 +460,10 @@ class _PanchangBody extends StatelessWidget {
 
   /// Live guidance block — feeds the spiritual-advice card.
   final PanchangGuidance? guidance;
+
+  /// The raw panchang, so the advice card can compose a localised summary
+  /// from the same structured values the elements grid shows.
+  final PanchangData? panchang;
 
   /// A festival falling on the shown date, or null on the great majority of
   /// days that have none.
@@ -418,6 +517,7 @@ class _PanchangBody extends StatelessWidget {
           l10n: l10n,
           locale: locale,
           guidance: guidance,
+          data: panchang,
         ),
         const SizedBox(height: 14),
         _ViewAllMuhuratLink(l10n: l10n, locale: locale),
@@ -715,7 +815,7 @@ class _DateStepper extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  _formatPanchangDate(selectedDate),
+                  _formatPanchangDate(selectedDate, locale),
                   textAlign: TextAlign.center,
                   style: AppFonts.body(
                     locale,
@@ -1336,7 +1436,12 @@ class _AdviceCard extends StatelessWidget {
     required this.l10n,
     required this.locale,
     required this.guidance,
+    required this.data,
   });
+
+  /// The day's panchang, for composing a localised summary — see
+  /// [_adviceText].
+  final PanchangData? data;
 
   /// Live reading of the day from `guidance.summary` — it names this day's
   /// actual tithi, nakshatra and yoga.
@@ -1393,7 +1498,7 @@ class _AdviceCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  guidance?.summary ?? PanchangStaticData.advice,
+                  _adviceText(guidance, data, l10n, locale),
                   style: AppFonts.body(
                     locale,
                     fontSize: 11.5,

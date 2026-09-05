@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/astrology/astro_terms.dart';
 import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
@@ -216,7 +217,7 @@ class _CurrentMahadashaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final planetLabel = _planetLabel(current.planet, current.vedicName, l10n);
+    final planetLabel = _planetLabel(current.planet, current.vedicName, l10n, locale);
     final range = _dateRange(current.startDate, current.endDate, l10n);
     final phase = guidance?.currentPhase;
     final remainingLabel = dashaRemainingLabel(current.endDate, l10n);
@@ -257,18 +258,22 @@ class _CurrentMahadashaCard extends StatelessWidget {
             range,
             style: AppFonts.body(locale, fontSize: 11, color: AppColors.muted),
           ),
-          // `phase` is Vedika's own ready-made English sentence (see
-          // `DashaGuidance`'s doc comment) — rendered as-is regardless of
-          // app locale, same documented gap as the Chart tab's summary
-          // banner. The "remaining" line below is DIFFERENT: it used to be
-          // `guidance.timeRemaining`, also one of Vedika's sentences, but
-          // that field was REMOVED — see `dashaRemainingLabel`'s doc
-          // comment for why — and is now computed locally (and therefore
-          // properly localized) from `current.endDate`.
-          if (phase != null) ...[
+          // COMPOSED LOCALLY as of 4 Sep 2026, not taken from Vedika.
+          //
+          // `guidance.currentPhase` is their ready-made English sentence
+          // ("You are in Moon (Chandra) Maha Dasha") — the client saw it
+          // sitting in English inside an otherwise Telugu card. It carries
+          // no information the planet name above does not, so it is rebuilt
+          // from our own template plus the already-localised planet label.
+          //
+          // Falls back to Vedika's sentence only when we have no planet to
+          // name — better their English than nothing at all.
+          if (planetLabel.isNotEmpty || phase != null) ...[
             const SizedBox(height: 10),
             Text(
-              phase,
+              planetLabel.isNotEmpty
+                  ? l10n.dashaCurrentSentence(planetLabel)
+                  : phase!,
               style: AppFonts.body(locale, fontSize: 11.5, color: AppColors.ink),
             ),
           ],
@@ -303,7 +308,7 @@ class _DashaBalanceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final planetLabel = _planetLabel(balance.planet, balance.vedicName, l10n);
+    final planetLabel = _planetLabel(balance.planet, balance.vedicName, l10n, locale);
     final years = balance.years;
     final months = balance.months;
     final days = balance.days;
@@ -368,7 +373,7 @@ class _DashaPeriodRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final planetLabel = _planetLabel(period.planet, period.vedicName, l10n);
+    final planetLabel = _planetLabel(period.planet, period.vedicName, l10n, locale);
     final range = _dateRange(period.startDate, period.endDate, l10n);
     final isCurrent = period.isCurrent;
 
@@ -437,7 +442,23 @@ class _DashaPeriodRow extends StatelessWidget {
 
 /// e.g. `"Moon (Chandra)"` — falls back to whichever of the two names is
 /// present, or the localized "unavailable" dash if neither is.
-String _planetLabel(String? planet, String? vedicName, AppLocalizations l10n) {
+/// LOCALISED 4 Sep 2026 — this rendered "Mercury (Budha)" in English on a
+/// fully Hindi screen.
+///
+/// In a non-English locale the parenthetical is DROPPED, not translated
+/// twice: "Mercury (Budha)" exists to give an English reader the Sanskrit
+/// name alongside the familiar one. Once the label itself is "बुध", repeating
+/// it in brackets is noise.
+String _planetLabel(
+  String? planet,
+  String? vedicName,
+  AppLocalizations l10n,
+  Locale locale,
+) {
+  final localized = localizeAstroTerm(planet, AstroTermKind.graha, locale);
+  if (locale.languageCode != 'en') {
+    return localized ?? vedicName ?? planet ?? l10n.kundliValueUnavailable;
+  }
   if (planet != null && vedicName != null) return '$planet ($vedicName)';
   return planet ?? vedicName ?? l10n.kundliValueUnavailable;
 }

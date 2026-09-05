@@ -1,7 +1,14 @@
 import { onRequest } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { VEDIKA_API_KEY, VEDIKA_BASE_URL, vedikaHeaders } from "./config";
-import { cacheKey, cacheTtlSeconds } from "./vedikaCache";
+import {
+  acquireFetchLock,
+  awaitFreshEntry,
+  cacheKey,
+  cacheTtlSeconds,
+  dayScope,
+  releaseFetchLock,
+} from "./vedikaCache";
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -76,8 +83,16 @@ export const vedika = onRequest(
     const bodyText =
       req.method === "POST" ? JSON.stringify(req.body ?? {}) : "";
 
-    const key = cacheKey(req.method, path, query, bodyText);
-    const ttl = cacheTtlSeconds(path);
+    const ttl = cacheTtlSeconds(path, bodyText);
+    // The calendar day is part of the key for day-varying routes, so a new
+    // day cannot be served yesterday's answer. See `dayScope`.
+    const key = cacheKey(
+      req.method,
+      path,
+      query,
+      bodyText,
+      dayScope(path, bodyText, ttl)
+    );
     const docRef = db.collection("vedikaCache").doc(key);
 
     try {
@@ -98,6 +113,25 @@ export const vedika = onRequest(
       console.warn("vedikaCache read failed", e);
     }
 
+    // ---- SINGLE FLIGHT ---------------------------------------------------
+    // Misses are correlated: if the prewarm failed, every user opening the
+    // app at 7am misses the SAME key at once. Without this, that is one
+    // billed Vedika call per user for a single answer. See
+    // `acquireFetchLock`.
+    const holdsLock = await acquireFetchLock(db, key);
+    if (!holdsLock) {
+      const shared = await awaitFreshEntry(db, key, ttl);
+      if (shared !== null) {
+        // Someone else paid for this while we waited.
+        res.set("X-Vedika-Cache", "HIT-SHARED");
+        res.set("X-Cache", "HIT");
+        res.status(200).json(shared);
+        return;
+      }
+      // The winner crashed or is slow. Fall through and fetch it ourselves —
+      // an extra call is always better than a hung request.
+    }
+
     let upstream: Response;
     try {
       upstream = await fetch(
@@ -116,6 +150,7 @@ export const vedika = onRequest(
       );
     } catch (e) {
       console.error("vedika upstream unreachable", e);
+      if (holdsLock) await releaseFetchLock(db, key);
       res.status(502).json({
         success: false,
         code: "UPSTREAM_UNREACHABLE",
@@ -129,6 +164,7 @@ export const vedika = onRequest(
     try {
       payload = JSON.parse(text);
     } catch {
+      if (holdsLock) await releaseFetchLock(db, key);
       res.status(502).json({
         success: false,
         code: "MALFORMED_UPSTREAM",
@@ -147,10 +183,26 @@ export const vedika = onRequest(
       (payload as { success?: boolean }).success !== false;
 
     if (ok) {
-      docRef
-        .set({ payload, fetchedAtMs: Date.now(), path })
-        .catch((e) => console.warn("vedikaCache write failed", e));
+      // AWAITED, unlike before: the lock is released immediately after, and
+      // releasing before the entry is visible would let every waiter fall
+      // through and re-fetch — exactly the stampede this is meant to stop.
+      try {
+        await docRef.set({
+          payload,
+          fetchedAtMs: Date.now(),
+          path,
+          // Drives the Firestore TTL policy on `vedikaCache` — see
+          // firestore.indexes.json. Without a field to key it on, this
+          // collection grows forever: 1-year natal entries are never
+          // otherwise deleted. Stamped a day PAST the logical TTL so a
+          // still-valid entry is never swept out from under a reader.
+          expiresAt: new Date(Date.now() + (ttl + 86400) * 1000),
+        });
+      } catch (e) {
+        console.warn("vedikaCache write failed", e);
+      }
     }
+    if (holdsLock) await releaseFetchLock(db, key);
 
     res.set("X-Vedika-Cache", "MISS");
     res.set("X-Cache", "MISS");

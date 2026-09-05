@@ -1616,4 +1616,108 @@ class AppLocalizationsEn extends AppLocalizations {
   String lblHouseN(int n) {
     return 'House $n';
   }
+
+  @override
+  String get aiFollowUpDasha => 'What does my current dasha period mean?';
+
+  @override
+  String get aiFollowUpCareer => 'What does my career outlook look like?';
+
+  @override
+  String get aiFollowUpRemedies => 'Which remedies suit my chart?';
+
+  @override
+  String get aiFollowUpHealth => 'What does my chart say about my health?';
+
+  @override
+  String get panchangMasaLabel => 'Masa';
+
+  @override
+  String get panchangPakshaLabel => 'Paksha';
+
+  @override
+  String dashaCurrentSentence(String planet) {
+    return 'You are in $planet Maha Dasha';
+  }
+
+  @override
+  String panchangAdviceComposed(
+    String quality,
+    String tithi,
+    String paksha,
+    String nakshatra,
+    String yoga,
+  ) {
+    return 'Today is $quality. $tithi tithi ($paksha paksha) with $nakshatra nakshatra and $yoga yoga.';
+  }
+
+  @override
+  String get choghadiyaBestForKaal =>
+      'Only for specific purposes like overcoming enemies or tantric practices';
+
+  @override
+  String get choghadiyaBestForShubh =>
+      'Religious ceremonies, education, financial planning, and meeting elders';
+
+  @override
+  String get choghadiyaBestForRog =>
+      'Surgical procedures, competitive activities, and confronting challenges';
+
+  @override
+  String get choghadiyaBestForUdveg =>
+      'Government work, meeting officials, and administrative tasks';
+
+  @override
+  String get choghadiyaBestForChar =>
+      'Travel, journeys, buying vehicles, and temporary arrangements';
+
+  @override
+  String get choghadiyaBestForLabh =>
+      'Business deals, financial transactions, trade, and career moves';
+
+  @override
+  String get choghadiyaBestForAmrit =>
+      'All auspicious activities, especially new ventures, marriages, and important ceremonies';
+
+  @override
+  String get notifDailyHoroscopeTitle => 'Your daily horoscope is ready';
+
+  @override
+  String get notifDailyHoroscopeBody =>
+      'Your reading for today is waiting — tap to see it.';
+
+  @override
+  String get notifSawanSomvarTitle => 'Sawan Somvar tomorrow';
+
+  @override
+  String get notifSawanSomvarBody =>
+      'Fasting day for Lord Shiva. See rituals, muhurat & vrat rules.';
+
+  @override
+  String get notifRishiAiReplyTitle => 'Rishi AI replied';
+
+  @override
+  String get notifRishiAiReplyBody =>
+      'Your question has an answer waiting in the chat.';
+
+  @override
+  String get notifRahuKaalAlertTitle => 'Rahu Kaal alert';
+
+  @override
+  String get notifRahuKaalAlertBody =>
+      'Avoid starting anything new during today\'s Rahu Kaal.';
+
+  @override
+  String get notifPremiumOfferTitle => 'Unlock premium';
+
+  @override
+  String get notifPremiumOfferBody =>
+      'See the plans and what each one includes.';
+
+  @override
+  String get notifNewArticleTitle => 'New article published';
+
+  @override
+  String get notifNewArticleBody =>
+      'A new reading has been added to Wisdom for you.';
 }

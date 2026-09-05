@@ -12,6 +12,7 @@ import '../../core/widgets/ask_ai_button.dart';
 import '../../core/widgets/premium_glimpse.dart';
 import '../../l10n/app_localizations.dart';
 import '../premium/subscription_paywall_screen.dart';
+import '../profile/birth_profile.dart';
 import '../profile/birth_profile_repository.dart';
 import 'guna_milan_data.dart';
 import 'guna_milan_repository.dart';
@@ -63,9 +64,25 @@ class _GunMilanResultScreenState extends ConsumerState<GunMilanResultScreen> {
         ? trimmedName
         : GunMilanStaticData.fallbackGroomName;
 
-    final maleParams = profile != null
+    final ownParams = profile != null
         ? GunaMilanPartnerParams.fromBirthProfile(profile)
         : GunMilanStaticData.fallbackGroomPartnerParams;
+
+    // WHICH CHART IS MALE (fixed 4 Sep 2026, client-reported).
+    //
+    // The signed-in user's chart used to go into `male` unconditionally and
+    // the partner into `female`. For a woman running a match that is not
+    // merely a mislabel — **Gun Milan is asymmetric**. Several kootas
+    // (Bhakoot, Nadi, Gana, and the Rajju/Vedha checks) are scored from the
+    // male chart relative to the female one, so feeding the charts in
+    // backwards produces a genuinely WRONG compatibility score, presented
+    // as a finished verdict families act on.
+    //
+    // `Gender.other` keeps the male slot: Vedika accepts only `male`/`female`
+    // (verified — `boy`/`girl` return MISSING_PARTNER_DETAILS), so a third
+    // option must map to one of them. Flagged for the client: the honest fix
+    // is asking the user which side they occupy rather than inferring it.
+    final userIsBride = profile?.gender == Gender.female;
 
     // THE REAL PARTNER, OR NOTHING — 21 Aug 2026.
     //
@@ -86,9 +103,11 @@ class _GunMilanResultScreenState extends ConsumerState<GunMilanResultScreen> {
     if (partner == null) {
       return _MissingPartnerScaffold(l10n: l10n, locale: locale);
     }
-    final femaleParams = GunaMilanPartnerParams.fromBirthProfile(partner);
+    final partnerParams = GunaMilanPartnerParams.fromBirthProfile(partner);
     final brideName = partner.fullName.trim();
-    final request = (male: maleParams, female: femaleParams);
+    final request = userIsBride
+        ? (male: partnerParams, female: ownParams)
+        : (male: ownParams, female: partnerParams);
 
     final resultAsync = ref.watch(gunaMilanResultProvider(request));
 

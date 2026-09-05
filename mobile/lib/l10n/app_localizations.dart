@@ -2953,6 +2953,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'House {n}'**
   String lblHouseN(int n);
+
+  /// Localised AI follow-up suggestion. Used instead of Vedika's own followUpSuggestions, which come back in English in every locale (verified 4 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'What does my current dasha period mean?'**
+  String get aiFollowUpDasha;
+
+  /// Localised AI follow-up suggestion. Used instead of Vedika's own followUpSuggestions, which come back in English in every locale (verified 4 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'What does my career outlook look like?'**
+  String get aiFollowUpCareer;
+
+  /// Localised AI follow-up suggestion. Used instead of Vedika's own followUpSuggestions, which come back in English in every locale (verified 4 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'Which remedies suit my chart?'**
+  String get aiFollowUpRemedies;
+
+  /// Localised AI follow-up suggestion. Used instead of Vedika's own followUpSuggestions, which come back in English in every locale (verified 4 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'What does my chart say about my health?'**
+  String get aiFollowUpHealth;
+
+  /// Panchang header: the words "Masa"/"Paksha" themselves, localised 4 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Masa'**
+  String get panchangMasaLabel;
+
+  /// Panchang header: the words "Masa"/"Paksha" themselves, localised 4 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Paksha'**
+  String get panchangPakshaLabel;
+
+  /// Replaces Vedika's English-only current_phase sentence (4 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'You are in {planet} Maha Dasha'**
+  String dashaCurrentSentence(String planet);
+
+  /// Locally-composed panchang advice for non-English locales — Vedika's own summary is English-only.
+  ///
+  /// In en, this message translates to:
+  /// **'Today is {quality}. {tithi} tithi ({paksha} paksha) with {nakshatra} nakshatra and {yoga} yoga.'**
+  String panchangAdviceComposed(
+    String quality,
+    String tithi,
+    String paksha,
+    String nakshatra,
+    String yoga,
+  );
+
+  /// What the Kaal choghadiya is suited for. Translates Vedika's own fixed English description — a closed set of 7, one per period type.
+  ///
+  /// In en, this message translates to:
+  /// **'Only for specific purposes like overcoming enemies or tantric practices'**
+  String get choghadiyaBestForKaal;
+
+  /// What the Shubh choghadiya is suited for. Translates Vedika's own fixed English description — a closed set of 7, one per period type.
+  ///
+  /// In en, this message translates to:
+  /// **'Religious ceremonies, education, financial planning, and meeting elders'**
+  String get choghadiyaBestForShubh;
+
+  /// What the Rog choghadiya is suited for. Translates Vedika's own fixed English description — a closed set of 7, one per period type.
+  ///
+  /// In en, this message translates to:
+  /// **'Surgical procedures, competitive activities, and confronting challenges'**
+  String get choghadiyaBestForRog;
+
+  /// What the Udveg choghadiya is suited for. Translates Vedika's own fixed English description — a closed set of 7, one per period type.
+  ///
+  /// In en, this message translates to:
+  /// **'Government work, meeting officials, and administrative tasks'**
+  String get choghadiyaBestForUdveg;
+
+  /// What the Char choghadiya is suited for. Translates Vedika's own fixed English description — a closed set of 7, one per period type.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel, journeys, buying vehicles, and temporary arrangements'**
+  String get choghadiyaBestForChar;
+
+  /// What the Labh choghadiya is suited for. Translates Vedika's own fixed English description — a closed set of 7, one per period type.
+  ///
+  /// In en, this message translates to:
+  /// **'Business deals, financial transactions, trade, and career moves'**
+  String get choghadiyaBestForLabh;
+
+  /// What the Amrit choghadiya is suited for. Translates Vedika's own fixed English description — a closed set of 7, one per period type.
+  ///
+  /// In en, this message translates to:
+  /// **'All auspicious activities, especially new ventures, marriages, and important ceremonies'**
+  String get choghadiyaBestForAmrit;
+
+  /// Notification title (daily-horoscope) — placeholder content, see notifications_static_data.dart.
+  ///
+  /// In en, this message translates to:
+  /// **'Your daily horoscope is ready'**
+  String get notifDailyHoroscopeTitle;
+
+  /// Notification body (daily-horoscope) — placeholder content.
+  ///
+  /// In en, this message translates to:
+  /// **'Your reading for today is waiting — tap to see it.'**
+  String get notifDailyHoroscopeBody;
+
+  /// Notification title (sawan-somvar) — placeholder content, see notifications_static_data.dart.
+  ///
+  /// In en, this message translates to:
+  /// **'Sawan Somvar tomorrow'**
+  String get notifSawanSomvarTitle;
+
+  /// Notification body (sawan-somvar) — placeholder content.
+  ///
+  /// In en, this message translates to:
+  /// **'Fasting day for Lord Shiva. See rituals, muhurat & vrat rules.'**
+  String get notifSawanSomvarBody;
+
+  /// Notification title (rishi-ai-reply) — placeholder content, see notifications_static_data.dart.
+  ///
+  /// In en, this message translates to:
+  /// **'Rishi AI replied'**
+  String get notifRishiAiReplyTitle;
+
+  /// Notification body (rishi-ai-reply) — placeholder content.
+  ///
+  /// In en, this message translates to:
+  /// **'Your question has an answer waiting in the chat.'**
+  String get notifRishiAiReplyBody;
+
+  /// Notification title (rahu-kaal-alert) — placeholder content, see notifications_static_data.dart.
+  ///
+  /// In en, this message translates to:
+  /// **'Rahu Kaal alert'**
+  String get notifRahuKaalAlertTitle;
+
+  /// Notification body (rahu-kaal-alert) — placeholder content.
+  ///
+  /// In en, this message translates to:
+  /// **'Avoid starting anything new during today\'s Rahu Kaal.'**
+  String get notifRahuKaalAlertBody;
+
+  /// Notification title (premium-offer) — placeholder content, see notifications_static_data.dart.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock premium'**
+  String get notifPremiumOfferTitle;
+
+  /// Notification body (premium-offer) — placeholder content.
+  ///
+  /// In en, this message translates to:
+  /// **'See the plans and what each one includes.'**
+  String get notifPremiumOfferBody;
+
+  /// Notification title (new-article) — placeholder content, see notifications_static_data.dart.
+  ///
+  /// In en, this message translates to:
+  /// **'New article published'**
+  String get notifNewArticleTitle;
+
+  /// Notification body (new-article) — placeholder content.
+  ///
+  /// In en, this message translates to:
+  /// **'A new reading has been added to Wisdom for you.'**
+  String get notifNewArticleBody;
 }
 
 class _AppLocalizationsDelegate
