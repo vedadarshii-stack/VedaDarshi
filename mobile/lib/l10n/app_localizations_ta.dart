@@ -1746,4 +1746,14 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get noSavedProfiles => 'வேறு சேமித்த சுயவிவரங்கள் இல்லை';
+
+  @override
+  String get premiumMember => 'பிரீமியம் உறுப்பினர்';
+
+  @override
+  String get upgradeToPremium => 'பிரீமியத்திற்கு மேம்படுத்தவும்';
+
+  @override
+  String get premiumUnlockHint =>
+      'முழு பலன்கள் மற்றும் அறிக்கைகளைத் திறக்கவும்';
 }

@@ -2325,5 +2325,17 @@
   "noSavedProfiles": "No other saved profiles yet",
   "@noSavedProfiles": {
     "description": "Gun Milan profile picker (8 Sep 2026)."
+  },
+  "premiumMember": "Premium member",
+  "@premiumMember": {
+    "description": "Profile premium badge / upgrade CTA (8 Sep 2026)."
+  },
+  "upgradeToPremium": "Upgrade to Premium",
+  "@upgradeToPremium": {
+    "description": "Profile premium badge / upgrade CTA (8 Sep 2026)."
+  },
+  "premiumUnlockHint": "Unlock full readings and reports",
+  "@premiumUnlockHint": {
+    "description": "Profile premium badge / upgrade CTA (8 Sep 2026)."
   }
 }

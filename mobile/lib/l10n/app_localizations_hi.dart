@@ -1725,4 +1725,13 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get noSavedProfiles => 'अभी कोई अन्य सहेजी गई प्रोफ़ाइल नहीं';
+
+  @override
+  String get premiumMember => 'प्रीमियम सदस्य';
+
+  @override
+  String get upgradeToPremium => 'प्रीमियम में अपग्रेड करें';
+
+  @override
+  String get premiumUnlockHint => 'पूरी रिपोर्ट और फल अनलॉक करें';
 }

@@ -504,5 +504,8 @@
   "notifNewArticleBody": "ನಿಮಗಾಗಿ ಜ್ಞಾನದಲ್ಲಿ ಹೊಸ ಲೇಖನ ಸೇರಿಸಲಾಗಿದೆ.",
   "chooseSavedProfile": "ಉಳಿಸಿದ ಪ್ರೊಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ",
   "enterNewDetails": "ಹೊಸ ವಿವರಗಳನ್ನು ನಮೂದಿಸಿ",
-  "noSavedProfiles": "ಬೇರೆ ಉಳಿಸಿದ ಪ್ರೊಫೈಲ್‌ಗಳಿಲ್ಲ"
+  "noSavedProfiles": "ಬೇರೆ ಉಳಿಸಿದ ಪ್ರೊಫೈಲ್‌ಗಳಿಲ್ಲ",
+  "premiumMember": "ಪ್ರೀಮಿಯಂ ಸದಸ್ಯ",
+  "upgradeToPremium": "ಪ್ರೀಮಿಯಂಗೆ ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ",
+  "premiumUnlockHint": "ಪೂರ್ಣ ಫಲಿತಾಂಶಗಳು ಮತ್ತು ವರದಿಗಳನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಿ"
 }

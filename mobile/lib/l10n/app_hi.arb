@@ -504,5 +504,8 @@
   "notifNewArticleBody": "आपके लिए ज्ञान में एक नया लेख जोड़ा गया है।",
   "chooseSavedProfile": "सहेजी गई प्रोफ़ाइल चुनें",
   "enterNewDetails": "नया विवरण दर्ज करें",
-  "noSavedProfiles": "अभी कोई अन्य सहेजी गई प्रोफ़ाइल नहीं"
+  "noSavedProfiles": "अभी कोई अन्य सहेजी गई प्रोफ़ाइल नहीं",
+  "premiumMember": "प्रीमियम सदस्य",
+  "upgradeToPremium": "प्रीमियम में अपग्रेड करें",
+  "premiumUnlockHint": "पूरी रिपोर्ट और फल अनलॉक करें"
 }

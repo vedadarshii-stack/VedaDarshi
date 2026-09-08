@@ -125,8 +125,18 @@ abstract final class NotificationsStaticData {
     NotificationItem(
       id: 'premium-offer',
       category: NotificationCategory.premium,
-      title: 'Premium offer ends tonight',
-      body: 'Get yearly at ₹1,999 — save 44% before midnight.',
+      // PRICE REMOVED 8 Sep 2026. This said "Get yearly at ₹1,999 — save
+      // 44% before midnight" — a figure the catalogue does not sell, and the
+      // same fabricated number that got `subscription_static_data.dart`
+      // deleted (prices come only from `StoreProduct.priceString`).
+      //
+      // A previous pass localised the DISPLAY of this row and thought that
+      // settled it. It did not: these constants are still the `_ =>` fallback
+      // in `_notifTitle`/`_notifBody`, so an id that stops matching would put
+      // the false price straight back on screen. Shadowing a wrong value is
+      // not removing it.
+      title: 'Unlock premium',
+      body: 'See the plans and what each one includes.',
       time: '7:45 PM',
       group: NotificationGroup.yesterday,
       isUnread: false,

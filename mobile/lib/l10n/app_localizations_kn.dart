@@ -1734,4 +1734,14 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get noSavedProfiles => 'ಬೇರೆ ಉಳಿಸಿದ ಪ್ರೊಫೈಲ್‌ಗಳಿಲ್ಲ';
+
+  @override
+  String get premiumMember => 'ಪ್ರೀಮಿಯಂ ಸದಸ್ಯ';
+
+  @override
+  String get upgradeToPremium => 'ಪ್ರೀಮಿಯಂಗೆ ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ';
+
+  @override
+  String get premiumUnlockHint =>
+      'ಪೂರ್ಣ ಫಲಿತಾಂಶಗಳು ಮತ್ತು ವರದಿಗಳನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಿ';
 }

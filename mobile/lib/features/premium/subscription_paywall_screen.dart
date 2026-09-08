@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/motion/app_motion.dart';
+import '../../core/auth/auth_providers.dart';
 import '../../core/purchases/purchases_providers.dart';
+import 'purchase_error_messages.dart';
 import '../../core/purchases/purchases_service.dart';
 import '../../core/purchases/subscription_catalogue.dart';
 import '../../core/purchases/subscription_tier.dart';
@@ -99,7 +102,7 @@ class _SubscriptionPaywallScreenState
       // A cancelled purchase is the user changing their mind, not a failure
       // to report back at them.
       if (e.reason == PurchaseFailure.cancelled) return;
-      _showMessage(_failureMessage(l10n, e.reason));
+      _showMessage(purchaseFailureMessage(l10n, e.reason));
     } finally {
       if (mounted) setState(() => _isBusy = false);
     }
@@ -110,7 +113,15 @@ class _SubscriptionPaywallScreenState
     setState(() => _isBusy = true);
     final l10n = AppLocalizations.of(context)!;
     try {
-      final status = await ref.read(purchasesServiceProvider).restore();
+      // The uid is passed explicitly so the restore is aliased onto THIS
+      // signed-in user before Play's receipts are attached — see
+      // `PurchasesService.restore`. Empty for a signed-out user, which is a
+      // supported anonymous restore.
+      final status = await ref
+          .read(purchasesServiceProvider)
+          .restore(
+            firebaseUid: ref.read(authStateProvider).valueOrNull?.uid ?? '',
+          );
       if (!mounted) return;
       if (status.hasPaidAccess) {
         _showMessage(l10n.purchasesRestored);
@@ -121,7 +132,7 @@ class _SubscriptionPaywallScreenState
     } on PurchaseException catch (e) {
       if (!mounted) return;
       if (e.reason == PurchaseFailure.cancelled) return;
-      _showMessage(_failureMessage(l10n, e.reason));
+      _showMessage(purchaseFailureMessage(l10n, e.reason));
     } finally {
       if (mounted) setState(() => _isBusy = false);
     }
@@ -155,16 +166,6 @@ class _SubscriptionPaywallScreenState
       );
   }
 
-  static String _failureMessage(AppLocalizations l10n, PurchaseFailure reason) {
-    return switch (reason) {
-      PurchaseFailure.notAllowed => l10n.purchaseErrorNotAllowed,
-      PurchaseFailure.network => l10n.purchaseErrorNetwork,
-      PurchaseFailure.alreadyOwned => l10n.purchaseErrorAlreadyOwned,
-      PurchaseFailure.productUnavailable => l10n.purchaseErrorUnavailable,
-      PurchaseFailure.cancelled || PurchaseFailure.unknown =>
-        l10n.purchaseErrorGeneric,
-    };
-  }
 
   @override
   Widget build(BuildContext context) {

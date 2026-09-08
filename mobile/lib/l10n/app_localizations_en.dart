@@ -1729,4 +1729,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noSavedProfiles => 'No other saved profiles yet';
+
+  @override
+  String get premiumMember => 'Premium member';
+
+  @override
+  String get upgradeToPremium => 'Upgrade to Premium';
+
+  @override
+  String get premiumUnlockHint => 'Unlock full readings and reports';
 }

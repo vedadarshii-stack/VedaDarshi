@@ -3139,6 +3139,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No other saved profiles yet'**
   String get noSavedProfiles;
+
+  /// Profile premium badge / upgrade CTA (8 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'Premium member'**
+  String get premiumMember;
+
+  /// Profile premium badge / upgrade CTA (8 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Premium'**
+  String get upgradeToPremium;
+
+  /// Profile premium badge / upgrade CTA (8 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock full readings and reports'**
+  String get premiumUnlockHint;
 }
 
 class _AppLocalizationsDelegate

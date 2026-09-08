@@ -235,10 +235,37 @@ class PurchasesService {
   }
 
   /// Re-syncs purchases made on another device or before a reinstall.
-  Future<SubscriptionStatus> restore() async {
+  /// Re-syncs purchases made on another device or before a reinstall.
+  ///
+  /// ## `firebaseUid` is REQUIRED, and that is the point (8 Sep 2026)
+  ///
+  /// This used to call `Purchases.restorePurchases()` directly, trusting that
+  /// something else had already aliased the SDK onto the signed-in user.
+  /// `subscriptionStatusProvider` does call [logIn] — but only when IT runs,
+  /// and restore can fire before that resolves, or after a user switch.
+  ///
+  /// Restoring against the wrong app-user id is the classic, silent restore
+  /// bug: Play returns the receipts, RevenueCat attaches them to whichever id
+  /// the SDK currently holds, and the call REPORTS SUCCESS. On a shared
+  /// device that binds one person's subscription to another person's account,
+  /// and nothing visible goes wrong until someone notices they are paying for
+  /// somebody else's Platinum.
+  ///
+  /// Making the uid a required parameter means a caller cannot forget it —
+  /// the compiler asks. Aliasing first is cheap and idempotent.
+  ///
+  /// Pass an empty string ONLY for a deliberately anonymous restore (a signed
+  /// -out user recovering a purchase before signing in); the alias is then
+  /// skipped, exactly as [logIn] already handles.
+  Future<SubscriptionStatus> restore({required String firebaseUid}) async {
     if (!_configured) throw const PurchaseException(PurchaseFailure.unknown);
+    // Awaited, not fire-and-forget: the whole point is that the alias is in
+    // place BEFORE the receipts are attached.
+    await logIn(firebaseUid);
     try {
-      return SubscriptionStatus.fromCustomerInfo(await Purchases.restorePurchases());
+      return SubscriptionStatus.fromCustomerInfo(
+        await Purchases.restorePurchases(),
+      );
     } on PlatformException catch (e) {
       throw PurchaseException(_classify(e));
     } catch (e) {

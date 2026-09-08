@@ -9,6 +9,7 @@ import '../../core/locale/locale_controller.dart';
 import '../../core/motion/app_motion.dart';
 import '../../core/notifications/push_notification_service.dart';
 import '../../core/purchases/purchases_providers.dart';
+import '../../core/purchases/subscription_tier.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../core/theme/theme_controller.dart';
@@ -19,6 +20,8 @@ import '../auth/auth_error_messages.dart';
 import '../notifications/notifications_screen.dart';
 import '../panchang/panchang_location.dart';
 import '../panchang/panchang_location_screen.dart';
+import '../../core/purchases/purchases_service.dart';
+import '../premium/purchase_error_messages.dart';
 import '../premium/subscription_paywall_screen.dart';
 import '../reports/premium_reports_screen.dart';
 import '../startup/root_gate.dart';
@@ -161,6 +164,10 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
   /// Guards against a double-tap firing two concurrent account deletions —
   /// mirrors [_isSigningOut].
   bool _isDeleting = false;
+
+  /// Guards the Restore Purchases row against a double tap, same pattern as
+  /// [_isSigningOut] / [_isDeleting].
+  bool _isRestoring = false;
 
   Future<void> _confirmSignOut(AppLocalizations l10n, Locale locale) async {
     final confirmed = await showDialog<bool>(
@@ -362,6 +369,48 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
         text: l10n.profileInviteFriendsMessage(_playStoreListingUri.toString()),
       ),
     );
+  }
+
+  /// Restores purchases made on another device or before a reinstall.
+  ///
+  /// Falls through to the paywall ONLY when nothing was found — someone with
+  /// no prior purchase does want to see the plans, but someone whose
+  /// subscription was just restored emphatically does not.
+  Future<void> _restorePurchases() async {
+    if (_isRestoring) return;
+    setState(() => _isRestoring = true);
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      final status = await ref
+          .read(purchasesServiceProvider)
+          .restore(
+            // Aliases onto THIS user before Play's receipts are attached —
+            // see `PurchasesService.restore` for why passing this matters.
+            firebaseUid: ref.read(authStateProvider).valueOrNull?.uid ?? '',
+          );
+      if (!mounted) return;
+      if (status.hasPaidAccess) {
+        _showRestoreMessage(l10n.purchasesRestored);
+      } else {
+        _showRestoreMessage(l10n.purchasesNothingToRestore);
+        await Navigator.of(
+          context,
+        ).push(fadeThroughRoute(const SubscriptionPaywallScreen()));
+      }
+    } on PurchaseException catch (e) {
+      if (!mounted) return;
+      // The user closing the Play sheet is not a failure to report at them.
+      if (e.reason == PurchaseFailure.cancelled) return;
+      _showRestoreMessage(purchaseFailureMessage(l10n, e.reason));
+    } finally {
+      if (mounted) setState(() => _isRestoring = false);
+    }
+  }
+
+  void _showRestoreMessage(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _signOut() async {
@@ -782,9 +831,15 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                   title: l10n.profileRestorePurchases,
                   locale: locale,
                   isLast: true,
-                  onTap: () => Navigator.of(
-                    context,
-                  ).push(fadeThroughRoute(const SubscriptionPaywallScreen())),
+                  // ACTUALLY RESTORES as of 8 Sep 2026. This row used to just
+                  // push the paywall — so a user who had reinstalled and
+                  // tapped the control labelled "Restore Purchases" was shown
+                  // a page asking them to BUY, with no sign their existing
+                  // subscription had been found. Someone who has already paid
+                  // being shown a sales page is the wrong answer; they then
+                  // had to notice the small "Restore purchase" link in the
+                  // paywall's top bar and tap it a second time.
+                  onTap: _restorePurchases,
                 ),
               ],
             ),
@@ -835,14 +890,14 @@ class _SectionLabel extends StatelessWidget {
 /// birth summary from [BirthProfile], with the same defensive fallback
 /// `kundli_input_screen.dart` uses for the should-be-impossible "no saved
 /// profile" case.
-class _ProfileHeaderCard extends StatelessWidget {
+class _ProfileHeaderCard extends ConsumerWidget {
   const _ProfileHeaderCard({required this.profile, required this.locale});
 
   final BirthProfile? profile;
   final Locale locale;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final trimmedName = profile?.fullName.trim();
     final name = (trimmedName != null && trimmedName.isNotEmpty)
         ? trimmedName
@@ -858,7 +913,10 @@ class _ProfileHeaderCard extends StatelessWidget {
         gradient: AppColors.navyHeroGradient,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
         children: [
           Container(
             width: 56,
@@ -911,8 +969,136 @@ class _ProfileHeaderCard extends StatelessWidget {
             ),
           ),
         ],
+          ),
+          // PREMIUM STATUS (8 Sep 2026, client-requested).
+          //
+          // The design always had a 👑 badge here and it was deliberately
+          // NOT built: `projects/CLAUDE.md` recorded "no entitlement source —
+          // RevenueCat unwired, so it would lie about every account". That
+          // reason expired once `subscriptionStatusValueProvider` and the
+          // RevenueCat webhook landed, so the badge can now tell the truth.
+          //
+          // Three states, not two. `isKnown == false` means RevenueCat has
+          // not answered yet (the first frames after launch), and rendering
+          // "Upgrade" then would flash a sales pitch at someone who is
+          // already paying. Nothing is shown until the answer arrives.
+          _PremiumStatus(locale: locale, ref: ref),
+        ],
       ),
     );
+  }
+}
+
+/// Premium badge for a subscriber, upgrade CTA for everyone else.
+class _PremiumStatus extends StatelessWidget {
+  const _PremiumStatus({required this.locale, required this.ref});
+
+  final Locale locale;
+  final WidgetRef ref;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final status = ref.watch(subscriptionStatusValueProvider);
+
+    // See the call site: unknown means "not answered yet", which must not be
+    // rendered as "not subscribed".
+    if (!status.isKnown) return const SizedBox.shrink();
+
+    if (status.hasPaidAccess) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 14),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          decoration: BoxDecoration(
+            color: AppColors.gold.withValues(alpha: 0.16),
+            border: Border.all(color: AppColors.gold),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('👑', style: AppFonts.body(locale, fontSize: 12)),
+              const SizedBox(width: 6),
+              Text(
+                // Names the actual tier ("Gold"), not a generic "Premium" —
+                // someone paying for Platinum should see Platinum.
+                '${l10n.premiumMember} · ${_tierLabel(status)}',
+                style: AppFonts.body(
+                  locale,
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.gold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 14),
+      child: Semantics(
+        button: true,
+        child: PressableScale(
+          borderRadius: BorderRadius.circular(14),
+          onTap: () => Navigator.of(
+            context,
+          ).push(fadeThroughRoute(const SubscriptionPaywallScreen())),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              gradient: AppColors.saffronGradient,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(
+              children: [
+                Text('👑', style: AppFonts.body(locale, fontSize: 15)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.upgradeToPremium,
+                        style: AppFonts.body(
+                          locale,
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        l10n.premiumUnlockHint,
+                        style: AppFonts.body(
+                          locale,
+                          fontSize: 11,
+                          color: Colors.white.withValues(alpha: 0.85),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward,
+                  size: 16,
+                  color: Colors.white.withValues(alpha: 0.9),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// "Gold", "Platinum" … from the resolved tier. Left in Latin script in
+  /// every locale, matching how the paywall names its tiers.
+  static String _tierLabel(SubscriptionStatus status) {
+    final name = status.tier.name;
+    return name.isEmpty ? '' : name[0].toUpperCase() + name.substring(1);
   }
 }
 

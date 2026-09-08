@@ -1741,4 +1741,14 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get noSavedProfiles => 'ఇంకా ఇతర సేవ్ చేసిన ప్రొఫైల్‌లు లేవు';
+
+  @override
+  String get premiumMember => 'ప్రీమియం సభ్యులు';
+
+  @override
+  String get upgradeToPremium => 'ప్రీమియంకు అప్‌గ్రేడ్ చేయండి';
+
+  @override
+  String get premiumUnlockHint =>
+      'పూర్తి ఫలితాలు మరియు నివేదికలను అన్‌లాక్ చేయండి';
 }
