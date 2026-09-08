@@ -3121,6 +3121,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A new reading has been added to Wisdom for you.'**
   String get notifNewArticleBody;
+
+  /// Gun Milan profile picker (8 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a saved profile'**
+  String get chooseSavedProfile;
+
+  /// Gun Milan profile picker (8 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'Enter new details'**
+  String get enterNewDetails;
+
+  /// Gun Milan profile picker (8 Sep 2026).
+  ///
+  /// In en, this message translates to:
+  /// **'No other saved profiles yet'**
+  String get noSavedProfiles;
 }
 
 class _AppLocalizationsDelegate

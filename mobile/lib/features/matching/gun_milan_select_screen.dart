@@ -5,6 +5,7 @@ import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../l10n/app_localizations.dart';
+import '../../core/data/firestore_refs.dart';
 import '../profile/birth_profile.dart';
 import '../profile/birth_profile_repository.dart';
 import '../profile/birth_details_screen.dart';
@@ -46,7 +47,12 @@ class _GunMilanSelectScreenState extends ConsumerState<GunMilanSelectScreen> {
     // GunMilanStaticData's doc comment) — this screen must never flash a
     // loading state, so `valueOrNull` covers loading/error/null with the
     // same fallback (same pattern as the Kundli input screen).
-    final profile = ref.watch(birthProfileProvider).valueOrNull;
+    // The profile filling the account-holder's side. Defaults to their own
+    // primary profile; `ownMatchProfileProvider` overrides it when they pick
+    // a different saved profile via "Change" (8 Sep 2026).
+    final profile =
+        ref.watch(ownMatchProfileProvider) ??
+        ref.watch(birthProfileProvider).valueOrNull;
     final trimmedName = profile?.fullName.trim();
     final ownName = (trimmedName != null && trimmedName.isNotEmpty)
         ? trimmedName
@@ -264,7 +270,7 @@ class _RoleBadge extends StatelessWidget {
 /// RENAMED from `_GroomCard` 4 Sep 2026: it was never really "the groom
 /// card", it was "the user card" that happened to always say Groom. A woman
 /// running a match was labelled 🤵 Groom, which the client reported.
-class _OwnProfileCard extends StatelessWidget {
+class _OwnProfileCard extends ConsumerWidget {
   const _OwnProfileCard({
     required this.l10n,
     required this.locale,
@@ -280,7 +286,7 @@ class _OwnProfileCard extends StatelessWidget {
   final bool isBride;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
 
     return _ProfileCardShell(
@@ -351,18 +357,35 @@ class _OwnProfileCard extends StatelessWidget {
                 label: l10n.change,
                 child: PressableScale(
                   borderRadius: BorderRadius.circular(8),
-                  // Opens the account's own Birth Details for editing —
-                  // 21 Aug 2026. This was `onTap: () {}` on a control that
-                  // looks and reads exactly like a working button.
+                  // "Change" now means CHANGE — pick a different saved
+                  // profile (8 Sep 2026).
                   //
-                  // "Change" cannot yet mean "pick a different saved
-                  // profile" (multi-profile isn't built), but it CAN mean
-                  // "these details are wrong, correct them", which is what
-                  // a user tapping it almost always wants — and a wrong
-                  // birth time silently poisons the whole 36-guna score.
-                  onTap: () => Navigator.of(
-                    context,
-                  ).push(fadeThroughRoute(const BirthDetailsScreen())),
+                  // It used to push `BirthDetailsScreen`, the edit form for
+                  // the account's one profile. The comment here used to say
+                  // that picking a saved profile "isn't built"; it has been
+                  // since `savedBirthProfilesProvider` landed, and leaving
+                  // this pointing at a create/edit form made the button look
+                  // like it was making a new profile — exactly what the
+                  // client reported.
+                  //
+                  // Editing is still reachable through "Enter new details"
+                  // in the sheet, so the old behaviour is not lost.
+                  onTap: () async {
+                    final chosen = await showProfilePicker(
+                      context: context,
+                      ref: ref,
+                      l10n: l10n,
+                      locale: locale,
+                      title: l10n.chooseSavedProfile,
+                      onCreateNew: () => Navigator.of(context)
+                          .push<BirthProfile>(
+                            fadeThroughRoute(const BirthDetailsScreen()),
+                          ),
+                    );
+                    if (chosen != null) {
+                      ref.read(ownMatchProfileProvider.notifier).set(chosen);
+                    }
+                  },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 4,
@@ -440,12 +463,27 @@ class _PartnerCard extends ConsumerWidget {
         // Collects the partner's birth details (21 Aug 2026). Previously a
         // no-op, which is why the Result screen had nothing to match
         // against and fell back to a fabricated bride.
+        // Offers SAVED profiles first, falling back to the details form
+        // (8 Sep 2026). It used to open the form directly, so a user with
+        // profiles already saved had to retype details they had entered
+        // before.
         onTap: () async {
-          final entered = await Navigator.of(context).push<BirthProfile>(
-            fadeThroughRoute(PartnerDetailsScreen(initial: partner)),
+          final chosen = await showProfilePicker(
+            context: context,
+            ref: ref,
+            l10n: l10n,
+            locale: locale,
+            title: l10n.chooseSavedProfile,
+            // The account owner's own profile fills the other card, so
+            // offering it here would let someone match a chart against
+            // itself.
+            excludeId: primaryProfileId,
+            onCreateNew: () => Navigator.of(context).push<BirthProfile>(
+              fadeThroughRoute(PartnerDetailsScreen(initial: partner)),
+            ),
           );
-          if (entered != null) {
-            ref.read(partnerProfileProvider.notifier).set(entered);
+          if (chosen != null) {
+            ref.read(partnerProfileProvider.notifier).set(chosen);
           }
         },
         child: _ProfileCardShell(
@@ -650,6 +688,226 @@ class _MatchKundlisButton extends ConsumerWidget {
                 ),
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Lets the user pick one of their SAVED birth profiles, or enter a new one.
+///
+/// BUILT 8 Sep 2026, client-reported: *"if we saved profile we can allow
+/// select from there option also"* and *"when click groom its going create
+/// new profile that is wrong"*.
+///
+/// Both cards on this screen used to jump STRAIGHT into a details form:
+/// "Change" on the user's own card opened `BirthDetailsScreen`, and the
+/// partner card opened `PartnerDetailsScreen`. So a user with three saved
+/// profiles was still made to retype birth details they had already entered,
+/// and tapping "Change" looked like it was creating a new profile rather than
+/// switching to an existing one.
+///
+/// The stale comment those handlers carried — *"multi-profile isn't built"* —
+/// stopped being true when `savedBirthProfilesProvider` landed. This is the
+/// catch-up.
+///
+/// Returns the chosen [BirthProfile], or null if dismissed. `onCreateNew` is
+/// invoked instead when the user picks "Enter new details", so the caller
+/// keeps control of WHICH form to open — the two cards need different ones
+/// (own profile vs partner, and different default genders).
+Future<BirthProfile?> showProfilePicker({
+  required BuildContext context,
+  required WidgetRef ref,
+  required AppLocalizations l10n,
+  required Locale locale,
+  required String title,
+  String? excludeId,
+  required Future<BirthProfile?> Function() onCreateNew,
+}) async {
+  final saved = ref.read(savedBirthProfilesProvider).valueOrNull ?? const [];
+  // Exclude whichever profile already fills the OTHER side — matching a chart
+  // against itself is not a meaningful reading, and offering it invites the
+  // mistake.
+  final options = saved.where((e) => e.id != excludeId).toList();
+
+  if (!context.mounted) return null;
+  return showModalBottomSheet<BirthProfile>(
+    context: context,
+    backgroundColor: AppColors.surface,
+    showDragHandle: true,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+    ),
+    builder: (sheetContext) {
+      return SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: AppFonts.heading(
+                  locale,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.ink,
+                ),
+              ),
+              const SizedBox(height: 14),
+              if (options.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    l10n.noSavedProfiles,
+                    style: AppFonts.body(
+                      locale,
+                      fontSize: 13,
+                      color: AppColors.muted,
+                    ),
+                  ),
+                ),
+              for (final entry in options)
+                _PickerRow(
+                  entry: entry,
+                  locale: locale,
+                  onTap: () => Navigator.of(sheetContext).pop(entry.profile),
+                ),
+              const SizedBox(height: 6),
+              // Always offered, even when saved profiles exist — a partner
+              // who is not already a saved profile is the common case.
+              Semantics(
+                button: true,
+                child: PressableScale(
+                  borderRadius: BorderRadius.circular(14),
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    final created = await onCreateNew();
+                    if (created != null && context.mounted) {
+                      // The sheet is already gone, so the caller cannot get
+                      // this through the sheet's own pop value.
+                      _pendingCreated = created;
+                    }
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppColors.saffron),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Center(
+                      child: Text(
+                        l10n.enterNewDetails,
+                        style: AppFonts.body(
+                          locale,
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.saffron,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  ).then((picked) {
+    final created = _pendingCreated;
+    _pendingCreated = null;
+    return picked ?? created;
+  });
+}
+
+/// Holds a profile created through the picker's "Enter new details" path.
+///
+/// The sheet must close BEFORE the details form opens (a form pushed under a
+/// modal sheet is unreachable), so the created profile cannot travel back as
+/// the sheet's pop value. This hands it to the `.then` above instead.
+BirthProfile? _pendingCreated;
+
+class _PickerRow extends StatelessWidget {
+  const _PickerRow({
+    required this.entry,
+    required this.locale,
+    required this.onTap,
+  });
+
+  final SavedBirthProfile entry;
+  final Locale locale;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = entry.profile.fullName.trim();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: PressableScale(
+        borderRadius: BorderRadius.circular(14),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceAlt,
+            border: Border.all(color: AppColors.cardBorder),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.tileBlueBg,
+                ),
+                child: Text(
+                  name.isNotEmpty ? name[0].toUpperCase() : '?',
+                  style: AppFonts.heading(
+                    locale,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.tileBlueFg,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppFonts.body(
+                        locale,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.ink,
+                      ),
+                    ),
+                    Text(
+                      entry.profile.summaryLine,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppFonts.body(
+                        locale,
+                        fontSize: 11.5,
+                        color: AppColors.muted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),

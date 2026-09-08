@@ -1720,4 +1720,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notifNewArticleBody =>
       'A new reading has been added to Wisdom for you.';
+
+  @override
+  String get chooseSavedProfile => 'Choose a saved profile';
+
+  @override
+  String get enterNewDetails => 'Enter new details';
+
+  @override
+  String get noSavedProfiles => 'No other saved profiles yet';
 }

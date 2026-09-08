@@ -1716,4 +1716,13 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get notifNewArticleBody =>
       'आपके लिए ज्ञान में एक नया लेख जोड़ा गया है।';
+
+  @override
+  String get chooseSavedProfile => 'सहेजी गई प्रोफ़ाइल चुनें';
+
+  @override
+  String get enterNewDetails => 'नया विवरण दर्ज करें';
+
+  @override
+  String get noSavedProfiles => 'अभी कोई अन्य सहेजी गई प्रोफ़ाइल नहीं';
 }

@@ -42,3 +42,34 @@ class PartnerProfile extends Notifier<BirthProfile?> {
 final partnerProfileProvider = NotifierProvider<PartnerProfile, BirthProfile?>(
   PartnerProfile.new,
 );
+
+/// Which of the user's OWN saved profiles fills the account-holder side of a
+/// Gun Milan match, for the current session.
+///
+/// ADDED 8 Sep 2026, client-reported: *"when click groom its going create new
+/// profile that is wrong"*.
+///
+/// Until now this side was hardwired to `birthProfileProvider` — the account
+/// owner's `primary` profile — and the "Change" button opened
+/// `BirthDetailsScreen`, i.e. the EDIT form for that one profile. So a user
+/// who had saved several profiles could not run a match for any of them, and
+/// the button appeared to be creating a profile rather than switching.
+///
+/// `null` means "use the account owner's primary profile", which keeps the
+/// default behaviour unchanged for the common case and avoids duplicating
+/// that profile into this state.
+///
+/// NOT persisted, for the same reason as [PartnerProfile]: a match is an act,
+/// not a record. It also means the screen reopens on the user's own chart
+/// rather than silently remembering a relative's from last time.
+class OwnMatchProfile extends Notifier<BirthProfile?> {
+  @override
+  BirthProfile? build() => null;
+
+  void set(BirthProfile profile) => state = profile;
+
+  void clear() => state = null;
+}
+
+final ownMatchProfileProvider =
+    NotifierProvider<OwnMatchProfile, BirthProfile?>(OwnMatchProfile.new);

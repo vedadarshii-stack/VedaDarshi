@@ -1737,4 +1737,13 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get notifNewArticleBody =>
       'உங்களுக்கான ஞானத்தில் புதிய கட்டுரை சேர்க்கப்பட்டுள்ளது.';
+
+  @override
+  String get chooseSavedProfile => 'சேமித்த சுயவிவரத்தைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get enterNewDetails => 'புதிய விவரங்களை உள்ளிடவும்';
+
+  @override
+  String get noSavedProfiles => 'வேறு சேமித்த சுயவிவரங்கள் இல்லை';
 }

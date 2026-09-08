@@ -1732,4 +1732,13 @@ class AppLocalizationsTe extends AppLocalizations {
   @override
   String get notifNewArticleBody =>
       'మీ కోసం జ్ఞానంలో కొత్త వ్యాసం చేర్చబడింది.';
+
+  @override
+  String get chooseSavedProfile => 'సేవ్ చేసిన ప్రొఫైల్‌ను ఎంచుకోండి';
+
+  @override
+  String get enterNewDetails => 'కొత్త వివరాలను నమోదు చేయండి';
+
+  @override
+  String get noSavedProfiles => 'ఇంకా ఇతర సేవ్ చేసిన ప్రొఫైల్‌లు లేవు';
 }

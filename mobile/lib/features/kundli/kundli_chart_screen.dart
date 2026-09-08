@@ -176,7 +176,11 @@ class _KundliChartScreenState extends ConsumerState<KundliChartScreen> {
       backgroundColor: AppColors.cream,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(20, isCompact ? 32 : 56, 20, 24),
+          // Bottom padding raised 24 -> 40 (7 Sep 2026). The dosha banner is
+          // the last thing on this page and is a filled, full-width block, so
+          // 24px left it looking wedged against the bottom of the scroll area
+          // rather than deliberately placed.
+          padding: EdgeInsets.fromLTRB(20, isCompact ? 32 : 56, 20, 40),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -409,40 +413,49 @@ class _SectionTabs extends StatelessWidget {
     // HORIZONTALLY SCROLLABLE, pills at their natural width — changed
     // 21 Aug 2026.
     //
-    // Each pill used to be `Expanded`, so all four took an equal quarter of
-    // the row regardless of how long their labels are. "Chart" then sat in
-    // a pill with slack to spare while "Vimshottari Dasha" — more than
-    // three times as long — was clipped to "Vimshottari Da…", hiding which
-    // dasha system it is. Four labels of such unequal length simply do not
-    // fit a 360dp row at a legible size, so the row scrolls instead of
-    // truncating. `clipBehavior: none` keeps the selected pill's press
-    // scale from being clipped at the row edges.
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      clipBehavior: Clip.none,
-      child: Row(
-        children: [
+    // WRAPS, it does not scroll (fixed 7 Sep 2026, client-reported as a
+    // formatting issue).
+    //
+    // History: these were `Expanded`, so all four took an equal quarter of
+    // the row and "Vimshottari Dasha" truncated to "Vimshottari Da…". That
+    // was replaced with a horizontal scroll, which stopped the truncation
+    // but introduced two worse problems the client's screenshot showed:
+    //
+    //  1. The fourth pill was sliced mid-word at the viewport edge, which
+    //     reads as a broken layout rather than as "scroll for more".
+    //  2. **The hidden pill is the PREMIUM one.** A user who never thinks to
+    //     swipe a row that does not look scrollable never discovers
+    //     Predictions at all — so the tab we most want seen was the one
+    //     hidden. That is a discoverability bug wearing a styling bug's
+    //     clothes.
+    //
+    // `Wrap` puts every tab on screen at once. Four labels of this length
+    // simply do not fit one 360dp row at a legible size, so the honest
+    // options were "hide one" or "use two rows", and two rows loses nothing.
+    // It also self-corrects for the Indic locales, whose labels are longer
+    // again — no locale-specific tuning needed.
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
           _TabPill(
             label: l10n.tabChart,
             locale: locale,
             isSelected: selected == _KundliTab.chart,
             onTap: () => onSelect(_KundliTab.chart),
           ),
-          const SizedBox(width: 8),
           _TabPill(
             label: l10n.tabPlanetPositions,
             locale: locale,
             isSelected: selected == _KundliTab.planetPositions,
             onTap: () => onSelect(_KundliTab.planetPositions),
           ),
-          const SizedBox(width: 8),
           _TabPill(
             label: l10n.tabDasha,
             locale: locale,
             isSelected: selected == _KundliTab.dasha,
             onTap: () => onSelect(_KundliTab.dasha),
           ),
-          const SizedBox(width: 8),
           _TabPill(
             label: '${l10n.tabPredictions} 👑',
             locale: locale,
@@ -454,8 +467,7 @@ class _SectionTabs extends StatelessWidget {
             // `PremiumGlimpse`), so what is being sold is visible first.
             onTap: () => onSelect(_KundliTab.predictions),
           ),
-        ],
-      ),
+      ],
     );
   }
 }
@@ -1188,7 +1200,17 @@ class _DoshaOrSummaryBanner extends StatelessWidget {
     final verdict = doshas == null ? null : _DoshaVerdict.from(doshas, l10n);
 
     if (verdict != null) {
-      return _DoshaVerdictBanner(verdict: verdict, locale: locale);
+      // The SAME 16px top gap the summary fallback below has always had.
+      //
+      // It was missing here (fixed 7 Sep 2026, client-reported): the call
+      // site's comment says "the 16px gap above it is its own
+      // responsibility", but only the summary branch actually honoured that
+      // — so the real dosha banner, which is the branch users almost always
+      // get, sat flush against the Lagna/Rashi cards above it.
+      return Padding(
+        padding: const EdgeInsets.only(top: 16),
+        child: _DoshaVerdictBanner(verdict: verdict, locale: locale),
+      );
     }
     final overview = summaryOverview;
     if (overview != null) {

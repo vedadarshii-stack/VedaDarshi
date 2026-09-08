@@ -58,7 +58,14 @@ class _GunMilanResultScreenState extends ConsumerState<GunMilanResultScreen> {
 
     // Same fallback convention as the Select screen — see that screen's own
     // comment on why `valueOrNull` alone (no loading flash) is correct here.
-    final profile = ref.watch(birthProfileProvider).valueOrNull;
+    // MUST match what the Select screen showed (8 Sep 2026). Reading
+    // `birthProfileProvider` alone here would compute the match for the
+    // account owner even when the user explicitly chose a different saved
+    // profile on the previous screen — a silently wrong 36-guna score
+    // presented as a finished verdict.
+    final profile =
+        ref.watch(ownMatchProfileProvider) ??
+        ref.watch(birthProfileProvider).valueOrNull;
     final trimmedName = profile?.fullName.trim();
     final groomName = (trimmedName != null && trimmedName.isNotEmpty)
         ? trimmedName
@@ -879,19 +886,41 @@ class _GunaGrid extends StatelessWidget {
       if (rows.isNotEmpty) rows.add(const SizedBox(height: 8));
       final second = i + 1 < gunas.length ? gunas[i + 1] : null;
       rows.add(
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: _GunaCard(guna: gunas[i], l10n: l10n, locale: locale),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: second != null
-                  ? _GunaCard(guna: second, l10n: l10n, locale: locale)
-                  : const SizedBox.shrink(),
-            ),
-          ],
+        // IntrinsicHeight is REQUIRED here, not decoration (fixed 7 Sep 2026 —
+        // this crashed the whole screen to blank).
+        //
+        // `CrossAxisAlignment.stretch` on a Row means "make children fill the
+        // cross axis", and for a horizontal Row the cross axis is HEIGHT. This
+        // grid lives inside a scrolling ListView, where height is unbounded,
+        // so stretch resolved to `h=Infinity` and layout threw
+        // "BoxConstraints forces an infinite height". Flutter then failed
+        // every ancestor in turn, which is why the page rendered as an empty
+        // dark screen rather than showing an error box.
+        //
+        // IntrinsicHeight measures the taller of the two cards first and gives
+        // the Row that finite height, so `stretch` then means "match the
+        // taller sibling" — which is the actual intent: two cards side by side
+        // with equal heights and aligned borders.
+        //
+        // The cost is a second layout pass over two small cards, which is
+        // negligible here. Do NOT swap this for `CrossAxisAlignment.start` to
+        // avoid that — it compiles and stops the crash, but leaves the two
+        // cards at different heights with a visible step between them.
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: _GunaCard(guna: gunas[i], l10n: l10n, locale: locale),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: second != null
+                    ? _GunaCard(guna: second, l10n: l10n, locale: locale)
+                    : const SizedBox.shrink(),
+              ),
+            ],
+          ),
         ),
       );
     }

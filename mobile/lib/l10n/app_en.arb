@@ -2313,5 +2313,17 @@
   },
   "@notifNewArticleBody": {
     "description": "Notification body (new-article) — placeholder content."
+  },
+  "chooseSavedProfile": "Choose a saved profile",
+  "@chooseSavedProfile": {
+    "description": "Gun Milan profile picker (8 Sep 2026)."
+  },
+  "enterNewDetails": "Enter new details",
+  "@enterNewDetails": {
+    "description": "Gun Milan profile picker (8 Sep 2026)."
+  },
+  "noSavedProfiles": "No other saved profiles yet",
+  "@noSavedProfiles": {
+    "description": "Gun Milan profile picker (8 Sep 2026)."
   }
 }

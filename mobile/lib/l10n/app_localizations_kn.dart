@@ -1725,4 +1725,13 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get notifNewArticleBody => 'ನಿಮಗಾಗಿ ಜ್ಞಾನದಲ್ಲಿ ಹೊಸ ಲೇಖನ ಸೇರಿಸಲಾಗಿದೆ.';
+
+  @override
+  String get chooseSavedProfile => 'ಉಳಿಸಿದ ಪ್ರೊಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ';
+
+  @override
+  String get enterNewDetails => 'ಹೊಸ ವಿವರಗಳನ್ನು ನಮೂದಿಸಿ';
+
+  @override
+  String get noSavedProfiles => 'ಬೇರೆ ಉಳಿಸಿದ ಪ್ರೊಫೈಲ್‌ಗಳಿಲ್ಲ';
 }

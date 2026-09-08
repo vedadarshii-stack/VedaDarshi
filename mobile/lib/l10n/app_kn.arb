@@ -501,5 +501,8 @@
   "notifPremiumOfferTitle": "ಪ್ರೀಮಿಯಂ ಅನ್‌ಲಾಕ್ ಮಾಡಿ",
   "notifPremiumOfferBody": "ಯೋಜನೆಗಳು ಮತ್ತು ಪ್ರತಿಯೊಂದರಲ್ಲಿ ಏನಿದೆ ಎಂದು ನೋಡಿ.",
   "notifNewArticleTitle": "ಹೊಸ ಲೇಖನ ಪ್ರಕಟವಾಗಿದೆ",
-  "notifNewArticleBody": "ನಿಮಗಾಗಿ ಜ್ಞಾನದಲ್ಲಿ ಹೊಸ ಲೇಖನ ಸೇರಿಸಲಾಗಿದೆ."
+  "notifNewArticleBody": "ನಿಮಗಾಗಿ ಜ್ಞಾನದಲ್ಲಿ ಹೊಸ ಲೇಖನ ಸೇರಿಸಲಾಗಿದೆ.",
+  "chooseSavedProfile": "ಉಳಿಸಿದ ಪ್ರೊಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ",
+  "enterNewDetails": "ಹೊಸ ವಿವರಗಳನ್ನು ನಮೂದಿಸಿ",
+  "noSavedProfiles": "ಬೇರೆ ಉಳಿಸಿದ ಪ್ರೊಫೈಲ್‌ಗಳಿಲ್ಲ"
 }

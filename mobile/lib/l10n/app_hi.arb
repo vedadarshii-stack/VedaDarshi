@@ -501,5 +501,8 @@
   "notifPremiumOfferTitle": "प्रीमियम अनलॉक करें",
   "notifPremiumOfferBody": "योजनाएँ और उनमें शामिल सुविधाएँ देखें।",
   "notifNewArticleTitle": "नया लेख प्रकाशित",
-  "notifNewArticleBody": "आपके लिए ज्ञान में एक नया लेख जोड़ा गया है।"
+  "notifNewArticleBody": "आपके लिए ज्ञान में एक नया लेख जोड़ा गया है।",
+  "chooseSavedProfile": "सहेजी गई प्रोफ़ाइल चुनें",
+  "enterNewDetails": "नया विवरण दर्ज करें",
+  "noSavedProfiles": "अभी कोई अन्य सहेजी गई प्रोफ़ाइल नहीं"
 }

@@ -501,5 +501,8 @@
   "notifPremiumOfferTitle": "ప్రీమియం అన్‌లాక్ చేయండి",
   "notifPremiumOfferBody": "ప్లాన్‌లు మరియు ప్రతిదానిలో ఏమి ఉందో చూడండి.",
   "notifNewArticleTitle": "కొత్త వ్యాసం ప్రచురితమైంది",
-  "notifNewArticleBody": "మీ కోసం జ్ఞానంలో కొత్త వ్యాసం చేర్చబడింది."
+  "notifNewArticleBody": "మీ కోసం జ్ఞానంలో కొత్త వ్యాసం చేర్చబడింది.",
+  "chooseSavedProfile": "సేవ్ చేసిన ప్రొఫైల్‌ను ఎంచుకోండి",
+  "enterNewDetails": "కొత్త వివరాలను నమోదు చేయండి",
+  "noSavedProfiles": "ఇంకా ఇతర సేవ్ చేసిన ప్రొఫైల్‌లు లేవు"
 }
