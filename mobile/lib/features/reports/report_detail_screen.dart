@@ -126,9 +126,17 @@ class _Body extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        for (final section in content.sections)
+        for (final (index, section) in content.sections.indexed)
           if (section.lines.isNotEmpty)
-            _Section(section: section, l10n: l10n, locale: locale),
+            EntranceFadeSlide(
+              index: index,
+              child: _Section(
+                section: section,
+                report: report,
+                l10n: l10n,
+                locale: locale,
+              ),
+            ),
       ],
     );
 
@@ -147,76 +155,382 @@ class _Body extends StatelessWidget {
   }
 }
 
+/// One section of a report, laid out according to **what its lines actually
+/// are** rather than in one flat list.
+///
+/// REBUILT 8 Sep 2026 on client feedback that the report view "is not good".
+/// Every line used to render identically — a saffron label above muted body
+/// text, stacked 10px apart on the bare page. That collapsed three genuinely
+/// different kinds of content into one shape, and it fell apart as soon as
+/// the reports carried real production data: numerology alone returns 30
+/// strengths and 24 challenges, so the screen became ~70 identical
+/// paragraphs with no way to scan it.
+///
+/// Three layouts now, chosen by [ReportSectionKind]:
+///
+/// | Kind | Content it holds | Layout |
+/// |---|---|---|
+/// | overview | short labelled values ("Life path 8") | stat tiles |
+/// | strengths / challenges | bare short phrases ("Ambition") | chips |
+/// | everything else | labelled prose paragraphs | one card, hairline-split |
+///
+/// Each layout **falls back to prose** when its content does not fit the
+/// assumption — a long "overview" value or a chip-length that turns out to be
+/// a sentence renders as a paragraph instead of overflowing. The adapters in
+/// `report_content.dart` are shared across eight endpoints with quite
+/// different payloads, so the layout cannot assume the shape holds.
 class _Section extends StatelessWidget {
   const _Section({
     required this.section,
+    required this.report,
     required this.l10n,
     required this.locale,
   });
 
   final ReportSection section;
+  final AstrologyReport report;
   final AppLocalizations l10n;
   final Locale locale;
 
+  /// Longest value still rendered as a stat tile / chip. Beyond this the text
+  /// is a sentence, not a token, and belongs in a paragraph.
+  static const int _shortValue = 26;
+  static const int _shortChip = 42;
+
+  /// A short labelled value — "Career house: Virgo", "Life path: 8".
+  bool _isStatLine(ReportLine l) =>
+      section.kind == ReportSectionKind.overview &&
+      (l.label?.isNotEmpty ?? false) &&
+      l.text.length <= _shortValue;
+
+  /// A bare short phrase — "Ambition", "Workaholic".
+  bool _isChipLine(ReportLine l) =>
+      (section.kind == ReportSectionKind.strengths ||
+          section.kind == ReportSectionKind.challenges) &&
+      (l.label?.isEmpty ?? true) &&
+      l.text.length <= _shortChip;
+
   @override
   Widget build(BuildContext context) {
+    // ⚠️ Partitioned PER LINE, not all-or-nothing.
+    //
+    // The first version demoted an entire section to prose if any single line
+    // failed the test, which is how Career's overview ended up as three
+    // paragraphs: two of its lines are clean tile values (Virgo, Mercury) and
+    // the third happens to be a 53-character sentence. One sentence should
+    // not cost the other two their layout. Sade Sati's overview had the same
+    // shape ("Phase: No Sade Sati" behind a 66-character explanation).
+    //
+    // A section can therefore render as up to three stacked blocks. In
+    // practice it is one or two; the ordering below puts the scannable part
+    // first, which is the whole point of separating them.
+    final tiles = <ReportLine>[];
+    final chips = <ReportLine>[];
+    final prose = <ReportLine>[];
+    for (final line in section.lines) {
+      if (_isStatLine(line)) {
+        tiles.add(line);
+      } else if (_isChipLine(line)) {
+        chips.add(line);
+      } else {
+        prose.add(line);
+      }
+    }
+
+    // Strengths read as affirmations and challenges as cautions, so they take
+    // the palette's existing positive/ashubh pair rather than the report's
+    // own accent — the distinction is the point of the section.
+    final isStrength = section.kind == ReportSectionKind.strengths;
+
+    final blocks = <Widget>[
+      if (tiles.isNotEmpty)
+        _StatGrid(lines: tiles, report: report, locale: locale),
+      if (chips.isNotEmpty)
+        _ChipWrap(
+          lines: chips,
+          locale: locale,
+          background: isStrength ? AppColors.tileGreenBg : AppColors.ashubhBg,
+          foreground: isStrength ? AppColors.tileGreenFg : AppColors.ashubhFg,
+        ),
+      if (prose.isNotEmpty)
+        _ProseCard(lines: prose, report: report, locale: locale),
+    ];
+
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(bottom: 22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            reportSectionTitle(section.kind, l10n),
-            style: AppFonts.heading(
-              locale,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: AppColors.ink,
-            ),
+          _SectionHeader(
+            title: reportSectionTitle(section.kind, l10n),
+            count: section.lines.length,
+            locale: locale,
           ),
-          const SizedBox(height: 10),
-          for (final line in section.lines) _Line(line: line, locale: locale),
+          const SizedBox(height: 12),
+          for (var i = 0; i < blocks.length; i++) ...[
+            if (i > 0) const SizedBox(height: 12),
+            blocks[i],
+          ],
         ],
       ),
     );
   }
 }
 
-class _Line extends StatelessWidget {
-  const _Line({required this.line, required this.locale});
+/// Section title plus a count, so a long list announces its own length
+/// instead of the reader discovering it by scrolling.
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({
+    required this.title,
+    required this.count,
+    required this.locale,
+  });
+
+  final String title;
+  final int count;
+  final Locale locale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Flexible(
+          child: Text(
+            title,
+            style: AppFonts.heading(
+              locale,
+              fontSize: 17,
+              fontWeight: FontWeight.w600,
+              color: AppColors.ink,
+            ),
+          ),
+        ),
+        // Only worth showing once a section is long enough that its size is
+        // information. "1" next to a single paragraph is noise.
+        if (count > 2) ...[
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceAlt,
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: AppColors.cardBorder),
+            ),
+            child: Text(
+              '$count',
+              style: AppFonts.body(
+                locale,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: AppColors.muted,
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// Short labelled values as tiles — "Life path 8", "Lagna Sagittarius".
+///
+/// A [Wrap] rather than a fixed-column grid: Indic labels run 30–60% longer
+/// than English (a rule this codebase has paid for before), so a two-column
+/// grid that fits "Life path" clips "జీవన మార్గం". Tiles size to their own
+/// content and reflow.
+class _StatGrid extends StatelessWidget {
+  const _StatGrid({
+    required this.lines,
+    required this.report,
+    required this.locale,
+  });
+
+  final List<ReportLine> lines;
+  final AstrologyReport report;
+  final Locale locale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: [
+        for (final line in lines)
+          Container(
+            constraints: const BoxConstraints(minWidth: 96),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: report.tileBg,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  line.text,
+                  // Playfair for the value: these are the headline facts of
+                  // the report and the display face is what makes them read
+                  // as such rather than as another data row.
+                  style: AppFonts.heading(
+                    locale,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    color: report.tileFg,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  line.label ?? '',
+                  style: AppFonts.body(
+                    locale,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.muted,
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// Bare short phrases as chips. This is what turns numerology's 30 strengths
+/// from thirty stacked paragraphs into something scannable at a glance.
+class _ChipWrap extends StatelessWidget {
+  const _ChipWrap({
+    required this.lines,
+    required this.locale,
+    required this.background,
+    required this.foreground,
+  });
+
+  final List<ReportLine> lines;
+  final Locale locale;
+  final Color background;
+  final Color foreground;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (final line in lines)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+            decoration: BoxDecoration(
+              color: background,
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Text(
+              line.text,
+              style: AppFonts.body(
+                locale,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w500,
+                color: foreground,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// Labelled paragraphs in ONE card, split by hairlines.
+///
+/// One card per line was the obvious alternative and is worse: six cards of
+/// prose read as six unrelated things, where the section is one thing with
+/// six parts. The rules do the separating; the card does the grouping.
+class _ProseCard extends StatelessWidget {
+  const _ProseCard({
+    required this.lines,
+    required this.report,
+    required this.locale,
+  });
+
+  final List<ReportLine> lines;
+  final AstrologyReport report;
+  final Locale locale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        border: Border.all(color: AppColors.cardBorder),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (var i = 0; i < lines.length; i++) ...[
+            if (i > 0)
+              Divider(height: 1, thickness: 1, color: AppColors.cardBorder),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 14,
+              ),
+              child: _ProseLine(
+                line: lines[i],
+                report: report,
+                locale: locale,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ProseLine extends StatelessWidget {
+  const _ProseLine({
+    required this.line,
+    required this.report,
+    required this.locale,
+  });
 
   final ReportLine line;
+  final AstrologyReport report;
   final Locale locale;
 
   @override
   Widget build(BuildContext context) {
     final label = line.label;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (label != null && label.isNotEmpty)
-            Text(
-              label,
-              style: AppFonts.body(
-                locale,
-                fontSize: 12.5,
-                fontWeight: FontWeight.w600,
-                color: AppColors.saffron,
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (label != null && label.isNotEmpty) ...[
+          Text(
+            label,
+            style: AppFonts.body(
+              locale,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: report.tileFg,
             ),
-          if (line.text.isNotEmpty)
-            Text(
-              line.text,
-              style: AppFonts.body(
-                locale,
-                fontSize: 13,
-                color: AppColors.muted,
-              ),
-            ),
+          ),
+          const SizedBox(height: 5),
         ],
-      ),
+        if (line.text.isNotEmpty)
+          Text(
+            line.text,
+            style: AppFonts.body(
+              locale,
+              fontSize: 13.5,
+              // 1.5 line height: these are multi-sentence readings, and the
+              // default leading makes a paragraph of them a solid block.
+              height: 1.5,
+              color: AppColors.ink,
+            ),
+          ),
+      ],
     );
   }
 }

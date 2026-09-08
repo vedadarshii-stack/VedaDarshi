@@ -1609,6 +1609,15 @@ class AppLocalizationsHi extends AppLocalizations {
   String get lblPersonality => 'व्यक्तित्व';
 
   @override
+  String get lblBirthdayNumber => 'जन्मदिन';
+
+  @override
+  String get lblMaturity => 'परिपक्वता';
+
+  @override
+  String get lblLifeLesson => 'जीवन शिक्षा';
+
+  @override
   String lblHouseN(int n) {
     return 'भाव $n';
   }

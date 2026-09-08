@@ -1628,6 +1628,15 @@ class AppLocalizationsTa extends AppLocalizations {
   String get lblPersonality => 'ஆளுமை';
 
   @override
+  String get lblBirthdayNumber => 'பிறந்தநாள்';
+
+  @override
+  String get lblMaturity => 'முதிர்ச்சி';
+
+  @override
+  String get lblLifeLesson => 'வாழ்க்கைப் பாடம்';
+
+  @override
   String lblHouseN(int n) {
     return 'பாவம் $n';
   }

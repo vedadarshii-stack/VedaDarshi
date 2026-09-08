@@ -317,7 +317,115 @@ ReportContent _gemstone(Map<String, dynamic> json, AppLocalizations l10n) {
 }
 
 /// `POST /v2/astrology/numerology/complete-report`.
+///
+/// ⚠️ **REWRITTEN 8 Sep 2026 — this adapter had been reading a shape the live
+/// API never returns.** It looked for top-level `lifePath` / `destinyNumber` /
+/// `soulNumber` / `personalityNumber` and an `interpretations` map. In
+/// production every one of those is **null**: the six numbers are nested under
+/// **`coreNumbers`**, and each one carries its own description, keywords,
+/// strengths and challenges rather than living in a parallel map.
+///
+/// The result was an adapter that produced an entirely EMPTY [ReportContent]
+/// from a perfectly good HTTP 200, which the screen rendered as
+/// `reportEmptyMessage` — indistinguishable from "this report does not exist"
+/// and easily mistaken for the API never being called at all. Numerology was
+/// the ONLY one of the eight affected; the other seven were re-verified
+/// against live production payloads in the same pass.
+///
+/// The legacy branch is kept: it costs a few lines and lets an
+/// already-cached sandbox-shaped payload still render rather than going blank.
+///
+/// **Lesson: an adapter verified against the sandbox is not verified.** The
+/// sandbox served a different JSON shape for this endpoint, so the original
+/// verification pass was measuring the wrong thing.
 ReportContent _numerology(Map<String, dynamic> json, AppLocalizations l10n) {
+  final core = _asMap(json['coreNumbers']);
+  return core == null
+      ? _numerologyLegacy(json, l10n)
+      : _numerologyCoreNumbers(core, l10n);
+}
+
+/// The live production shape: `coreNumbers.{lifePath,destiny,soulUrge,…}`.
+ReportContent _numerologyCoreNumbers(
+  Map<String, dynamic> core,
+  AppLocalizations l10n,
+) {
+  // Ordered most-significant first rather than alphabetically — a reader
+  // looks for their life path number, not their maturity number, and the
+  // premium glimpse cuts the list off partway.
+  final ordered = <(String, String)>[
+    ('lifePath', l10n.lblLifePath),
+    ('destiny', l10n.lblDestiny),
+    ('soulUrge', l10n.lblSoulUrge),
+    ('personality', l10n.lblPersonality),
+    ('birthday', l10n.lblBirthdayNumber),
+    ('maturity', l10n.lblMaturity),
+  ];
+
+  final overview = <ReportLine>[];
+
+  // ⚠️ DE-DUPLICATION IS REQUIRED HERE, not a nicety.
+  //
+  // Numerology derives six numbers from one person, and two of them
+  // frequently land on the SAME digit — this chart returns soulUrge 6 and
+  // personality 6. Vedika keys its text off the digit, so both entries carry
+  // a byte-identical description, life lesson, strengths list and challenges
+  // list. Rendered naively that repeats whole paragraphs and chips verbatim
+  // on screen, which reads as a bug rather than as two numbers agreeing.
+  //
+  // Prose keeps ONE copy and merges the labels ("Soul urge · Personality"),
+  // which is both shorter and more informative than either repeating it or
+  // silently dropping the second number. Chips collapse case-insensitively.
+  final byText = <String, List<String>>{};
+  final lessonByText = <String, List<String>>{};
+  final strengths = <String, ReportLine>{};
+  final challenges = <String, ReportLine>{};
+
+  for (final (key, label) in ordered) {
+    final entry = _asMap(core[key]);
+    if (entry == null) continue;
+
+    if (parseInt(entry['number']) case final value?) {
+      overview.add(ReportLine('$value', label: label));
+    }
+    // The description is the actual reading for that number, so it is
+    // labelled with the number's name — otherwise six paragraphs arrive with
+    // no indication of which is which.
+    if (parseFreeText(entry['description']) case final value?) {
+      (byText[value] ??= <String>[]).add(label);
+    }
+    if (parseFreeText(entry['lifeLesson']) case final value?) {
+      (lessonByText[value] ??= <String>[]).add(label);
+    }
+    for (final item in parseStrings(entry['strengths'])) {
+      strengths.putIfAbsent(item.toLowerCase(), () => ReportLine(item));
+    }
+    for (final item in parseStrings(entry['challenges'])) {
+      challenges.putIfAbsent(item.toLowerCase(), () => ReportLine(item));
+    }
+  }
+
+  List<ReportLine> merged(Map<String, List<String>> source) => [
+    for (final entry in source.entries)
+      ReportLine(entry.key, label: entry.value.join(' · ')),
+  ];
+
+  return ReportContent(
+    sections: [
+      ReportSection(ReportSectionKind.overview, overview),
+      ReportSection(ReportSectionKind.highlights, merged(byText)),
+      ReportSection(ReportSectionKind.guidance, merged(lessonByText)),
+      ReportSection(ReportSectionKind.strengths, strengths.values.toList()),
+      ReportSection(ReportSectionKind.challenges, challenges.values.toList()),
+    ],
+  );
+}
+
+/// The older flat shape, kept so a cached sandbox-era payload still renders.
+ReportContent _numerologyLegacy(
+  Map<String, dynamic> json,
+  AppLocalizations l10n,
+) {
   final interpretations = _asMap(json['interpretations']) ?? const {};
   ReportLine? number(String key, String label) {
     final value = parseInt(json[key]);

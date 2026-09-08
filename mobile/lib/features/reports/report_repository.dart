@@ -53,7 +53,14 @@ class ReportRepository {
   /// the previous language's labels after a language switch — while the
   /// payload itself is locale-independent (Vedika answers in English no
   /// matter what is asked of it). Building is cheap; the billed call is not.
-  final Map<String, Map<String, dynamic>> _cache = {};
+  /// ⚠️ Keyed on a RECORD, not on an interpolated string. `'$reportId|$request'`
+  /// looked reasonable and was silently broken: [KundliRequest] has no
+  /// `toString`, so every request stringified to the same
+  /// `Instance of 'KundliRequest'` and all birth profiles collapsed onto ONE
+  /// entry per report — serving the first profile's report to everyone after
+  /// it. A record compares structurally through [KundliRequest]'s own
+  /// `==`/`hashCode`, so profiles stay distinct by construction.
+  final Map<(String, KundliRequest), Map<String, dynamic>> _cache = {};
 
   Future<Map<String, dynamic>> fetch({
     required String reportId,
@@ -62,7 +69,7 @@ class ReportRepository {
     final path = endpoints[reportId];
     if (path == null) return const {};
 
-    final key = '$reportId|$request';
+    final key = (reportId, request);
     if (_cache[key] case final cached?) return cached;
 
     final data = await _client.post(
@@ -72,10 +79,32 @@ class ReportRepository {
         'latitude': request.latitude,
         'longitude': request.longitude,
         'timezone': request.tzOffset,
+        // NUMEROLOGY ONLY — and it is REQUIRED there, not optional:
+        // `/v2/astrology/numerology/complete-report` answers
+        // `400 INVALID_BIRTH_DETAILS: name (or fullName) is required` without
+        // it, which is why this report failed for every user until 8 Sep 2026
+        // while the other seven returned 200 on the identical body.
+        //
+        // Sent ONLY for this report, never for all eight. The Cloud Functions
+        // proxy hashes the request BODY into its cache key, so adding a name
+        // everywhere would fragment the year-long chart-report cache per
+        // person — turning shared HITs into billed MISSes for data that does
+        // not depend on the name at all.
+        if (reportId == 'numerology') 'name': ?_trimmedName(request.name),
       },
     );
     _cache[key] = data;
     return data;
+  }
+
+  /// The name with surrounding whitespace removed, or null if nothing is
+  /// left. Vedika rejects `""` and `"   "` with the SAME
+  /// `name (or fullName) is required` 400 as a missing field (both probed
+  /// live), so a blank name must be treated as absent rather than sent and
+  /// hoped for.
+  static String? _trimmedName(String? value) {
+    final trimmed = value?.trim();
+    return (trimmed == null || trimmed.isEmpty) ? null : trimmed;
   }
 
   /// LOCAL wall-clock with no zone suffix — the convention every Vedika POST

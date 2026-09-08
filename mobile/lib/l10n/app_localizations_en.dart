@@ -1613,6 +1613,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lblPersonality => 'Personality';
 
   @override
+  String get lblBirthdayNumber => 'Birthday';
+
+  @override
+  String get lblMaturity => 'Maturity';
+
+  @override
+  String get lblLifeLesson => 'Life lesson';
+
+  @override
   String lblHouseN(int n) {
     return 'House $n';
   }

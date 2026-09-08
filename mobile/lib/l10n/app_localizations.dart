@@ -2948,6 +2948,24 @@ abstract class AppLocalizations {
   /// **'Personality'**
   String get lblPersonality;
 
+  /// Numerology core-number label. Production nests these under `coreNumbers`; added 8 Sep 2026 when the adapter was rewritten for that shape.
+  ///
+  /// In en, this message translates to:
+  /// **'Birthday'**
+  String get lblBirthdayNumber;
+
+  /// Numerology core-number label. Production nests these under `coreNumbers`; added 8 Sep 2026 when the adapter was rewritten for that shape.
+  ///
+  /// In en, this message translates to:
+  /// **'Maturity'**
+  String get lblMaturity;
+
+  /// Numerology core-number label. Production nests these under `coreNumbers`; added 8 Sep 2026 when the adapter was rewritten for that shape.
+  ///
+  /// In en, this message translates to:
+  /// **'Life lesson'**
+  String get lblLifeLesson;
+
   /// Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale.
   ///
   /// In en, this message translates to:

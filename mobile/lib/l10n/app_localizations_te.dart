@@ -1625,6 +1625,15 @@ class AppLocalizationsTe extends AppLocalizations {
   String get lblPersonality => 'వ్యక్తిత్వం';
 
   @override
+  String get lblBirthdayNumber => 'పుట్టినరోజు';
+
+  @override
+  String get lblMaturity => 'పరిపక్వత';
+
+  @override
+  String get lblLifeLesson => 'జీవిత పాఠం';
+
+  @override
   String lblHouseN(int n) {
     return 'భావం $n';
   }

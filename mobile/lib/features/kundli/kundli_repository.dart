@@ -19,6 +19,7 @@ class KundliRequest {
     required this.latitude,
     required this.longitude,
     required this.tzOffset,
+    this.name,
   });
 
   /// LOCAL wall-clock birth moment, no timezone suffix — Vedika interprets
@@ -30,6 +31,23 @@ class KundliRequest {
 
   /// UTC offset formatted the way Vedika expects it, e.g. `"+05:30"`.
   final String tzOffset;
+
+  /// The person's full name — carried for the ONE endpoint that needs it.
+  ///
+  /// A natal chart is a pure function of the four fields above; the name has
+  /// no bearing on any of them. It rides along because **numerology** is the
+  /// exception: `POST /v2/astrology/numerology/complete-report` computes
+  /// destiny and name numbers from the LETTERS of the name and rejects the
+  /// request outright without one —
+  /// `400 INVALID_BIRTH_DETAILS: name (or fullName) is required`. That was
+  /// the whole cause of the Numerology report failing for every user on
+  /// every device (found 8 Sep 2026, live-probed; the other seven reports
+  /// return 200 with exactly the same body).
+  ///
+  /// Optional because the four internal [KundliRepository] call sites build
+  /// requests from raw birth values and have no name to give — see the note
+  /// on [operator ==].
+  final String? name;
 
   /// Builds the request Vedika needs from a saved [BirthProfile], reusing
   /// the same `package:timezone`-backed offset resolution the Birth
@@ -54,20 +72,34 @@ class KundliRequest {
       latitude: profile.city.latitude,
       longitude: profile.city.longitude,
       tzOffset: _formatTzOffset(offsetMinutes),
+      name: profile.fullName,
     );
   }
 
+  /// [name] IS part of identity, deliberately.
+  ///
+  /// It plays no part in the chart, so including it costs a duplicate fetch
+  /// in the one case where two profiles share a birth moment AND a city but
+  /// differ by name. Excluding it would be far worse: [ReportRequest] keys a
+  /// Riverpod family on this object, so two same-birth profiles would COLLIDE
+  /// and one person would be shown the other's numerology — computed from a
+  /// name that is not theirs.
+  ///
+  /// The four raw call sites inside [KundliRepository] pass no name, so they
+  /// all key on `null` consistently among themselves and are unaffected.
   @override
   bool operator ==(Object other) {
     return other is KundliRequest &&
         other.datetime == datetime &&
         other.latitude == latitude &&
         other.longitude == longitude &&
-        other.tzOffset == tzOffset;
+        other.tzOffset == tzOffset &&
+        other.name == name;
   }
 
   @override
-  int get hashCode => Object.hash(datetime, latitude, longitude, tzOffset);
+  int get hashCode =>
+      Object.hash(datetime, latitude, longitude, tzOffset, name);
 }
 
 /// `330` minutes → `"+05:30"`, `-240` → `"-04:00"`.

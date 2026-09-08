@@ -1619,6 +1619,15 @@ class AppLocalizationsKn extends AppLocalizations {
   String get lblPersonality => 'ವ್ಯಕ್ತಿತ್ವ';
 
   @override
+  String get lblBirthdayNumber => 'ಹುಟ್ಟುಹಬ್ಬ';
+
+  @override
+  String get lblMaturity => 'ಪ್ರಬುದ್ಧತೆ';
+
+  @override
+  String get lblLifeLesson => 'ಜೀವನ ಪಾಠ';
+
+  @override
   String lblHouseN(int n) {
     return 'ಭಾವ $n';
   }

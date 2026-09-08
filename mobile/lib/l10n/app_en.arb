@@ -2175,6 +2175,18 @@
   "@lblPersonality": {
     "description": "Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale."
   },
+  "lblBirthdayNumber": "Birthday",
+  "@lblBirthdayNumber": {
+    "description": "Numerology core-number label. Production nests these under `coreNumbers`; added 8 Sep 2026 when the adapter was rewritten for that shape."
+  },
+  "lblMaturity": "Maturity",
+  "@lblMaturity": {
+    "description": "Numerology core-number label. Production nests these under `coreNumbers`; added 8 Sep 2026 when the adapter was rewritten for that shape."
+  },
+  "lblLifeLesson": "Life lesson",
+  "@lblLifeLesson": {
+    "description": "Numerology core-number label. Production nests these under `coreNumbers`; added 8 Sep 2026 when the adapter was rewritten for that shape."
+  },
   "lblHouseN": "House {n}",
   "@lblHouseN": {
     "description": "Astrology field label. Moved into l10n 2 Sep 2026 — these were hardcoded English inside report/kundli adapters and stayed English in every locale.",
