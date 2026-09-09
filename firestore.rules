@@ -264,11 +264,23 @@ service cloud.firestore {
         allow write: if false;
       }
 
+      // Purchased Daily Reading windows: /users/{uid}/dailyReadings/{txId}
+      // ADDED 9 Sep 2026 with functions/src/dailyReading.ts. Each document is
+      // a 24-hour access window, written ONLY by the RevenueCat webhook.
+      // Client-writable would mean minting free readings, each one a real
+      // billed Vedika call. Same carve-out mechanism and same OR-semantics
+      // caveat as aiUsage / aiChats / aiPacks above.
+      match /dailyReadings/{transactionId} {
+        allow read: if isOwner(userId);
+        allow write: if false;
+      }
+
       match /{subcollection}/{docId} {
         allow read, write: if isOwner(userId)
                            && subcollection != 'aiUsage'
                            && subcollection != 'aiChats'
-                           && subcollection != 'aiPacks';
+                           && subcollection != 'aiPacks'
+                           && subcollection != 'dailyReadings';
       }
     }
 

@@ -1798,4 +1798,44 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get aiPackTopUp => 'ప్రశ్నలు టాప్-అప్ చేయండి';
+
+  @override
+  String get dailyReadingTitle => 'వ్యక్తిగత దైనిక పఠనం';
+
+  @override
+  String get dailyReadingDesc =>
+      'మీ స్వంత జాతకం నుండి నేటి ఫలితం — రాశి మాత్రమే కాదు';
+
+  @override
+  String get dailyReadingBuy => 'నేటి పఠనాన్ని అన్‌లాక్ చేయండి';
+
+  @override
+  String dailyReadingActiveUntil(String time) {
+    return '$time వరకు అందుబాటులో';
+  }
+
+  @override
+  String get dailyReadingLocked =>
+      'మీ జన్మ జాతకం ఆధారంగా లెక్కించిన నేటి వ్యక్తిగత పఠనం.';
+
+  @override
+  String get dailyReadingUnavailable => 'ఇది ప్రస్తుతం అందుబాటులో లేదు.';
+
+  @override
+  String get dailyReadingLucky => 'నేడు అదృష్టం';
+
+  @override
+  String get dailyReadingRemedies => 'పరిహారాలు';
+
+  @override
+  String get dailyReadingAreaCareer => 'వృత్తి';
+
+  @override
+  String get dailyReadingAreaFinance => 'ఆర్థికం';
+
+  @override
+  String get dailyReadingAreaHealth => 'ఆరోగ్యం';
+
+  @override
+  String get dailyReadingAreaRelationship => 'సంబంధాలు';
 }

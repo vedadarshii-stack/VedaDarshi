@@ -206,14 +206,42 @@ class PurchasesService {
   /// [CustomerInfo] grants no entitlement — the credit arrives when the
   /// RevenueCat webhook reconciles the purchase server-side. The UI must
   /// therefore confirm from the SERVER balance, never from this return value.
-  Future<void> purchaseAiPack(AiPack pack) async {
+  Future<void> purchaseAiPack(AiPack pack) =>
+      purchaseConsumable(pack.package);
+
+  /// The single Personalized Daily Reading product, from the
+  /// **`daily_reading`** offering — the third offering the app had never
+  /// fetched (after `ai_packs`, wired the same day). `null` when RevenueCat
+  /// is unconfigured or the product is not Active in Play.
+  Future<Package?> fetchDailyReadingPackage() async {
+    if (!_configured) return null;
+    try {
+      final offerings = await Purchases.getOfferings();
+      final packages = offerings.all['daily_reading']?.availablePackages;
+      if (packages == null || packages.isEmpty) return null;
+      return packages.first;
+    } catch (e) {
+      debugPrint('PurchasesService: daily_reading offering failed ($e)');
+      return null;
+    }
+  }
+
+  /// Buys any one-time (consumable) product.
+  ///
+  /// Deliberately separate from [purchase]: a consumable must NOT carry
+  /// `StoreProductChangeInfo` (that is subscription upgrade/downgrade
+  /// machinery, and Play rejects it here), and the returned [CustomerInfo]
+  /// grants no entitlement — the credit or access window is granted by the
+  /// RevenueCat webhook server-side. Callers must therefore confirm from the
+  /// SERVER ledger, never from this call returning without throwing.
+  Future<void> purchaseConsumable(Package package) async {
     if (!_configured) throw const PurchaseException(PurchaseFailure.unknown);
     try {
-      await Purchases.purchase(PurchaseParams.package(pack.package));
+      await Purchases.purchase(PurchaseParams.package(package));
     } on PlatformException catch (e) {
       throw PurchaseException(_classify(e));
     } catch (e) {
-      debugPrint('PurchasesService: pack purchase failed ($e)');
+      debugPrint('PurchasesService: consumable purchase failed ($e)');
       throw const PurchaseException(PurchaseFailure.unknown);
     }
   }

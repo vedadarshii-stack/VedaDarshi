@@ -1791,4 +1791,44 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get aiPackTopUp => 'ಪ್ರಶ್ನೆಗಳನ್ನು ಟಾಪ್-ಅಪ್ ಮಾಡಿ';
+
+  @override
+  String get dailyReadingTitle => 'ವೈಯಕ್ತಿಕ ದೈನಂದಿನ ಫಲ';
+
+  @override
+  String get dailyReadingDesc =>
+      'ನಿಮ್ಮ ಸ್ವಂತ ಜಾತಕದಿಂದ ಇಂದಿನ ಫಲ — ರಾಶಿ ಮಾತ್ರವಲ್ಲ';
+
+  @override
+  String get dailyReadingBuy => 'ಇಂದಿನ ಫಲವನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಿ';
+
+  @override
+  String dailyReadingActiveUntil(String time) {
+    return '$time ವರೆಗೆ ಲಭ್ಯ';
+  }
+
+  @override
+  String get dailyReadingLocked =>
+      'ನಿಮ್ಮ ಜನ್ಮ ಜಾತಕದಿಂದ ಲೆಕ್ಕಹಾಕಿದ ಇಂದಿನ ವೈಯಕ್ತಿಕ ಫಲ.';
+
+  @override
+  String get dailyReadingUnavailable => 'ಇದು ಸದ್ಯಕ್ಕೆ ಲಭ್ಯವಿಲ್ಲ.';
+
+  @override
+  String get dailyReadingLucky => 'ಇಂದು ಅದೃಷ್ಟ';
+
+  @override
+  String get dailyReadingRemedies => 'ಪರಿಹಾರಗಳು';
+
+  @override
+  String get dailyReadingAreaCareer => 'ವೃತ್ತಿ';
+
+  @override
+  String get dailyReadingAreaFinance => 'ಹಣಕಾಸು';
+
+  @override
+  String get dailyReadingAreaHealth => 'ಆರೋಗ್ಯ';
+
+  @override
+  String get dailyReadingAreaRelationship => 'ಸಂಬಂಧಗಳು';
 }

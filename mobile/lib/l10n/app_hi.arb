@@ -520,5 +520,17 @@
   "aiPacksUnavailable": "पैक अभी उपलब्ध नहीं हैं।",
   "aiPackPurchased": "खरीद पूरी हुई — आपके प्रश्न कुछ ही क्षणों में दिखेंगे।",
   "aiPackBalance": "{count} पैक प्रश्न शेष",
-  "aiPackTopUp": "प्रश्न टॉप-अप करें"
+  "aiPackTopUp": "प्रश्न टॉप-अप करें",
+  "dailyReadingTitle": "व्यक्तिगत दैनिक रीडिंग",
+  "dailyReadingDesc": "आज का फल आपकी अपनी कुंडली से — केवल राशि से नहीं",
+  "dailyReadingBuy": "आज की रीडिंग खोलें",
+  "dailyReadingActiveUntil": "{time} तक उपलब्ध",
+  "dailyReadingLocked": "आपकी जन्म कुंडली से गणना की गई आज की व्यक्तिगत रीडिंग।",
+  "dailyReadingUnavailable": "यह अभी उपलब्ध नहीं है।",
+  "dailyReadingLucky": "आज शुभ",
+  "dailyReadingRemedies": "उपाय",
+  "dailyReadingAreaCareer": "करियर",
+  "dailyReadingAreaFinance": "धन",
+  "dailyReadingAreaHealth": "स्वास्थ्य",
+  "dailyReadingAreaRelationship": "रिश्ते"
 }

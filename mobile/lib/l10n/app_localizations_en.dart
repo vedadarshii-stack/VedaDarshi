@@ -1785,4 +1785,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiPackTopUp => 'Top up questions';
+
+  @override
+  String get dailyReadingTitle => 'Personalized Daily Reading';
+
+  @override
+  String get dailyReadingDesc =>
+      'Today read from your own chart — not your sun sign';
+
+  @override
+  String get dailyReadingBuy => 'Unlock today\'s reading';
+
+  @override
+  String dailyReadingActiveUntil(String time) {
+    return 'Unlocked until $time';
+  }
+
+  @override
+  String get dailyReadingLocked =>
+      'Your personal reading for today, computed from your birth chart.';
+
+  @override
+  String get dailyReadingUnavailable => 'This isn\'t available right now.';
+
+  @override
+  String get dailyReadingLucky => 'Lucky today';
+
+  @override
+  String get dailyReadingRemedies => 'Remedies';
+
+  @override
+  String get dailyReadingAreaCareer => 'Career';
+
+  @override
+  String get dailyReadingAreaFinance => 'Finance';
+
+  @override
+  String get dailyReadingAreaHealth => 'Health';
+
+  @override
+  String get dailyReadingAreaRelationship => 'Relationships';
 }

@@ -1804,4 +1804,44 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get aiPackTopUp => 'கேள்விகளை நிரப்பு';
+
+  @override
+  String get dailyReadingTitle => 'தனிப்பட்ட தினசரி பலன்';
+
+  @override
+  String get dailyReadingDesc =>
+      'உங்கள் சொந்த ஜாதகத்திலிருந்து இன்றைய பலன் — ராசி மட்டுமல்ல';
+
+  @override
+  String get dailyReadingBuy => 'இன்றைய பலனைத் திறக்கவும்';
+
+  @override
+  String dailyReadingActiveUntil(String time) {
+    return '$time வரை கிடைக்கும்';
+  }
+
+  @override
+  String get dailyReadingLocked =>
+      'உங்கள் ஜாதகத்தில் இருந்து கணக்கிடப்பட்ட இன்றைய தனிப்பட்ட பலன்.';
+
+  @override
+  String get dailyReadingUnavailable => 'இது தற்போது கிடைக்கவில்லை.';
+
+  @override
+  String get dailyReadingLucky => 'இன்று அதிர்ஷ்டம்';
+
+  @override
+  String get dailyReadingRemedies => 'பரிகாரங்கள்';
+
+  @override
+  String get dailyReadingAreaCareer => 'தொழில்';
+
+  @override
+  String get dailyReadingAreaFinance => 'நிதி';
+
+  @override
+  String get dailyReadingAreaHealth => 'உடல்நலம்';
+
+  @override
+  String get dailyReadingAreaRelationship => 'உறவுகள்';
 }

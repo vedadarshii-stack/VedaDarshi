@@ -1781,4 +1781,44 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get aiPackTopUp => 'प्रश्न टॉप-अप करें';
+
+  @override
+  String get dailyReadingTitle => 'व्यक्तिगत दैनिक रीडिंग';
+
+  @override
+  String get dailyReadingDesc =>
+      'आज का फल आपकी अपनी कुंडली से — केवल राशि से नहीं';
+
+  @override
+  String get dailyReadingBuy => 'आज की रीडिंग खोलें';
+
+  @override
+  String dailyReadingActiveUntil(String time) {
+    return '$time तक उपलब्ध';
+  }
+
+  @override
+  String get dailyReadingLocked =>
+      'आपकी जन्म कुंडली से गणना की गई आज की व्यक्तिगत रीडिंग।';
+
+  @override
+  String get dailyReadingUnavailable => 'यह अभी उपलब्ध नहीं है।';
+
+  @override
+  String get dailyReadingLucky => 'आज शुभ';
+
+  @override
+  String get dailyReadingRemedies => 'उपाय';
+
+  @override
+  String get dailyReadingAreaCareer => 'करियर';
+
+  @override
+  String get dailyReadingAreaFinance => 'धन';
+
+  @override
+  String get dailyReadingAreaHealth => 'स्वास्थ्य';
+
+  @override
+  String get dailyReadingAreaRelationship => 'रिश्ते';
 }

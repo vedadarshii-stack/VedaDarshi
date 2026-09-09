@@ -7,6 +7,8 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../l10n/app_localizations.dart';
 import '../premium/subscription_paywall_screen.dart';
+import 'daily_reading_repository.dart';
+import 'daily_reading_screen.dart';
 import 'report_detail_screen.dart';
 import 'report_labels.dart';
 import 'reports_static_data.dart';
@@ -67,6 +69,13 @@ class _PremiumReportsScreenState extends ConsumerState<PremiumReportsScreen> {
               _GoPremiumBanner(l10n: l10n, locale: locale),
               const SizedBox(height: 14),
             ],
+            // Personalized Daily Reading — a SEPARATE one-time purchase, not
+            // part of the subscription. The Access Control Matrix marks it
+            // "Paid" for every tier including Platinum, so it is deliberately
+            // shown to subscribers too and must never be folded into the
+            // tier check above.
+            _DailyReadingCard(l10n: l10n, locale: locale),
+            const SizedBox(height: 14),
             Column(
               children: [
                 for (var i = 0; i < reports.length; i++) ...[
@@ -517,6 +526,88 @@ class _Footer extends StatelessWidget {
           child: Icon(Icons.download_rounded, size: 12, color: AppColors.hint),
         ),
       ],
+    );
+  }
+}
+
+
+/// Entry point for the Personalized Daily Reading. Figma has no frame for
+/// this — it was a product that existed only in Play until 9 Sep 2026.
+class _DailyReadingCard extends ConsumerWidget {
+  const _DailyReadingCard({required this.l10n, required this.locale});
+
+  final AppLocalizations l10n;
+  final Locale locale;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unlocked = ref.watch(dailyReadingAccessProvider).valueOrNull ?? false;
+    return Semantics(
+      button: true,
+      child: PressableScale(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => Navigator.of(
+          context,
+        ).push(fadeThroughRoute(const DailyReadingScreen())),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: unlocked ? AppColors.gold : AppColors.cardBorder,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.mantraBg,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text('🌅', style: AppFonts.body(locale, fontSize: 19)),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      l10n.dailyReadingTitle,
+                      style: AppFonts.body(
+                        locale,
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.ink,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      l10n.dailyReadingDesc,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppFonts.body(
+                        locale,
+                        fontSize: 11.5,
+                        color: AppColors.muted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                unlocked ? Icons.lock_open : Icons.chevron_right,
+                size: 18,
+                color: unlocked ? AppColors.gold : AppColors.muted,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

@@ -520,5 +520,17 @@
   "aiPacksUnavailable": "தொகுப்புகள் தற்போது கிடைக்கவில்லை.",
   "aiPackPurchased": "வாங்குதல் முடிந்தது — உங்கள் கேள்விகள் சற்று நேரத்தில் தோன்றும்.",
   "aiPackBalance": "{count} தொகுப்பு கேள்விகள் மீதம்",
-  "aiPackTopUp": "கேள்விகளை நிரப்பு"
+  "aiPackTopUp": "கேள்விகளை நிரப்பு",
+  "dailyReadingTitle": "தனிப்பட்ட தினசரி பலன்",
+  "dailyReadingDesc": "உங்கள் சொந்த ஜாதகத்திலிருந்து இன்றைய பலன் — ராசி மட்டுமல்ல",
+  "dailyReadingBuy": "இன்றைய பலனைத் திறக்கவும்",
+  "dailyReadingActiveUntil": "{time} வரை கிடைக்கும்",
+  "dailyReadingLocked": "உங்கள் ஜாதகத்தில் இருந்து கணக்கிடப்பட்ட இன்றைய தனிப்பட்ட பலன்.",
+  "dailyReadingUnavailable": "இது தற்போது கிடைக்கவில்லை.",
+  "dailyReadingLucky": "இன்று அதிர்ஷ்டம்",
+  "dailyReadingRemedies": "பரிகாரங்கள்",
+  "dailyReadingAreaCareer": "தொழில்",
+  "dailyReadingAreaFinance": "நிதி",
+  "dailyReadingAreaHealth": "உடல்நலம்",
+  "dailyReadingAreaRelationship": "உறவுகள்"
 }

@@ -1,6 +1,7 @@
 import { onRequest } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { AI_PACKS, grantPack } from "./aiPacks";
+import { DAILY_READING_SKU, grantDailyReading } from "./dailyReading";
 import {
   REVENUECAT_PROJECT_ID,
   REVENUECAT_SECRET_API_KEY,
@@ -123,14 +124,14 @@ export const revenueCatWebhook = onRequest(
       // a failure to grant a pack must not roll back a subscription tier
       // the user is already entitled to. It throws into the same catch, so
       // RevenueCat still retries and the next attempt repairs it.
-      const packsGranted = await reconcileAiPacks(appUserId);
+      const consumablesGranted = await reconcileConsumables(appUserId);
 
       console.log("revenueCatWebhook: synced", {
         uid: appUserId,
         eventType,
         environment,
         tier: entitlement.tier,
-        packsGranted,
+        consumablesGranted,
       });
       res.status(200).json({ ok: true });
     } catch (e) {
@@ -157,7 +158,7 @@ export const revenueCatWebhook = onRequest(
  * Idempotency lives in `grantPack`, keyed on the store transaction id, so
  * reconciling repeatedly cannot double-grant.
  */
-async function reconcileAiPacks(appUserId: string): Promise<number> {
+async function reconcileConsumables(appUserId: string): Promise<number> {
   const key = REVENUECAT_SECRET_API_KEY.value();
   const url =
     `https://api.revenuecat.com/v2/projects/${REVENUECAT_PROJECT_ID}` +
@@ -186,21 +187,30 @@ async function reconcileAiPacks(appUserId: string): Promise<number> {
   let granted = 0;
   for (const item of body.items ?? []) {
     const sku = item.product_id;
-    if (!sku || !(sku in AI_PACKS)) continue;
-    // A refunded or charged-back purchase must not hand out questions.
+    if (!sku) continue;
+    // A refunded or charged-back purchase must not hand out anything.
     if (item.revenue_status === "refunded") continue;
 
     const transactionId = item.store_purchase_identifier ?? item.id;
     if (!transactionId) continue;
 
-    const didGrant = await grantPack({
-      uid: appUserId,
-      sku,
-      transactionId,
-      purchasedAtMs:
-        typeof item.purchased_at === "number" ? item.purchased_at : Date.now(),
-    });
-    if (didGrant) granted += 1;
+    const purchasedAtMs =
+      typeof item.purchased_at === "number" ? item.purchased_at : Date.now();
+
+    // Two different consumables share this loop because they share the same
+    // source list and the same idempotency key. They are granted by
+    // DIFFERENT ledgers though: a pack is a credit count, a daily reading is
+    // a 24-hour window — see `dailyReading.ts` for why that distinction is
+    // deliberate rather than a missing abstraction.
+    if (sku in AI_PACKS) {
+      if (await grantPack({ uid: appUserId, sku, transactionId, purchasedAtMs })) {
+        granted += 1;
+      }
+    } else if (sku === DAILY_READING_SKU) {
+      if (await grantDailyReading({ uid: appUserId, transactionId, purchasedAtMs })) {
+        granted += 1;
+      }
+    }
   }
   return granted;
 }

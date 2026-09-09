@@ -125,3 +125,9 @@ final aiPackBalanceProvider = StreamProvider<int>((ref) {
       })
       .handleError((_) => 0);
 });
+
+/// The Personalized Daily Reading product, or `null` when unavailable.
+final dailyReadingPackageProvider = FutureProvider((ref) async {
+  ref.watch(subscriptionStatusProvider);
+  return ref.watch(purchasesServiceProvider).fetchDailyReadingPackage();
+});

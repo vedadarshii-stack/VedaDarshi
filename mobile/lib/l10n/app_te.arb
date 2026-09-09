@@ -520,5 +520,17 @@
   "aiPacksUnavailable": "ప్యాక్‌లు ప్రస్తుతం అందుబాటులో లేవు.",
   "aiPackPurchased": "కొనుగోలు పూర్తయింది — మీ ప్రశ్నలు కొద్దిసేపట్లో కనిపిస్తాయి.",
   "aiPackBalance": "{count} ప్యాక్ ప్రశ్నలు మిగిలాయి",
-  "aiPackTopUp": "ప్రశ్నలు టాప్-అప్ చేయండి"
+  "aiPackTopUp": "ప్రశ్నలు టాప్-అప్ చేయండి",
+  "dailyReadingTitle": "వ్యక్తిగత దైనిక పఠనం",
+  "dailyReadingDesc": "మీ స్వంత జాతకం నుండి నేటి ఫలితం — రాశి మాత్రమే కాదు",
+  "dailyReadingBuy": "నేటి పఠనాన్ని అన్‌లాక్ చేయండి",
+  "dailyReadingActiveUntil": "{time} వరకు అందుబాటులో",
+  "dailyReadingLocked": "మీ జన్మ జాతకం ఆధారంగా లెక్కించిన నేటి వ్యక్తిగత పఠనం.",
+  "dailyReadingUnavailable": "ఇది ప్రస్తుతం అందుబాటులో లేదు.",
+  "dailyReadingLucky": "నేడు అదృష్టం",
+  "dailyReadingRemedies": "పరిహారాలు",
+  "dailyReadingAreaCareer": "వృత్తి",
+  "dailyReadingAreaFinance": "ఆర్థికం",
+  "dailyReadingAreaHealth": "ఆరోగ్యం",
+  "dailyReadingAreaRelationship": "సంబంధాలు"
 }

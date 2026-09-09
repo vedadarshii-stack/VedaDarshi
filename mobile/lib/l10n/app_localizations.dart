@@ -3235,6 +3235,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Top up questions'**
   String get aiPackTopUp;
+
+  /// Personalized Daily Reading. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Personalized Daily Reading'**
+  String get dailyReadingTitle;
+
+  /// Personalized Daily Reading. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Today read from your own chart — not your sun sign'**
+  String get dailyReadingDesc;
+
+  /// Personalized Daily Reading. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock today\'s reading'**
+  String get dailyReadingBuy;
+
+  /// Personalized Daily Reading. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlocked until {time}'**
+  String dailyReadingActiveUntil(String time);
+
+  /// Personalized Daily Reading. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Your personal reading for today, computed from your birth chart.'**
+  String get dailyReadingLocked;
+
+  /// Personalized Daily Reading. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'This isn\'t available right now.'**
+  String get dailyReadingUnavailable;
+
+  /// Personalized Daily Reading. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Lucky today'**
+  String get dailyReadingLucky;
+
+  /// Personalized Daily Reading. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Remedies'**
+  String get dailyReadingRemedies;
+
+  /// Personalized Daily Reading. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Career'**
+  String get dailyReadingAreaCareer;
+
+  /// Personalized Daily Reading. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Finance'**
+  String get dailyReadingAreaFinance;
+
+  /// Personalized Daily Reading. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Health'**
+  String get dailyReadingAreaHealth;
+
+  /// Personalized Daily Reading. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Relationships'**
+  String get dailyReadingAreaRelationship;
 }
 
 class _AppLocalizationsDelegate
