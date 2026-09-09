@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
+import 'ai_pack_catalogue.dart';
 import 'subscription_catalogue.dart';
 import 'subscription_tier.dart';
 
@@ -176,6 +177,44 @@ class PurchasesService {
     } catch (e) {
       debugPrint('PurchasesService: getOfferings failed ($e)');
       return const SubscriptionCatalogue.empty();
+    }
+  }
+
+  /// The AI question packs, from the **`ai_packs`** offering.
+  ///
+  /// ⚠️ Fetched BY LOOKUP KEY, not from `offerings.current`. `current` is the
+  /// `default` (subscription) offering, which is why the six pack products
+  /// were unreachable from the app until 9 Sep 2026 despite existing in Play
+  /// and RevenueCat since 16 Aug. The same applies to `reports` and
+  /// `daily_reading` — both still unfetched, both still unbuilt features.
+  Future<AiPackCatalogue> fetchAiPacks() async {
+    if (!_configured) return const AiPackCatalogue.empty();
+    try {
+      final offerings = await Purchases.getOfferings();
+      return AiPackCatalogue.fromOffering(offerings.all['ai_packs']);
+    } catch (e) {
+      debugPrint('PurchasesService: ai_packs offering failed ($e)');
+      return const AiPackCatalogue.empty();
+    }
+  }
+
+  /// Buys a consumable AI pack.
+  ///
+  /// Deliberately separate from [purchase]: a pack is a one-time product, so
+  /// it must NOT carry `StoreProductChangeInfo` (that is subscription
+  /// upgrade/downgrade machinery and Play rejects it here), and the returned
+  /// [CustomerInfo] grants no entitlement — the credit arrives when the
+  /// RevenueCat webhook reconciles the purchase server-side. The UI must
+  /// therefore confirm from the SERVER balance, never from this return value.
+  Future<void> purchaseAiPack(AiPack pack) async {
+    if (!_configured) throw const PurchaseException(PurchaseFailure.unknown);
+    try {
+      await Purchases.purchase(PurchaseParams.package(pack.package));
+    } on PlatformException catch (e) {
+      throw PurchaseException(_classify(e));
+    } catch (e) {
+      debugPrint('PurchasesService: pack purchase failed ($e)');
+      throw const PurchaseException(PurchaseFailure.unknown);
     }
   }
 

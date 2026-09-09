@@ -511,5 +511,14 @@
   "noSavedProfiles": "வேறு சேமித்த சுயவிவரங்கள் இல்லை",
   "premiumMember": "பிரீமியம் உறுப்பினர்",
   "upgradeToPremium": "பிரீமியத்திற்கு மேம்படுத்தவும்",
-  "premiumUnlockHint": "முழு பலன்கள் மற்றும் அறிக்கைகளைத் திறக்கவும்"
+  "premiumUnlockHint": "முழு பலன்கள் மற்றும் அறிக்கைகளைத் திறக்கவும்",
+  "aiPacksTitle": "AI கேள்வி தொகுப்புகள்",
+  "aiPacksSubtitle": "இன்றைய கேள்விகள் தீர்ந்ததும் நிரப்பிக்கொள்ளுங்கள்",
+  "aiPackQuestions": "{count} கேள்விகள்",
+  "aiPackValidity": "{days} நாட்கள் செல்லுபடியாகும்",
+  "aiPackBestValue": "சிறந்த மதிப்பு",
+  "aiPacksUnavailable": "தொகுப்புகள் தற்போது கிடைக்கவில்லை.",
+  "aiPackPurchased": "வாங்குதல் முடிந்தது — உங்கள் கேள்விகள் சற்று நேரத்தில் தோன்றும்.",
+  "aiPackBalance": "{count} தொகுப்பு கேள்விகள் மீதம்",
+  "aiPackTopUp": "கேள்விகளை நிரப்பு"
 }

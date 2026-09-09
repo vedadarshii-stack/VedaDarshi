@@ -244,10 +244,31 @@ service cloud.firestore {
       // the same ownership rule instead of being open by omission —
       // EXCEPT 'aiUsage' and 'aiChats', carved out above for the reasons
       // explained there.
+      // Purchased AI packs: /users/{uid}/aiPacks/{transactionId}
+      // ADDED 9 Sep 2026 with functions/src/aiPacks.ts. Each document is a
+      // one-time purchase worth N AI questions until it expires, written
+      // ONLY by the RevenueCat webhook via the Admin SDK.
+      //
+      // ⚠️ Client-writable would be strictly worse than the aiUsage hole:
+      // there a user could zero what they had SPENT, here they could mint
+      // credit that was never bought — `{remaining: 999999}` is unlimited
+      // AI questions, every one a real billed Vedika call against the
+      // account owner's wallet.
+      //
+      // Same carve-out mechanism as aiUsage/aiChats, and for the same
+      // reason: Firestore rules are a logical OR across matching blocks, so
+      // `allow write: if false` here is worthless unless the wildcard below
+      // ALSO excludes 'aiPacks'.
+      match /aiPacks/{transactionId} {
+        allow read: if isOwner(userId);
+        allow write: if false;
+      }
+
       match /{subcollection}/{docId} {
         allow read, write: if isOwner(userId)
                            && subcollection != 'aiUsage'
-                           && subcollection != 'aiChats';
+                           && subcollection != 'aiChats'
+                           && subcollection != 'aiPacks';
       }
     }
 

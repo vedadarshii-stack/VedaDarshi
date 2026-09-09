@@ -1764,4 +1764,38 @@ class AppLocalizationsTe extends AppLocalizations {
   @override
   String get premiumUnlockHint =>
       'పూర్తి ఫలితాలు మరియు నివేదికలను అన్‌లాక్ చేయండి';
+
+  @override
+  String get aiPacksTitle => 'AI ప్రశ్న ప్యాక్‌లు';
+
+  @override
+  String get aiPacksSubtitle => 'నేటి ప్రశ్నలు అయిపోయాక టాప్-అప్ చేయండి';
+
+  @override
+  String aiPackQuestions(String count) {
+    return '$count ప్రశ్నలు';
+  }
+
+  @override
+  String aiPackValidity(String days) {
+    return '$days రోజులు చెల్లుబాటు';
+  }
+
+  @override
+  String get aiPackBestValue => 'ఉత్తమ విలువ';
+
+  @override
+  String get aiPacksUnavailable => 'ప్యాక్‌లు ప్రస్తుతం అందుబాటులో లేవు.';
+
+  @override
+  String get aiPackPurchased =>
+      'కొనుగోలు పూర్తయింది — మీ ప్రశ్నలు కొద్దిసేపట్లో కనిపిస్తాయి.';
+
+  @override
+  String aiPackBalance(String count) {
+    return '$count ప్యాక్ ప్రశ్నలు మిగిలాయి';
+  }
+
+  @override
+  String get aiPackTopUp => 'ప్రశ్నలు టాప్-అప్ చేయండి';
 }

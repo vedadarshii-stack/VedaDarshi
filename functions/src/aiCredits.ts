@@ -34,6 +34,25 @@ import { VEDIKA_API_KEY, VEDIKA_BASE_URL, vedikaHeaders, todayKeyIST } from "./c
  * released. See `resolveBirthDetails` and `callVedikaAi` below.
  */
 
+import {
+  reserveFromPack,
+  commitPack,
+  releasePack,
+  packBalance,
+} from "./aiPacks";
+
+/**
+ * Which bucket a reserved question came from.
+ *
+ * ADDED 9 Sep 2026 with AI packs. The reserve → commit/release pattern has
+ * to know WHICH bucket it took from, or a failed call would refund the
+ * wrong one — releasing a daily credit while a paid pack question stays
+ * spent is the expensive direction to get this wrong.
+ */
+type CreditSource =
+  | { kind: "daily" }
+  | { kind: "pack"; packId: string };
+
 interface AiUsageDoc {
   limit: number;
   used: number;
@@ -114,11 +133,14 @@ async function resolveDailyLimit(uid: string): Promise<number> {
  * — is visible as a stuck `pending` count rather than silently vanishing,
  * and can be swept by an operator/cron later if that is ever observed.
  */
-async function reserveCredit(uid: string, dateKey: string): Promise<void> {
+async function reserveCredit(
+  uid: string,
+  dateKey: string
+): Promise<CreditSource> {
   const limit = await resolveDailyLimit(uid);
   const docRef = usageDocRef(uid, dateKey);
 
-  await admin.firestore().runTransaction(async (tx) => {
+  const gotDaily = await admin.firestore().runTransaction(async (tx) => {
     const snap = await tx.get(docRef);
     const data = snap.data() as Partial<AiUsageDoc> | undefined;
     const used = data?.used ?? 0;
@@ -128,19 +150,31 @@ async function reserveCredit(uid: string, dateKey: string): Promise<void> {
     // concurrent reservations can never both observe "room available" —
     // Firestore aborts and retries whichever one loses the race, and the
     // retry re-reads the other's already-incremented `pending`.
-    if (used + pending >= limit) {
-      throw new HttpsError(
-        "resource-exhausted",
-        `Daily AI credit limit (${limit}) reached.`
-      );
-    }
+    if (used + pending >= limit) return false;
 
     tx.set(
       docRef,
       { limit, used, pending: pending + 1, updatedAtMs: Date.now() },
       { merge: true }
     );
+    return true;
   });
+
+  if (gotDaily) return { kind: "daily" };
+
+  // ---- Fall through to purchased packs -------------------------------
+  // Order is the pricing spec's (§9) and it is deliberate: the DAILY
+  // allowance is spent first because it is free and resets tomorrow, so
+  // spending a paid question while a free one is still available would be
+  // taking money for nothing. Only once today's allowance is gone do we
+  // touch what the user actually bought.
+  const packId = await reserveFromPack(uid);
+  if (packId) return { kind: "pack", packId };
+
+  throw new HttpsError(
+    "resource-exhausted",
+    `Daily AI credit limit (${limit}) reached.`
+  );
 }
 
 /**
@@ -150,10 +184,24 @@ async function reserveCredit(uid: string, dateKey: string): Promise<void> {
  */
 async function commitCredit(
   uid: string,
-  dateKey: string
-): Promise<{ used: number; limit: number }> {
+  dateKey: string,
+  source: CreditSource
+): Promise<{ used: number; limit: number; packBalance: number }> {
+  // A pack question never touches the daily ledger: the daily allowance was
+  // already exhausted when we fell through to the pack, so incrementing
+  // `used` past `limit` here would make tomorrow's counter read wrong.
+  if (source.kind === "pack") {
+    await commitPack(uid, source.packId);
+    const snap = await usageDocRef(uid, dateKey).get();
+    const data = (snap.data() ?? {}) as Partial<AiUsageDoc>;
+    return {
+      used: data.used ?? 0,
+      limit: data.limit ?? DEFAULT_FREE_DAILY_AI_LIMIT,
+      packBalance: await packBalance(uid),
+    };
+  }
   const docRef = usageDocRef(uid, dateKey);
-  return admin.firestore().runTransaction(async (tx) => {
+  const daily = await admin.firestore().runTransaction(async (tx) => {
     const snap = await tx.get(docRef);
     const data = (snap.data() ?? {}) as Partial<AiUsageDoc>;
     const pending = Math.max(0, (data.pending ?? 0) - 1);
@@ -162,6 +210,7 @@ async function commitCredit(
     tx.set(docRef, { pending, used, updatedAtMs: Date.now() }, { merge: true });
     return { used, limit };
   });
+  return { ...daily, packBalance: await packBalance(uid) };
 }
 
 /**
@@ -169,7 +218,18 @@ async function commitCredit(
  * point of the pattern: a failed or timed-out call must leave the user's
  * balance exactly where it was before they tapped Send.
  */
-async function releaseCredit(uid: string, dateKey: string): Promise<void> {
+async function releaseCredit(
+  uid: string,
+  dateKey: string,
+  source: CreditSource
+): Promise<void> {
+  // Refund the bucket we actually took from. Releasing the daily ledger for
+  // a question reserved against a PAID pack would leave the user short a
+  // question they bought — the failure mode worth being careful about.
+  if (source.kind === "pack") {
+    await releasePack(uid, source.packId);
+    return;
+  }
   const docRef = usageDocRef(uid, dateKey);
   await admin.firestore().runTransaction(async (tx) => {
     const snap = await tx.get(docRef);
@@ -576,7 +636,7 @@ export const askAiAstrologer = onCall(
     // Throws resource-exhausted (and touches nothing else) if the daily
     // limit is already used up — no reservation is made in that case, so
     // there is nothing to release.
-    await reserveCredit(uid, dateKey);
+    const creditSource = await reserveCredit(uid, dateKey);
 
     // ---- 2. CALL, then 3. COMMIT-OR-RELEASE ----------------------------
     // Wrapped so that ANY failure between the reserve above and the
@@ -588,7 +648,8 @@ export const askAiAstrologer = onCall(
     try {
       const result = await callVedikaAi({ question, birthDetails, language, conversationId });
 
-      const { used, limit } = await commitCredit(uid, dateKey);
+      const { used, limit, packBalance: packsLeft } =
+        await commitCredit(uid, dateKey, creditSource);
 
       // ---- 4. PERSIST CHAT LOG (best-effort) ----------------------------
       // Vedika's own conversation storage expires 24h after the last
@@ -620,9 +681,13 @@ export const askAiAstrologer = onCall(
         conversationId: result.conversationId,
         used,
         limit,
+        // Questions left across live packs, so the chat header can show a
+        // top-up balance without a second round trip. 0 for the vast
+        // majority of users, who have never bought a pack.
+        packBalance: packsLeft,
       };
     } catch (e) {
-      await releaseCredit(uid, dateKey).catch((releaseErr) => {
+      await releaseCredit(uid, dateKey, creditSource).catch((releaseErr) => {
         // If even the release fails, the user is left with a reserved
         // slot they didn't get to use and no automatic recovery — log it
         // LOUDLY rather than let it disappear into a normal error log,

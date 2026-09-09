@@ -1,5 +1,6 @@
 import { onRequest } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import { AI_PACKS, grantPack } from "./aiPacks";
 import {
   REVENUECAT_PROJECT_ID,
   REVENUECAT_SECRET_API_KEY,
@@ -118,11 +119,18 @@ export const revenueCatWebhook = onRequest(
           },
           { merge: true }
         );
+      // Packs are reconciled AFTER the entitlement write, and separately:
+      // a failure to grant a pack must not roll back a subscription tier
+      // the user is already entitled to. It throws into the same catch, so
+      // RevenueCat still retries and the next attempt repairs it.
+      const packsGranted = await reconcileAiPacks(appUserId);
+
       console.log("revenueCatWebhook: synced", {
         uid: appUserId,
         eventType,
         environment,
         tier: entitlement.tier,
+        packsGranted,
       });
       res.status(200).json({ ok: true });
     } catch (e) {
@@ -135,6 +143,68 @@ export const revenueCatWebhook = onRequest(
 );
 
 /** Tier ranks, mirroring `subscription_tier.dart`. */
+/**
+ * Reconciles one-time AI pack purchases, ADDED 9 Sep 2026.
+ *
+ * ⚠️ Deliberately a RECONCILE, not a "handle the NON_RENEWING_PURCHASE
+ * event". It re-reads the customer's whole purchase list from RevenueCat and
+ * grants anything not already granted, on EVERY event type. That follows the
+ * same principle as `fetchEntitlement` — never trust the event body — and it
+ * buys real robustness: a webhook that RevenueCat dropped, or that we 500'd
+ * on and it stopped retrying, is repaired by the next event of any kind
+ * rather than leaving a user who paid with nothing.
+ *
+ * Idempotency lives in `grantPack`, keyed on the store transaction id, so
+ * reconciling repeatedly cannot double-grant.
+ */
+async function reconcileAiPacks(appUserId: string): Promise<number> {
+  const key = REVENUECAT_SECRET_API_KEY.value();
+  const url =
+    `https://api.revenuecat.com/v2/projects/${REVENUECAT_PROJECT_ID}` +
+    `/customers/${encodeURIComponent(appUserId)}/purchases`;
+
+  const response = await fetch(url, {
+    headers: { Authorization: `Bearer ${key}`, Accept: "application/json" },
+  });
+  if (response.status === 404) return 0;
+  if (!response.ok) {
+    throw new Error(
+      `RevenueCat purchases ${response.status}: ${await response.text()}`
+    );
+  }
+
+  const body = (await response.json()) as {
+    items?: Array<{
+      id?: string;
+      store_purchase_identifier?: string;
+      purchased_at?: number;
+      product_id?: string;
+      revenue_status?: string;
+    }>;
+  };
+
+  let granted = 0;
+  for (const item of body.items ?? []) {
+    const sku = item.product_id;
+    if (!sku || !(sku in AI_PACKS)) continue;
+    // A refunded or charged-back purchase must not hand out questions.
+    if (item.revenue_status === "refunded") continue;
+
+    const transactionId = item.store_purchase_identifier ?? item.id;
+    if (!transactionId) continue;
+
+    const didGrant = await grantPack({
+      uid: appUserId,
+      sku,
+      transactionId,
+      purchasedAtMs:
+        typeof item.purchased_at === "number" ? item.purchased_at : Date.now(),
+    });
+    if (didGrant) granted += 1;
+  }
+  return granted;
+}
+
 const TIER_BY_ENTITLEMENT: Record<string, number> = {
   vedadarshi_bronze: 1,
   vedadarshi_silver: 2,

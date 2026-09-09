@@ -1769,4 +1769,39 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get premiumUnlockHint =>
       'முழு பலன்கள் மற்றும் அறிக்கைகளைத் திறக்கவும்';
+
+  @override
+  String get aiPacksTitle => 'AI கேள்வி தொகுப்புகள்';
+
+  @override
+  String get aiPacksSubtitle =>
+      'இன்றைய கேள்விகள் தீர்ந்ததும் நிரப்பிக்கொள்ளுங்கள்';
+
+  @override
+  String aiPackQuestions(String count) {
+    return '$count கேள்விகள்';
+  }
+
+  @override
+  String aiPackValidity(String days) {
+    return '$days நாட்கள் செல்லுபடியாகும்';
+  }
+
+  @override
+  String get aiPackBestValue => 'சிறந்த மதிப்பு';
+
+  @override
+  String get aiPacksUnavailable => 'தொகுப்புகள் தற்போது கிடைக்கவில்லை.';
+
+  @override
+  String get aiPackPurchased =>
+      'வாங்குதல் முடிந்தது — உங்கள் கேள்விகள் சற்று நேரத்தில் தோன்றும்.';
+
+  @override
+  String aiPackBalance(String count) {
+    return '$count தொகுப்பு கேள்விகள் மீதம்';
+  }
+
+  @override
+  String get aiPackTopUp => 'கேள்விகளை நிரப்பு';
 }

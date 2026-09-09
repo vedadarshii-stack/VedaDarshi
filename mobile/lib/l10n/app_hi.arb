@@ -511,5 +511,14 @@
   "noSavedProfiles": "अभी कोई अन्य सहेजी गई प्रोफ़ाइल नहीं",
   "premiumMember": "प्रीमियम सदस्य",
   "upgradeToPremium": "प्रीमियम में अपग्रेड करें",
-  "premiumUnlockHint": "पूरी रिपोर्ट और फल अनलॉक करें"
+  "premiumUnlockHint": "पूरी रिपोर्ट और फल अनलॉक करें",
+  "aiPacksTitle": "एआई प्रश्न पैक",
+  "aiPacksSubtitle": "आज के प्रश्न समाप्त होने पर टॉप-अप करें",
+  "aiPackQuestions": "{count} प्रश्न",
+  "aiPackValidity": "{days} दिन तक मान्य",
+  "aiPackBestValue": "सर्वोत्तम मूल्य",
+  "aiPacksUnavailable": "पैक अभी उपलब्ध नहीं हैं।",
+  "aiPackPurchased": "खरीद पूरी हुई — आपके प्रश्न कुछ ही क्षणों में दिखेंगे।",
+  "aiPackBalance": "{count} पैक प्रश्न शेष",
+  "aiPackTopUp": "प्रश्न टॉप-अप करें"
 }

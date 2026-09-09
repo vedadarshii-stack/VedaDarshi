@@ -11,6 +11,7 @@ import 'core/geo/city.dart';
 import 'core/locale/locale_controller.dart';
 import 'core/notifications/push_notification_service.dart';
 import 'core/purchases/purchases_providers.dart';
+import 'core/purchases/debug_tier_override.dart';
 import 'core/purchases/purchases_service.dart';
 import 'core/theme/app_colors.dart';
 import 'core/theme/app_palette.dart';
@@ -108,6 +109,15 @@ void main() async {
     ProviderScope(
       overrides: [
         purchasesServiceProvider.overrideWithValue(purchasesService),
+        // DEBUG ONLY — see `DebugTierOverride`. Lets entitlement gating be
+        // exercised at any tier on a plain `flutter run`, because a
+        // locally-signed build can never complete a real Play purchase (Play
+        // re-signs with the app signing key, which Google holds).
+        //
+        // Safe to install unconditionally in debug: with no tier forced it
+        // reproduces the real provider exactly, so there is no second source
+        // of truth that could drift from live RevenueCat state.
+        if (DebugTierOverride.isAvailable) debugTierOverride(),
         if (savedLocale != null)
           localeControllerProvider.overrideWith(
             () => LocaleController(savedLocale),

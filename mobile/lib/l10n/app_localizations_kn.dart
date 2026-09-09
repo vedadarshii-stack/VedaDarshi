@@ -1757,4 +1757,38 @@ class AppLocalizationsKn extends AppLocalizations {
   @override
   String get premiumUnlockHint =>
       'ಪೂರ್ಣ ಫಲಿತಾಂಶಗಳು ಮತ್ತು ವರದಿಗಳನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಿ';
+
+  @override
+  String get aiPacksTitle => 'AI ಪ್ರಶ್ನೆ ಪ್ಯಾಕ್‌ಗಳು';
+
+  @override
+  String get aiPacksSubtitle => 'ಇಂದಿನ ಪ್ರಶ್ನೆಗಳು ಮುಗಿದ ಮೇಲೆ ಟಾಪ್-ಅಪ್ ಮಾಡಿ';
+
+  @override
+  String aiPackQuestions(String count) {
+    return '$count ಪ್ರಶ್ನೆಗಳು';
+  }
+
+  @override
+  String aiPackValidity(String days) {
+    return '$days ದಿನಗಳವರೆಗೆ ಮಾನ್ಯ';
+  }
+
+  @override
+  String get aiPackBestValue => 'ಅತ್ಯುತ್ತಮ ಮೌಲ್ಯ';
+
+  @override
+  String get aiPacksUnavailable => 'ಪ್ಯಾಕ್‌ಗಳು ಸದ್ಯಕ್ಕೆ ಲಭ್ಯವಿಲ್ಲ.';
+
+  @override
+  String get aiPackPurchased =>
+      'ಖರೀದಿ ಪೂರ್ಣಗೊಂಡಿದೆ — ನಿಮ್ಮ ಪ್ರಶ್ನೆಗಳು ಕ್ಷಣದಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.';
+
+  @override
+  String aiPackBalance(String count) {
+    return '$count ಪ್ಯಾಕ್ ಪ್ರಶ್ನೆಗಳು ಉಳಿದಿವೆ';
+  }
+
+  @override
+  String get aiPackTopUp => 'ಪ್ರಶ್ನೆಗಳನ್ನು ಟಾಪ್-ಅಪ್ ಮಾಡಿ';
 }

@@ -1,6 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../auth/auth_providers.dart';
+import 'ai_pack_catalogue.dart';
 import 'purchases_service.dart';
 import 'subscription_catalogue.dart';
 import 'subscription_tier.dart';
@@ -68,4 +71,57 @@ final subscriptionCatalogueProvider = FutureProvider<SubscriptionCatalogue>((
   // so the previous user's offering must not linger on screen.
   ref.watch(subscriptionStatusProvider);
   return ref.watch(purchasesServiceProvider).fetchCatalogue();
+});
+
+/// The buyable AI question packs.
+///
+/// Separate from [subscriptionCatalogueProvider] because it reads a DIFFERENT
+/// RevenueCat offering (`ai_packs`, not `current`). Resolves to an empty
+/// catalogue rather than an error when RevenueCat is unconfigured or the
+/// products are not Active in Play — the sheet renders that as
+/// "packs unavailable" with a retry, exactly like the paywall does.
+final aiPackCatalogueProvider = FutureProvider<AiPackCatalogue>((ref) async {
+  // Same dependency as the subscription catalogue: offerings can be targeted
+  // per user, so a sign-in must not leave the previous user's packs on screen.
+  ref.watch(subscriptionStatusProvider);
+  return ref.watch(purchasesServiceProvider).fetchAiPacks();
+});
+
+/// Questions remaining across the user's live packs.
+///
+/// ⚠️ Read from **Firestore, not from the SDK**. A pack is a consumable: the
+/// store confirms the PURCHASE, but how many questions are left is our own
+/// server-side ledger (`functions/src/aiPacks.ts`), written by the RevenueCat
+/// webhook and spent by `askAiAstrologer`. Asking RevenueCat "how many
+/// questions do I have" would be asking the wrong system.
+///
+/// The collection is client-readable but `allow write: if false`, so this is
+/// a trustworthy read of a value the user cannot forge.
+final aiPackBalanceProvider = StreamProvider<int>((ref) {
+  final user = ref.watch(authStateProvider).valueOrNull;
+  if (user == null) return Stream.value(0);
+
+  final nowMs = DateTime.now().millisecondsSinceEpoch;
+  return FirebaseFirestore.instance
+      .collection('users')
+      .doc(user.uid)
+      .collection('aiPacks')
+      // Expiry is filtered CLIENT-side after the read rather than in the
+      // query: `where(expiresAtMs > now)` would need a composite index and,
+      // worse, would not re-evaluate as time passes on a live snapshot —
+      // a pack expiring while the screen is open would keep counting.
+      .snapshots()
+      .map((snap) {
+        var total = 0;
+        for (final doc in snap.docs) {
+          final data = doc.data();
+          final expiresAtMs = (data['expiresAtMs'] as num?)?.toInt() ?? 0;
+          if (expiresAtMs <= nowMs) continue;
+          final remaining = (data['remaining'] as num?)?.toInt() ?? 0;
+          final pending = (data['pending'] as num?)?.toInt() ?? 0;
+          total += (remaining - pending).clamp(0, remaining);
+        }
+        return total;
+      })
+      .handleError((_) => 0);
 });

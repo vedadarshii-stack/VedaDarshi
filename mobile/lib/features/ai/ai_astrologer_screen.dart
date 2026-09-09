@@ -6,7 +6,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../l10n/app_localizations.dart';
 import '../home/home_static_data.dart';
-import '../premium/subscription_paywall_screen.dart';
+import '../premium/ai_pack_sheet.dart';
 import '../profile/birth_profile_repository.dart';
 import 'ai_chat_message.dart';
 import 'ai_error_messages.dart';
@@ -1290,9 +1290,14 @@ class _InputBar extends StatelessWidget {
                 button: true,
                 child: PressableScale(
                   borderRadius: BorderRadius.circular(999),
-                  onTap: () => Navigator.of(
-                    context,
-                  ).push(fadeThroughRoute(const SubscriptionPaywallScreen())),
+                  // ⚠️ CHANGED 9 Sep 2026: this used to push the full
+                  // subscription paywall. Someone whose daily question just
+                  // ran out wants ONE more answer, not a monthly plan — so
+                  // the small purchase leads, and the sheet keeps the
+                  // subscription reachable underneath it. The packs are also
+                  // the only product that fits a free user who will never
+                  // subscribe.
+                  onTap: () => showAiPackSheet(context),
                   // TAP TARGET, not just text — 2 Sep 2026, client reported
                   // this "should go to the subscription page". It always
                   // did: the handler below has pushed

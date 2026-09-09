@@ -1751,4 +1751,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumUnlockHint => 'Unlock full readings and reports';
+
+  @override
+  String get aiPacksTitle => 'AI question packs';
+
+  @override
+  String get aiPacksSubtitle => 'Top up when today\'s questions run out';
+
+  @override
+  String aiPackQuestions(String count) {
+    return '$count questions';
+  }
+
+  @override
+  String aiPackValidity(String days) {
+    return 'Valid $days days';
+  }
+
+  @override
+  String get aiPackBestValue => 'Best value';
+
+  @override
+  String get aiPacksUnavailable => 'Packs aren\'t available right now.';
+
+  @override
+  String get aiPackPurchased =>
+      'Purchase complete — your questions will appear in a moment.';
+
+  @override
+  String aiPackBalance(String count) {
+    return '$count pack questions left';
+  }
+
+  @override
+  String get aiPackTopUp => 'Top up questions';
 }

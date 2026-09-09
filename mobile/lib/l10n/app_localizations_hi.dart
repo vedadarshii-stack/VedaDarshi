@@ -1747,4 +1747,38 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get premiumUnlockHint => 'पूरी रिपोर्ट और फल अनलॉक करें';
+
+  @override
+  String get aiPacksTitle => 'एआई प्रश्न पैक';
+
+  @override
+  String get aiPacksSubtitle => 'आज के प्रश्न समाप्त होने पर टॉप-अप करें';
+
+  @override
+  String aiPackQuestions(String count) {
+    return '$count प्रश्न';
+  }
+
+  @override
+  String aiPackValidity(String days) {
+    return '$days दिन तक मान्य';
+  }
+
+  @override
+  String get aiPackBestValue => 'सर्वोत्तम मूल्य';
+
+  @override
+  String get aiPacksUnavailable => 'पैक अभी उपलब्ध नहीं हैं।';
+
+  @override
+  String get aiPackPurchased =>
+      'खरीद पूरी हुई — आपके प्रश्न कुछ ही क्षणों में दिखेंगे।';
+
+  @override
+  String aiPackBalance(String count) {
+    return '$count पैक प्रश्न शेष';
+  }
+
+  @override
+  String get aiPackTopUp => 'प्रश्न टॉप-अप करें';
 }

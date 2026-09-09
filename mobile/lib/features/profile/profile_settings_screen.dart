@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
@@ -22,6 +23,8 @@ import '../panchang/panchang_location.dart';
 import '../panchang/panchang_location_screen.dart';
 import '../../core/purchases/purchases_service.dart';
 import '../premium/purchase_error_messages.dart';
+import '../premium/ai_pack_sheet.dart';
+import 'debug_tier_row.dart';
 import '../premium/subscription_paywall_screen.dart';
 import '../reports/premium_reports_screen.dart';
 import '../startup/root_gate.dart';
@@ -597,6 +600,8 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final locale = Localizations.localeOf(context);
+    final packBalance =
+        ref.watch(aiPackBalanceProvider).valueOrNull ?? 0;
     final isCompact = MediaQuery.sizeOf(context).height < 840;
     final profile = ref.watch(birthProfileProvider).valueOrNull;
     final currentLocale = ref.watch(localeControllerProvider) ?? locale;
@@ -826,6 +831,26 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                   // Opens a `mailto:` compose screen — see `_sendFeedback`.
                   onTap: _sendFeedback,
                 ),
+                // AI packs, ADDED 9 Sep 2026. The chat screen offers these at
+                // the moment the daily quota runs out, which is the high-
+                // intent moment — but that is the ONLY place they appear, so
+                // a user who wants to top up before they run dry, or who
+                // simply wants to see their remaining balance, has nowhere to
+                // go. Hence a passive entry point here.
+                //
+                // The subtitle shows the live balance when there is one; that
+                // number comes from the server-side ledger via Firestore, not
+                // from the store, because remaining questions are our
+                // accounting and not Play's.
+                _MenuRow(
+                  emoji: '🔮',
+                  title: l10n.aiPackTopUp,
+                  subtitle: packBalance > 0
+                      ? l10n.aiPackBalance('$packBalance')
+                      : null,
+                  locale: locale,
+                  onTap: () => showAiPackSheet(context),
+                ),
                 _MenuRow(
                   emoji: '♻️',
                   title: l10n.profileRestorePurchases,
@@ -843,6 +868,15 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                 ),
               ],
             ),
+            // ⚠️ Guarded by `kDebugMode` AT THE CALL SITE, not only inside
+            // the widget. `kDebugMode` is a compile-time constant, so the
+            // whole branch — and with it the widget class — is tree-shaken
+            // out of a release build entirely. Constructing it
+            // unconditionally and letting it return SizedBox.shrink() is
+            // behaviourally identical but leaves the class in the release
+            // binary; absent beats inert for anything that fakes
+            // entitlement.
+            if (kDebugMode) const DebugTierRow(),
             const SizedBox(height: 20),
             _FooterActions(
               l10n: l10n,

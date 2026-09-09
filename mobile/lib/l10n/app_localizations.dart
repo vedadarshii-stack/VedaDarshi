@@ -3181,6 +3181,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unlock full readings and reports'**
   String get premiumUnlockHint;
+
+  /// AI question pack UI. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'AI question packs'**
+  String get aiPacksTitle;
+
+  /// AI question pack UI. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Top up when today\'s questions run out'**
+  String get aiPacksSubtitle;
+
+  /// AI question pack UI. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} questions'**
+  String aiPackQuestions(String count);
+
+  /// AI question pack UI. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid {days} days'**
+  String aiPackValidity(String days);
+
+  /// AI question pack UI. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Best value'**
+  String get aiPackBestValue;
+
+  /// AI question pack UI. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Packs aren\'t available right now.'**
+  String get aiPacksUnavailable;
+
+  /// AI question pack UI. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase complete — your questions will appear in a moment.'**
+  String get aiPackPurchased;
+
+  /// AI question pack UI. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} pack questions left'**
+  String aiPackBalance(String count);
+
+  /// AI question pack UI. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Top up questions'**
+  String get aiPackTopUp;
 }
 
 class _AppLocalizationsDelegate

@@ -2353,5 +2353,23 @@
   "premiumUnlockHint": "Unlock full readings and reports",
   "@premiumUnlockHint": {
     "description": "Profile premium badge / upgrade CTA (8 Sep 2026)."
-  }
+  },
+  "aiPacksTitle": "AI question packs",
+  "@aiPacksTitle": {"description": "AI question pack UI. Added 9 Sep 2026."},
+  "aiPacksSubtitle": "Top up when today's questions run out",
+  "@aiPacksSubtitle": {"description": "AI question pack UI. Added 9 Sep 2026."},
+  "aiPackQuestions": "{count} questions",
+  "@aiPackQuestions": {"description": "AI question pack UI. Added 9 Sep 2026.", "placeholders": {"count": {"type": "String"}}},
+  "aiPackValidity": "Valid {days} days",
+  "@aiPackValidity": {"description": "AI question pack UI. Added 9 Sep 2026.", "placeholders": {"days": {"type": "String"}}},
+  "aiPackBestValue": "Best value",
+  "@aiPackBestValue": {"description": "AI question pack UI. Added 9 Sep 2026."},
+  "aiPacksUnavailable": "Packs aren't available right now.",
+  "@aiPacksUnavailable": {"description": "AI question pack UI. Added 9 Sep 2026."},
+  "aiPackPurchased": "Purchase complete — your questions will appear in a moment.",
+  "@aiPackPurchased": {"description": "AI question pack UI. Added 9 Sep 2026."},
+  "aiPackBalance": "{count} pack questions left",
+  "@aiPackBalance": {"description": "AI question pack UI. Added 9 Sep 2026.", "placeholders": {"count": {"type": "String"}}},
+  "aiPackTopUp": "Top up questions",
+  "@aiPackTopUp": {"description": "AI question pack UI. Added 9 Sep 2026."}
 }
