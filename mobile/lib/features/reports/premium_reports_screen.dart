@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/motion/app_motion.dart';
+import '../../core/purchases/purchases_providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../l10n/app_localizations.dart';
@@ -39,6 +40,21 @@ class _PremiumReportsScreenState extends ConsumerState<PremiumReportsScreen> {
     final reports = ReportsStaticData.reports;
     final remaining = ReportsStaticData.totalReports - reports.length;
 
+    // ⚠️ ADDED 9 Sep 2026 — this screen previously ignored entitlement
+    // entirely. The "Go Premium" banner and every card's 👑 badge were
+    // rendered unconditionally, so a PAYING subscriber was still shown an
+    // upgrade pitch for reports they had already bought. Client-reported:
+    // "i upgraded into premium but it's not reflecting".
+    //
+    // Three states, not two: [SubscriptionStatus.isKnown] is false until
+    // RevenueCat answers (the first frames after launch). The banner stays
+    // hidden while unknown — flashing a sales pitch at an existing
+    // subscriber is the exact failure `isKnown` exists to prevent, and a
+    // promotional banner appearing a beat late costs nothing.
+    final subscription = ref.watch(subscriptionStatusValueProvider);
+    final hasPaid = subscription.hasPaidAccess;
+    final showUpgradePitch = subscription.isKnown && !hasPaid;
+
     return Scaffold(
       backgroundColor: AppColors.cream,
       body: SafeArea(
@@ -47,8 +63,10 @@ class _PremiumReportsScreenState extends ConsumerState<PremiumReportsScreen> {
           children: [
             _Header(l10n: l10n, locale: locale),
             const SizedBox(height: 14),
-            _GoPremiumBanner(l10n: l10n, locale: locale),
-            const SizedBox(height: 14),
+            if (showUpgradePitch) ...[
+              _GoPremiumBanner(l10n: l10n, locale: locale),
+              const SizedBox(height: 14),
+            ],
             Column(
               children: [
                 for (var i = 0; i < reports.length; i++) ...[
@@ -59,6 +77,9 @@ class _PremiumReportsScreenState extends ConsumerState<PremiumReportsScreen> {
                       report: reports[i],
                       l10n: l10n,
                       locale: locale,
+                      // A subscriber owns every report, so the padlock/crown
+                      // badge is not merely redundant — it is wrong.
+                      showPremiumBadge: !hasPaid,
                     ),
                   ),
                 ],
@@ -233,11 +254,17 @@ class _ReportCard extends StatelessWidget {
     required this.report,
     required this.l10n,
     required this.locale,
+    this.showPremiumBadge = true,
   });
 
   final AstrologyReport report;
   final AppLocalizations l10n;
   final Locale locale;
+
+  /// `false` once the user holds any paid tier — see the note in
+  /// [_PremiumReportsScreenState.build]. The 🔒 Premium pill states that a
+  /// report is locked, which stops being true the moment they subscribe.
+  final bool showPremiumBadge;
 
   @override
   Widget build(BuildContext context) {
@@ -341,7 +368,14 @@ class _ReportCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              _AccessBadge(access: report.access, l10n: l10n, locale: locale),
+              // A paid user sees no lock on anything; the FREE pill still
+              // renders, since "Free" stays true for Gemstone/Numerology.
+              if (showPremiumBadge || report.access == ReportAccess.free)
+                _AccessBadge(
+                  access: report.access,
+                  l10n: l10n,
+                  locale: locale,
+                ),
             ],
           ),
         ),

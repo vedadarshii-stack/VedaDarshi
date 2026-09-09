@@ -386,6 +386,7 @@
   "purchasesNothingToRestore": "कोई पिछली खरीदारी नहीं मिली।",
   "purchaseErrorGeneric": "खरीदारी पूरी नहीं हो सकी। कृपया पुनः प्रयास करें।",
   "purchaseErrorNotAllowed": "इस खाते या डिवाइस पर खरीदारी उपलब्ध नहीं है।",
+  "purchaseErrorPending": "आपका भुगतान संसाधित हो रहा है। पुष्टि होते ही प्रीमियम चालू हो जाएगा।",
   "purchaseErrorNetwork": "कोई कनेक्शन नहीं। अपना नेटवर्क जांचें और पुनः प्रयास करें।",
   "purchaseErrorAlreadyOwned": "यह योजना आपके पास पहले से है — सिंक करने के लिए 'खरीदारी बहाल करें' दबाएं।",
   "purchaseErrorUnavailable": "यह योजना अभी उपलब्ध नहीं है।",

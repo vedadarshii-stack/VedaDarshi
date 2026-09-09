@@ -1325,6 +1325,10 @@ class AppLocalizationsHi extends AppLocalizations {
       'इस खाते या डिवाइस पर खरीदारी उपलब्ध नहीं है।';
 
   @override
+  String get purchaseErrorPending =>
+      'आपका भुगतान संसाधित हो रहा है। पुष्टि होते ही प्रीमियम चालू हो जाएगा।';
+
+  @override
   String get purchaseErrorNetwork =>
       'कोई कनेक्शन नहीं। अपना नेटवर्क जांचें और पुनः प्रयास करें।';
 

@@ -24,6 +24,22 @@ enum PurchaseFailure {
   /// unsupported device, billing unavailable in this country).
   notAllowed,
 
+  /// **The payment is still clearing — this is NOT a failure.**
+  ///
+  /// Play returns `paymentPendingError` for deferred payment methods, which
+  /// in India means UPI mandates, net-banking and cash-at-counter. The money
+  /// has been committed; Play will confirm it, typically within minutes but
+  /// sometimes days.
+  ///
+  /// ⚠️ Until 9 Sep 2026 this was folded into [notAllowed], so a user paying
+  /// by UPI was told *"Purchases aren't available on this account or
+  /// device."* — a flat contradiction of what had just happened, and exactly
+  /// the sort of message that makes someone pay twice or ask for a refund.
+  ///
+  /// Nothing has to be retried: RevenueCat grants the entitlement when Play
+  /// confirms, and `statusChanges()` unlocks the app on its own.
+  pending,
+
   /// Offline, or Play/RevenueCat unreachable.
   network,
 
@@ -284,9 +300,9 @@ class PurchasesService {
     }
     return switch (code) {
       PurchasesErrorCode.purchaseCancelledError => PurchaseFailure.cancelled,
+      PurchasesErrorCode.paymentPendingError => PurchaseFailure.pending,
       PurchasesErrorCode.purchaseNotAllowedError ||
-      PurchasesErrorCode.storeProblemError ||
-      PurchasesErrorCode.paymentPendingError => PurchaseFailure.notAllowed,
+      PurchasesErrorCode.storeProblemError => PurchaseFailure.notAllowed,
       PurchasesErrorCode.networkError ||
       PurchasesErrorCode.offlineConnectionError => PurchaseFailure.network,
       PurchasesErrorCode.productAlreadyPurchasedError ||

@@ -1324,6 +1324,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Purchases aren\'t available on this account or device.';
 
   @override
+  String get purchaseErrorPending =>
+      'Your payment is being processed. Premium unlocks as soon as it clears.';
+
+  @override
   String get purchaseErrorNetwork =>
       'No connection. Check your network and try again.';
 

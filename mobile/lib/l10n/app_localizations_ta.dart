@@ -1334,6 +1334,10 @@ class AppLocalizationsTa extends AppLocalizations {
       'இந்தக் கணக்கிலோ சாதனத்திலோ கொள்முதல் கிடைக்கவில்லை.';
 
   @override
+  String get purchaseErrorPending =>
+      'உங்கள் கட்டணம் செயலாக்கத்தில் உள்ளது. உறுதியானதும் பிரீமியம் திறக்கப்படும்.';
+
+  @override
   String get purchaseErrorNetwork =>
       'இணைப்பு இல்லை. உங்கள் நெட்வொர்க்கைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.';
 

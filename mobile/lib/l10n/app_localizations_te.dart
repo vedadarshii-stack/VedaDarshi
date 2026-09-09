@@ -1335,6 +1335,10 @@ class AppLocalizationsTe extends AppLocalizations {
       'ఈ ఖాతా లేదా పరికరంలో కొనుగోళ్లు అందుబాటులో లేవు.';
 
   @override
+  String get purchaseErrorPending =>
+      'మీ చెల్లింపు ప్రాసెస్ అవుతోంది. నిర్ధారణ కాగానే ప్రీమియం అన్‌లాక్ అవుతుంది.';
+
+  @override
   String get purchaseErrorNetwork =>
       'కనెక్షన్ లేదు. మీ నెట్‌వర్క్‌ను తనిఖీ చేసి మళ్లీ ప్రయత్నించండి.';
 

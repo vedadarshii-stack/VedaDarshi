@@ -103,6 +103,14 @@ class _SubscriptionPaywallScreenState
       // to report back at them.
       if (e.reason == PurchaseFailure.cancelled) return;
       _showMessage(purchaseFailureMessage(l10n, e.reason));
+      // A DEFERRED payment (UPI / net-banking / cash) is not a failure — the
+      // money is committed and Play will confirm it. Close the paywall as if
+      // the purchase succeeded, because for the user it did; the entitlement
+      // arrives on its own through `statusChanges()` when Play clears it.
+      // Leaving them staring at the plan list invites paying a second time.
+      if (e.reason == PurchaseFailure.pending && mounted) {
+        Navigator.of(context).pop();
+      }
     } finally {
       if (mounted) setState(() => _isBusy = false);
     }

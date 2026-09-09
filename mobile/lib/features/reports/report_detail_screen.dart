@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/motion/app_motion.dart';
+import '../../core/purchases/purchases_providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../core/widgets/premium_glimpse.dart';
@@ -31,12 +32,16 @@ import 'reports_static_data.dart';
 /// content, cut off partway with an upgrade CTA underneath. The content
 /// fetched is identical either way; only the presentation differs.
 ///
-/// ⚠️ **This is a TEASER gate, not entitlement enforcement.** A subscriber
-/// still sees the glimpse here, because nothing yet checks their entitlement
-/// on this screen — and the report body itself must eventually be served
-/// behind a server-side check, not merely hidden behind a gradient. Wire it
-/// to `subscriptionStatusProvider` and move the full body server-side before
-/// this counts as a paid feature.
+/// Since 9 Sep 2026 a SUBSCRIBER gets the full body — the screen reads
+/// `subscriptionStatusValueProvider`. Before that it did not, so paying
+/// changed nothing the user could see, which is what the client reported as
+/// *"i upgraded into premium but its not reflecting"*.
+///
+/// ⚠️ **Still a CLIENT-SIDE gate, not server-side enforcement.** The full
+/// payload is fetched before the gate is applied, so the gradient hides
+/// content the device already holds. That is fine for an upsell teaser and
+/// NOT fine as the only thing standing between a free user and paid content —
+/// the body must eventually be served behind a server-side entitlement check.
 class ReportDetailScreen extends ConsumerWidget {
   const ReportDetailScreen({super.key, required this.report});
 
@@ -94,6 +99,9 @@ class ReportDetailScreen extends ConsumerWidget {
                   content: buildReportContent(report.id, payload, l10n),
                   l10n: l10n,
                   locale: locale,
+                  hasPaidAccess: ref
+                      .watch(subscriptionStatusValueProvider)
+                      .hasPaidAccess,
                 ),
               ),
           ],
@@ -109,12 +117,17 @@ class _Body extends StatelessWidget {
     required this.content,
     required this.l10n,
     required this.locale,
+    required this.hasPaidAccess,
   });
 
   final AstrologyReport report;
   final ReportContent content;
   final AppLocalizations l10n;
   final Locale locale;
+
+  /// Whether the reader holds any paid tier. `false` also while RevenueCat
+  /// has not answered yet — see the note at the `PremiumGlimpse` below.
+  final bool hasPaidAccess;
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +153,15 @@ class _Body extends StatelessWidget {
       ],
     );
 
-    if (report.access == ReportAccess.free) return sections;
+    // ⚠️ THE PAID PATH, added 9 Sep 2026. Until now this line was the ONLY
+    // branch: a premium report was cut off by [PremiumGlimpse] for everyone,
+    // subscribers included, so paying changed nothing a user could see.
+    //
+    // While RevenueCat has not answered, `hasPaidAccess` is false and the
+    // glimpse shows. That is the deliberate direction to fail in: a
+    // subscriber briefly sees a teaser that then expands, rather than a free
+    // user briefly seeing the whole report.
+    if (report.access == ReportAccess.free || hasPaidAccess) return sections;
 
     return PremiumGlimpse(
       locale: locale,

@@ -1332,6 +1332,10 @@ class AppLocalizationsKn extends AppLocalizations {
       'ಈ ಖಾತೆ ಅಥವಾ ಸಾಧನದಲ್ಲಿ ಖರೀದಿಗಳು ಲಭ್ಯವಿಲ್ಲ.';
 
   @override
+  String get purchaseErrorPending =>
+      'ನಿಮ್ಮ ಪಾವತಿ ಪ್ರಕ್ರಿಯೆಯಲ್ಲಿದೆ. ದೃಢಪಟ್ಟ ತಕ್ಷಣ ಪ್ರೀಮಿಯಂ ಅನ್‌ಲಾಕ್ ಆಗುತ್ತದೆ.';
+
+  @override
   String get purchaseErrorNetwork =>
       'ಸಂಪರ್ಕವಿಲ್ಲ. ನಿಮ್ಮ ನೆಟ್‌ವರ್ಕ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
 

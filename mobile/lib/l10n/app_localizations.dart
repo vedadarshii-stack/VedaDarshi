@@ -2420,6 +2420,12 @@ abstract class AppLocalizations {
   /// **'Purchases aren\'t available on this account or device.'**
   String get purchaseErrorNotAllowed;
 
+  /// Shown when Play reports a DEFERRED payment (UPI / net-banking / cash). Not an error: the purchase is clearing and unlocks itself. Added 9 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Your payment is being processed. Premium unlocks as soon as it clears.'**
+  String get purchaseErrorPending;
+
   /// Snackbar when the purchase failed because the device is offline.
   ///
   /// In en, this message translates to:

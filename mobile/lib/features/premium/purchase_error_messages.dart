@@ -17,6 +17,7 @@ String purchaseFailureMessage(
   PurchaseFailure reason,
 ) {
   return switch (reason) {
+    PurchaseFailure.pending => l10n.purchaseErrorPending,
     PurchaseFailure.notAllowed => l10n.purchaseErrorNotAllowed,
     PurchaseFailure.network => l10n.purchaseErrorNetwork,
     PurchaseFailure.alreadyOwned => l10n.purchaseErrorAlreadyOwned,

@@ -1808,6 +1808,10 @@
   "@purchaseErrorNotAllowed": {
     "description": "Snackbar when Play refuses purchases on this account/device."
   },
+  "purchaseErrorPending": "Your payment is being processed. Premium unlocks as soon as it clears.",
+  "@purchaseErrorPending": {
+    "description": "Shown when Play reports a DEFERRED payment (UPI / net-banking / cash). Not an error: the purchase is clearing and unlocks itself. Added 9 Sep 2026."
+  },
   "purchaseErrorNetwork": "No connection. Check your network and try again.",
   "@purchaseErrorNetwork": {
     "description": "Snackbar when the purchase failed because the device is offline."
