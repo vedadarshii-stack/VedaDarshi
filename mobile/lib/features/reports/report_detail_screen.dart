@@ -13,8 +13,11 @@ import '../kundli/kundli_repository.dart';
 import '../premium/purchase_error_messages.dart';
 import '../premium/subscription_paywall_screen.dart';
 import '../profile/birth_profile_repository.dart';
+import 'package:printing/printing.dart';
+
 import 'report_content.dart';
 import 'report_labels.dart';
+import 'report_pdf.dart';
 import 'report_repository.dart';
 import 'reports_static_data.dart';
 
@@ -115,6 +118,8 @@ class ReportDetailScreen extends ConsumerWidget {
                   purchasable: ref
                       .watch(reportCatalogueProvider)
                       .valueOrNull?[report.id],
+                  personName: profile?.fullName ?? '',
+                  birthSummary: profile?.summaryLine ?? '',
                 ),
               ),
           ],
@@ -132,6 +137,8 @@ class _Body extends StatelessWidget {
     required this.locale,
     required this.hasPaidAccess,
     required this.purchasable,
+    required this.personName,
+    required this.birthSummary,
   });
 
   final AstrologyReport report;
@@ -150,6 +157,10 @@ class _Body extends StatelessWidget {
   /// to the subscription CTA rather than showing a Buy button that cannot
   /// complete.
   final PurchasableReport? purchasable;
+
+  /// Printed on the PDF cover, so a shared file says whose chart it is.
+  final String personName;
+  final String birthSummary;
 
   @override
   Widget build(BuildContext context) {
@@ -183,7 +194,28 @@ class _Body extends StatelessWidget {
     // glimpse shows. That is the deliberate direction to fail in: a
     // subscriber briefly sees a teaser that then expands, rather than a free
     // user briefly seeing the whole report.
-    if (report.access == ReportAccess.free || hasPaidAccess) return sections;
+    if (report.access == ReportAccess.free || hasPaidAccess) {
+      // ⚠️ The download button lives ONLY here, on the unlocked path.
+      // Offering it beside a glimpse would export the cut-off teaser as a
+      // finished document — the gradient hides content the device already
+      // holds, so the PDF would contain the paid text in full. That is the
+      // one place this client-side gate would actually leak.
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          sections,
+          const SizedBox(height: 18),
+          _DownloadPdfButton(
+            reportId: report.id,
+            content: content,
+            l10n: l10n,
+            locale: locale,
+            personName: personName,
+            birthSummary: birthSummary,
+          ),
+        ],
+      );
+    }
 
     // BUY-ONCE, added 10 Sep 2026. When Play offers this single report, the
     // glimpse's CTA becomes "Unlock this report · ₹x" instead of a
@@ -837,6 +869,120 @@ class _Message extends StatelessWidget {
             TextButton(onPressed: retry, child: Text(l10n.retry)),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// "Download PDF", on every report the reader is entitled to see in full.
+///
+/// BUILT 10 Sep 2026. Uses `Printing.sharePdf`, which opens Android's share
+/// sheet — that is what lets the user save to Files, send on WhatsApp, or
+/// print, without the app asking for storage permission. Writing to external
+/// storage ourselves would need a permission the app does not currently
+/// request and that Play scrutinises.
+class _DownloadPdfButton extends StatefulWidget {
+  const _DownloadPdfButton({
+    required this.reportId,
+    required this.content,
+    required this.l10n,
+    required this.locale,
+    required this.personName,
+    required this.birthSummary,
+  });
+
+  final String reportId;
+  final ReportContent content;
+  final AppLocalizations l10n;
+  final Locale locale;
+  final String personName;
+  final String birthSummary;
+
+  @override
+  State<_DownloadPdfButton> createState() => _DownloadPdfButtonState();
+}
+
+class _DownloadPdfButtonState extends State<_DownloadPdfButton> {
+  bool _isBusy = false;
+
+  Future<void> _download() async {
+    if (_isBusy) return;
+    setState(() => _isBusy = true);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final bytes = await ReportPdf.build(
+        reportId: widget.reportId,
+        content: widget.content,
+        l10n: widget.l10n,
+        personName: widget.personName,
+        birthSummary: widget.birthSummary,
+      );
+      if (!mounted) return;
+      // A filename the user can find again — "document.pdf" in a Downloads
+      // folder of thirty files is not a deliverable.
+      final safeTitle = reportTitle(widget.reportId, widget.l10n)
+          .replaceAll(RegExp(r'[^A-Za-z0-9]+'), '-')
+          .replaceAll(RegExp(r'^-|-$'), '');
+      await Printing.sharePdf(
+        bytes: bytes,
+        filename: 'Vedadarshi-$safeTitle.pdf',
+      );
+    } catch (e) {
+      if (!mounted) return;
+      debugPrint('Report PDF failed: $e');
+      messenger.showSnackBar(
+        SnackBar(content: Text(widget.l10n.reportPdfFailed)),
+      );
+    } finally {
+      if (mounted) setState(() => _isBusy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      child: PressableScale(
+        borderRadius: BorderRadius.circular(999),
+        onTap: _download,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: AppColors.cardBorder),
+          ),
+          child: _isBusy
+              ? SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation(AppColors.saffron),
+                  ),
+                )
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.download_rounded,
+                      size: 17,
+                      color: AppColors.saffron,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      widget.l10n.reportDownloadPdf,
+                      style: AppFonts.body(
+                        widget.locale,
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.saffron,
+                      ),
+                    ),
+                  ],
+                ),
+        ),
       ),
     );
   }

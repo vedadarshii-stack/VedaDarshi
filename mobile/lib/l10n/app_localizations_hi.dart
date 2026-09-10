@@ -1830,4 +1830,10 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get reportBuyOrSubscribe => 'या सभी रिपोर्ट्स के लिए सदस्यता लें';
+
+  @override
+  String get reportDownloadPdf => 'PDF डाउनलोड करें';
+
+  @override
+  String get reportPdfFailed => 'PDF नहीं बन सका।';
 }

@@ -535,5 +535,7 @@
   "dailyReadingAreaRelationship": "సంబంధాలు",
   "reportBuyOnce": "ఈ నివేదికను అన్‌లాక్ చేయండి",
   "reportOwned": "ఈ నివేదిక మీ వద్ద ఉంది",
-  "reportBuyOrSubscribe": "లేదా అన్ని నివేదికల కోసం సబ్‌స్క్రైబ్ చేయండి"
+  "reportBuyOrSubscribe": "లేదా అన్ని నివేదికల కోసం సబ్‌స్క్రైబ్ చేయండి",
+  "reportDownloadPdf": "PDF డౌన్‌లోడ్ చేయండి",
+  "reportPdfFailed": "PDF సృష్టించలేకపోయాము."
 }

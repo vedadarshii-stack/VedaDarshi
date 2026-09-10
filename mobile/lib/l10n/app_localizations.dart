@@ -3325,6 +3325,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Or subscribe for all reports'**
   String get reportBuyOrSubscribe;
+
+  /// Report PDF export. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Download PDF'**
+  String get reportDownloadPdf;
+
+  /// Report PDF export. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t create the PDF.'**
+  String get reportPdfFailed;
 }
 
 class _AppLocalizationsDelegate

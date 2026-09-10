@@ -1840,4 +1840,10 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get reportBuyOrSubscribe => 'ಅಥವಾ ಎಲ್ಲಾ ವರದಿಗಳಿಗೆ ಚಂದಾದಾರರಾಗಿ';
+
+  @override
+  String get reportDownloadPdf => 'PDF ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ';
+
+  @override
+  String get reportPdfFailed => 'PDF ರಚಿಸಲಾಗಲಿಲ್ಲ.';
 }

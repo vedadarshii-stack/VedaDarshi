@@ -1848,4 +1848,10 @@ class AppLocalizationsTe extends AppLocalizations {
   @override
   String get reportBuyOrSubscribe =>
       'లేదా అన్ని నివేదికల కోసం సబ్‌స్క్రైబ్ చేయండి';
+
+  @override
+  String get reportDownloadPdf => 'PDF డౌన్‌లోడ్ చేయండి';
+
+  @override
+  String get reportPdfFailed => 'PDF సృష్టించలేకపోయాము.';
 }

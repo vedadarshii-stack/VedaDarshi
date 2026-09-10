@@ -1834,4 +1834,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportBuyOrSubscribe => 'Or subscribe for all reports';
+
+  @override
+  String get reportDownloadPdf => 'Download PDF';
+
+  @override
+  String get reportPdfFailed => 'Couldn\'t create the PDF.';
 }

@@ -39,6 +39,8 @@ dependencies:
   # message + the Play Store link, rather than the app implementing its own
   # sharing UI.
   share_plus: ^13.3.0
+  pdf: ^3.13.0
+  printing: ^5.15.0
 
 dev_dependencies:
   flutter_test:

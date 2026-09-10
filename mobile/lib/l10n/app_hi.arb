@@ -535,5 +535,7 @@
   "dailyReadingAreaRelationship": "रिश्ते",
   "reportBuyOnce": "यह रिपोर्ट खोलें",
   "reportOwned": "यह रिपोर्ट आपके पास है",
-  "reportBuyOrSubscribe": "या सभी रिपोर्ट्स के लिए सदस्यता लें"
+  "reportBuyOrSubscribe": "या सभी रिपोर्ट्स के लिए सदस्यता लें",
+  "reportDownloadPdf": "PDF डाउनलोड करें",
+  "reportPdfFailed": "PDF नहीं बन सका।"
 }

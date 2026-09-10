@@ -1854,4 +1854,10 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get reportBuyOrSubscribe =>
       'அல்லது அனைத்து அறிக்கைகளுக்கும் சந்தா செலுத்துங்கள்';
+
+  @override
+  String get reportDownloadPdf => 'PDF பதிவிறக்கவும்';
+
+  @override
+  String get reportPdfFailed => 'PDF உருவாக்க முடியவில்லை.';
 }
