@@ -275,12 +275,24 @@ service cloud.firestore {
         allow write: if false;
       }
 
+      // Individually purchased reports:
+      // /users/{uid}/reportPurchases/{transactionId}
+      // ADDED 10 Sep 2026 with functions/src/reportPurchases.ts. Ownership is
+      // PERMANENT and is the only thing standing between a free user and a
+      // paid report, so a client write here would hand out the whole
+      // catalogue. Written solely by the RevenueCat webhook.
+      match /reportPurchases/{transactionId} {
+        allow read: if isOwner(userId);
+        allow write: if false;
+      }
+
       match /{subcollection}/{docId} {
         allow read, write: if isOwner(userId)
                            && subcollection != 'aiUsage'
                            && subcollection != 'aiChats'
                            && subcollection != 'aiPacks'
-                           && subcollection != 'dailyReadings';
+                           && subcollection != 'dailyReadings'
+                           && subcollection != 'reportPurchases';
       }
     }
 

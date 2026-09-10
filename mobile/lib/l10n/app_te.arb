@@ -532,5 +532,8 @@
   "dailyReadingAreaCareer": "వృత్తి",
   "dailyReadingAreaFinance": "ఆర్థికం",
   "dailyReadingAreaHealth": "ఆరోగ్యం",
-  "dailyReadingAreaRelationship": "సంబంధాలు"
+  "dailyReadingAreaRelationship": "సంబంధాలు",
+  "reportBuyOnce": "ఈ నివేదికను అన్‌లాక్ చేయండి",
+  "reportOwned": "ఈ నివేదిక మీ వద్ద ఉంది",
+  "reportBuyOrSubscribe": "లేదా అన్ని నివేదికల కోసం సబ్‌స్క్రైబ్ చేయండి"
 }

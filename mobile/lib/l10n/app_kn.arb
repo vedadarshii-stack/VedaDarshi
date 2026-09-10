@@ -532,5 +532,8 @@
   "dailyReadingAreaCareer": "ವೃತ್ತಿ",
   "dailyReadingAreaFinance": "ಹಣಕಾಸು",
   "dailyReadingAreaHealth": "ಆರೋಗ್ಯ",
-  "dailyReadingAreaRelationship": "ಸಂಬಂಧಗಳು"
+  "dailyReadingAreaRelationship": "ಸಂಬಂಧಗಳು",
+  "reportBuyOnce": "ಈ ವರದಿಯನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಿ",
+  "reportOwned": "ಈ ವರದಿ ನಿಮ್ಮ ಬಳಿ ಇದೆ",
+  "reportBuyOrSubscribe": "ಅಥವಾ ಎಲ್ಲಾ ವರದಿಗಳಿಗೆ ಚಂದಾದಾರರಾಗಿ"
 }

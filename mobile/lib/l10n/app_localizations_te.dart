@@ -1838,4 +1838,14 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get dailyReadingAreaRelationship => 'సంబంధాలు';
+
+  @override
+  String get reportBuyOnce => 'ఈ నివేదికను అన్‌లాక్ చేయండి';
+
+  @override
+  String get reportOwned => 'ఈ నివేదిక మీ వద్ద ఉంది';
+
+  @override
+  String get reportBuyOrSubscribe =>
+      'లేదా అన్ని నివేదికల కోసం సబ్‌స్క్రైబ్ చేయండి';
 }

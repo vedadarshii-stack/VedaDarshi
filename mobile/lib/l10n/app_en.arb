@@ -2395,5 +2395,11 @@
   "dailyReadingAreaHealth": "Health",
   "@dailyReadingAreaHealth": {"description": "Personalized Daily Reading. Added 9 Sep 2026."},
   "dailyReadingAreaRelationship": "Relationships",
-  "@dailyReadingAreaRelationship": {"description": "Personalized Daily Reading. Added 9 Sep 2026."}
+  "@dailyReadingAreaRelationship": {"description": "Personalized Daily Reading. Added 9 Sep 2026."},
+  "reportBuyOnce": "Unlock this report",
+  "@reportBuyOnce": {"description": "Individual report purchase. Added 10 Sep 2026."},
+  "reportOwned": "You own this report",
+  "@reportOwned": {"description": "Individual report purchase. Added 10 Sep 2026."},
+  "reportBuyOrSubscribe": "Or subscribe for all reports",
+  "@reportBuyOrSubscribe": {"description": "Individual report purchase. Added 10 Sep 2026."}
 }

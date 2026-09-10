@@ -271,3 +271,8 @@
     width: 100%;
   }
 }
+
+/* Send result / error, added 9 Sep 2026 when the composer became real. */
+.notify__error { color: var(--color-danger, #b3261e); }
+.notify__ok { color: var(--color-success, #1b7f4b); }
+.notify__send:disabled { opacity: 0.6; cursor: default; }

@@ -1831,4 +1831,13 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get dailyReadingAreaRelationship => 'ಸಂಬಂಧಗಳು';
+
+  @override
+  String get reportBuyOnce => 'ಈ ವರದಿಯನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಿ';
+
+  @override
+  String get reportOwned => 'ಈ ವರದಿ ನಿಮ್ಮ ಬಳಿ ಇದೆ';
+
+  @override
+  String get reportBuyOrSubscribe => 'ಅಥವಾ ಎಲ್ಲಾ ವರದಿಗಳಿಗೆ ಚಂದಾದಾರರಾಗಿ';
 }

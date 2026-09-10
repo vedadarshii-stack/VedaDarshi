@@ -3307,6 +3307,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Relationships'**
   String get dailyReadingAreaRelationship;
+
+  /// Individual report purchase. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock this report'**
+  String get reportBuyOnce;
+
+  /// Individual report purchase. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'You own this report'**
+  String get reportOwned;
+
+  /// Individual report purchase. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Or subscribe for all reports'**
+  String get reportBuyOrSubscribe;
 }
 
 class _AppLocalizationsDelegate

@@ -3,7 +3,6 @@ import type { ReactNode } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { useAuth } from './authContext';
-import { isConceptMode } from './conceptMode';
 import { claimPendingInvite } from './claimInvite';
 import { AdminProfileContext } from './adminProfileContext';
 import type { AdminProfileState } from './adminProfileContext';
@@ -25,7 +24,7 @@ export function AdminProfileProvider({ children }: { children: ReactNode }) {
     }
 
     if (!user) {
-      setState(isConceptMode() ? { status: 'concept' } : { status: 'not-admin', email: null });
+      setState({ status: 'not-admin', email: null });
       return;
     }
 

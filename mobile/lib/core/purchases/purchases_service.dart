@@ -226,6 +226,23 @@ class PurchasesService {
     }
   }
 
+  /// Every package in the **`reports`** offering.
+  ///
+  /// The fourth offering the app reads. Returns an empty list rather than
+  /// throwing when RevenueCat is unconfigured or the products are not Active
+  /// in Play — the report screen renders that as "not available", the same
+  /// treatment the paywall and pack sheet use.
+  Future<List<Package>> fetchReportPackages() async {
+    if (!_configured) return const [];
+    try {
+      final offerings = await Purchases.getOfferings();
+      return offerings.all['reports']?.availablePackages ?? const [];
+    } catch (e) {
+      debugPrint('PurchasesService: reports offering failed ($e)');
+      return const [];
+    }
+  }
+
   /// Buys any one-time (consumable) product.
   ///
   /// Deliberately separate from [purchase]: a consumable must NOT carry

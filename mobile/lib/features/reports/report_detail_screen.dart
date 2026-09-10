@@ -3,11 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/motion/app_motion.dart';
 import '../../core/purchases/purchases_providers.dart';
+import '../../core/purchases/purchases_service.dart';
+import '../../core/purchases/report_catalogue.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../core/widgets/premium_glimpse.dart';
 import '../../l10n/app_localizations.dart';
 import '../kundli/kundli_repository.dart';
+import '../premium/purchase_error_messages.dart';
 import '../premium/subscription_paywall_screen.dart';
 import '../profile/birth_profile_repository.dart';
 import 'report_content.dart';
@@ -99,9 +102,19 @@ class ReportDetailScreen extends ConsumerWidget {
                   content: buildReportContent(report.id, payload, l10n),
                   l10n: l10n,
                   locale: locale,
-                  hasPaidAccess: ref
-                      .watch(subscriptionStatusValueProvider)
-                      .hasPaidAccess,
+                  // Three independent ways to see a full report:
+                  //  1. a paid SUBSCRIPTION (any tier), or
+                  //  2. having BOUGHT this one report outright, or
+                  //  3. it being a free report to begin with.
+                  // Ownership is the server-written ledger, not anything the
+                  // client can assert.
+                  hasPaidAccess:
+                      ref.watch(subscriptionStatusValueProvider).hasPaidAccess ||
+                      (ref.watch(ownedReportsProvider).valueOrNull ?? const {})
+                          .contains(report.id),
+                  purchasable: ref
+                      .watch(reportCatalogueProvider)
+                      .valueOrNull?[report.id],
                 ),
               ),
           ],
@@ -118,6 +131,7 @@ class _Body extends StatelessWidget {
     required this.l10n,
     required this.locale,
     required this.hasPaidAccess,
+    required this.purchasable,
   });
 
   final AstrologyReport report;
@@ -125,9 +139,17 @@ class _Body extends StatelessWidget {
   final AppLocalizations l10n;
   final Locale locale;
 
-  /// Whether the reader holds any paid tier. `false` also while RevenueCat
-  /// has not answered yet — see the note at the `PremiumGlimpse` below.
+  /// Whether the reader may see the full body — subscription, outright
+  /// purchase, or a free report. `false` also while RevenueCat has not
+  /// answered yet; see the note at the `PremiumGlimpse` below.
   final bool hasPaidAccess;
+
+  /// This report as a one-time purchase, when Play offers it. `null` for the
+  /// three products with no deliverable data (see [reportSkus]) and whenever
+  /// the store is unreachable — in both cases the glimpse simply falls back
+  /// to the subscription CTA rather than showing a Buy button that cannot
+  /// complete.
+  final PurchasableReport? purchasable;
 
   @override
   Widget build(BuildContext context) {
@@ -163,6 +185,22 @@ class _Body extends StatelessWidget {
     // user briefly seeing the whole report.
     if (report.access == ReportAccess.free || hasPaidAccess) return sections;
 
+    // BUY-ONCE, added 10 Sep 2026. When Play offers this single report, the
+    // glimpse's CTA becomes "Unlock this report · ₹x" instead of a
+    // subscription pitch — someone reading the Marriage Report wants THAT
+    // report, and asking them to commit to a monthly plan first is the same
+    // mistake the AI-pack sheet fixed. The subscription stays reachable
+    // underneath, because for a heavy reader it is the better deal.
+    final offer = purchasable;
+    if (offer != null) {
+      return _BuyableGlimpse(
+        offer: offer,
+        sections: sections,
+        l10n: l10n,
+        locale: locale,
+      );
+    }
+
     return PremiumGlimpse(
       locale: locale,
       previewHeight: 260,
@@ -172,6 +210,103 @@ class _Body extends StatelessWidget {
         context,
       ).push(fadeThroughRoute(const SubscriptionPaywallScreen())),
       child: sections,
+    );
+  }
+}
+
+/// A glimpse whose CTA buys this one report.
+///
+/// Stateful only to guard against a double tap opening two Play sheets.
+class _BuyableGlimpse extends ConsumerStatefulWidget {
+  const _BuyableGlimpse({
+    required this.offer,
+    required this.sections,
+    required this.l10n,
+    required this.locale,
+  });
+
+  final PurchasableReport offer;
+  final Widget sections;
+  final AppLocalizations l10n;
+  final Locale locale;
+
+  @override
+  ConsumerState<_BuyableGlimpse> createState() => _BuyableGlimpseState();
+}
+
+class _BuyableGlimpseState extends ConsumerState<_BuyableGlimpse> {
+  bool _isBusy = false;
+
+  Future<void> _buy() async {
+    if (_isBusy) return;
+    setState(() => _isBusy = true);
+    final l10n = widget.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await ref
+          .read(purchasesServiceProvider)
+          .purchaseConsumable(widget.offer.package);
+      if (!mounted) return;
+      // No "unlocked!" claim: ownership is granted by the RevenueCat webhook
+      // and arrives through `ownedReportsProvider`, a live Firestore stream,
+      // which expands this screen on its own. Asserting success here would be
+      // claiming something not yet observed.
+      messenger.showSnackBar(SnackBar(content: Text(l10n.aiPackPurchased)));
+    } on PurchaseException catch (e) {
+      if (!mounted) return;
+      if (e.reason == PurchaseFailure.cancelled) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(purchaseFailureMessage(l10n, e.reason))),
+      );
+    } finally {
+      if (mounted) setState(() => _isBusy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        PremiumGlimpse(
+          locale: widget.locale,
+          previewHeight: 260,
+          // Play's own localized price, never formatted by us.
+          ctaLabel:
+              '${widget.l10n.reportBuyOnce} · ${widget.offer.priceString}',
+          isBusy: _isBusy,
+          subtitle: widget.l10n.reportGlimpseSubtitle,
+          onUpgrade: _buy,
+          child: widget.sections,
+        ),
+        const SizedBox(height: 6),
+        Center(
+          child: Semantics(
+            button: true,
+            child: PressableScale(
+              borderRadius: BorderRadius.circular(999),
+              onTap: () => Navigator.of(context).push(
+                fadeThroughRoute(const SubscriptionPaywallScreen()),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                child: Text(
+                  widget.l10n.reportBuyOrSubscribe,
+                  style: AppFonts.body(
+                    widget.locale,
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.saffron,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

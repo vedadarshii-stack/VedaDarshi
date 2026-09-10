@@ -19,6 +19,12 @@ export { dailyPrewarm } from "./dailyPrewarm";
 export { askAiAstrologer } from "./aiCredits";
 export { deleteAccount } from "./deleteAccount";
 export { revenueCatWebhook } from "./revenueCatWebhook";
+export {
+  adminVedikaUsage,
+  adminListUsers,
+  adminSendNotification,
+  adminDashboardStats,
+} from "./adminApi";
 
 /**
  * The paid Vedika API key is imported from ./config (see that file for

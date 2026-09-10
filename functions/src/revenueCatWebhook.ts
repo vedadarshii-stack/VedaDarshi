@@ -2,6 +2,7 @@ import { onRequest } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { AI_PACKS, grantPack } from "./aiPacks";
 import { DAILY_READING_SKU, grantDailyReading } from "./dailyReading";
+import { REPORT_SKUS, grantReport } from "./reportPurchases";
 import {
   REVENUECAT_PROJECT_ID,
   REVENUECAT_SECRET_API_KEY,
@@ -208,6 +209,11 @@ async function reconcileConsumables(appUserId: string): Promise<number> {
       }
     } else if (sku === DAILY_READING_SKU) {
       if (await grantDailyReading({ uid: appUserId, transactionId, purchasedAtMs })) {
+        granted += 1;
+      }
+    } else if (sku in REPORT_SKUS) {
+      // Permanent ownership, no expiry — see reportPurchases.ts.
+      if (await grantReport({ uid: appUserId, sku, transactionId, purchasedAtMs })) {
         granted += 1;
       }
     }

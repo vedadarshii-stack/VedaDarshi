@@ -20,8 +20,6 @@ export type AdminProfileState =
   | { status: 'ready'; profile: AdminProfile }
   /** Signed in, but no active /adminUsers row — not console staff. */
   | { status: 'not-admin'; email: string | null }
-  /** Browsing the static concept without signing in. */
-  | { status: 'concept' }
   /** The role lookup itself failed (rules not deployed yet, offline, …). */
   | { status: 'error'; message: string };
 
@@ -37,12 +35,11 @@ export function useAdminProfile(): AdminProfileState {
 
 /** Permission check that resolves the current profile for you.
  *
- *  Concept mode grants everything so the unsigned static walkthrough stays
- *  complete; it reads no real data, so this cannot leak anything. Every other
- *  state (loading, not-admin, error) grants nothing — fail closed. */
+ *  Every state other than `ready` grants nothing — fail closed. There is no
+ *  longer a state that grants everything: the `concept` bypass was removed
+ *  9 Sep 2026. */
 export function useCan(permission: Permission): boolean {
   const state = useAdminProfile();
-  if (state.status === 'concept') return true;
   if (state.status !== 'ready') return false;
   return hasPermission(state.profile.permissions, permission);
 }

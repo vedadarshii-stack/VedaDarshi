@@ -1821,4 +1821,13 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get dailyReadingAreaRelationship => 'रिश्ते';
+
+  @override
+  String get reportBuyOnce => 'यह रिपोर्ट खोलें';
+
+  @override
+  String get reportOwned => 'यह रिपोर्ट आपके पास है';
+
+  @override
+  String get reportBuyOrSubscribe => 'या सभी रिपोर्ट्स के लिए सदस्यता लें';
 }

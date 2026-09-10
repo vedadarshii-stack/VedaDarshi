@@ -1825,4 +1825,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dailyReadingAreaRelationship => 'Relationships';
+
+  @override
+  String get reportBuyOnce => 'Unlock this report';
+
+  @override
+  String get reportOwned => 'You own this report';
+
+  @override
+  String get reportBuyOrSubscribe => 'Or subscribe for all reports';
 }

@@ -46,6 +46,7 @@ class PremiumGlimpse extends StatelessWidget {
     required this.onUpgrade,
     this.previewHeight = 190,
     this.subtitle,
+    this.isBusy = false,
   });
 
   final Locale locale;
@@ -57,6 +58,18 @@ class PremiumGlimpse extends StatelessWidget {
   final String ctaLabel;
 
   final VoidCallback onUpgrade;
+
+  /// Whether a purchase is in flight.
+  ///
+  /// ADDED 10 Sep 2026. The buy buttons previously gave NO feedback between
+  /// the tap and Play's sheet appearing — which on a slow connection is
+  /// several seconds of a button that looks like it did nothing. The result
+  /// is a second tap, and the caller's `_isBusy` guard silently swallowing
+  /// it, so the user is left believing the purchase is broken.
+  ///
+  /// The spinner replaces the label rather than sitting beside it, so the
+  /// button never changes width mid-press.
+  final bool isBusy;
 
   /// One line above the button saying what unlocking actually gets them.
   /// Keep it concrete ("all 8 koota readings and remedies"), not "go
@@ -144,15 +157,24 @@ class PremiumGlimpse extends StatelessWidget {
               ],
             ),
             child: Center(
-              child: Text(
-                ctaLabel,
-                style: AppFonts.body(
-                  locale,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
+              child: isBusy
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation(Colors.white),
+                      ),
+                    )
+                  : Text(
+                      ctaLabel,
+                      style: AppFonts.body(
+                        locale,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
             ),
           ),
         ),

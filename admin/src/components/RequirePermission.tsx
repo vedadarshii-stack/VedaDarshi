@@ -23,11 +23,6 @@ export function RequirePermission({
     return <PageSkeleton label="Checking your permissions" />;
   }
 
-  // The static walkthrough has no role, and reads no real data.
-  if (state.status === 'concept') {
-    return <>{children}</>;
-  }
-
   if (state.status === 'error') {
     return (
       <AccessNotice

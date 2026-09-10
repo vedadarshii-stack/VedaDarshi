@@ -532,5 +532,8 @@
   "dailyReadingAreaCareer": "करियर",
   "dailyReadingAreaFinance": "धन",
   "dailyReadingAreaHealth": "स्वास्थ्य",
-  "dailyReadingAreaRelationship": "रिश्ते"
+  "dailyReadingAreaRelationship": "रिश्ते",
+  "reportBuyOnce": "यह रिपोर्ट खोलें",
+  "reportOwned": "यह रिपोर्ट आपके पास है",
+  "reportBuyOrSubscribe": "या सभी रिपोर्ट्स के लिए सदस्यता लें"
 }

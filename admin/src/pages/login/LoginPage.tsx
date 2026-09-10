@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/authContext';
 import { authErrorMessage } from '../../lib/authErrors';
-import { enterConceptMode, exitConceptMode } from '../../lib/conceptMode';
 import './LoginPage.css';
 
 /** Official Google "G". Not a Figma asset — the concept predates the Google
@@ -58,19 +57,13 @@ export function LoginPage() {
     setError(null);
     setBusy(kind);
     try {
-      exitConceptMode();
-      await action();
+        await action();
       navigate(destination, { replace: true });
     } catch (caught) {
       setError(authErrorMessage(caught));
     } finally {
       setBusy(null);
     }
-  }
-
-  function viewConcept() {
-    enterConceptMode();
-    navigate('/dashboard');
   }
 
   return (
@@ -190,10 +183,6 @@ export function LoginPage() {
           <p className="login__note">
             <span className="vd-glyph">🔒</span> Protected by 2-step verification
           </p>
-
-          <button type="button" className="login__concept" onClick={viewConcept}>
-            Skip sign-in — view the static UI concept
-          </button>
         </form>
       </section>
     </div>

@@ -71,10 +71,15 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  flex: 1;
-  min-height: 0;
   margin-top: 18px;
-  overflow: hidden;
+  /* ⚠️ NOT `flex: 1` + `overflow: hidden` (9 Sep 2026). That made the table
+     fill the remaining viewport height and CLIP every row past the fold —
+     invisible with the six mock rows this was designed against, obvious the
+     moment real paging returned 25. The page scrolls via
+     `.adminLayout__content`; this box just sizes to its content.
+     `overflow-x` stays so a wide table scrolls sideways on its own instead
+     of pushing the whole page. */
+  overflow-x: auto;
 }
 
 /* One grid definition keeps the header and every row in the same columns.
@@ -178,4 +183,54 @@
   .users__grid {
     min-width: 1000px;
   }
+}
+
+/* Error banner + UID cell, added 9 Sep 2026 when this screen moved from mock
+   rows to the real `adminListUsers` callable. */
+.users__error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  color: var(--color-danger, #b3261e);
+  font-size: 13px;
+}
+
+.users__error button {
+  margin-left: auto;
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  border-radius: 999px;
+  padding: 4px 12px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.users__uid {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.65;
+}
+
+/* Sign-in method chips + per-row badge. Added 9 Sep 2026 — a guest is the
+   ABSENCE of a provider, so the three states are Google / Email / Guest. */
+.users__filter--active {
+  border-color: var(--vd-saffron, #e8720c);
+  color: var(--vd-saffron, #e8720c);
+  font-weight: 600;
+}
+
+.users__filterCount {
+  margin-left: 6px;
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+
+.users__method {
+  font-size: 11px;
+}
+
+.users__method--guest {
+  opacity: 0.75;
 }

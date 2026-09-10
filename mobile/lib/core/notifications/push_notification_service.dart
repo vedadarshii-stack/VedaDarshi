@@ -118,6 +118,61 @@ class PushNotificationService {
   /// `runApp`, so a failure here (missing plugin registration, a platform
   /// quirk, anything) must never stop the app booting — same contract as the
   /// existing `dotenv.load()` guard in `main.dart`.
+  /// Topic every install joins, so an admin can reach the whole audience
+  /// with ONE FCM call instead of iterating every token document.
+  static const String allUsersTopic = 'all_users';
+
+  /// The locale topic currently subscribed to, so a language change can
+  /// leave the old one. Null until [syncTopics] runs.
+  String? _localeTopic;
+
+  /// Subscribes this device to the broadcast topic and to its language
+  /// topic, leaving any previous language topic behind.
+  ///
+  /// ADDED 9 Sep 2026 with `adminSendNotification`. Until now the client
+  /// registered its FCM token but subscribed to NO topics, so a topic-
+  /// targeted send would have reached nobody — the send path and the
+  /// receive path each looked complete on their own while the pair did
+  /// nothing.
+  ///
+  /// ⚠️ Topics are per-DEVICE, not per-account. FCM has no notion of the
+  /// signed-in user, so this must be re-run when the language changes and
+  /// there is nothing to undo on sign-out — a shared device stays subscribed
+  /// to the language it is set to, which is the correct behaviour for a
+  /// broadcast.
+  ///
+  /// Every failure is swallowed: not receiving a promotional push is never a
+  /// reason to break startup, and FCM throws on a subscribe attempt made
+  /// with no network.
+  Future<void> syncTopics(String languageCode) async {
+    final next = 'locale_$languageCode';
+    if (_localeTopic == next) return;
+
+    try {
+      await _messaging.subscribeToTopic(allUsersTopic);
+    } catch (e) {
+      debugPrint('PushNotificationService: subscribe $allUsersTopic failed ($e)');
+    }
+
+    final previous = _localeTopic;
+    if (previous != null && previous != next) {
+      try {
+        await _messaging.unsubscribeFromTopic(previous);
+      } catch (e) {
+        debugPrint('PushNotificationService: unsubscribe $previous failed ($e)');
+      }
+    }
+
+    try {
+      await _messaging.subscribeToTopic(next);
+      // Only recorded after the subscribe SUCCEEDS, so a failed attempt is
+      // retried on the next call rather than being remembered as done.
+      _localeTopic = next;
+    } catch (e) {
+      debugPrint('PushNotificationService: subscribe $next failed ($e)');
+    }
+  }
+
   Future<void> initialize() async {
     if (_initialized) return;
     _initialized = true;

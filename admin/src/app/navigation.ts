@@ -32,6 +32,6 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Plans & Billing', icon: '👑', permission: PERMISSIONS.plansManage, path: '/plans' },
   { label: 'Quotes & Festivals', icon: '🪔', permission: PERMISSIONS.quotesManage },
   { label: 'Muhurat Content', icon: '🗓', permission: PERMISSIONS.muhuratManage },
-  { label: 'AI Usage', icon: '🔮', permission: PERMISSIONS.aiView },
+  { label: 'AI Usage', icon: '🔮', permission: PERMISSIONS.aiView, path: '/ai-usage' },
   { label: 'App Config', icon: '⚙', permission: PERMISSIONS.configManage },
 ];

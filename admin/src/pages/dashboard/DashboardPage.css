@@ -290,3 +290,24 @@
     width: 100%;
   }
 }
+
+/* Wallet health + provenance stamp. Added 9 Sep 2026 when this screen stopped
+   rendering invented figures. */
+.dash__health {
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.dash__healthValue {
+  font-family: var(--font-heading, inherit);
+  font-size: 28px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+  margin: 6px 0 2px;
+}
+
+.dash__healthNote,
+.dash__stamp {
+  font-size: 12px;
+  color: var(--color-muted);
+}

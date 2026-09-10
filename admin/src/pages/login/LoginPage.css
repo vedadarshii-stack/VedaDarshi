@@ -295,17 +295,7 @@
 }
 
 /* Temporary escape hatch while the console is still a design-review artefact. */
-.login__concept {
-  text-align: center;
-  font-size: 11px;
-  color: var(--vd-placeholder);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
 
-.login__concept:hover {
-  color: var(--vd-muted);
-}
 
 @media (max-width: 1080px) {
   .login__brand {

@@ -1,91 +1,156 @@
-import { DASHBOARD_STATS, GROWTH_CHART, TODAYS_CONTENT } from '../../data/mock';
+import { useCallback, useEffect, useState } from 'react';
+
+import {
+  callableErrorMessage,
+  fetchDashboardStats,
+  type DashboardStats,
+} from '../../lib/adminApi';
 import './DashboardPage.css';
 
-/** Figma E2 · Dashboard (node 31:2). */
+/**
+ * Figma E2 · Dashboard (node 31:2) — now showing REAL numbers.
+ *
+ * ⚠️ **REWIRED 9 Sep 2026 because every figure on this screen was invented.**
+ * It rendered hardcoded strings from `mock.ts`: "48,320 Total Users",
+ * "6,905 Active Subscriptions", "₹11.4L Revenue (July)", "12,441 AI Questions
+ * Today", plus a six-month growth chart and a fixed date of "Saturday,
+ * 12 July 2026". The real figures were 18 users, 0 subscriptions and zero
+ * revenue.
+ *
+ * That is more dangerous than an empty screen: it was screenshot-ready and
+ * read as a business report. Numbers now come from `adminDashboardStats`, and
+ * anything the server could not determine renders as "—" rather than as a
+ * confident zero.
+ *
+ * The growth chart is GONE rather than zeroed. We keep no historical
+ * user/revenue series, so any chart drawn here would be shape without data —
+ * exactly the problem being fixed. It comes back when there is something to
+ * plot.
+ */
+
+function formatNumber(value: number | null | undefined): string {
+  return value == null ? '—' : value.toLocaleString();
+}
+
+function formatUsd(value: string | null | undefined): string {
+  return value == null ? '—' : `$${value}`;
+}
+
 export function DashboardPage() {
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      setStats(await fetchDashboardStats());
+    } catch (e) {
+      setError(callableErrorMessage(e));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const today = new Date().toLocaleDateString(undefined, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
+  const cards = [
+    {
+      label: 'Total users',
+      value: formatNumber(stats?.totalUsers),
+      note: 'registered accounts',
+      icon: '👥',
+      tone: 'saffron',
+    },
+    {
+      label: 'Paid subscribers',
+      value: formatNumber(stats?.paidSubscribers),
+      // Sandbox entitlements are called out rather than folded in — a
+      // licence tester's Platinum is not a customer.
+      note:
+        stats?.sandboxEntitlements
+          ? `${stats.sandboxEntitlements} sandbox (test) entitlement${stats.sandboxEntitlements === 1 ? '' : 's'}`
+          : 'active entitlements',
+      icon: '👑',
+      tone: 'gold',
+    },
+    {
+      label: 'Vedika queries',
+      value: formatNumber(stats?.vedikaQueries),
+      note: `spend ${formatUsd(stats?.vedikaSpendUsd)}`,
+      icon: '🔮',
+      tone: 'purple',
+    },
+    {
+      label: 'Revenue (28 days)',
+      value: stats?.revenue28d != null ? `$${stats.revenue28d}` : '—',
+      note: `${formatNumber(stats?.activeSubscriptions)} active subscriptions`,
+      icon: '💰',
+      tone: 'green',
+    },
+  ];
+
   return (
     <>
       <header className="pageHead">
         <div className="pageHead__text">
           <h1 className="pageHead__title">Dashboard</h1>
-          <p className="pageHead__subtitle">Saturday, 12 July 2026 · Shukla Ashtami</p>
+          <p className="pageHead__subtitle">{today}</p>
         </div>
-        <label className="dash__search">
-          <span className="vd-glyph">🔍</span>
-          <input type="search" placeholder="Search users, articles…" />
-        </label>
-        <button type="button" className="dash__bell vd-glyph" aria-label="Notifications">
-          🔔
+        <button type="button" className="users__export" onClick={() => void load()}>
+          ↻ Refresh
         </button>
       </header>
 
+      {error && (
+        <div className="card users__error" role="alert">
+          <strong>Couldn’t load stats.</strong> {error}
+          <button type="button" onClick={() => void load()}>
+            Retry
+          </button>
+        </div>
+      )}
+
       <section className="dash__stats">
-        {DASHBOARD_STATS.map((stat) => (
+        {cards.map((stat) => (
           <article key={stat.label} className="statCard">
             <div className="statCard__top">
               <p className="statCard__label">{stat.label}</p>
-              <span className={`statCard__icon vd-glyph tone tone--${stat.tone}`}>{stat.icon}</span>
+              <span className={`statCard__icon vd-glyph tone tone--${stat.tone}`}>
+                {stat.icon}
+              </span>
             </div>
-            <p className="statCard__value">{stat.value}</p>
-            <p className="statCard__delta">{stat.delta}</p>
+            <p className="statCard__value">{loading && !stats ? '…' : stat.value}</p>
+            <p className="statCard__delta">{stat.note}</p>
           </article>
         ))}
       </section>
 
-      <section className="dash__lower">
-        <article className="card chartCard">
-          <div className="chartCard__head">
-            <h2 className="card__title">User growth &amp; revenue</h2>
-            <span className="chartCard__range">Last 6 months ▾</span>
-          </div>
-
-          <div className="chartCard__plot">
-            {GROWTH_CHART.map((column) => (
-              <div key={column.month} className="chartCard__column">
-                <div className="chartCard__bars">
-                  <span
-                    className="chartCard__bar chartCard__bar--users"
-                    style={{ height: `${column.users}px` }}
-                    title={`${column.month} · new users`}
-                  />
-                  <span
-                    className="chartCard__bar chartCard__bar--revenue"
-                    style={{ height: `${column.revenue}px` }}
-                    title={`${column.month} · revenue`}
-                  />
-                </div>
-                <span className="chartCard__month">{column.month}</span>
-              </div>
-            ))}
-          </div>
-
-          <div className="chartCard__legend">
-            <span className="chartCard__legendItem">
-              <i className="chartCard__dot chartCard__dot--users" />
-              New users
-            </span>
-            <span className="chartCard__legendItem">
-              <i className="chartCard__dot chartCard__dot--revenue" />
-              Revenue (₹10k)
-            </span>
-          </div>
-        </article>
-
-        <article className="card sideCard">
-          <h2 className="card__title">Today&rsquo;s content</h2>
-          <ul className="sideCard__list">
-            {TODAYS_CONTENT.map((item) => (
-              <li key={item.title} className="sideCard__row">
-                <span className={`sideCard__icon sideCard__icon--${item.tone}`}>{item.icon}</span>
-                <span className="sideCard__text">
-                  <span className="sideCard__title">{item.title}</span>
-                  <span className="sideCard__detail">{item.detail}</span>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </article>
+      <section className="card dash__health">
+        <h2 className="card__title">Vedika wallet</h2>
+        <p className="dash__healthValue">{formatUsd(stats?.vedikaBalanceUsd)}</p>
+        <p className="dash__healthNote">
+          Prepaid. At zero, every astrology call in the app fails — panchang,
+          horoscopes, kundli and AI.
+        </p>
       </section>
+
+      {stats && (
+        <p className="dash__stamp">
+          Live figures, fetched {new Date(stats.fetchedAtMs).toLocaleTimeString()}.
+          Historical charts return once there is history to plot.
+        </p>
+      )}
     </>
   );
 }

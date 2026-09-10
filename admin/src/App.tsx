@@ -11,6 +11,7 @@ import { UsersPage } from './pages/users/UsersPage';
 import { ArticlesPage } from './pages/articles/ArticlesPage';
 import { NotificationsPage } from './pages/notifications/NotificationsPage';
 import { PlansPage } from './pages/plans/PlansPage';
+import { AiUsagePage } from './pages/ai-usage/AiUsagePage';
 
 /** Screens follow the Figma "E · Admin CMS (React Web)" concept.
  *
@@ -56,6 +57,14 @@ function App() {
                   element={
                     <RequirePermission need={PERMISSIONS.notificationsSend}>
                       <NotificationsPage />
+                    </RequirePermission>
+                  }
+                />
+                <Route
+                  path="/ai-usage"
+                  element={
+                    <RequirePermission need={PERMISSIONS.aiView}>
+                      <AiUsagePage />
                     </RequirePermission>
                   }
                 />

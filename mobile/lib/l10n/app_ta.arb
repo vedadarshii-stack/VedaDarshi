@@ -532,5 +532,8 @@
   "dailyReadingAreaCareer": "தொழில்",
   "dailyReadingAreaFinance": "நிதி",
   "dailyReadingAreaHealth": "உடல்நலம்",
-  "dailyReadingAreaRelationship": "உறவுகள்"
+  "dailyReadingAreaRelationship": "உறவுகள்",
+  "reportBuyOnce": "இந்த அறிக்கையைத் திறக்கவும்",
+  "reportOwned": "இந்த அறிக்கை உங்களிடம் உள்ளது",
+  "reportBuyOrSubscribe": "அல்லது அனைத்து அறிக்கைகளுக்கும் சந்தா செலுத்துங்கள்"
 }

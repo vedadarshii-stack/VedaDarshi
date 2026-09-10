@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/authContext';
-import { exitConceptMode } from '../lib/conceptMode';
 import './AccessNotice.css';
 
 /** Full-bleed message for the states where the console cannot show a screen:
@@ -19,7 +18,6 @@ export function AccessNotice({
   const { signOut } = useAuth();
 
   async function leave() {
-    exitConceptMode();
     await signOut();
     navigate('/login', { replace: true });
   }

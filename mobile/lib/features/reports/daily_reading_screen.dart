@@ -185,18 +185,27 @@ class _LockedCard extends StatelessWidget {
                     gradient: AppColors.saffronGradient,
                     borderRadius: BorderRadius.circular(999),
                   ),
-                  child: Text(
-                    // Play's own price when known; never formatted by us.
-                    priceString == null
-                        ? l10n.dailyReadingBuy
-                        : '${l10n.dailyReadingBuy} · $priceString',
-                    style: AppFonts.body(
-                      locale,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
+                  child: isBusy
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation(Colors.white),
+                          ),
+                        )
+                      : Text(
+                          // Play's own price when known; never formatted by us.
+                          priceString == null
+                              ? l10n.dailyReadingBuy
+                              : '${l10n.dailyReadingBuy} · $priceString',
+                          style: AppFonts.body(
+                            locale,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
                 ),
               ),
             ),

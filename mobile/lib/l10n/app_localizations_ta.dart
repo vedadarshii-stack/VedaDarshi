@@ -1844,4 +1844,14 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get dailyReadingAreaRelationship => 'உறவுகள்';
+
+  @override
+  String get reportBuyOnce => 'இந்த அறிக்கையைத் திறக்கவும்';
+
+  @override
+  String get reportOwned => 'இந்த அறிக்கை உங்களிடம் உள்ளது';
+
+  @override
+  String get reportBuyOrSubscribe =>
+      'அல்லது அனைத்து அறிக்கைகளுக்கும் சந்தா செலுத்துங்கள்';
 }

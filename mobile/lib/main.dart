@@ -189,6 +189,16 @@ class _MainAppState extends ConsumerState<MainApp> {
     final locale = ref.watch(localeControllerProvider);
     final themeMode = ref.watch(themeControllerProvider);
 
+    // Keep the FCM topic subscriptions in step with the chosen language, so
+    // an admin's locale-targeted push actually reaches this device. Done in
+    // a post-frame callback because `syncTopics` is async and network-bound,
+    // and build() must stay synchronous and side-effect-free. It is a no-op
+    // when the language has not changed.
+    final languageCode = locale?.languageCode ?? 'en';
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      PushNotificationService.instance.syncTopics(languageCode);
+    });
+
     // Resolve which brightness is ACTUALLY about to render (ThemeMode.system
     // depends on the platform) and point AppColors at the matching palette
     // BEFORE this build's widget tree is constructed. Every AppColors.*

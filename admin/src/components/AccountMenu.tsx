@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/authContext';
-import { exitConceptMode } from '../lib/conceptMode';
 import './AccountMenu.css';
 
 /** Sidebar account row + sign-out popover.
@@ -53,9 +52,6 @@ export function AccountMenu({
   async function handleSignOut() {
     setSigningOut(true);
     try {
-      // Clear the concept flag too, or "sign out" would leave the console
-      // browsable and look like it failed.
-      exitConceptMode();
       await signOut();
       navigate('/login', { replace: true });
     } finally {

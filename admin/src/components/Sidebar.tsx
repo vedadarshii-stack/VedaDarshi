@@ -10,14 +10,12 @@ export function Sidebar() {
   const { user } = useAuth();
   const profileState = useAdminProfile();
 
-  // Concept mode shows the whole sidebar (it is the static walkthrough);
-  // a real session shows only what the role grants. Anything else fails closed.
+  // Only a resolved role grants anything. Every other state — loading,
+  // not-admin, error — shows an empty sidebar rather than the full menu.
+  // The `concept` branch that used to grant ['*'] here was removed
+  // 9 Sep 2026 along with the sign-in bypass.
   const granted =
-    profileState.status === 'concept'
-      ? ['*']
-      : profileState.status === 'ready'
-        ? profileState.profile.permissions
-        : [];
+    profileState.status === 'ready' ? profileState.profile.permissions : [];
 
   const visibleItems = NAV_ITEMS.filter((item) => hasPermission(granted, item.permission));
 
@@ -31,11 +29,9 @@ export function Sidebar() {
   const roleLabel =
     profileState.status === 'ready'
       ? profileState.profile.roleName
-      : profileState.status === 'concept'
-        ? 'Concept preview'
-        : profileState.status === 'loading'
-          ? 'Loading role…'
-          : 'No console role';
+      : profileState.status === 'loading'
+        ? 'Loading role…'
+        : 'No console role';
 
   return (
     <aside className="sidebar">
