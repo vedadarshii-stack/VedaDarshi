@@ -1860,4 +1860,77 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get reportPdfFailed => 'PDF உருவாக்க முடியவில்லை.';
+
+  @override
+  String get lblOverallScore => 'மொத்த மதிப்பெண்';
+
+  @override
+  String get lblFifthHouse => 'புத்திர ஸ்தானம்';
+
+  @override
+  String get lblFifthLord => 'புத்திர அதிபதி';
+
+  @override
+  String get lblJupiter => 'குரு';
+
+  @override
+  String get reportRemedies => 'லால் கிதாப் பரிகாரங்கள்';
+
+  @override
+  String get reportRemediesDesc => 'உங்கள் ஜாதகத்தின் கிரக பரிகாரங்கள்';
+
+  @override
+  String get reportRudraksha => 'ருத்திராட்ச வழிகாட்டி';
+
+  @override
+  String get reportRudrakshaDesc => 'உங்கள் கிரகங்களுக்கு ஏற்ற முகி';
+
+  @override
+  String get reportProperty => 'சொத்து அறிக்கை';
+
+  @override
+  String get reportPropertyDesc => 'நிலம், வீடு & வாகன நேரம்';
+
+  @override
+  String get reportChildFamily => 'குழந்தை & குடும்ப அறிக்கை';
+
+  @override
+  String get reportChildFamilyDesc => 'புத்திர யோகம் & நேரம்';
+
+  @override
+  String get reportBusiness => 'வணிக அறிக்கை';
+
+  @override
+  String get reportBusinessDesc => 'வணிக நேரம் & கூட்டாண்மை';
+
+  @override
+  String get allReportsFooter => 'அனைத்து அறிக்கைகளிலும் PDF பதிவிறக்கம் உண்டு';
+
+  @override
+  String get storeTitle => 'கடை';
+
+  @override
+  String get storeSubtitle => 'ஒருமுறை கொள்முதல் — சந்தா தேவையில்லை';
+
+  @override
+  String get storeTabPacks => 'AI தொகுப்புகள்';
+
+  @override
+  String get storeTabReports => 'அறிக்கைகள்';
+
+  @override
+  String get storeTabDaily => 'தினசரி பலன்';
+
+  @override
+  String get storeOwned => 'உங்களிடம் உள்ளது';
+
+  @override
+  String get storeIncluded => 'சேர்க்கப்பட்டது';
+
+  @override
+  String get storeUnavailable => 'தற்போது கிடைக்கவில்லை.';
+
+  @override
+  String get storeSubscribeHint =>
+      'சந்தா செலுத்தினால் அனைத்து அறிக்கைகளும் திறக்கும்';
 }

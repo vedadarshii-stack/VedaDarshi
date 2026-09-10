@@ -515,7 +515,13 @@ class _Footer extends StatelessWidget {
       children: [
         Flexible(
           child: Text(
-            l10n.moreReportsFooter(remaining.toString()),
+            // `remaining` is now always 0 — every report in the catalogue is
+            // built and openable. The footer keeps only the true half of its
+            // old copy (PDF download, which shipped 10 Sep) instead of
+            // advertising reports that do not exist.
+            remaining > 0
+                ? l10n.moreReportsFooter(remaining.toString())
+                : l10n.allReportsFooter,
             textAlign: TextAlign.center,
             style: AppFonts.body(locale, fontSize: 11.5, color: AppColors.hint),
           ),

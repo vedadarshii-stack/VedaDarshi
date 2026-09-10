@@ -1840,4 +1840,76 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportPdfFailed => 'Couldn\'t create the PDF.';
+
+  @override
+  String get lblOverallScore => 'Overall score';
+
+  @override
+  String get lblFifthHouse => 'Children house';
+
+  @override
+  String get lblFifthLord => 'Children lord';
+
+  @override
+  String get lblJupiter => 'Jupiter';
+
+  @override
+  String get reportRemedies => 'Lal Kitab Remedies';
+
+  @override
+  String get reportRemediesDesc => 'Per-planet remedies from your chart';
+
+  @override
+  String get reportRudraksha => 'Rudraksha Guide';
+
+  @override
+  String get reportRudrakshaDesc => 'Which mukhi suits your planets';
+
+  @override
+  String get reportProperty => 'Property Report';
+
+  @override
+  String get reportPropertyDesc => 'Timing for land, home & vehicles';
+
+  @override
+  String get reportChildFamily => 'Child & Family Report';
+
+  @override
+  String get reportChildFamilyDesc => 'Progeny indicators & timing';
+
+  @override
+  String get reportBusiness => 'Business Report';
+
+  @override
+  String get reportBusinessDesc => 'Venture timing & partnership';
+
+  @override
+  String get allReportsFooter => 'All reports include PDF download';
+
+  @override
+  String get storeTitle => 'Store';
+
+  @override
+  String get storeSubtitle => 'One-time purchases — no subscription needed';
+
+  @override
+  String get storeTabPacks => 'AI packs';
+
+  @override
+  String get storeTabReports => 'Reports';
+
+  @override
+  String get storeTabDaily => 'Daily reading';
+
+  @override
+  String get storeOwned => 'Owned';
+
+  @override
+  String get storeIncluded => 'Included';
+
+  @override
+  String get storeUnavailable => 'Not available right now.';
+
+  @override
+  String get storeSubscribeHint => 'Subscribing unlocks every report instead';
 }

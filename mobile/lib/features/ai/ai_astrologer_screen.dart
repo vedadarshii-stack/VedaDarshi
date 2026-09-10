@@ -6,7 +6,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../l10n/app_localizations.dart';
 import '../home/home_static_data.dart';
-import '../premium/ai_pack_sheet.dart';
+import '../premium/store_screen.dart';
 import '../profile/birth_profile_repository.dart';
 import 'ai_chat_message.dart';
 import 'ai_error_messages.dart';
@@ -1297,7 +1297,11 @@ class _InputBar extends StatelessWidget {
                   // subscription reachable underneath it. The packs are also
                   // the only product that fits a free user who will never
                   // subscribe.
-                  onTap: () => showAiPackSheet(context),
+                  onTap: () => Navigator.of(context).push(
+                    fadeThroughRoute(
+                      const StoreScreen(initialTab: StoreTab.packs),
+                    ),
+                  ),
                   // TAP TARGET, not just text — 2 Sep 2026, client reported
                   // this "should go to the subscription page". It always
                   // did: the handler below has pushed

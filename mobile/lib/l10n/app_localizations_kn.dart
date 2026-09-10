@@ -1846,4 +1846,77 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get reportPdfFailed => 'PDF ರಚಿಸಲಾಗಲಿಲ್ಲ.';
+
+  @override
+  String get lblOverallScore => 'ಒಟ್ಟು ಅಂಕ';
+
+  @override
+  String get lblFifthHouse => 'ಸಂತಾನ ಭಾವ';
+
+  @override
+  String get lblFifthLord => 'ಸಂತಾನ ಅಧಿಪತಿ';
+
+  @override
+  String get lblJupiter => 'ಗುರು';
+
+  @override
+  String get reportRemedies => 'ಲಾಲ್ ಕಿತಾಬ್ ಪರಿಹಾರಗಳು';
+
+  @override
+  String get reportRemediesDesc => 'ನಿಮ್ಮ ಜಾತಕದ ಗ್ರಹವಾರು ಪರಿಹಾರಗಳು';
+
+  @override
+  String get reportRudraksha => 'ರುದ್ರಾಕ್ಷ ಮಾರ್ಗದರ್ಶಿ';
+
+  @override
+  String get reportRudrakshaDesc => 'ನಿಮ್ಮ ಗ್ರಹಗಳಿಗೆ ಸೂಕ್ತ ಮುಖಿ';
+
+  @override
+  String get reportProperty => 'ಆಸ್ತಿ ವರದಿ';
+
+  @override
+  String get reportPropertyDesc => 'ಭೂಮಿ, ಮನೆ & ವಾಹನ ಸಮಯ';
+
+  @override
+  String get reportChildFamily => 'ಮಕ್ಕಳು & ಕುಟುಂಬ ವರದಿ';
+
+  @override
+  String get reportChildFamilyDesc => 'ಸಂತಾನ ಸೂಚನೆ & ಸಮಯ';
+
+  @override
+  String get reportBusiness => 'ವ್ಯಾಪಾರ ವರದಿ';
+
+  @override
+  String get reportBusinessDesc => 'ವ್ಯಾಪಾರ ಸಮಯ & ಪಾಲುದಾರಿಕೆ';
+
+  @override
+  String get allReportsFooter => 'ಎಲ್ಲಾ ವರದಿಗಳಲ್ಲಿ PDF ಡೌನ್‌ಲೋಡ್ ಇದೆ';
+
+  @override
+  String get storeTitle => 'ಸ್ಟೋರ್';
+
+  @override
+  String get storeSubtitle => 'ಒಂದು ಬಾರಿ ಖರೀದಿ — ಚಂದಾದಾರಿಕೆ ಅಗತ್ಯವಿಲ್ಲ';
+
+  @override
+  String get storeTabPacks => 'AI ಪ್ಯಾಕ್‌ಗಳು';
+
+  @override
+  String get storeTabReports => 'ವರದಿಗಳು';
+
+  @override
+  String get storeTabDaily => 'ದೈನಂದಿನ ಫಲ';
+
+  @override
+  String get storeOwned => 'ನಿಮ್ಮ ಬಳಿ ಇದೆ';
+
+  @override
+  String get storeIncluded => 'ಸೇರಿದೆ';
+
+  @override
+  String get storeUnavailable => 'ಸದ್ಯಕ್ಕೆ ಲಭ್ಯವಿಲ್ಲ.';
+
+  @override
+  String get storeSubscribeHint =>
+      'ಚಂದಾದಾರರಾದರೆ ಎಲ್ಲಾ ವರದಿಗಳು ಅನ್‌ಲಾಕ್ ಆಗುತ್ತವೆ';
 }

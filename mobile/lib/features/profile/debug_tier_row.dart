@@ -69,7 +69,7 @@ class DebugTierRow extends ConsumerWidget {
           Text(
             forced == null
                 ? 'Using the real entitlement. Pick a tier to fake one.'
-                : 'Faking ${forced.name} — client-side gates only. '
+                : 'Faking ${_capitalise(forced.name)} — client-side gates only. '
                       'Server quotas (AI questions, packs) ignore this.',
             style: AppFonts.body(
               locale,
@@ -93,7 +93,11 @@ class DebugTierRow extends ConsumerWidget {
               ),
               for (final tier in SubscriptionTier.values)
                 _TierChip(
-                  label: tier.name,
+                  // `tier.name` is lowercase ("gold"), which sat next to a
+                  // capitalised "Real" and read as a typo. Capitalised here
+                  // rather than renaming the enum, whose lowercase values are
+                  // correct — they match RevenueCat's entitlement keys.
+                  label: _capitalise(tier.name),
                   selected: forced == tier,
                   locale: locale,
                   onTap: () =>
@@ -106,6 +110,9 @@ class DebugTierRow extends ConsumerWidget {
     );
   }
 }
+
+String _capitalise(String value) =>
+    value.isEmpty ? value : value[0].toUpperCase() + value.substring(1);
 
 class _TierChip extends StatelessWidget {
   const _TierChip({

@@ -111,12 +111,61 @@ abstract final class ReportsStaticData {
       readMinutes: 7,
       access: ReportAccess.free,
     ),
+    // ADDED 10 Sep 2026. These five were already SELLABLE in Play and
+    // RevenueCat but had no screen — the footer promised "+n more reports"
+    // that could not be opened. Every endpoint was probed live first.
+    AstrologyReport(
+      id: 'remedies',
+      emoji: '🪔',
+      tileBg: AppColors.tileGoldBg,
+      tileFg: AppColors.tileGoldFg,
+      readMinutes: 8,
+      access: ReportAccess.premium,
+    ),
+    AstrologyReport(
+      id: 'rudraksha',
+      emoji: '📿',
+      tileBg: AppColors.tilePurpleBg,
+      tileFg: AppColors.tilePurpleFg,
+      readMinutes: 5,
+      access: ReportAccess.premium,
+    ),
+    AstrologyReport(
+      id: 'property',
+      emoji: '🏠',
+      tileBg: AppColors.tileGreenBg,
+      tileFg: AppColors.tileGreenFg,
+      readMinutes: 7,
+      access: ReportAccess.premium,
+    ),
+    AstrologyReport(
+      id: 'childFamily',
+      emoji: '👶',
+      tileBg: AppColors.tilePinkBg,
+      tileFg: AppColors.tilePinkFg,
+      readMinutes: 8,
+      access: ReportAccess.premium,
+    ),
+    AstrologyReport(
+      id: 'business',
+      emoji: '💼',
+      tileBg: AppColors.tileBlueBg,
+      tileFg: AppColors.tileBlueFg,
+      readMinutes: 9,
+      access: ReportAccess.premium,
+    ),
   ];
 
-  /// Total reports the finished catalogue will offer (the banner promises
-  /// "all 9 reports" and the footer says "+n more"). 8 are now live — the
-  /// 7 approved in Figma plus the Complete Life Report added 2 Sep 2026.
-  /// Kept as one constant so the banner/footer copy can never drift out of
-  /// sync with [reports].length.
-  static const int totalReports = 9;
+  /// Total reports the catalogue offers.
+  ///
+  /// ⚠️ **Derived from [reports], not hardcoded (10 Sep 2026).** It was the
+  /// constant `9` against 8 built reports, so the footer rendered
+  /// "+ 1 more reports" — bad grammar promising a report that did not exist
+  /// and could not be opened. A hand-maintained total is a promise nobody
+  /// updates; deriving it means the copy cannot drift again.
+  ///
+  /// All 13 are now live: the 7 approved in Figma, the Complete Life Report
+  /// (2 Sep), and the 5 that were already sellable in Play but had no screen
+  /// (10 Sep).
+  static int get totalReports => reports.length;
 }

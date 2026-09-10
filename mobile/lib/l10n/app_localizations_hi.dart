@@ -1836,4 +1836,76 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get reportPdfFailed => 'PDF नहीं बन सका।';
+
+  @override
+  String get lblOverallScore => 'कुल स्कोर';
+
+  @override
+  String get lblFifthHouse => 'संतान भाव';
+
+  @override
+  String get lblFifthLord => 'संतान स्वामी';
+
+  @override
+  String get lblJupiter => 'गुरु';
+
+  @override
+  String get reportRemedies => 'लाल किताब उपाय';
+
+  @override
+  String get reportRemediesDesc => 'आपकी कुंडली से ग्रहवार उपाय';
+
+  @override
+  String get reportRudraksha => 'रुद्राक्ष मार्गदर्शिका';
+
+  @override
+  String get reportRudrakshaDesc => 'आपके ग्रहों के लिए उपयुक्त मुखी';
+
+  @override
+  String get reportProperty => 'संपत्ति रिपोर्ट';
+
+  @override
+  String get reportPropertyDesc => 'भूमि, घर व वाहन का समय';
+
+  @override
+  String get reportChildFamily => 'संतान व परिवार रिपोर्ट';
+
+  @override
+  String get reportChildFamilyDesc => 'संतान योग व समय';
+
+  @override
+  String get reportBusiness => 'व्यापार रिपोर्ट';
+
+  @override
+  String get reportBusinessDesc => 'व्यवसाय का समय व साझेदारी';
+
+  @override
+  String get allReportsFooter => 'सभी रिपोर्ट्स में PDF डाउनलोड शामिल है';
+
+  @override
+  String get storeTitle => 'स्टोर';
+
+  @override
+  String get storeSubtitle => 'एकमुश्त खरीद — सदस्यता की ज़रूरत नहीं';
+
+  @override
+  String get storeTabPacks => 'एआई पैक';
+
+  @override
+  String get storeTabReports => 'रिपोर्ट्स';
+
+  @override
+  String get storeTabDaily => 'दैनिक रीडिंग';
+
+  @override
+  String get storeOwned => 'आपके पास है';
+
+  @override
+  String get storeIncluded => 'शामिल';
+
+  @override
+  String get storeUnavailable => 'अभी उपलब्ध नहीं है।';
+
+  @override
+  String get storeSubscribeHint => 'सदस्यता लेने पर सभी रिपोर्ट्स खुल जाती हैं';
 }

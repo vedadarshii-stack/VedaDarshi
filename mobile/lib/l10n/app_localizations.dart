@@ -3337,6 +3337,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t create the PDF.'**
   String get reportPdfFailed;
+
+  /// Five new report types. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall score'**
+  String get lblOverallScore;
+
+  /// Five new report types. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Children house'**
+  String get lblFifthHouse;
+
+  /// Five new report types. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Children lord'**
+  String get lblFifthLord;
+
+  /// Five new report types. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Jupiter'**
+  String get lblJupiter;
+
+  /// Five new report types. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Lal Kitab Remedies'**
+  String get reportRemedies;
+
+  /// Five new report types. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Per-planet remedies from your chart'**
+  String get reportRemediesDesc;
+
+  /// Five new report types. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Rudraksha Guide'**
+  String get reportRudraksha;
+
+  /// Five new report types. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Which mukhi suits your planets'**
+  String get reportRudrakshaDesc;
+
+  /// Five new report types. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Property Report'**
+  String get reportProperty;
+
+  /// Five new report types. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Timing for land, home & vehicles'**
+  String get reportPropertyDesc;
+
+  /// Five new report types. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Child & Family Report'**
+  String get reportChildFamily;
+
+  /// Five new report types. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Progeny indicators & timing'**
+  String get reportChildFamilyDesc;
+
+  /// Five new report types. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Business Report'**
+  String get reportBusiness;
+
+  /// Five new report types. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Venture timing & partnership'**
+  String get reportBusinessDesc;
+
+  /// Reports footer once every report is built. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'All reports include PDF download'**
+  String get allReportsFooter;
+
+  /// Unified one-time purchase store. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Store'**
+  String get storeTitle;
+
+  /// Unified one-time purchase store. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'One-time purchases — no subscription needed'**
+  String get storeSubtitle;
+
+  /// Unified one-time purchase store. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'AI packs'**
+  String get storeTabPacks;
+
+  /// Unified one-time purchase store. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports'**
+  String get storeTabReports;
+
+  /// Unified one-time purchase store. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily reading'**
+  String get storeTabDaily;
+
+  /// Unified one-time purchase store. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Owned'**
+  String get storeOwned;
+
+  /// Unified one-time purchase store. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Included'**
+  String get storeIncluded;
+
+  /// Unified one-time purchase store. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available right now.'**
+  String get storeUnavailable;
+
+  /// Unified one-time purchase store. Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribing unlocks every report instead'**
+  String get storeSubscribeHint;
 }
 
 class _AppLocalizationsDelegate

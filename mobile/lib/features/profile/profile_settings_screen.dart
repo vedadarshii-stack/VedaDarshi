@@ -23,7 +23,7 @@ import '../panchang/panchang_location.dart';
 import '../panchang/panchang_location_screen.dart';
 import '../../core/purchases/purchases_service.dart';
 import '../premium/purchase_error_messages.dart';
-import '../premium/ai_pack_sheet.dart';
+import '../premium/store_screen.dart';
 import 'debug_tier_row.dart';
 import '../premium/subscription_paywall_screen.dart';
 import '../reports/premium_reports_screen.dart';
@@ -842,14 +842,20 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                 // number comes from the server-side ledger via Firestore, not
                 // from the store, because remaining questions are our
                 // accounting and not Play's.
+                // ⚠️ Was "Top up questions", opening only the AI-pack sheet.
+                // That made packs the ONLY discoverable one-time purchase
+                // while reports and the daily reading hid behind other
+                // screens. Now one Store lists all three.
                 _MenuRow(
-                  emoji: '🔮',
-                  title: l10n.aiPackTopUp,
+                  emoji: '🛍️',
+                  title: l10n.storeTitle,
                   subtitle: packBalance > 0
                       ? l10n.aiPackBalance('$packBalance')
-                      : null,
+                      : l10n.storeSubtitle,
                   locale: locale,
-                  onTap: () => showAiPackSheet(context),
+                  onTap: () => Navigator.of(
+                    context,
+                  ).push(fadeThroughRoute(const StoreScreen())),
                 ),
                 _MenuRow(
                   emoji: '♻️',

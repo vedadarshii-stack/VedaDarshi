@@ -17,6 +17,11 @@ String reportTitle(String id, AppLocalizations l10n) {
     'sadeSati' => l10n.reportSadeSati,
     'gemstone' => l10n.reportGemstone,
     'numerology' => l10n.reportNumerology,
+    'remedies' => l10n.reportRemedies,
+    'rudraksha' => l10n.reportRudraksha,
+    'property' => l10n.reportProperty,
+    'childFamily' => l10n.reportChildFamily,
+    'business' => l10n.reportBusiness,
     // An unknown id is a bug, but showing the raw id beats showing nothing —
     // it names the thing that is broken instead of hiding it.
     _ => id,
@@ -33,6 +38,11 @@ String reportDescription(String id, AppLocalizations l10n) {
     'sadeSati' => l10n.reportSadeSatiDesc,
     'gemstone' => l10n.reportGemstoneDesc,
     'numerology' => l10n.reportNumerologyDesc,
+    'remedies' => l10n.reportRemediesDesc,
+    'rudraksha' => l10n.reportRudrakshaDesc,
+    'property' => l10n.reportPropertyDesc,
+    'childFamily' => l10n.reportChildFamilyDesc,
+    'business' => l10n.reportBusinessDesc,
     _ => '',
   };
 }
