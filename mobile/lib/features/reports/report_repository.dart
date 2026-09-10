@@ -42,6 +42,15 @@ class ReportRepository {
     'sadeSati': '/v2/astrology/sade-sati',
     'gemstone': '/v2/astrology/remedies/gemstone',
     'numerology': '/v2/astrology/numerology/complete-report',
+    // ADDED 10 Sep 2026. These five were already SELLABLE — their Play
+    // products and RevenueCat packages existed — but had no screen, so the
+    // Reports footer promised "+n more reports" that could not be opened.
+    // Every endpoint was probed live before being listed here.
+    'remedies': '/v2/astrology/lalkitab/remedies',
+    'rudraksha': '/v2/spiritual/rudraksha',
+    'property': '/v2/career/finance/property',
+    'childFamily': '/v2/matrimony/children',
+    'business': '/v2/career/finance/business-start',
   };
 
   /// In-memory, keyed by report id + birth parameters. A report is a pure

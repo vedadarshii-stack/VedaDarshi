@@ -94,6 +94,16 @@ ReportContent buildReportContent(
     'sadeSati' => _sadeSati(json, l10n),
     'gemstone' => _gemstone(json, l10n),
     'numerology' => _numerology(json, l10n),
+    // ADDED 10 Sep 2026 — see `ReportRepository.endpoints`.
+    'remedies' => _lalKitabRemedies(json, l10n),
+    'rudraksha' => _rudraksha(json, l10n),
+    // Property and Business share wealth-timing's SHAPE but not its content:
+    // Vedika keys them off different houses (4 & 2 for property, 7/10/3 for
+    // business) with distinct guidance and rationale — verified by diffing
+    // all three live payloads. One adapter, three genuinely different
+    // readings.
+    'property' || 'business' => _wealth(json, l10n),
+    'childFamily' => _children(json, l10n),
     _ => const ReportContent(),
   };
 }
@@ -488,4 +498,93 @@ List<ReportLine> _mapList(
   return [
     for (final item in _listOfMaps(value)) ?build(item),
   ];
+}
+
+
+/// `POST /v2/astrology/lalkitab/remedies`.
+///
+/// Lal Kitab prescribes per-planet remedies rather than one overall reading,
+/// so the shape is a list of `{planet, house, reason, remedies[]}`. The
+/// planet + reason becomes the label; the remedies become the lines.
+ReportContent _lalKitabRemedies(
+  Map<String, dynamic> json,
+  AppLocalizations l10n,
+) {
+  final overview = <ReportLine>[
+    if (parseFreeText(json['overallStrength']) case final value?)
+      ReportLine(value),
+  ];
+
+  final remedies = <ReportLine>[];
+  for (final entry in _listOfMaps(json['remedies'])) {
+    final planet = parseFreeText(entry['planet']);
+    final reason = parseFreeText(entry['reason']);
+    // The REASON carries the diagnosis ("Mars sleeping in house 9 — needs
+    // activation"), so it leads. Without it the remedies read as folk advice
+    // with no connection to the chart.
+    if (reason != null) {
+      remedies.add(ReportLine(reason, label: planet));
+    }
+    for (final item in parseStrings(entry['remedies'])) {
+      remedies.add(ReportLine(item));
+    }
+  }
+
+  return ReportContent(
+    sections: [
+      ReportSection(ReportSectionKind.overview, overview),
+      ReportSection(ReportSectionKind.remedies, remedies),
+    ],
+  );
+}
+
+/// `POST /v2/spiritual/rudraksha`.
+ReportContent _rudraksha(Map<String, dynamic> json, AppLocalizations l10n) {
+  final highlights = <ReportLine>[];
+  for (final entry in _listOfMaps(json['recommendations'])) {
+    final name = parseFreeText(entry['mukhiName']);
+    final benefit = parseFreeText(entry['deityAndBenefit']);
+    final reason = parseFreeText(entry['reason']);
+    final text = [benefit, reason].whereType<String>().join(' — ');
+    if (text.isNotEmpty) highlights.add(ReportLine(text, label: name));
+  }
+
+  return ReportContent(
+    sections: [
+      ReportSection(ReportSectionKind.highlights, highlights),
+      ReportSection(ReportSectionKind.guidance, [
+        // The note explains HOW to energise the bead before wearing, which is
+        // the part a reader actually has to act on.
+        if (parseFreeText(json['note']) case final value?) ReportLine(value),
+      ]),
+    ],
+  );
+}
+
+/// `POST /v2/matrimony/children`.
+ReportContent _children(Map<String, dynamic> json, AppLocalizations l10n) {
+  final overview = <ReportLine>[
+    if (parseFreeText(json['assessment']) case final value?) ReportLine(value),
+    if (parseInt(json['overallScore']) case final value?)
+      ReportLine('$value%', label: l10n.lblOverallScore),
+  ];
+
+  final highlights = <ReportLine>[
+    if (parseFreeText(json['fifthHouseSign']) case final value?)
+      ReportLine(value, label: l10n.lblFifthHouse),
+    if (parseFreeText(json['fifthLord']) case final value?)
+      ReportLine(value, label: l10n.lblFifthLord),
+    if (parseFreeText(json['jupiterSign']) case final value?)
+      ReportLine(value, label: l10n.lblJupiter),
+  ];
+
+  return ReportContent(
+    sections: [
+      ReportSection(ReportSectionKind.overview, overview),
+      ReportSection(ReportSectionKind.highlights, highlights),
+      ReportSection(ReportSectionKind.remedies, [
+        for (final item in parseStrings(json['remedies'])) ReportLine(item),
+      ]),
+    ],
+  );
 }
