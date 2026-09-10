@@ -561,5 +561,6 @@
   "storeOwned": "आपके पास है",
   "storeIncluded": "शामिल",
   "storeUnavailable": "अभी उपलब्ध नहीं है।",
-  "storeSubscribeHint": "सदस्यता लेने पर सभी रिपोर्ट्स खुल जाती हैं"
+  "storeSubscribeHint": "सदस्यता लेने पर सभी रिपोर्ट्स खुल जाती हैं",
+  "storeSubscriptionOnly": "केवल सदस्यता में"
 }

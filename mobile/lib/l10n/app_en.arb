@@ -2455,5 +2455,9 @@
   "storeUnavailable": "Not available right now.",
   "@storeUnavailable": {"description": "Unified one-time purchase store. Added 10 Sep 2026."},
   "storeSubscribeHint": "Subscribing unlocks every report instead",
-  "@storeSubscribeHint": {"description": "Unified one-time purchase store. Added 10 Sep 2026."}
+  "@storeSubscribeHint": {"description": "Unified one-time purchase store. Added 10 Sep 2026."},
+  "storeSubscriptionOnly": "Subscription only",
+  "@storeSubscriptionOnly": {
+    "description": "A premium report Play does not sell individually (Sade Sati). Added 10 Sep 2026."
+  }
 }

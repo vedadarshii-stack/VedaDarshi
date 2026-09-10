@@ -1912,4 +1912,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storeSubscribeHint => 'Subscribing unlocks every report instead';
+
+  @override
+  String get storeSubscriptionOnly => 'Subscription only';
 }

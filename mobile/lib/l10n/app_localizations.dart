@@ -3481,6 +3481,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Subscribing unlocks every report instead'**
   String get storeSubscribeHint;
+
+  /// A premium report Play does not sell individually (Sade Sati). Added 10 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription only'**
+  String get storeSubscriptionOnly;
 }
 
 class _AppLocalizationsDelegate

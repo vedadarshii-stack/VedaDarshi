@@ -230,11 +230,16 @@ class _ReportsTab extends ConsumerWidget {
                 emoji: report.emoji,
                 title: reportTitle(report.id, l10n),
                 subtitle: reportDescription(report.id, l10n),
+                // ⚠️ Four states, not two. A premium report with NO Play SKU
+                // (Sade Sati — Play sells 14 reports and it is not one of
+                // them) previously rendered dimmed with no price and no
+                // word, which reads as a loading failure rather than as
+                // "buy the plan for this one". Say it plainly instead.
                 price: alreadyHave
                     ? (isFree || subscribed
                           ? l10n.storeIncluded
                           : l10n.storeOwned)
-                    : offer?.priceString,
+                    : (offer?.priceString ?? l10n.storeSubscriptionOnly),
                 enabled: !isBusy && !alreadyHave && offer != null,
                 dimmed: alreadyHave,
                 locale: locale,

@@ -1908,4 +1908,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get storeSubscribeHint => 'सदस्यता लेने पर सभी रिपोर्ट्स खुल जाती हैं';
+
+  @override
+  String get storeSubscriptionOnly => 'केवल सदस्यता में';
 }

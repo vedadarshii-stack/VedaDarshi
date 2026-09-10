@@ -1927,4 +1927,7 @@ class AppLocalizationsTe extends AppLocalizations {
   @override
   String get storeSubscribeHint =>
       'సబ్‌స్క్రైబ్ చేస్తే అన్ని నివేదికలు అన్‌లాక్ అవుతాయి';
+
+  @override
+  String get storeSubscriptionOnly => 'సబ్‌స్క్రిప్షన్‌లో మాత్రమే';
 }

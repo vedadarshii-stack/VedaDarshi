@@ -1919,4 +1919,7 @@ class AppLocalizationsKn extends AppLocalizations {
   @override
   String get storeSubscribeHint =>
       'ಚಂದಾದಾರರಾದರೆ ಎಲ್ಲಾ ವರದಿಗಳು ಅನ್‌ಲಾಕ್ ಆಗುತ್ತವೆ';
+
+  @override
+  String get storeSubscriptionOnly => 'ಚಂದಾದಾರಿಕೆಯಲ್ಲಿ ಮಾತ್ರ';
 }

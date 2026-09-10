@@ -561,5 +561,6 @@
   "storeOwned": "ನಿಮ್ಮ ಬಳಿ ಇದೆ",
   "storeIncluded": "ಸೇರಿದೆ",
   "storeUnavailable": "ಸದ್ಯಕ್ಕೆ ಲಭ್ಯವಿಲ್ಲ.",
-  "storeSubscribeHint": "ಚಂದಾದಾರರಾದರೆ ಎಲ್ಲಾ ವರದಿಗಳು ಅನ್‌ಲಾಕ್ ಆಗುತ್ತವೆ"
+  "storeSubscribeHint": "ಚಂದಾದಾರರಾದರೆ ಎಲ್ಲಾ ವರದಿಗಳು ಅನ್‌ಲಾಕ್ ಆಗುತ್ತವೆ",
+  "storeSubscriptionOnly": "ಚಂದಾದಾರಿಕೆಯಲ್ಲಿ ಮಾತ್ರ"
 }
