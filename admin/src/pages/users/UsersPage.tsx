@@ -5,6 +5,7 @@ import {
   fetchUsers,
   type AdminUserRow,
 } from '../../lib/adminApi';
+import { PageSkeleton } from '../../components/PageSkeleton';
 import './UsersPage.css';
 
 /**
@@ -141,6 +142,11 @@ export function UsersPage() {
   }, [users]);
 
   const premiumCount = users.filter((u) => u.tier !== 'free').length;
+
+  // First load only — "Load more" must not blank the rows already read.
+  if (loading && users.length === 0 && !error) {
+    return <PageSkeleton label="Loading users" />;
+  }
 
   return (
     <>

@@ -5,6 +5,7 @@ import {
   fetchVedikaUsage,
   type VedikaUsage,
 } from '../../lib/adminApi';
+import { PageSkeleton } from '../../components/PageSkeleton';
 import './AiUsagePage.css';
 
 /**
@@ -84,7 +85,11 @@ export function AiUsagePage() {
         </div>
       )}
 
-      {loading && !usage && <p className="aiUsage__loading">Loading…</p>}
+      {/* The project's own shimmer skeleton, not a bare "Loading…" line.
+          It reserves the same shape the content will occupy, so the layout
+          does not jump when the numbers land — and it honours
+          prefers-reduced-motion, which a spinner would not. */}
+      {loading && !usage && <PageSkeleton label="Loading Vedika usage" />}
 
       {usage && (
         <>

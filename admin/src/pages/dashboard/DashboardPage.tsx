@@ -5,6 +5,7 @@ import {
   fetchDashboardStats,
   type DashboardStats,
 } from '../../lib/adminApi';
+import { PageSkeleton } from '../../components/PageSkeleton';
 import './DashboardPage.css';
 
 /**
@@ -63,6 +64,13 @@ export function DashboardPage() {
     month: 'long',
     year: 'numeric',
   });
+
+  // A skeleton for the FIRST load only. On a refresh the existing numbers
+  // stay on screen rather than collapsing to placeholders — replacing real
+  // data with a shimmer is a downgrade, not a loading state.
+  if (loading && !stats && !error) {
+    return <PageSkeleton label="Loading dashboard" />;
+  }
 
   const cards = [
     {
@@ -130,7 +138,7 @@ export function DashboardPage() {
                 {stat.icon}
               </span>
             </div>
-            <p className="statCard__value">{loading && !stats ? '…' : stat.value}</p>
+            <p className="statCard__value">{stat.value}</p>
             <p className="statCard__delta">{stat.note}</p>
           </article>
         ))}
