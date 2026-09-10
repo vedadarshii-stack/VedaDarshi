@@ -11,6 +11,7 @@ import '../../l10n/app_localizations.dart';
 import '../ai/ai_astrologer_screen.dart';
 import '../articles/article_detail_screen.dart';
 import '../articles/articles_screen.dart';
+import '../articles/articles_repository.dart';
 import '../articles/articles_static_data.dart';
 import '../horoscope/horoscope_detail_screen.dart';
 import '../horoscope/horoscope_repository.dart';
@@ -1817,10 +1818,12 @@ class _HoroscopeSection extends ConsumerWidget {
 /// Falls back to the featured article rather than throwing if the id is
 /// ever missing — see [ArticleTeaser.articleId]'s doc comment for why the
 /// two surfaces' copy doesn't always match exactly yet.
-Article _resolveArticle(String articleId) {
-  return ArticlesStaticData.all.firstWhere(
+Article _resolveArticle(String articleId, List<Article> catalogue) {
+  return catalogue.firstWhere(
     (article) => article.id == articleId,
-    orElse: () => ArticlesStaticData.featured,
+    orElse: () => catalogue.isNotEmpty
+        ? catalogue.first
+        : ArticlesStaticData.featured,
   );
 }
 
@@ -1830,8 +1833,19 @@ void _openArticles(BuildContext context) {
 }
 
 /// Opens "D2 · Article Detail" for the [Article] linked to [teaser].
-void _openArticleDetail(BuildContext context, ArticleTeaser teaser) {
-  final article = _resolveArticle(teaser.articleId);
+///
+/// Takes a [WidgetRef] so it resolves against the LIVE catalogue (10 Sep
+/// 2026). Resolving against the bundled list would open a stale copy of an
+/// article the editor has since rewritten — or fail to find a CMS-only one
+/// and silently open something else.
+void _openArticleDetail(
+  BuildContext context,
+  WidgetRef ref,
+  ArticleTeaser teaser,
+) {
+  final catalogue =
+      ref.read(articlesProvider).valueOrNull ?? ArticlesStaticData.all;
+  final article = _resolveArticle(teaser.articleId, catalogue);
   Navigator.of(
     context,
   ).push<void>(fadeThroughRoute(ArticleDetailScreen(article: article)));
@@ -1885,7 +1899,7 @@ class _WisdomSection extends StatelessWidget {
   }
 }
 
-class _ArticleCard extends StatelessWidget {
+class _ArticleCard extends ConsumerWidget {
   const _ArticleCard({
     required this.article,
     required this.locale,
@@ -1897,7 +1911,7 @@ class _ArticleCard extends StatelessWidget {
   final Gradient headerGradient;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Semantics(
       button: true,
       label: article.title,
@@ -1906,7 +1920,7 @@ class _ArticleCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: () => _openArticleDetail(context, article),
+          onTap: () => _openArticleDetail(context, ref, article),
           child: Container(
             decoration: BoxDecoration(
               color: AppColors.surface,

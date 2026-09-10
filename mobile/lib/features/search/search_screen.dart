@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
@@ -6,6 +7,7 @@ import '../../core/theme/app_fonts.dart';
 import '../../core/widgets/app_empty_state.dart';
 import '../../l10n/app_localizations.dart';
 import '../articles/article_detail_screen.dart';
+import '../articles/articles_repository.dart';
 import '../articles/articles_static_data.dart';
 import '../reports/premium_reports_screen.dart';
 import '../reports/reports_static_data.dart';
@@ -23,11 +25,11 @@ import 'search_static_data.dart';
 /// results. See [_SearchFilter]'s doc comment for why the design's 7 filter
 /// chips (All/Articles/Horoscope/Panchang/Reports/AI/Remedies) are
 /// deliberately reduced to 3 here.
-class SearchScreen extends StatefulWidget {
+class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  ConsumerState<SearchScreen> createState() => _SearchScreenState();
 }
 
 /// Which content bucket the RESULTS section is filtered to.
@@ -106,7 +108,7 @@ String _reportDescription(String id, AppLocalizations l10n) {
   }
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+class _SearchScreenState extends ConsumerState<SearchScreen> {
   final TextEditingController _controller = TextEditingController();
 
   _SearchFilter _filter = _SearchFilter.all;
@@ -152,7 +154,12 @@ class _SearchScreenState extends State<SearchScreen> {
     final hits = <_SearchHit>[];
 
     if (_filter != _SearchFilter.reports) {
-      for (final article in ArticlesStaticData.all) {
+      // LIVE catalogue since 10 Sep 2026 — searching the bundled list would
+      // silently exclude every article the editor has published, which is
+      // exactly the content most worth finding.
+      final catalogue =
+          ref.read(articlesProvider).valueOrNull ?? ArticlesStaticData.all;
+      for (final article in catalogue) {
         final category = ArticlesStaticData.categoryLabels[article.categoryId]!;
         final haystack = '${article.title} ${article.author} $category'
             .toLowerCase();

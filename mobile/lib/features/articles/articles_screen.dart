@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../l10n/app_localizations.dart';
 import 'article_detail_screen.dart';
+import 'articles_repository.dart';
 import 'articles_static_data.dart';
 
 /// Wisdom & Articles, per the approved Figma "D1 · Articles" (node 25:3)
@@ -21,14 +23,14 @@ import 'articles_static_data.dart';
 /// Every article shown below is STATIC PLACEHOLDER DATA from
 /// [ArticlesStaticData]; see that file's doc comment for what eventually
 /// replaces it (the Firestore CMS article catalogue).
-class ArticlesScreen extends StatefulWidget {
+class ArticlesScreen extends ConsumerStatefulWidget {
   const ArticlesScreen({super.key});
 
   @override
-  State<ArticlesScreen> createState() => _ArticlesScreenState();
+  ConsumerState<ArticlesScreen> createState() => _ArticlesScreenState();
 }
 
-class _ArticlesScreenState extends State<ArticlesScreen> {
+class _ArticlesScreenState extends ConsumerState<ArticlesScreen> {
   ArticleCategoryId? _selectedCategory;
 
   /// Locally-toggled bookmark state for THIS screen only — real persistence
@@ -48,14 +50,28 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     final locale = Localizations.localeOf(context);
     final isCompact = MediaQuery.sizeOf(context).height < 840;
 
-    final featured = ArticlesStaticData.featured;
+    // LIVE from the CMS since 10 Sep 2026, falling back to the bundled
+    // catalogue while the collection is empty or unreachable — see
+    // `articlesProvider`. `valueOrNull` keeps the previous list on screen
+    // during a locale-triggered refetch instead of flashing empty.
+    final all =
+        ref.watch(articlesProvider).valueOrNull ?? ArticlesStaticData.all;
+
+    // The featured slot is whichever article the editor marked featured; the
+    // bundled `featured` is only the fallback, so a CMS article can take the
+    // hero position without a code change.
+    final featured = all.firstWhere(
+      (a) => a.isFeatured,
+      orElse: () => all.isNotEmpty ? all.first : ArticlesStaticData.featured,
+    );
     final showFeatured =
         _selectedCategory == null || featured.categoryId == _selectedCategory;
-    final listArticles = ArticlesStaticData.listArticles
+    final listArticles = all
         .where(
           (article) =>
-              _selectedCategory == null ||
-              article.categoryId == _selectedCategory,
+              article.id != featured.id &&
+              (_selectedCategory == null ||
+                  article.categoryId == _selectedCategory),
         )
         .toList();
 

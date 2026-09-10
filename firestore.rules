@@ -158,6 +158,29 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // ---- ARTICLES CMS (added 10 Sep 2026) -------------------------------
+    //
+    // Editorial content, NOT personal data — so unlike /users this is read
+    // directly by the app rather than through a callable. There is nothing
+    // here worth hiding from a signed-in reader.
+    //
+    // ⚠️ Read is limited to PUBLISHED documents for everyone but admins.
+    // Firestore evaluates rules per document, so a list query that would
+    // return a draft fails outright for a non-admin — the app must therefore
+    // query `where('status', '==', 'published')`. That is deliberate: a
+    // half-written article must never reach a user because someone forgot a
+    // filter.
+    //
+    // Writes are admin-only and go through the console, which is the whole
+    // point of the CMS. `isAdmin()` re-reads /adminUsers on every write, so a
+    // revoked editor loses access immediately.
+    match /articles/{articleId} {
+      allow get, list: if isAdmin()
+                       || resource.data.status == 'published';
+      allow create, update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
     match /users/{userId} {
       allow get: if isOwner(userId);
       // No `list` — a client must never be able to enumerate users.

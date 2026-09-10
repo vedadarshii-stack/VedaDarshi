@@ -1,6 +1,7 @@
 import { onRequest } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { VEDIKA_API_KEY, VEDIKA_BASE_URL, vedikaHeaders } from "./config";
+import { rebrand } from "./rebrand";
 import {
   acquireFetchLock,
   awaitFreshEntry,
@@ -169,7 +170,10 @@ export const vedika = onRequest(
     const text = await upstream.text();
     let payload: unknown;
     try {
-      payload = JSON.parse(text);
+      // Rebranded BEFORE the cache write below, so a cached answer carries
+      // the corrected text too — otherwise a year-long cached report would
+      // keep serving the vendor's name long after this shipped.
+      payload = rebrand(JSON.parse(text));
     } catch {
       if (holdsLock) await releaseFetchLock(db, key);
       res.status(502).json({
