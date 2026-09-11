@@ -2,6 +2,7 @@ import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { randomUUID } from "node:crypto";
 import { VEDIKA_API_KEY, VEDIKA_BASE_URL, vedikaHeaders, todayKeyIST } from "./config";
+import { rebrand } from "./rebrand";
 
 /**
  * CREDIT PROTECTION — the rule this whole file exists to enforce:
@@ -444,6 +445,27 @@ async function resolveBirthDetails(
 const SUPPORTED_LANGUAGES = ["en", "hi", "te", "ta", "kn"] as const;
 type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
+/**
+ * Matches a trailing "— Vedika" / "-- vedika." / "―Vedika" attribution at the
+ * very end of a string.
+ *
+ * Deliberately the SAME pattern as the app's
+ * `mobile/lib/core/vedika/vedika_text_sanitizer.dart` — the two must agree,
+ * because the app's copy is still the defence-in-depth layer for chat rows
+ * written before this server-side strip existed. If you change the dash class
+ * or the optional trailing period here, change it there too.
+ *
+ * Trailing-only, for the same reason the Dart version is: an attribution
+ * embedded mid-sentence is real content, and cutting at the first match would
+ * truncate a genuine answer.
+ */
+const TRAILING_VENDOR_ATTRIBUTION = /\s*[-‐‑‒–—―−]{1,2}\s*vedika\.?\s*$/i;
+
+/** Removes a trailing vendor attribution and trims. Safe on any free text. */
+function stripTrailingVendorAttribution(text: string): string {
+  return text.replace(TRAILING_VENDOR_ATTRIBUTION, "").trim();
+}
+
 interface VedikaQueryResult {
   answer: string;
   followUps: string[];
@@ -509,6 +531,7 @@ async function callVedikaAi(params: {
 
   const payload = (await res.json().catch(() => null)) as Record<string, unknown> | null;
 
+
   // Success envelope has NO `data` key (unlike the /v2 endpoints elsewhere
   // in this codebase) — the answer is directly on `response`.
   if (res.ok && payload && payload.success === true) {
@@ -516,9 +539,35 @@ async function callVedikaAi(params: {
       (payload.followUps as string[] | undefined) ??
       (payload.followUpSuggestions as string[] | undefined) ??
       [];
+    // ⚠️ REBRANDED HERE, 11 Sep 2026 — client-reported, and the one place it
+    // was actually needed. `rebrand.ts` was written FOR this exact string
+    // ("I am Vedika, your personal Vedic astrologer" — see its own doc
+    // comment) but was only ever wired into the `vedika` HTTP proxy in
+    // index.ts. The AI does NOT go through that proxy: this callable fetches
+    // Vedika directly, so every answer reached users un-rebranded and the
+    // chat introduced itself under the vendor's name.
+    //
+    // The app-side `stripVedikaAttribution` does not cover it either — that
+    // strips a TRAILING "— Vedika" only, by design, so a mid-sentence
+    // self-introduction sails straight through.
+    //
+    // Applied at the parse boundary rather than at the return, so the
+    // Firestore chat log written further down persists the corrected text
+    // too — otherwise history would keep replaying the vendor name forever.
+    // ORDER IS LOAD-BEARING: strip the trailing attribution FIRST, rebrand
+    // second. Rebranding first turns "— Vedika" into "— Vedadarshi", which
+    // the app's own `stripVedikaAttribution` (mobile, matches the vendor
+    // name only) would then fail to catch — so an attribution line that used
+    // to be removed would start being DISPLAYED, signed with our own name.
+    const branded = rebrand({
+      answer: stripTrailingVendorAttribution(
+        typeof payload.response === "string" ? payload.response : ""
+      ),
+      followUps: followUps.map(stripTrailingVendorAttribution),
+    });
     return {
-      answer: typeof payload.response === "string" ? payload.response : "",
-      followUps,
+      answer: branded.answer,
+      followUps: branded.followUps,
       conversationId: typeof payload.conversationId === "string" ? payload.conversationId : null,
     };
   }
