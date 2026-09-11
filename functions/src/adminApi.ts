@@ -503,3 +503,153 @@ export const adminDashboardStats = onCall(
     };
   }
 );
+
+// ---------------------------------------------------------------------------
+// Plans & pricing
+// ---------------------------------------------------------------------------
+
+/**
+ * Live subscription products and their REAL Play prices.
+ *
+ * ⚠️ **Replaces fabricated pricing.** The console's Plans & Billing screen
+ * rendered "₹299 / ₹1,999 / ₹4,999" from `mock.ts`. The actual catalogue is
+ * four tiers at ₹219–₹4,999 with monthly AND annual base plans — so every
+ * figure on that screen was wrong, on the one page a client would read to
+ * check what they charge.
+ *
+ * ## Read-only, deliberately
+ *
+ * This returns prices; it does not set them. Play owns subscription pricing,
+ * and a price change is not a CMS field:
+ *
+ *  - Raising the price for EXISTING subscribers requires Google's price-change
+ *    flow, with user notification and, in many regions, explicit opt-in.
+ *    Skipping it can suspend the subscription.
+ *  - The service account would additionally need "Manage store presence",
+ *    which we deliberately did not grant — a leaked key that can only read
+ *    orders is a much smaller problem than one that can reprice the catalogue.
+ *
+ * So the console shows the truth and links to Play to change it. That is a
+ * smaller feature than an editable field, and a far safer one.
+ */
+export const adminPlans = onCall(
+  {
+    region: "asia-south1",
+    secrets: [REVENUECAT_SECRET_API_KEY],
+    timeoutSeconds: 60,
+  },
+  async (request) => {
+    await requireAdmin(request, "plans.manage");
+
+    const key = REVENUECAT_SECRET_API_KEY.value();
+    const headers = { Authorization: `Bearer ${key}`, Accept: "application/json" };
+    const base = `https://api.revenuecat.com/v2/projects/${REVENUECAT_PROJECT_ID}`;
+
+    // 1. Every product on the Play app.
+    const products: Array<{
+      id?: string;
+      store_identifier?: string;
+      type?: string;
+      display_name?: string;
+    }> = [];
+    let cursor: string | undefined;
+    do {
+      const url = new URL(`${base}/products`);
+      url.searchParams.set("limit", "50");
+      if (cursor) url.searchParams.set("starting_after", cursor);
+      const res = await fetch(url, { headers });
+      if (!res.ok) {
+        console.warn("adminPlans: products", res.status);
+        break;
+      }
+      const body = (await res.json()) as {
+        items?: typeof products;
+        next_page?: string | null;
+      };
+      products.push(...(body.items ?? []));
+      cursor = body.next_page
+        ? new URL(body.next_page).searchParams.get("starting_after") ?? undefined
+        : undefined;
+    } while (cursor);
+
+    // 2. Live store state per SUBSCRIPTION — that is where Play's real
+    //    per-region price and base-plan status live. One-time products are
+    //    not supported by this endpoint, so they are reported by identifier
+    //    only rather than guessed at.
+    const subscriptions = products.filter((p) => p.type === "subscription");
+    const plans = await Promise.all(
+      subscriptions.map(async (product) => {
+        let basePlans: Record<string, unknown> = {};
+        let storeStatus: string | null = null;
+        try {
+          const res = await fetch(
+            `${base}/products/${product.id}/store_state`,
+            { headers }
+          );
+          if (res.ok) {
+            const body = (await res.json()) as {
+              store_status?: { status?: string };
+              store_state?: { base_plans?: Record<string, unknown> };
+            };
+            storeStatus = body.store_status?.status ?? null;
+            basePlans = body.store_state?.base_plans ?? {};
+          }
+        } catch (e) {
+          console.warn("adminPlans: store_state", product.id, e);
+        }
+
+        const periods = Object.entries(basePlans).map(([id, raw]) => {
+          const plan = raw as {
+            state?: string;
+            regional_configs?: Record<
+              string,
+              { price?: { amount_micros?: number; currency?: string } }
+            >;
+            auto_renewing_base_plan_type?: { billing_period_duration?: string };
+          };
+          const regions = plan.regional_configs ?? {};
+          const priced = Object.entries(regions).map(([region, cfg]) => ({
+            region,
+            // Play stores money in MICROS. Dividing here rather than in the
+            // browser keeps the rounding in one place.
+            amount: (cfg.price?.amount_micros ?? 0) / 1000000,
+            currency: cfg.price?.currency ?? null,
+          }));
+          return {
+            id,
+            state: plan.state ?? null,
+            billingPeriod:
+              plan.auto_renewing_base_plan_type?.billing_period_duration ?? null,
+            prices: priced,
+          };
+        });
+
+        return {
+          productId: product.id ?? null,
+          storeIdentifier: product.store_identifier ?? null,
+          displayName: product.display_name ?? null,
+          storeStatus,
+          periods,
+        };
+      })
+    );
+
+    const oneTime = products
+      .filter((p) => p.type === "one_time")
+      .map((p) => ({
+        productId: p.id ?? null,
+        storeIdentifier: p.store_identifier ?? null,
+        displayName: p.display_name ?? null,
+      }));
+
+    return {
+      plans: plans.sort((a, b) =>
+        (a.storeIdentifier ?? "").localeCompare(b.storeIdentifier ?? "")
+      ),
+      oneTime: oneTime.sort((a, b) =>
+        (a.storeIdentifier ?? "").localeCompare(b.storeIdentifier ?? "")
+      ),
+      fetchedAtMs: Date.now(),
+    };
+  }
+);

@@ -212,3 +212,107 @@
     flex: 1 1 260px;
   }
 }
+
+/* Live Play pricing. Added 11 Sep 2026 when this screen stopped showing
+   invented figures. Tokens only — never a raw hex. */
+
+.plans__notice {
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+
+.plans__notice strong { color: var(--color-ink); }
+
+.plans__notice a {
+  display: inline-block;
+  margin-top: 6px;
+  color: var(--vd-saffron, #e8720c);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.plans__plan { padding: 16px; margin-bottom: 12px; }
+
+.plans__planHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.plans__sku {
+  font-size: 11.5px;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+  margin: 2px 0 0;
+}
+
+.plans__period {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-top: 1px solid var(--color-border, #e4e4e7);
+}
+
+.plans__periodName {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.plans__state {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border, #e4e4e7);
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+.plans__state--active {
+  border-color: var(--color-success, #1b7f4b);
+  color: var(--color-success, #1b7f4b);
+}
+
+.plans__prices { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.plans__price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+}
+
+.plans__price em {
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+.plans__empty,
+.plans__stamp { font-size: 12px; color: var(--color-muted); }
+
+.plans__oneTime { padding: 16px; margin-top: 12px; }
+
+.plans__skus { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+
+.plans__oneTime .plans__sku {
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border, #e4e4e7);
+  white-space: nowrap;
+}

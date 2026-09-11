@@ -133,3 +133,32 @@ export function fetchDashboardStats(): Promise<DashboardStats> {
     'adminDashboardStats',
   )().then((r) => r.data);
 }
+
+export interface PlanPeriod {
+  id: string;
+  state: string | null;
+  billingPeriod: string | null;
+  prices: { region: string; amount: number; currency: string | null }[];
+}
+
+export interface PlansData {
+  plans: {
+    productId: string | null;
+    storeIdentifier: string | null;
+    displayName: string | null;
+    storeStatus: string | null;
+    periods: PlanPeriod[];
+  }[];
+  oneTime: {
+    productId: string | null;
+    storeIdentifier: string | null;
+    displayName: string | null;
+  }[];
+  fetchedAtMs: number;
+}
+
+export function fetchPlans(): Promise<PlansData> {
+  return httpsCallable<void, PlansData>(functions, 'adminPlans')().then(
+    (r) => r.data,
+  );
+}

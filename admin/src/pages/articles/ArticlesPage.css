@@ -197,7 +197,13 @@
   padding: 14px 16px;
 }
 
-.articles__main { flex: 1; min-width: 0; }
+.articles__main {
+  flex: 1;
+  min-width: 0;
+  /* Caps the text column so the status pill and actions do not drift to
+     the far edge of a wide monitor, leaving a lake of empty space. */
+  max-width: 720px;
+}
 
 .articles__title {
   font-size: 13.5px;
@@ -215,11 +221,23 @@
 .articles__locales { display: flex; gap: 6px; flex-wrap: wrap; }
 
 .articles__locale {
+  /* ⚠️ `flex-shrink: 0` + `white-space: nowrap` are both load-bearing.
+     Without them these pills shrink to fit the row, the "EN ✓" wraps onto
+     two lines INSIDE the pill, and `border-radius: 999px` turns each one
+     into a small circle with stacked text — which is what they looked like
+     before 10 Sep 2026. */
+  flex: 0 0 auto;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   font-size: 10px;
-  padding: 2px 6px;
+  line-height: 1.6;
+  padding: 1px 8px;
   border-radius: 999px;
   border: 1px solid var(--color-border, #e4e4e7);
   color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .articles__locale--ready {

@@ -25,6 +25,7 @@ export {
   adminListUsers,
   adminSendNotification,
   adminDashboardStats,
+  adminPlans,
 } from "./adminApi";
 
 /**
