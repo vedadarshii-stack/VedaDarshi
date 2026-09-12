@@ -1839,7 +1839,7 @@ class AppLocalizationsKn extends AppLocalizations {
   String get reportOwned => 'ಈ ವರದಿ ನಿಮ್ಮ ಬಳಿ ಇದೆ';
 
   @override
-  String get reportBuyOrSubscribe => 'ಅಥವಾ ಎಲ್ಲಾ ವರದಿಗಳಿಗೆ ಚಂದಾದಾರರಾಗಿ';
+  String get reportBuyOrSubscribe => 'ಚಂದಾದಾರಿಕೆ ಯೋಜನೆಗಳನ್ನು ನೋಡಿ';
 
   @override
   String get reportDownloadPdf => 'PDF ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ';

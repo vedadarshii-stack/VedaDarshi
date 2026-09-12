@@ -2400,7 +2400,7 @@
   "@reportBuyOnce": {"description": "Individual report purchase. Added 10 Sep 2026."},
   "reportOwned": "You own this report",
   "@reportOwned": {"description": "Individual report purchase. Added 10 Sep 2026."},
-  "reportBuyOrSubscribe": "Or subscribe for all reports",
+  "reportBuyOrSubscribe": "View subscription plans",
   "@reportBuyOrSubscribe": {"description": "Individual report purchase. Added 10 Sep 2026."},
   "reportDownloadPdf": "Download PDF",
   "@reportDownloadPdf": {"description": "Report PDF export. Added 10 Sep 2026."},

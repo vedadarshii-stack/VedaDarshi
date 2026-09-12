@@ -1833,7 +1833,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportOwned => 'You own this report';
 
   @override
-  String get reportBuyOrSubscribe => 'Or subscribe for all reports';
+  String get reportBuyOrSubscribe => 'View subscription plans';
 
   @override
   String get reportDownloadPdf => 'Download PDF';

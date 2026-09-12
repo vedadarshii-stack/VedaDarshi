@@ -3323,7 +3323,7 @@ abstract class AppLocalizations {
   /// Individual report purchase. Added 10 Sep 2026.
   ///
   /// In en, this message translates to:
-  /// **'Or subscribe for all reports'**
+  /// **'View subscription plans'**
   String get reportBuyOrSubscribe;
 
   /// Report PDF export. Added 10 Sep 2026.

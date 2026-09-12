@@ -28,6 +28,7 @@ import '../panchang/panchang_repository.dart';
 import '../profile/birth_profile_repository.dart';
 import '../reports/premium_reports_screen.dart';
 import '../search/search_screen.dart';
+import 'daily_quote_repository.dart';
 import 'home_static_data.dart';
 
 /// Fallback coordinates used until a saved [BirthProfile] is available (a
@@ -2245,14 +2246,24 @@ class _ReportCard extends StatelessWidget {
 }
 
 /// Dark gold-bordered daily quote card, closing out the dashboard.
-class _DailyQuoteCard extends StatelessWidget {
+///
+/// Reads the CMS quote as of 12 Sep 2026 (`dailyQuoteProvider`). It is a
+/// `Consumer` rather than a `StatelessWidget` so the rest of the dashboard
+/// does not rebuild when the quote resolves.
+///
+/// The provider never surfaces an error or a loading state to the user: while
+/// the read is in flight, and on any failure, it yields the bundled sentence.
+/// A spinner — or worse, an error box — at the very bottom of Home would be a
+/// lot of ceremony for one decorative line.
+class _DailyQuoteCard extends ConsumerWidget {
   const _DailyQuoteCard({required this.locale});
 
   final Locale locale;
 
   @override
-  Widget build(BuildContext context) {
-    final quote = HomeStaticData.quote;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final quote =
+        ref.watch(dailyQuoteProvider).valueOrNull ?? HomeStaticData.quote;
     // The design's attribution ends in a typographic "↗" glyph that isn't in
     // any bundled font (see TYPOGRAPHY RULE) and would render as a tofu box
     // on-device. Split it off the data string and render it as a Material

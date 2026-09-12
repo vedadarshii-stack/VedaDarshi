@@ -6,6 +6,7 @@ import {
   vedikaHeaders,
   REVENUECAT_SECRET_API_KEY,
   REVENUECAT_PROJECT_ID,
+  REVENUECAT_PLAY_APP_ID,
 } from "./config";
 
 /**
@@ -546,6 +547,21 @@ export const adminPlans = onCall(
     const base = `https://api.revenuecat.com/v2/projects/${REVENUECAT_PROJECT_ID}`;
 
     // 1. Every product on the Play app.
+    //
+    // ⚠️ SCOPED TO `app_id` — 12 Sep 2026. This comment always CLAIMED "the
+    // Play app" but the request did not say so, and `/products` is a PROJECT
+    // level list: it also returned everything on the retired Test Store app
+    // (`appcbf3207cda`). So the Plans screen listed, alongside the 29 real
+    // products, the archived RevenueCat scaffold SKUs (`monthly`, `yearly`,
+    // `lifetime`) and the superseded underscore-form subscriptions
+    // (`vedadarshi_gold_annual` …). Those render as "No base plans returned by
+    // Play" rows, which reads as a Play outage rather than as dead data.
+    //
+    // It became load-bearing rather than merely untidy once each row got a
+    // deep link into Play Console: a product that exists only in RevenueCat's
+    // Test Store has no Play page, so the link 404s and the console looks
+    // broken. Filtering at the source is the fix — do NOT filter in the UI,
+    // or the same stale rows come back anywhere else this endpoint is used.
     const products: Array<{
       id?: string;
       store_identifier?: string;
@@ -555,6 +571,7 @@ export const adminPlans = onCall(
     let cursor: string | undefined;
     do {
       const url = new URL(`${base}/products`);
+      url.searchParams.set("app_id", REVENUECAT_PLAY_APP_ID);
       url.searchParams.set("limit", "50");
       if (cursor) url.searchParams.set("starting_after", cursor);
       const res = await fetch(url, { headers });

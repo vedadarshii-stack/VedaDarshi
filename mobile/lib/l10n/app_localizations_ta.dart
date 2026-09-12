@@ -1852,8 +1852,7 @@ class AppLocalizationsTa extends AppLocalizations {
   String get reportOwned => 'இந்த அறிக்கை உங்களிடம் உள்ளது';
 
   @override
-  String get reportBuyOrSubscribe =>
-      'அல்லது அனைத்து அறிக்கைகளுக்கும் சந்தா செலுத்துங்கள்';
+  String get reportBuyOrSubscribe => 'சந்தா திட்டங்களைப் பார்க்கவும்';
 
   @override
   String get reportDownloadPdf => 'PDF பதிவிறக்கவும்';

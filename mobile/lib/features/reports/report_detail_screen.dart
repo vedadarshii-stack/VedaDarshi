@@ -105,14 +105,28 @@ class ReportDetailScreen extends ConsumerWidget {
                   content: buildReportContent(report.id, payload, l10n),
                   l10n: l10n,
                   locale: locale,
-                  // Three independent ways to see a full report:
-                  //  1. a paid SUBSCRIPTION (any tier), or
-                  //  2. having BOUGHT this one report outright, or
-                  //  3. it being a free report to begin with.
+                  // TWO ways to see a full report:
+                  //  1. having BOUGHT this one report outright, or
+                  //  2. it being a free report to begin with.
                   // Ownership is the server-written ledger, not anything the
                   // client can assert.
+                  //
+                  // ⚠️ A SUBSCRIPTION NO LONGER UNLOCKS REPORTS (12 Sep 2026,
+                  // client: *"we can't give free for subscription users, just
+                  // give discounts as respective plans"*). Until then any paid
+                  // tier read every premium report for free, so the 14 report
+                  // SKUs were unsellable to exactly the users most likely to
+                  // buy them.
+                  //
+                  // What replaces it is NOT built yet and must not be faked
+                  // here: the per-tier discount (5/10/15/20%) cannot be
+                  // applied client-side because Play sets the price per SKU,
+                  // and Platinum's one free Complete Report per month is a
+                  // server-side grant that does not exist. Both are tracked in
+                  // `claudedocs/vedika-prebuilt-reports.md`. Granting access
+                  // here to approximate either one would put entitlement back
+                  // on the client, which this codebase refuses everywhere.
                   hasPaidAccess:
-                      ref.watch(subscriptionStatusValueProvider).hasPaidAccess ||
                       (ref.watch(ownedReportsProvider).valueOrNull ?? const {})
                           .contains(report.id),
                   purchasable: ref

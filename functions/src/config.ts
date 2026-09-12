@@ -45,6 +45,21 @@ export const REVENUECAT_SECRET_API_KEY = defineSecret(
 export const REVENUECAT_PROJECT_ID = "proj0503f814";
 
 /**
+ * The PLAY STORE app inside that RevenueCat project — "Vedadarshi (Play
+ * Store)", package `com.gosewealth.vedadarshi`.
+ *
+ * ⚠️ The project also contains a second, RETIRED app: `appcbf3207cda`
+ * ("Test Store"), which still holds the archived scaffold products
+ * (`monthly`/`yearly`/`lifetime`) and the superseded underscore-form
+ * subscriptions. Anything listing products for display or sale MUST scope to
+ * this id — a project-wide `/products` call mixes dead Test Store SKUs in
+ * with the 29 real ones, and they are indistinguishable by name alone.
+ *
+ * Not a secret; it is visible in the dashboard URL.
+ */
+export const REVENUECAT_PLAY_APP_ID = "app04675a40cc";
+
+/**
  * Shared secret RevenueCat sends as the `Authorization` header on every
  * webhook.
  *

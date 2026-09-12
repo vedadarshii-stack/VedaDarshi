@@ -181,6 +181,62 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // ---- THE REST OF THE CMS (added 12 Sep 2026) ------------------------
+    //
+    // Banners, daily quotes, festivals and muhurat copy are the same KIND of
+    // thing as /articles — editorial content authored in the console and read
+    // by every app user — so they get the identical rule, published-only for
+    // readers and admin-only for writes. The same consequence applies: a
+    // client MUST query `where('status', '==', 'published')`, because a list
+    // that could return a draft fails outright rather than filtering.
+    //
+    // These four exist as separate collections rather than one `cms` bucket
+    // because their shapes genuinely differ (a festival has a date, a banner
+    // has a CTA target) and because per-collection rules let one of them be
+    // tightened later without touching the others.
+    match /banners/{bannerId} {
+      allow get, list: if isAdmin()
+                       || resource.data.status == 'published';
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /quotes/{quoteId} {
+      allow get, list: if isAdmin()
+                       || resource.data.status == 'published';
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /festivals/{festivalId} {
+      allow get, list: if isAdmin()
+                       || resource.data.status == 'published';
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /muhuratContent/{kind} {
+      allow get, list: if isAdmin()
+                       || resource.data.status == 'published';
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ---- APP CONFIG -----------------------------------------------------
+    //
+    // ⚠️ DELIBERATELY READABLE BY EVERYONE, including signed-out clients, and
+    // with NO status gate. Two of its fields — `maintenanceMode` and
+    // `minSupportedVersion` — have to be readable at cold start, BEFORE a user
+    // signs in, or the two situations they exist for (the backend is down; this
+    // build must stop talking to it) are exactly the situations in which the
+    // app cannot find out about them.
+    //
+    // Consequence to respect: anything written here is PUBLIC. Never put a
+    // key, an endpoint credential, or anything user-specific in appConfig.
+    // Tunable NUMBERS for entitlements do not belong here either — those live
+    // in Remote Config's `access_control_matrix`, and real enforcement is
+    // server-side regardless.
+    match /appConfig/{docId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
     match /users/{userId} {
       allow get: if isOwner(userId);
       // No `list` — a client must never be able to enumerate users.

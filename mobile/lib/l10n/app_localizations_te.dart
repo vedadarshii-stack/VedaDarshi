@@ -1846,8 +1846,7 @@ class AppLocalizationsTe extends AppLocalizations {
   String get reportOwned => 'ఈ నివేదిక మీ వద్ద ఉంది';
 
   @override
-  String get reportBuyOrSubscribe =>
-      'లేదా అన్ని నివేదికల కోసం సబ్‌స్క్రైబ్ చేయండి';
+  String get reportBuyOrSubscribe => 'సబ్‌స్క్రిప్షన్ ప్లాన్‌లు చూడండి';
 
   @override
   String get reportDownloadPdf => 'PDF డౌన్‌లోడ్ చేయండి';

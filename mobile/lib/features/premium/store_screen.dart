@@ -211,7 +211,6 @@ class _ReportsTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final offers = ref.watch(reportCatalogueProvider).valueOrNull ?? const {};
     final owned = ref.watch(ownedReportsProvider).valueOrNull ?? const <String>{};
-    final subscribed = ref.watch(subscriptionStatusValueProvider).hasPaidAccess;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(18, 6, 18, 18),
@@ -224,7 +223,14 @@ class _ReportsTab extends ConsumerWidget {
               // Three ways a report is already yours. Showing a price on
               // something the reader can already open is how a store loses
               // trust.
-              final alreadyHave = isFree || subscribed || owned.contains(report.id);
+              // ⚠️ `subscribed` is deliberately NOT part of this (12 Sep
+              // 2026). It used to be, so every report showed "Included" to
+              // any subscriber and could not be bought — see the same change
+              // in `report_detail_screen.dart` for the client instruction
+              // behind it. Reports are a separate one-time purchase for
+              // everyone; a subscription is meant to discount them, not
+              // include them.
+              final alreadyHave = isFree || owned.contains(report.id);
 
               return _StoreRow(
                 emoji: report.emoji,
@@ -236,9 +242,7 @@ class _ReportsTab extends ConsumerWidget {
                 // word, which reads as a loading failure rather than as
                 // "buy the plan for this one". Say it plainly instead.
                 price: alreadyHave
-                    ? (isFree || subscribed
-                          ? l10n.storeIncluded
-                          : l10n.storeOwned)
+                    ? (isFree ? l10n.storeIncluded : l10n.storeOwned)
                     : (offer?.priceString ?? l10n.storeSubscriptionOnly),
                 enabled: !isBusy && !alreadyHave && offer != null,
                 dimmed: alreadyHave,

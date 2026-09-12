@@ -12,13 +12,20 @@ import { ArticlesPage } from './pages/articles/ArticlesPage';
 import { NotificationsPage } from './pages/notifications/NotificationsPage';
 import { PlansPage } from './pages/plans/PlansPage';
 import { AiUsagePage } from './pages/ai-usage/AiUsagePage';
+import { BannersPage } from './pages/banners/BannersPage';
+import { QuotesPage } from './pages/quotes/QuotesPage';
+import { MuhuratPage } from './pages/muhurat/MuhuratPage';
+import { ConfigPage } from './pages/config/ConfigPage';
 
 /** Screens follow the Figma "E · Admin CMS (React Web)" concept.
  *
  *  Auth and role resolution are real (Firebase project vedadarshi-20989):
  *  RequireAuth checks the session, RequirePermission checks the role loaded from
- *  adminUsers/{uid} → adminRoles/{roleId}. The CMS *content* data layer is not
- *  live yet — see src/lib/useCollection.ts. */
+ *  adminUsers/{uid} → adminRoles/{roleId}. Editorial content (Articles, Banners,
+ *  Quotes & Festivals, Muhurat Content, App Config) reads/writes Firestore
+ *  directly — see the comment in src/lib/articles.ts for why that differs from
+ *  Users, which needs a Cloud Function because the rules refuse `list`.
+ *  `src/lib/useCollection.ts` is what a screen falls back to when it isn't. */
 function App() {
   return (
     <AuthProvider>
@@ -73,6 +80,38 @@ function App() {
                   element={
                     <RequirePermission need={PERMISSIONS.plansManage}>
                       <PlansPage />
+                    </RequirePermission>
+                  }
+                />
+                <Route
+                  path="/banners"
+                  element={
+                    <RequirePermission need={PERMISSIONS.bannersManage}>
+                      <BannersPage />
+                    </RequirePermission>
+                  }
+                />
+                <Route
+                  path="/quotes"
+                  element={
+                    <RequirePermission need={PERMISSIONS.quotesManage}>
+                      <QuotesPage />
+                    </RequirePermission>
+                  }
+                />
+                <Route
+                  path="/muhurat"
+                  element={
+                    <RequirePermission need={PERMISSIONS.muhuratManage}>
+                      <MuhuratPage />
+                    </RequirePermission>
+                  }
+                />
+                <Route
+                  path="/config"
+                  element={
+                    <RequirePermission need={PERMISSIONS.configManage}>
+                      <ConfigPage />
                     </RequirePermission>
                   }
                 />

@@ -30,8 +30,39 @@ import './PlansPage.css';
  * So: show the truth, and link to Play to change it.
  */
 
-const PLAY_CONSOLE_SUBSCRIPTIONS =
-  'https://play.google.com/console/u/0/developers/6794665206972998780/app/4974821764704847706/subscriptions';
+const PLAY_CONSOLE_APP =
+  'https://play.google.com/console/u/0/developers/6794665206972998780/app/4974821764704847706';
+
+const PLAY_CONSOLE_SUBSCRIPTIONS = `${PLAY_CONSOLE_APP}/subscriptions`;
+
+/**
+ * Deep links to ONE product's page in Play Console.
+ *
+ * ADDED 12 Sep 2026. This screen is read-only by design (see the header
+ * comment), but "prices live in Play" was previously a dead end: the only
+ * link went to the subscriptions LIST, so changing one report's price meant
+ * landing on a list of 29 products and hunting for it by id. Linking each row
+ * straight through is the whole practical value of a read-only pricing screen.
+ *
+ * ⚠️ Both URL shapes were read off the live console by navigating to a real
+ * product, NOT guessed — and they are NOT the same shape:
+ *   subscription : /subscriptions/s/{productId}
+ *   one-time     : /one-time-products/sku/{productId}
+ * Note also that `/managed-products` 302s to `/one-time-products`; Play
+ * renamed in-app products, so the older path still works but is not canonical.
+ */
+function playConsoleSubscriptionUrl(storeIdentifier: string): string {
+  // ⚠️ RevenueCat's identifier for a subscription is `productId:basePlanId`
+  // (e.g. `vedadarshi_bronze:monthly`), but Play's URL wants the product id
+  // ALONE. Passing the colon form lands on a "product not found" page, which
+  // looks like a broken console rather than a malformed link.
+  const productId = storeIdentifier.split(':')[0];
+  return `${PLAY_CONSOLE_APP}/subscriptions/s/${encodeURIComponent(productId)}`;
+}
+
+function playConsoleOneTimeUrl(storeIdentifier: string): string {
+  return `${PLAY_CONSOLE_APP}/one-time-products/sku/${encodeURIComponent(storeIdentifier)}`;
+}
 
 function formatPrice(amount: number, currency: string | null): string {
   if (!currency) return String(amount);
@@ -126,13 +157,25 @@ export function PlansPage() {
               <h2 className="card__title">{plan.displayName ?? plan.storeIdentifier}</h2>
               <p className="plans__sku">{plan.storeIdentifier}</p>
             </div>
-            {plan.storeStatus && (
-              <span
-                className={`pill ${plan.storeStatus === 'ok' ? 'pill--premium' : 'pill--free'}`}
-              >
-                {plan.storeStatus}
-              </span>
-            )}
+            <div className="plans__planActions">
+              {plan.storeStatus && (
+                <span
+                  className={`pill ${plan.storeStatus === 'ok' ? 'pill--premium' : 'pill--free'}`}
+                >
+                  {plan.storeStatus}
+                </span>
+              )}
+              {plan.storeIdentifier && (
+                <a
+                  className="plans__editLink"
+                  href={playConsoleSubscriptionUrl(plan.storeIdentifier)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Edit price in Play ↗
+                </a>
+              )}
+            </div>
           </div>
 
           {plan.periods.length === 0 && (
@@ -187,12 +230,24 @@ export function PlansPage() {
             Play does not expose prices for one-time products through this API.
             Identifiers only; open Play Console to see or change their prices.
           </p>
+          {/* Each one is a link rather than a label: this list is the only
+              place the 21 one-time SKUs are enumerated anywhere in the console,
+              so it is the natural jumping-off point for editing one. */}
           <div className="plans__skus">
-            {data.oneTime.map((p) => (
-              <span key={p.productId ?? p.storeIdentifier} className="plans__sku">
-                {p.storeIdentifier}
-              </span>
-            ))}
+            {data.oneTime.map((p) =>
+              p.storeIdentifier ? (
+                <a
+                  key={p.productId ?? p.storeIdentifier}
+                  className="plans__sku plans__sku--link"
+                  href={playConsoleOneTimeUrl(p.storeIdentifier)}
+                  target="_blank"
+                  rel="noreferrer"
+                  title={`Open ${p.storeIdentifier} in Play Console`}
+                >
+                  {p.storeIdentifier} ↗
+                </a>
+              ) : null,
+            )}
           </div>
         </section>
       )}

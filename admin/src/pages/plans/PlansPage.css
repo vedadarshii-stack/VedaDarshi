@@ -316,3 +316,44 @@
   border: 1px solid var(--color-border, #e4e4e7);
   white-space: nowrap;
 }
+
+/* The SKU chips became links on 12 Sep 2026. `white-space: nowrap` above is
+   load-bearing for these too — a product id wrapping mid-token inside a pill
+   is the same circular-blob bug the admin language badges already hit once. */
+.plans__oneTime .plans__sku--link {
+  /* `--vd-saffron-text` (#c25705), not `--vd-saffron` (#e8720c): the raw brand
+     saffron only measures ~3.1:1 on white, which fails AA for 11.5px text.
+     The -text variant is the darkened pair kept for exactly this case. */
+  color: var(--vd-saffron-text);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.plans__oneTime .plans__sku--link:hover,
+.plans__oneTime .plans__sku--link:focus-visible {
+  border-color: var(--vd-saffron);
+  background: var(--vd-saffron-tint);
+}
+
+/* Keeps the status pill and the Play link on one line at the top-right of a
+   plan card, so the card header reads status-then-action rather than stacking
+   and pushing the base-plan rows down. */
+.plans__planActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.plans__editLink {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--vd-saffron-text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.plans__editLink:hover,
+.plans__editLink:focus-visible {
+  text-decoration: underline;
+}

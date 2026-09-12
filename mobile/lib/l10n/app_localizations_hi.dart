@@ -1829,7 +1829,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get reportOwned => 'यह रिपोर्ट आपके पास है';
 
   @override
-  String get reportBuyOrSubscribe => 'या सभी रिपोर्ट्स के लिए सदस्यता लें';
+  String get reportBuyOrSubscribe => 'सदस्यता योजनाएँ देखें';
 
   @override
   String get reportDownloadPdf => 'PDF डाउनलोड करें';
