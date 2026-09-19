@@ -29,6 +29,25 @@
           ]
         },
         {
+          "comment": "The SPA shell must never be cached. Hosting matches a header rule against the REQUEST path, NOT the file the rewrite resolves to — so '/index.html' alone only covered a literal request for that path, and every real entry point ('/', '/plans', '/quotes' …) fell through to Hosting's default max-age=3600. Effect: for up to an hour after a deploy a returning admin kept the OLD HTML, which references the previous hashed bundle, so a shipped fix simply did not arrive. Verified live 19 Sep 2026: '/index.html' returned no-cache while '/' returned max-age=3600. The '!(*.*)' glob matches extensionless paths only, i.e. SPA routes — it cannot swallow /assets/**, whose filenames all contain a dot and which must stay immutable.",
+          "source": "/",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            }
+          ]
+        },
+        {
+          "source": "/**/!(*.*)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            }
+          ]
+        },
+        {
           "source": "/index.html",
           "headers": [
             {
