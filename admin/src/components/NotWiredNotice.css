@@ -1,0 +1,16 @@
+/* Amber rather than red: this is a "know this" state, not a failure. Matches
+   the warning tone the legal site and the Plans notice already use. */
+.notWired {
+  background: var(--vd-warn-bg);
+  border: 1px solid var(--vd-gold-light);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--vd-gold-text);
+}
+
+.notWired strong {
+  color: var(--vd-amber);
+}

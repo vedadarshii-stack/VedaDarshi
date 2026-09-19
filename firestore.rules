@@ -183,7 +183,7 @@ service cloud.firestore {
 
     // ---- THE REST OF THE CMS (added 12 Sep 2026) ------------------------
     //
-    // Banners, daily quotes, festivals and muhurat copy are the same KIND of
+    // Daily quotes, festivals and muhurat copy are the same KIND of
     // thing as /articles — editorial content authored in the console and read
     // by every app user — so they get the identical rule, published-only for
     // readers and admin-only for writes. The same consequence applies: a
@@ -194,12 +194,10 @@ service cloud.firestore {
     // because their shapes genuinely differ (a festival has a date, a banner
     // has a CTA target) and because per-collection rules let one of them be
     // tightened later without touching the others.
-    match /banners/{bannerId} {
-      allow get, list: if isAdmin()
-                       || resource.data.status == 'published';
-      allow create, update, delete: if isAdmin();
-    }
-
+    // NOTE: there is deliberately no `/banners` rule. A Banners CMS was built
+    // and removed on 12 Sep 2026 — the app has no banner surface for it to
+    // drive (see `admin/src/app/navigation.ts`). Leaving a rule for a
+    // collection nothing writes would imply the feature exists.
     match /quotes/{quoteId} {
       allow get, list: if isAdmin()
                        || resource.data.status == 'published';

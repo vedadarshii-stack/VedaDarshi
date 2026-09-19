@@ -12,6 +12,7 @@ import { callableErrorMessage } from '../../lib/adminApi';
 import { isPermissionDenied, firestoreErrorMessage } from '../../lib/firestoreErrors';
 import { PageSkeleton } from '../../components/PageSkeleton';
 import './ConfigPage.css';
+import { NotWiredNotice } from '../../components/NotWiredNotice';
 
 /** App Config CMS (sidebar item, previously inert) — a FORM over a single
  *  document, `appConfig/global`, not a list like the other three new
@@ -110,7 +111,7 @@ export function ConfigPage() {
         <div className="pageHead__text">
           <h1 className="pageHead__title">App Config</h1>
           <p className="pageHead__subtitle">
-            Global settings read by the app on every launch.
+            Global settings, saved to Firestore.
           </p>
         </div>
         {state.status === 'ready' && (
@@ -124,6 +125,8 @@ export function ConfigPage() {
           </button>
         )}
       </header>
+
+      <NotWiredNotice what="These settings" />
 
       {state.status === 'denied' && (
         <div className="card users__error" role="alert">
@@ -179,7 +182,8 @@ export function ConfigPage() {
                 placeholder="1.0.0"
               />
               <span className="config__hint">
-                Users below this version see a forced-update prompt.
+                Intended to drive a forced-update prompt. The app does not read
+                this yet, so setting it currently has no effect.
               </span>
             </label>
           </section>

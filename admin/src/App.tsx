@@ -12,7 +12,6 @@ import { ArticlesPage } from './pages/articles/ArticlesPage';
 import { NotificationsPage } from './pages/notifications/NotificationsPage';
 import { PlansPage } from './pages/plans/PlansPage';
 import { AiUsagePage } from './pages/ai-usage/AiUsagePage';
-import { BannersPage } from './pages/banners/BannersPage';
 import { QuotesPage } from './pages/quotes/QuotesPage';
 import { MuhuratPage } from './pages/muhurat/MuhuratPage';
 import { ConfigPage } from './pages/config/ConfigPage';
@@ -21,7 +20,7 @@ import { ConfigPage } from './pages/config/ConfigPage';
  *
  *  Auth and role resolution are real (Firebase project vedadarshi-20989):
  *  RequireAuth checks the session, RequirePermission checks the role loaded from
- *  adminUsers/{uid} → adminRoles/{roleId}. Editorial content (Articles, Banners,
+ *  adminUsers/{uid} → adminRoles/{roleId}. Editorial content (Articles,
  *  Quotes & Festivals, Muhurat Content, App Config) reads/writes Firestore
  *  directly — see the comment in src/lib/articles.ts for why that differs from
  *  Users, which needs a Cloud Function because the rules refuse `list`.
@@ -80,14 +79,6 @@ function App() {
                   element={
                     <RequirePermission need={PERMISSIONS.plansManage}>
                       <PlansPage />
-                    </RequirePermission>
-                  }
-                />
-                <Route
-                  path="/banners"
-                  element={
-                    <RequirePermission need={PERMISSIONS.bannersManage}>
-                      <BannersPage />
                     </RequirePermission>
                   }
                 />
