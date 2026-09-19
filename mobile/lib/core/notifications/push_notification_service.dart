@@ -199,6 +199,38 @@ class PushNotificationService {
       FirebaseMessaging.onMessageOpenedApp.listen(_handleRemoteMessageTap);
       _messaging.onTokenRefresh.listen(_onTokenRefresh);
 
+      // ⚠️ RE-SYNC THE TOKEN ON EVERY LAUNCH — added 12 Sep 2026.
+      //
+      // Until now `syncTokenForCurrentUser` had exactly ONE caller,
+      // `post_sign_in_route.dart`, so a device's token reached Firestore only
+      // in the moments after an explicit sign-in. That leaves two silent
+      // holes, and both fail the same way: no error, the phone simply stops
+      // receiving pushes and nobody finds out.
+      //
+      //  1. **Rotation while the app is closed.** `onTokenRefresh` only fires
+      //     in a running process. FCM rotates tokens on its own schedule
+      //     (Play-services updates, restores to a new device, app-data
+      //     clears), so a token can go stale between launches with the
+      //     listener never seeing it.
+      //  2. **Accounts that predate this feature.** Anyone who signed in
+      //     before FCM shipped has no token document at all, and would not
+      //     get one until they happened to sign out and back in.
+      //
+      // Listening to `authStateChanges` rather than reading `currentUser`
+      // once is deliberate: session restoration is ASYNCHRONOUS, so at this
+      // point in `main()` a returning user's `currentUser` is usually still
+      // null. The stream fires as soon as it resolves, and again on every
+      // later sign-in.
+      //
+      // Writes are keyed by the token itself (`fcmTokens/{token}`), so this
+      // overlapping with the post-sign-in call is an idempotent no-op rather
+      // than a duplicate. Fire-and-forget: a token write must never block or
+      // break startup.
+      _firebaseAuth.authStateChanges().listen((user) {
+        if (user == null) return;
+        unawaited(syncTokenForCurrentUser());
+      });
+
       // Terminated-state launch: the app process didn't exist until the user
       // tapped a notification, so the navigator isn't mounted yet at this
       // point (this runs before `runApp`). Deferring to the first drawn
