@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { VEDIKA_API_KEY, VEDIKA_BASE_URL, vedikaHeaders } from "./config";
 import { resolveBirthDetails, type VedikaBirthDetails } from "./aiCredits";
 import { ownedReports } from "./reportPurchases";
+import { renderBrandedReport, signExistingReport } from "./reportRenderer";
 
 /**
  * Full-length premium reports, rendered by Vedika as multi-page PDFs.
@@ -85,7 +86,9 @@ interface DetailedReportDoc {
   sectionCount: number;
   reportTitle: string;
   downloadUrl: string;
-  iframeUrl: string | null;
+  /** Object in our own reports bucket. The vendor URL is never persisted. */
+  storagePath: string;
+  expiresAtMs: number;
   idempotencyKey: string;
   generatedAtMs: number;
 }
@@ -145,7 +148,17 @@ export const generateDetailedReport = onCall(
     secrets: [VEDIKA_API_KEY],
     // Rendering 89 pages is not instant; the SDK's 60s default cut off
     // legitimate responses in testing.
-    timeoutSeconds: 180,
+    timeoutSeconds: 300,
+    // ⚠️ 2 GiB because this function launches CHROMIUM to re-render the
+    // report (see reportRenderer.ts). The default 256 MiB is not close —
+    // a browser plus an 850 KB document with inline fonts and images OOMs
+    // immediately, and an OOM here looks like a generic crash rather than
+    // anything that names memory as the cause.
+    memory: "2GiB",
+    // One render at a time per instance. Chromium is memory-hungry enough
+    // that two concurrent renders in one 2 GiB container is the OOM case
+    // above; Cloud Run scales out instead.
+    concurrency: 1,
   },
   async (request) => {
     const uid = request.auth?.uid;
@@ -197,8 +210,15 @@ export const generateDetailedReport = onCall(
       | undefined;
     const force =
       (request.data as { force?: unknown } | undefined)?.force === true;
-    if (existing?.downloadUrl && !force) {
-      return { ...existing, cached: true };
+    if (existing?.storagePath && !force) {
+      // Re-sign rather than reuse the stored URL: a signed link expires, and
+      // re-signing is a metadata call — no Vedika charge, no chromium run.
+      const signed = await signExistingReport(uid, reportId);
+      if (signed) {
+        return { ...existing, ...signed, cached: true };
+      }
+      // The object is gone (bucket lifecycle, manual delete). Fall through
+      // and rebuild it — Vedika's idempotency makes the regeneration free.
     }
 
     // ---- 3. Birth details, from the SERVER's copy ----------------------
@@ -395,6 +415,20 @@ async function storeAndReturn(
     );
   }
 
+  // ⚠️ RENDER BEFORE STORING. The vendor's own `downloadUrl` must never
+  // reach the app: it is literally `https://api.vedika.io/...`, so handing it
+  // over would put their name in front of the user no matter how clean the
+  // document itself is (client, 20 Sep 2026: "i don't want show vedika
+  // anywhere"). What the app receives is a signed link to OUR bucket.
+  const iframeUrl = data.iframeUrl;
+  if (typeof iframeUrl !== "string" || !iframeUrl) {
+    throw new HttpsError(
+      "internal",
+      "The report service returned no document. Please try again."
+    );
+  }
+  const rendered = await renderBrandedReport({ uid, reportId, iframeUrl });
+
   const doc: DetailedReportDoc = {
     reportId,
     reportType,
@@ -405,8 +439,9 @@ async function storeAndReturn(
       typeof data.sectionCount === "number" ? data.sectionCount : 0,
     reportTitle:
       typeof data.reportTitle === "string" ? data.reportTitle : reportId,
-    downloadUrl,
-    iframeUrl: typeof data.iframeUrl === "string" ? data.iframeUrl : null,
+    downloadUrl: rendered.downloadUrl,
+    storagePath: rendered.storagePath,
+    expiresAtMs: rendered.expiresAtMs,
     idempotencyKey,
     generatedAtMs: Date.now(),
   };
