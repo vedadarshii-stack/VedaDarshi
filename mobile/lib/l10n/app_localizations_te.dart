@@ -1929,4 +1929,22 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get storeSubscriptionOnly => 'సబ్‌స్క్రిప్షన్‌లో మాత్రమే';
+
+  @override
+  String get reportFullDownload => 'పూర్తి నివేదిక డౌన్‌లోడ్ చేయండి';
+
+  @override
+  String reportFullPages(int pages) {
+    return '$pages పేజీల వివరణాత్మక నివేదిక';
+  }
+
+  @override
+  String get reportFullGenerating => 'మీ నివేదిక సిద్ధమవుతోంది…';
+
+  @override
+  String get reportFullNotPurchased => 'పూర్తి నివేదిక కోసం దీన్ని కొనండి.';
+
+  @override
+  String get reportFullFailed =>
+      'నివేదిక సిద్ధం చేయలేకపోయాం. మళ్లీ ప్రయత్నించండి.';
 }

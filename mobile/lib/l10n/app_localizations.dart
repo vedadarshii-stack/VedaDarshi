@@ -3487,6 +3487,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Subscription only'**
   String get storeSubscriptionOnly;
+
+  /// Button on an OWNED report that fetches the full-length Vedika PDF. Added 20 Sep 2026.
+  ///
+  /// In en, this message translates to:
+  /// **'Download full report'**
+  String get reportFullDownload;
+
+  /// Subtitle under the full-report button, e.g. '89-page detailed report'.
+  ///
+  /// In en, this message translates to:
+  /// **'{pages}-page detailed report'**
+  String reportFullPages(int pages);
+
+  /// Shown while the server generates the full PDF (can take up to ~3 minutes).
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing your report…'**
+  String get reportFullGenerating;
+
+  /// Shown when the purchase ledger says this report was never bought.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy this report to download the full version.'**
+  String get reportFullNotPurchased;
+
+  /// Generic failure for the full-report download.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn’t prepare the report. Please try again.'**
+  String get reportFullFailed;
 }
 
 class _AppLocalizationsDelegate

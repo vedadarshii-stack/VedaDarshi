@@ -2355,109 +2355,252 @@
     "description": "Profile premium badge / upgrade CTA (8 Sep 2026)."
   },
   "aiPacksTitle": "AI question packs",
-  "@aiPacksTitle": {"description": "AI question pack UI. Added 9 Sep 2026."},
+  "@aiPacksTitle": {
+    "description": "AI question pack UI. Added 9 Sep 2026."
+  },
   "aiPacksSubtitle": "Top up when today's questions run out",
-  "@aiPacksSubtitle": {"description": "AI question pack UI. Added 9 Sep 2026."},
+  "@aiPacksSubtitle": {
+    "description": "AI question pack UI. Added 9 Sep 2026."
+  },
   "aiPackQuestions": "{count} questions",
-  "@aiPackQuestions": {"description": "AI question pack UI. Added 9 Sep 2026.", "placeholders": {"count": {"type": "String"}}},
+  "@aiPackQuestions": {
+    "description": "AI question pack UI. Added 9 Sep 2026.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "aiPackValidity": "Valid {days} days",
-  "@aiPackValidity": {"description": "AI question pack UI. Added 9 Sep 2026.", "placeholders": {"days": {"type": "String"}}},
+  "@aiPackValidity": {
+    "description": "AI question pack UI. Added 9 Sep 2026.",
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
   "aiPackBestValue": "Best value",
-  "@aiPackBestValue": {"description": "AI question pack UI. Added 9 Sep 2026."},
+  "@aiPackBestValue": {
+    "description": "AI question pack UI. Added 9 Sep 2026."
+  },
   "aiPacksUnavailable": "Packs aren't available right now.",
-  "@aiPacksUnavailable": {"description": "AI question pack UI. Added 9 Sep 2026."},
+  "@aiPacksUnavailable": {
+    "description": "AI question pack UI. Added 9 Sep 2026."
+  },
   "aiPackPurchased": "Purchase complete — your questions will appear in a moment.",
-  "@aiPackPurchased": {"description": "AI question pack UI. Added 9 Sep 2026."},
+  "@aiPackPurchased": {
+    "description": "AI question pack UI. Added 9 Sep 2026."
+  },
   "aiPackBalance": "{count} pack questions left",
-  "@aiPackBalance": {"description": "AI question pack UI. Added 9 Sep 2026.", "placeholders": {"count": {"type": "String"}}},
+  "@aiPackBalance": {
+    "description": "AI question pack UI. Added 9 Sep 2026.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "aiPackTopUp": "Top up questions",
-  "@aiPackTopUp": {"description": "AI question pack UI. Added 9 Sep 2026."},
+  "@aiPackTopUp": {
+    "description": "AI question pack UI. Added 9 Sep 2026."
+  },
   "dailyReadingTitle": "Personalized Daily Reading",
-  "@dailyReadingTitle": {"description": "Personalized Daily Reading. Added 9 Sep 2026."},
+  "@dailyReadingTitle": {
+    "description": "Personalized Daily Reading. Added 9 Sep 2026."
+  },
   "dailyReadingDesc": "Today read from your own chart — not your sun sign",
-  "@dailyReadingDesc": {"description": "Personalized Daily Reading. Added 9 Sep 2026."},
+  "@dailyReadingDesc": {
+    "description": "Personalized Daily Reading. Added 9 Sep 2026."
+  },
   "dailyReadingBuy": "Unlock today's reading",
-  "@dailyReadingBuy": {"description": "Personalized Daily Reading. Added 9 Sep 2026."},
+  "@dailyReadingBuy": {
+    "description": "Personalized Daily Reading. Added 9 Sep 2026."
+  },
   "dailyReadingActiveUntil": "Unlocked until {time}",
-  "@dailyReadingActiveUntil": {"description": "Personalized Daily Reading. Added 9 Sep 2026.", "placeholders": {"time": {"type": "String"}}},
+  "@dailyReadingActiveUntil": {
+    "description": "Personalized Daily Reading. Added 9 Sep 2026.",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "dailyReadingLocked": "Your personal reading for today, computed from your birth chart.",
-  "@dailyReadingLocked": {"description": "Personalized Daily Reading. Added 9 Sep 2026."},
+  "@dailyReadingLocked": {
+    "description": "Personalized Daily Reading. Added 9 Sep 2026."
+  },
   "dailyReadingUnavailable": "This isn't available right now.",
-  "@dailyReadingUnavailable": {"description": "Personalized Daily Reading. Added 9 Sep 2026."},
+  "@dailyReadingUnavailable": {
+    "description": "Personalized Daily Reading. Added 9 Sep 2026."
+  },
   "dailyReadingLucky": "Lucky today",
-  "@dailyReadingLucky": {"description": "Personalized Daily Reading. Added 9 Sep 2026."},
+  "@dailyReadingLucky": {
+    "description": "Personalized Daily Reading. Added 9 Sep 2026."
+  },
   "dailyReadingRemedies": "Remedies",
-  "@dailyReadingRemedies": {"description": "Personalized Daily Reading. Added 9 Sep 2026."},
+  "@dailyReadingRemedies": {
+    "description": "Personalized Daily Reading. Added 9 Sep 2026."
+  },
   "dailyReadingAreaCareer": "Career",
-  "@dailyReadingAreaCareer": {"description": "Personalized Daily Reading. Added 9 Sep 2026."},
+  "@dailyReadingAreaCareer": {
+    "description": "Personalized Daily Reading. Added 9 Sep 2026."
+  },
   "dailyReadingAreaFinance": "Finance",
-  "@dailyReadingAreaFinance": {"description": "Personalized Daily Reading. Added 9 Sep 2026."},
+  "@dailyReadingAreaFinance": {
+    "description": "Personalized Daily Reading. Added 9 Sep 2026."
+  },
   "dailyReadingAreaHealth": "Health",
-  "@dailyReadingAreaHealth": {"description": "Personalized Daily Reading. Added 9 Sep 2026."},
+  "@dailyReadingAreaHealth": {
+    "description": "Personalized Daily Reading. Added 9 Sep 2026."
+  },
   "dailyReadingAreaRelationship": "Relationships",
-  "@dailyReadingAreaRelationship": {"description": "Personalized Daily Reading. Added 9 Sep 2026."},
+  "@dailyReadingAreaRelationship": {
+    "description": "Personalized Daily Reading. Added 9 Sep 2026."
+  },
   "reportBuyOnce": "Unlock this report",
-  "@reportBuyOnce": {"description": "Individual report purchase. Added 10 Sep 2026."},
+  "@reportBuyOnce": {
+    "description": "Individual report purchase. Added 10 Sep 2026."
+  },
   "reportOwned": "You own this report",
-  "@reportOwned": {"description": "Individual report purchase. Added 10 Sep 2026."},
+  "@reportOwned": {
+    "description": "Individual report purchase. Added 10 Sep 2026."
+  },
   "reportBuyOrSubscribe": "View subscription plans",
-  "@reportBuyOrSubscribe": {"description": "Individual report purchase. Added 10 Sep 2026."},
+  "@reportBuyOrSubscribe": {
+    "description": "Individual report purchase. Added 10 Sep 2026."
+  },
   "reportDownloadPdf": "Download PDF",
-  "@reportDownloadPdf": {"description": "Report PDF export. Added 10 Sep 2026."},
+  "@reportDownloadPdf": {
+    "description": "Report PDF export. Added 10 Sep 2026."
+  },
   "reportPdfFailed": "Couldn't create the PDF.",
-  "@reportPdfFailed": {"description": "Report PDF export. Added 10 Sep 2026."},
+  "@reportPdfFailed": {
+    "description": "Report PDF export. Added 10 Sep 2026."
+  },
   "lblOverallScore": "Overall score",
-  "@lblOverallScore": {"description": "Five new report types. Added 10 Sep 2026."},
+  "@lblOverallScore": {
+    "description": "Five new report types. Added 10 Sep 2026."
+  },
   "lblFifthHouse": "Children house",
-  "@lblFifthHouse": {"description": "Five new report types. Added 10 Sep 2026."},
+  "@lblFifthHouse": {
+    "description": "Five new report types. Added 10 Sep 2026."
+  },
   "lblFifthLord": "Children lord",
-  "@lblFifthLord": {"description": "Five new report types. Added 10 Sep 2026."},
+  "@lblFifthLord": {
+    "description": "Five new report types. Added 10 Sep 2026."
+  },
   "lblJupiter": "Jupiter",
-  "@lblJupiter": {"description": "Five new report types. Added 10 Sep 2026."},
+  "@lblJupiter": {
+    "description": "Five new report types. Added 10 Sep 2026."
+  },
   "reportRemedies": "Lal Kitab Remedies",
-  "@reportRemedies": {"description": "Five new report types. Added 10 Sep 2026."},
+  "@reportRemedies": {
+    "description": "Five new report types. Added 10 Sep 2026."
+  },
   "reportRemediesDesc": "Per-planet remedies from your chart",
-  "@reportRemediesDesc": {"description": "Five new report types. Added 10 Sep 2026."},
+  "@reportRemediesDesc": {
+    "description": "Five new report types. Added 10 Sep 2026."
+  },
   "reportRudraksha": "Rudraksha Guide",
-  "@reportRudraksha": {"description": "Five new report types. Added 10 Sep 2026."},
+  "@reportRudraksha": {
+    "description": "Five new report types. Added 10 Sep 2026."
+  },
   "reportRudrakshaDesc": "Which mukhi suits your planets",
-  "@reportRudrakshaDesc": {"description": "Five new report types. Added 10 Sep 2026."},
+  "@reportRudrakshaDesc": {
+    "description": "Five new report types. Added 10 Sep 2026."
+  },
   "reportProperty": "Property Report",
-  "@reportProperty": {"description": "Five new report types. Added 10 Sep 2026."},
+  "@reportProperty": {
+    "description": "Five new report types. Added 10 Sep 2026."
+  },
   "reportPropertyDesc": "Timing for land, home & vehicles",
-  "@reportPropertyDesc": {"description": "Five new report types. Added 10 Sep 2026."},
+  "@reportPropertyDesc": {
+    "description": "Five new report types. Added 10 Sep 2026."
+  },
   "reportChildFamily": "Child & Family Report",
-  "@reportChildFamily": {"description": "Five new report types. Added 10 Sep 2026."},
+  "@reportChildFamily": {
+    "description": "Five new report types. Added 10 Sep 2026."
+  },
   "reportChildFamilyDesc": "Progeny indicators & timing",
-  "@reportChildFamilyDesc": {"description": "Five new report types. Added 10 Sep 2026."},
+  "@reportChildFamilyDesc": {
+    "description": "Five new report types. Added 10 Sep 2026."
+  },
   "reportBusiness": "Business Report",
-  "@reportBusiness": {"description": "Five new report types. Added 10 Sep 2026."},
+  "@reportBusiness": {
+    "description": "Five new report types. Added 10 Sep 2026."
+  },
   "reportBusinessDesc": "Venture timing & partnership",
-  "@reportBusinessDesc": {"description": "Five new report types. Added 10 Sep 2026."},
+  "@reportBusinessDesc": {
+    "description": "Five new report types. Added 10 Sep 2026."
+  },
   "allReportsFooter": "All reports include PDF download",
   "@allReportsFooter": {
     "description": "Reports footer once every report is built. Added 10 Sep 2026."
   },
   "storeTitle": "Store",
-  "@storeTitle": {"description": "Unified one-time purchase store. Added 10 Sep 2026."},
+  "@storeTitle": {
+    "description": "Unified one-time purchase store. Added 10 Sep 2026."
+  },
   "storeSubtitle": "One-time purchases — no subscription needed",
-  "@storeSubtitle": {"description": "Unified one-time purchase store. Added 10 Sep 2026."},
+  "@storeSubtitle": {
+    "description": "Unified one-time purchase store. Added 10 Sep 2026."
+  },
   "storeTabPacks": "AI packs",
-  "@storeTabPacks": {"description": "Unified one-time purchase store. Added 10 Sep 2026."},
+  "@storeTabPacks": {
+    "description": "Unified one-time purchase store. Added 10 Sep 2026."
+  },
   "storeTabReports": "Reports",
-  "@storeTabReports": {"description": "Unified one-time purchase store. Added 10 Sep 2026."},
+  "@storeTabReports": {
+    "description": "Unified one-time purchase store. Added 10 Sep 2026."
+  },
   "storeTabDaily": "Daily reading",
-  "@storeTabDaily": {"description": "Unified one-time purchase store. Added 10 Sep 2026."},
+  "@storeTabDaily": {
+    "description": "Unified one-time purchase store. Added 10 Sep 2026."
+  },
   "storeOwned": "Owned",
-  "@storeOwned": {"description": "Unified one-time purchase store. Added 10 Sep 2026."},
+  "@storeOwned": {
+    "description": "Unified one-time purchase store. Added 10 Sep 2026."
+  },
   "storeIncluded": "Included",
-  "@storeIncluded": {"description": "Unified one-time purchase store. Added 10 Sep 2026."},
+  "@storeIncluded": {
+    "description": "Unified one-time purchase store. Added 10 Sep 2026."
+  },
   "storeUnavailable": "Not available right now.",
-  "@storeUnavailable": {"description": "Unified one-time purchase store. Added 10 Sep 2026."},
+  "@storeUnavailable": {
+    "description": "Unified one-time purchase store. Added 10 Sep 2026."
+  },
   "storeSubscribeHint": "Subscribing unlocks every report instead",
-  "@storeSubscribeHint": {"description": "Unified one-time purchase store. Added 10 Sep 2026."},
+  "@storeSubscribeHint": {
+    "description": "Unified one-time purchase store. Added 10 Sep 2026."
+  },
   "storeSubscriptionOnly": "Subscription only",
   "@storeSubscriptionOnly": {
     "description": "A premium report Play does not sell individually (Sade Sati). Added 10 Sep 2026."
+  },
+  "reportFullDownload": "Download full report",
+  "@reportFullDownload": {
+    "description": "Button on an OWNED report that fetches the full-length Vedika PDF. Added 20 Sep 2026."
+  },
+  "reportFullPages": "{pages}-page detailed report",
+  "@reportFullPages": {
+    "description": "Subtitle under the full-report button, e.g. '89-page detailed report'.",
+    "placeholders": {
+      "pages": {
+        "type": "int"
+      }
+    }
+  },
+  "reportFullGenerating": "Preparing your report…",
+  "@reportFullGenerating": {
+    "description": "Shown while the server generates the full PDF (can take up to ~3 minutes)."
+  },
+  "reportFullNotPurchased": "Buy this report to download the full version.",
+  "@reportFullNotPurchased": {
+    "description": "Shown when the purchase ledger says this report was never bought."
+  },
+  "reportFullFailed": "Couldn’t prepare the report. Please try again.",
+  "@reportFullFailed": {
+    "description": "Generic failure for the full-report download."
   }
 }

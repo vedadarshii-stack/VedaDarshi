@@ -14,7 +14,9 @@ import '../premium/purchase_error_messages.dart';
 import '../premium/subscription_paywall_screen.dart';
 import '../profile/birth_profile_repository.dart';
 import 'package:printing/printing.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import 'detailed_report_repository.dart';
 import 'report_content.dart';
 import 'report_labels.dart';
 import 'report_pdf.dart';
@@ -219,6 +221,13 @@ class _Body extends StatelessWidget {
         children: [
           sections,
           const SizedBox(height: 18),
+          // The FULL report (Vedika-rendered, ~89 pages) sits above the
+          // short summary PDF. Both are offered because they are genuinely
+          // different artifacts: this one is the depth the client is selling
+          // at Rs299+, the one below is our own Vedadarshi-branded summary of
+          // what is already on screen and works offline.
+          _FullReportButton(reportId: report.id, l10n: l10n, locale: locale),
+          const SizedBox(height: 10),
           _DownloadPdfButton(
             reportId: report.id,
             content: content,
@@ -994,6 +1003,182 @@ class _DownloadPdfButtonState extends State<_DownloadPdfButton> {
                         color: AppColors.saffron,
                       ),
                     ),
+                  ],
+                ),
+        ),
+      ),
+    );
+  }
+}
+
+
+/// Fetches and opens the full-length PDF for an OWNED report.
+///
+/// BUILT 20 Sep 2026. Only ever rendered on the unlocked path, so the button
+/// is not a paywall — but the server checks ownership again regardless, since
+/// a client-side check protects nothing and each generation spends real money
+/// from the client's Vedika wallet.
+///
+/// ⚠️ Generation can take up to ~3 minutes on a first request, which is why
+/// this shows a labelled progress state rather than a bare spinner: an
+/// unexplained 3-minute spinner reads as a hang, and a user who force-quits
+/// mid-render may have already been charged for it.
+class _FullReportButton extends ConsumerStatefulWidget {
+  const _FullReportButton({
+    required this.reportId,
+    required this.l10n,
+    required this.locale,
+  });
+
+  final String reportId;
+  final AppLocalizations l10n;
+  final Locale locale;
+
+  @override
+  ConsumerState<_FullReportButton> createState() => _FullReportButtonState();
+}
+
+class _FullReportButtonState extends ConsumerState<_FullReportButton> {
+  bool _isBusy = false;
+  DetailedReport? _report;
+
+  Future<void> _open() async {
+    if (_isBusy) return;
+
+    // Already generated this session — open it again without a round trip.
+    if (_report case final ready?) {
+      await _launch(ready.downloadUrl);
+      return;
+    }
+
+    setState(() => _isBusy = true);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final report = await ref
+          .read(detailedReportRepositoryProvider)
+          .generate(widget.reportId);
+      if (!mounted) return;
+      setState(() => _report = report);
+      await _launch(report.downloadUrl);
+    } on DetailedReportException catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(switch (e.error) {
+            DetailedReportError.notPurchased =>
+              widget.l10n.reportFullNotPurchased,
+            _ => widget.l10n.reportFullFailed,
+          }),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isBusy = false);
+    }
+  }
+
+  /// Opens the PDF in the device's browser/viewer.
+  ///
+  /// `externalApplication` rather than an in-app webview: the artifact is a
+  /// multi-megabyte PDF, and handing it to the platform gives the user their
+  /// own viewer plus Save and Share for free.
+  Future<void> _launch(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!ok && mounted) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(widget.l10n.reportFullFailed)),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final pages = _report?.pageCount ?? 0;
+    return Semantics(
+      button: true,
+      child: PressableScale(
+        borderRadius: BorderRadius.circular(999),
+        onTap: _open,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 16),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AppColors.saffron, AppColors.saffronDark],
+            ),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: _isBusy
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation(Colors.white),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: Text(
+                        widget.l10n.reportFullGenerating,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppFonts.body(
+                          widget.locale,
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.picture_as_pdf_rounded,
+                          size: 17,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            widget.l10n.reportFullDownload,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppFonts.body(
+                              widget.locale,
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    // The page count is only known AFTER the first render, so
+                    // this line appears once rather than promising a number
+                    // up front that might not match what Vedika returns.
+                    if (pages > 0) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        widget.l10n.reportFullPages(pages),
+                        style: AppFonts.body(
+                          widget.locale,
+                          fontSize: 11,
+                          color: Colors.white.withValues(alpha: 0.85),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
         ),

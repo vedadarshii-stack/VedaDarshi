@@ -1911,4 +1911,21 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get storeSubscriptionOnly => 'केवल सदस्यता में';
+
+  @override
+  String get reportFullDownload => 'पूरी रिपोर्ट डाउनलोड करें';
+
+  @override
+  String reportFullPages(int pages) {
+    return '$pages पृष्ठ की विस्तृत रिपोर्ट';
+  }
+
+  @override
+  String get reportFullGenerating => 'आपकी रिपोर्ट तैयार हो रही है…';
+
+  @override
+  String get reportFullNotPurchased => 'पूरी रिपोर्ट के लिए इसे खरीदें।';
+
+  @override
+  String get reportFullFailed => 'रिपोर्ट तैयार नहीं हो सकी। पुनः प्रयास करें।';
 }

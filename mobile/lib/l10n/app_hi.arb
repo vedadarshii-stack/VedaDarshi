@@ -562,5 +562,10 @@
   "storeIncluded": "शामिल",
   "storeUnavailable": "अभी उपलब्ध नहीं है।",
   "storeSubscribeHint": "सदस्यता लेने पर सभी रिपोर्ट्स खुल जाती हैं",
-  "storeSubscriptionOnly": "केवल सदस्यता में"
+  "storeSubscriptionOnly": "केवल सदस्यता में",
+  "reportFullDownload": "पूरी रिपोर्ट डाउनलोड करें",
+  "reportFullPages": "{pages} पृष्ठ की विस्तृत रिपोर्ट",
+  "reportFullGenerating": "आपकी रिपोर्ट तैयार हो रही है…",
+  "reportFullNotPurchased": "पूरी रिपोर्ट के लिए इसे खरीदें।",
+  "reportFullFailed": "रिपोर्ट तैयार नहीं हो सकी। पुनः प्रयास करें।"
 }

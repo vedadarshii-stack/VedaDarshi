@@ -562,5 +562,10 @@
   "storeIncluded": "చేర్చబడింది",
   "storeUnavailable": "ప్రస్తుతం అందుబాటులో లేదు.",
   "storeSubscribeHint": "సబ్‌స్క్రైబ్ చేస్తే అన్ని నివేదికలు అన్‌లాక్ అవుతాయి",
-  "storeSubscriptionOnly": "సబ్‌స్క్రిప్షన్‌లో మాత్రమే"
+  "storeSubscriptionOnly": "సబ్‌స్క్రిప్షన్‌లో మాత్రమే",
+  "reportFullDownload": "పూర్తి నివేదిక డౌన్‌లోడ్ చేయండి",
+  "reportFullPages": "{pages} పేజీల వివరణాత్మక నివేదిక",
+  "reportFullGenerating": "మీ నివేదిక సిద్ధమవుతోంది…",
+  "reportFullNotPurchased": "పూర్తి నివేదిక కోసం దీన్ని కొనండి.",
+  "reportFullFailed": "నివేదిక సిద్ధం చేయలేకపోయాం. మళ్లీ ప్రయత్నించండి."
 }

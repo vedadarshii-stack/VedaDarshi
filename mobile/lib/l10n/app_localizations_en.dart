@@ -1915,4 +1915,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storeSubscriptionOnly => 'Subscription only';
+
+  @override
+  String get reportFullDownload => 'Download full report';
+
+  @override
+  String reportFullPages(int pages) {
+    return '$pages-page detailed report';
+  }
+
+  @override
+  String get reportFullGenerating => 'Preparing your report…';
+
+  @override
+  String get reportFullNotPurchased =>
+      'Buy this report to download the full version.';
+
+  @override
+  String get reportFullFailed =>
+      'Couldn’t prepare the report. Please try again.';
 }

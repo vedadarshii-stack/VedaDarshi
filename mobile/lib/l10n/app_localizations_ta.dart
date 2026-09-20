@@ -1935,4 +1935,22 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get storeSubscriptionOnly => 'சந்தாவில் மட்டும்';
+
+  @override
+  String get reportFullDownload => 'முழு அறிக்கையை பதிவிறக்கவும்';
+
+  @override
+  String reportFullPages(int pages) {
+    return '$pages பக்க விரிவான அறிக்கை';
+  }
+
+  @override
+  String get reportFullGenerating => 'உங்கள் அறிக்கை தயாராகிறது…';
+
+  @override
+  String get reportFullNotPurchased => 'முழு அறிக்கைக்கு இதனை வாங்கவும்.';
+
+  @override
+  String get reportFullFailed =>
+      'அறிக்கையை தயாரிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.';
 }

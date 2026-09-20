@@ -562,5 +562,10 @@
   "storeIncluded": "ಸೇರಿದೆ",
   "storeUnavailable": "ಸದ್ಯಕ್ಕೆ ಲಭ್ಯವಿಲ್ಲ.",
   "storeSubscribeHint": "ಚಂದಾದಾರರಾದರೆ ಎಲ್ಲಾ ವರದಿಗಳು ಅನ್‌ಲಾಕ್ ಆಗುತ್ತವೆ",
-  "storeSubscriptionOnly": "ಚಂದಾದಾರಿಕೆಯಲ್ಲಿ ಮಾತ್ರ"
+  "storeSubscriptionOnly": "ಚಂದಾದಾರಿಕೆಯಲ್ಲಿ ಮಾತ್ರ",
+  "reportFullDownload": "ಪೂರ್ಣ ವರದಿಯನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ",
+  "reportFullPages": "{pages} ಪುಟಗಳ ವಿವರವಾದ ವರದಿ",
+  "reportFullGenerating": "ನಿಮ್ಮ ವರದಿ ಸಿದ್ಧವಾಗುತ್ತಿದೆ…",
+  "reportFullNotPurchased": "ಪೂರ್ಣ ವರದಿಗಾಗಿ ಇದನ್ನು ಖರೀದಿಸಿ.",
+  "reportFullFailed": "ವರದಿ ಸಿದ್ಧಪಡಿಸಲಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
 }

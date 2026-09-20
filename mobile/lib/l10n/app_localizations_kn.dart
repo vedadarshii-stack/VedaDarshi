@@ -1922,4 +1922,22 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get storeSubscriptionOnly => 'ಚಂದಾದಾರಿಕೆಯಲ್ಲಿ ಮಾತ್ರ';
+
+  @override
+  String get reportFullDownload => 'ಪೂರ್ಣ ವರದಿಯನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ';
+
+  @override
+  String reportFullPages(int pages) {
+    return '$pages ಪುಟಗಳ ವಿವರವಾದ ವರದಿ';
+  }
+
+  @override
+  String get reportFullGenerating => 'ನಿಮ್ಮ ವರದಿ ಸಿದ್ಧವಾಗುತ್ತಿದೆ…';
+
+  @override
+  String get reportFullNotPurchased => 'ಪೂರ್ಣ ವರದಿಗಾಗಿ ಇದನ್ನು ಖರೀದಿಸಿ.';
+
+  @override
+  String get reportFullFailed =>
+      'ವರದಿ ಸಿದ್ಧಪಡಿಸಲಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
 }
