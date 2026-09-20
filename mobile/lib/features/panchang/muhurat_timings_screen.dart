@@ -6,6 +6,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../l10n/app_localizations.dart';
 import 'panchang_data.dart';
+import 'cms_muhurat_repository.dart';
 import 'panchang_location.dart';
 import 'panchang_repository.dart';
 
@@ -78,7 +79,14 @@ class MuhuratTimingsScreen extends ConsumerWidget {
           ),
         ),
         data: (muhurta) =>
-            _Body(muhurta: muhurta, l10n: l10n, locale: locale, city: location.city.name),
+            _Body(
+              muhurta: muhurta,
+              l10n: l10n,
+              locale: locale,
+              city: location.city.name,
+              cmsMuhurat:
+                  ref.watch(cmsMuhuratProvider).valueOrNull ?? const {},
+            ),
       ),
     );
   }
@@ -90,7 +98,14 @@ class _Body extends StatelessWidget {
     required this.l10n,
     required this.locale,
     required this.city,
+    required this.cmsMuhurat,
   });
+
+  /// Authored muhurat descriptions by kind, threaded down from the
+  /// ConsumerWidget above rather than read here — this widget and its two
+  /// children must see the SAME map, or a rebuild could render one tile from
+  /// the console and its neighbour from the bundled copy.
+  final Map<String, String> cmsMuhurat;
 
   final MuhurtaData muhurta;
   final AppLocalizations l10n;
@@ -112,7 +127,12 @@ class _Body extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         if (rahu != null) ...[
-          _RahuCard(range: rahu, l10n: l10n, locale: locale),
+          _RahuCard(
+            range: rahu,
+            l10n: l10n,
+            locale: locale,
+            description: cmsMuhurat[MuhuratKindIds.rahuKaal],
+          ),
           const SizedBox(height: 18),
         ],
         // Sections are omitted entirely when empty rather than shown as an
@@ -121,14 +141,24 @@ class _Body extends StatelessWidget {
           _SectionLabel(l10n.muhuratDay, locale: locale),
           const SizedBox(height: 8),
           for (final period in day)
-            _PeriodTile(period: period, locale: locale, l10n: l10n),
+            _PeriodTile(
+              period: period,
+              locale: locale,
+              l10n: l10n,
+              cmsMuhurat: cmsMuhurat,
+            ),
           const SizedBox(height: 18),
         ],
         if (night.isNotEmpty) ...[
           _SectionLabel(l10n.muhuratNight, locale: locale),
           const SizedBox(height: 8),
           for (final period in night)
-            _PeriodTile(period: period, locale: locale, l10n: l10n),
+            _PeriodTile(
+              period: period,
+              locale: locale,
+              l10n: l10n,
+              cmsMuhurat: cmsMuhurat,
+            ),
         ],
         if (day.isEmpty && night.isEmpty && rahu == null)
           Padding(
@@ -173,7 +203,15 @@ class _RahuCard extends StatelessWidget {
     required this.range,
     required this.l10n,
     required this.locale,
+    this.description,
   });
+
+  /// The console's authored explanation, or null.
+  ///
+  /// Optional on purpose: this card shipped as name + time only, and there is
+  /// no bundled description to fall back on. So the line appears ONLY when
+  /// the client has written one — nothing is invented to fill the space.
+  final String? description;
 
   final String range;
   final AppLocalizations l10n;
@@ -218,6 +256,17 @@ class _RahuCard extends StatelessWidget {
                     color: AppColors.muted,
                   ),
                 ),
+                if (description case final text?) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    text,
+                    style: AppFonts.body(
+                      locale,
+                      fontSize: 11.5,
+                      color: AppColors.ashubhFg,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -252,6 +301,46 @@ class _RahuCard extends StatelessWidget {
 ///
 /// Returns null for an unrecognised period so the caller falls back to
 /// Vedika's own English rather than showing nothing.
+/// The console's `choghadiya*` document-id suffix for [period], or null when
+/// Vedika sent a name outside the classical seven.
+///
+/// Normalises the same way [_bestForText] does — Vedika is inconsistent about
+/// spelling (`Kaal`/`Kala`, `Labh`/`Labha`), and a raw name would miss the
+/// document every time.
+String? _choghadiyaSuffix(ChoghadiyaPeriod period) {
+  final name = period.name?.toLowerCase().replaceAll(RegExp(r'[^a-z]'), '');
+  return switch (name) {
+    'kaal' || 'kala' => 'Kaal',
+    'shubh' || 'shubha' => 'Shubh',
+    'rog' || 'roga' => 'Rog',
+    'udveg' || 'udvega' => 'Udveg',
+    'char' || 'chara' => 'Char',
+    'labh' || 'labha' => 'Labh',
+    'amrit' || 'amrita' => 'Amrit',
+    _ => null,
+  };
+}
+
+/// What this period is suited for: the console's authored line if the client
+/// wrote one, else the bundled translation, else Vedika's own English.
+///
+/// ⚠️ Order matters and is the whole safety argument for letting a CMS
+/// override astrology copy — see `cms_muhurat_repository.dart`. A row that is
+/// unpublished, empty, or absent never reaches this map, so the shipped
+/// translation stays the floor.
+String? _resolvedBestFor(
+  ChoghadiyaPeriod period,
+  AppLocalizations l10n,
+  Map<String, String> cms,
+) {
+  final suffix = _choghadiyaSuffix(period);
+  if (suffix != null) {
+    final authored = cms[MuhuratKindIds.choghadiya(suffix)];
+    if (authored != null) return authored;
+  }
+  return _bestForText(period, l10n);
+}
+
 String? _bestForText(ChoghadiyaPeriod period, AppLocalizations l10n) {
   final name = period.name?.toLowerCase().replaceAll(RegExp(r'[^a-z]'), '');
   return switch (name) {
@@ -271,7 +360,11 @@ class _PeriodTile extends StatelessWidget {
     required this.period,
     required this.locale,
     required this.l10n,
+    required this.cmsMuhurat,
   });
+
+  /// Authored descriptions by kind; empty when nothing is published.
+  final Map<String, String> cmsMuhurat;
 
   final ChoghadiyaPeriod period;
   final Locale locale;
@@ -348,7 +441,8 @@ class _PeriodTile extends StatelessWidget {
                 if (period.bestFor != null && period.bestFor!.isNotEmpty) ...[
                   const SizedBox(height: 3),
                   Text(
-                    _bestForText(period, l10n) ?? period.bestFor!,
+                    _resolvedBestFor(period, l10n, cmsMuhurat) ??
+                        period.bestFor!,
                     style: AppFonts.body(
                       locale,
                       fontSize: 11.5,

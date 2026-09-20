@@ -10,6 +10,8 @@ import '../../core/widgets/app_empty_state.dart';
 import '../../core/astrology/astro_terms.dart';
 import '../../l10n/app_localizations.dart';
 import 'muhurat_timings_screen.dart';
+import 'cms_festivals_repository.dart';
+import 'cms_muhurat_repository.dart';
 import 'panchang_data.dart';
 import 'panchang_location.dart';
 import 'panchang_repository.dart';
@@ -206,7 +208,11 @@ List<PanchangElement> _elementsFrom(
 /// Names and colour treatments still come from [PanchangStaticData.muhurats]
 /// because those are UI copy, not data: Abhijit stays `shubh`, Rahu Kaal
 /// and Yamaganda `ashubh`, Gulika `caution`. Only the TIMES are live.
-List<Muhurat> _muhuratsFrom(InauspiciousPeriods? periods, AppLocalizations l10n) {
+List<Muhurat> _muhuratsFrom(
+  InauspiciousPeriods? periods,
+  AppLocalizations l10n,
+  Map<String, String> cmsMuhurat,
+) {
   if (periods == null) return const [];
   // Names come from l10n as of 2 Sep 2026, not `PanchangStaticData.muhurats`
   // — those were hardcoded English and therefore stayed English in Hindi,
@@ -218,19 +224,48 @@ List<Muhurat> _muhuratsFrom(InauspiciousPeriods? periods, AppLocalizations l10n)
   // (`shubh`), like Abhijit — rendering the pre-dawn devotional window in
   // the warning tone the three inauspicious ones use would tell people to
   // avoid the best hour of their day.
-  final windows = <(String, RahuKaal?, MuhuratKind)>[
-    (l10n.muhuratBrahma, periods.brahmaMuhurta, MuhuratKind.shubh),
-    (l10n.muhuratAbhijit, periods.abhijitMuhurta, MuhuratKind.shubh),
-    (l10n.muhuratRahuKaal, periods.rahuKaal, MuhuratKind.ashubh),
-    (l10n.muhuratYamaganda, periods.yamaganda, MuhuratKind.ashubh),
-    (l10n.muhuratGulikaKaal, periods.gulikaKaal, MuhuratKind.caution),
+  // The 4th element is the console's document id for that window, so an
+  // authored description can be attached without the card knowing where the
+  // text came from.
+  final windows = <(String, RahuKaal?, MuhuratKind, String)>[
+    (
+      l10n.muhuratBrahma,
+      periods.brahmaMuhurta,
+      MuhuratKind.shubh,
+      MuhuratKindIds.brahmaMuhurta,
+    ),
+    (
+      l10n.muhuratAbhijit,
+      periods.abhijitMuhurta,
+      MuhuratKind.shubh,
+      MuhuratKindIds.abhijit,
+    ),
+    (
+      l10n.muhuratRahuKaal,
+      periods.rahuKaal,
+      MuhuratKind.ashubh,
+      MuhuratKindIds.rahuKaal,
+    ),
+    (
+      l10n.muhuratYamaganda,
+      periods.yamaganda,
+      MuhuratKind.ashubh,
+      MuhuratKindIds.yamaganda,
+    ),
+    (
+      l10n.muhuratGulikaKaal,
+      periods.gulikaKaal,
+      MuhuratKind.caution,
+      MuhuratKindIds.gulika,
+    ),
   ];
   return [
-    for (final (name, window, kind) in windows)
+    for (final (name, window, kind, cmsId) in windows)
       // A window whose end is not after its start is dropped, not rendered
       // as an impossible range — Vedika does occasionally return one (a
       // negative `durationMinutes` was observed live on Abhijit).
-      if (window?.formattedRange case final range?) Muhurat(name, range, kind),
+      if (window?.formattedRange case final range?)
+        Muhurat(name, range, kind, description: cmsMuhurat[cmsId]),
   ];
 }
 
@@ -411,11 +446,24 @@ class _PanchangScreenState extends ConsumerState<PanchangScreen> {
                 l10n: l10n,
                 locale: locale,
                 elements: _elementsFrom(data, l10n, locale),
-                muhurats: _muhuratsFrom(periodsAsync.valueOrNull, l10n),
+                muhurats: _muhuratsFrom(
+                  periodsAsync.valueOrNull,
+                  l10n,
+                  ref.watch(cmsMuhuratProvider).valueOrNull ?? const {},
+                ),
                 sunTimes: data.sunTimes,
                 guidance: data.guidance,
                 panchang: data,
-                festivalToday: data.festivalToday,
+                // CMS-authored festival wins for the BROWSED date, not just
+                // today — the date stepper must show the client's own copy on
+                // whichever day they authored it. Falls back to Vedika's
+                // `festivalToday`; see `resolveFestival` for why the
+                // precedence lives in one shared helper.
+                festivalToday: resolveFestival(
+                  date: _selectedDate,
+                  cms: ref.watch(cmsFestivalsProvider).valueOrNull ?? const {},
+                  vedikaFestival: data.festivalToday,
+                ),
               ),
               loading: () => _PanchangLoadingView(l10n: l10n, locale: locale),
               error: (error, stackTrace) => _PanchangErrorView(
@@ -1314,6 +1362,25 @@ class _MuhuratCard extends StatelessWidget {
             muhurat.time,
             style: AppFonts.body(locale, fontSize: 11, color: AppColors.muted),
           ),
+          // Authored in the console; absent for every window until the client
+          // writes one, which is why there is no fallback string here.
+          //
+          // Capped at 3 lines: these cards sit in a fixed grid beside one
+          // another, and an unbounded description would make one tile tower
+          // over its neighbours. The console is where the full text lives.
+          if (muhurat.description case final text?) ...[
+            const SizedBox(height: 4),
+            Text(
+              text,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: AppFonts.body(
+                locale,
+                fontSize: 10.5,
+                color: AppColors.hint,
+              ),
+            ),
+          ],
         ],
       ),
     );

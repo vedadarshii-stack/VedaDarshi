@@ -75,9 +75,17 @@ enum MuhuratKind { shubh, ashubh, caution }
 /// One auspicious/inauspicious time window shown in the Muhurat grid.
 @immutable
 class Muhurat {
-  const Muhurat(this.name, this.time, this.kind);
+  const Muhurat(this.name, this.time, this.kind, {this.description});
 
   final String name;
   final String time;
   final MuhuratKind kind;
+
+  /// The console's authored explanation of what this window is for, or null.
+  ///
+  /// Optional and unnamed-positional-free on purpose: these cards shipped as
+  /// badge + name + time, and there is no bundled description to fall back
+  /// on, so the line renders only when the client has actually written one.
+  /// Nothing is invented to fill the space.
+  final String? description;
 }

@@ -22,6 +22,7 @@ import '../kundli/kundli_input_screen.dart';
 import '../matching/gun_milan_select_screen.dart';
 import '../notifications/notifications_screen.dart';
 import '../notifications/notifications_static_data.dart';
+import '../panchang/cms_festivals_repository.dart';
 import '../panchang/panchang_data.dart';
 import '../panchang/panchang_location.dart';
 import '../panchang/panchang_repository.dart';
@@ -372,6 +373,15 @@ class HomeDashboardScreen extends ConsumerWidget {
     // (`disha_shool.remedies`), when Vedika supplies one. No placeholder:
     // an empty/missing list means the remedy card is omitted below rather
     // than showing `HomeStaticData.remedy`'s old fixed sentence.
+    // Festival of the day: the console's authored row for today wins, else
+    // whatever Vedika returned. Same precedence helper the Panchang screen
+    // uses, so the two screens can never name different festivals.
+    final festivalToday = resolveFestival(
+      date: _todayDate(),
+      cms: ref.watch(cmsFestivalsProvider).valueOrNull ?? const {},
+      vedikaFestival: livePanchang?.festivalToday,
+    );
+
     final liveRemedies = livePanchang?.dishaShool?.remedies;
     final remedyText = (liveRemedies != null && liveRemedies.isNotEmpty)
         ? liveRemedies.first
@@ -416,14 +426,30 @@ class HomeDashboardScreen extends ConsumerWidget {
               _RemedyCard(l10n: l10n, locale: locale, remedy: remedyText),
               const SizedBox(height: 14),
             ],
-            // _FestivalCard REMOVED 21 Aug 2026 — it was hardcoded to
-            // "Sawan Somvar — tomorrow". On 21 Aug 2026 the Panchang screen
-            // (live) read "Bhadrapada Masa": Sawan was over, and the day was
-            // a Friday, not Somvar. A festival card that names the wrong
-            // festival on the wrong day is worse than no card, and there is
-            // no festival field in any endpoint this app calls. Restore it
-            // when a real source exists — the widget itself is kept below.
-
+            // _FestivalCard RESTORED 20 Sep 2026, on the condition its own
+            // removal note set: "restore it when a real source exists".
+            //
+            // It was removed 21 Aug 2026 because it hardcoded "Sawan Somvar
+            // — tomorrow", and on that very day the live Panchang screen read
+            // "Bhadrapada Masa": Sawan was over and it was a Friday, not
+            // Somvar. Naming the wrong festival on the wrong day is worse
+            // than showing no card.
+            //
+            // Two real sources exist now — a festival authored in the admin
+            // console, and Vedika's own `upcoming_festivals` — and
+            // `resolveFestival` picks between them. The card still renders
+            // ONLY when one of them actually covers today, so the failure
+            // mode that got it deleted cannot return: no festival, no card
+            // (and no spacer either, same conditional pattern as
+            // `_RemedyCard` above).
+            if (festivalToday?.name != null) ...[
+              _FestivalCard(
+                l10n: l10n,
+                locale: locale,
+                festival: festivalToday!,
+              ),
+              const SizedBox(height: 14),
+            ],
             _ExploreSection(l10n: l10n, locale: locale),
             const SizedBox(height: 14),
             _HoroscopeSection(l10n: l10n, locale: locale),
@@ -1384,12 +1410,20 @@ class _LabeledIconRow extends StatelessWidget {
 }
 
 /// Festival-of-the-day navy strip.
-// ignore: unused_element  — kept for when a real festival source exists
+///
+/// Takes the resolved [PanchangFestival] rather than reading a source itself
+/// — the caller decides between the console's authored row and Vedika's, via
+/// `resolveFestival`, so Home and Panchang cannot disagree.
 class _FestivalCard extends StatelessWidget {
-  const _FestivalCard({required this.l10n, required this.locale});
+  const _FestivalCard({
+    required this.l10n,
+    required this.locale,
+    required this.festival,
+  });
 
   final AppLocalizations l10n;
   final Locale locale;
+  final PanchangFestival festival;
 
   @override
   Widget build(BuildContext context) {
@@ -1431,7 +1465,9 @@ class _FestivalCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        HomeStaticData.festival,
+                        // The caller only renders this card when a name
+                        // exists, so `!` cannot fire here.
+                        festival.name!,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppFonts.body(

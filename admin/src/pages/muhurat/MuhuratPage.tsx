@@ -16,7 +16,6 @@ import { callableErrorMessage } from '../../lib/adminApi';
 import { isPermissionDenied, firestoreErrorMessage } from '../../lib/firestoreErrors';
 import { PageSkeleton } from '../../components/PageSkeleton';
 import './MuhuratPage.css';
-import { NotWiredNotice } from '../../components/NotWiredNotice';
 
 /** Muhurat Content CMS (sidebar item, previously inert). Unlike the other
  *  three new screens this is NOT an open collection — the app's astrology
@@ -77,8 +76,6 @@ export function MuhuratPage() {
           </p>
         </div>
       </header>
-
-      <NotWiredNotice what="Muhurat descriptions" />
 
       {state.status === 'denied' && (
         <div className="card users__error" role="alert">
