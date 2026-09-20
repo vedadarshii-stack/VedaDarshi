@@ -19,6 +19,7 @@ const db = admin.firestore();
 export { dailyPrewarm } from "./dailyPrewarm";
 export { askAiAstrologer } from "./aiCredits";
 export { deleteAccount } from "./deleteAccount";
+export { generateDetailedReport } from "./detailedReports";
 export { revenueCatWebhook } from "./revenueCatWebhook";
 export {
   adminVedikaUsage,

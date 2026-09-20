@@ -247,7 +247,7 @@ async function releaseCredit(
 // every other screen in the app renders for them.
 // ---------------------------------------------------------------------------
 
-interface VedikaBirthDetails {
+export interface VedikaBirthDetails {
   datetime: string;
   latitude: number;
   longitude: number;
@@ -386,7 +386,7 @@ function buildBirthDateComponents(
  * profile can never get an answer anyway, so failing here must not cost
  * them one of their scarce, tier-limited daily questions.
  */
-async function resolveBirthDetails(
+export async function resolveBirthDetails(
   uid: string,
   profileId: string = "primary"
 ): Promise<VedikaBirthDetails> {

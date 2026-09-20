@@ -363,13 +363,30 @@ service cloud.firestore {
         allow write: if false;
       }
 
+      // The generated full-length report artifacts:
+      // /users/{uid}/detailedReports/{reportId}
+      // ADDED 20 Sep 2026 with functions/src/detailedReports.ts.
+      //
+      // ⚠️ Write must stay `false` for a COST reason on top of the usual
+      // entitlement one. Each document records a PAID Vedika render, and the
+      // callable returns the stored artifact instead of regenerating. A
+      // client that could delete its own document would force a fresh paid
+      // render on demand — an unbounded drain on the client's prepaid wallet
+      // triggered from an app anyone can install. Written only by the
+      // callable, via the Admin SDK.
+      match /detailedReports/{reportId} {
+        allow read: if isOwner(userId);
+        allow write: if false;
+      }
+
       match /{subcollection}/{docId} {
         allow read, write: if isOwner(userId)
                            && subcollection != 'aiUsage'
                            && subcollection != 'aiChats'
                            && subcollection != 'aiPacks'
                            && subcollection != 'dailyReadings'
-                           && subcollection != 'reportPurchases';
+                           && subcollection != 'reportPurchases'
+                           && subcollection != 'detailedReports';
       }
     }
 
