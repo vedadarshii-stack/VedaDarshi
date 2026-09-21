@@ -5,11 +5,36 @@ import {
   sendNotification,
   type NotificationTarget,
 } from '../../lib/adminApi';
-import { NOTIFICATION_TRANSLATIONS } from '../../data/mock';
 import './NotificationsPage.css';
 
 /** Figma E5 · Notification Composer (node 35:2).
  *  The phone mock on the right is bound to the form so the preview is genuinely live. */
+/** The five shipped app languages, with the font each needs to render. */
+const LOCALES = [
+  { code: 'en', label: 'English', font: 'var(--vd-font-ui)' },
+  { code: 'hi', label: 'हिन्दी', font: 'var(--vd-font-deva)' },
+  { code: 'te', label: 'తెలుగు', font: 'var(--vd-font-telu)' },
+  { code: 'ta', label: 'தமிழ்', font: 'var(--vd-font-tamil)' },
+  { code: 'kn', label: 'ಕನ್ನಡ', font: 'var(--vd-font-kannada)' },
+] as const;
+
+type LocaleCode = (typeof LOCALES)[number]['code'];
+
+type Draft = { title: string; body: string };
+
+const EMPTY_DRAFTS: Record<LocaleCode, Draft> = {
+  en: { title: '', body: '' },
+  hi: { title: '', body: '' },
+  te: { title: '', body: '' },
+  ta: { title: '', body: '' },
+  kn: { title: '', body: '' },
+};
+
+/** A language counts as written only when BOTH fields are filled. */
+function isReady(d: Draft | undefined): boolean {
+  return !!d && d.title.trim().length > 0 && d.body.trim().length > 0;
+}
+
 export function NotificationsPage() {
   // ⚠️ AUDIENCE IS NOW REAL, and the options changed to match what FCM can
   // actually do. The previous list offered "Premium subscribers (6,905)" and
@@ -23,10 +48,39 @@ export function NotificationsPage() {
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const [title, setTitle] = useState('🛕 Sawan Somvar is tomorrow!');
-  const [message, setMessage] = useState(
-    'Observe the sacred Monday fast. Tap for rituals, muhurat timings and vrat rules.',
-  );
+  // ⚠️ REWRITTEN 21 Sep 2026. The TRANSLATIONS row used to be a hardcoded
+  // array in `data/mock.ts` that rendered a fixed "English ✓ हिन्दी ✓ తెలుగు ✓
+  // தமிழ் — ಕನ್ನಡ —". It reflected nothing: not the message being composed,
+  // not the ARB files, not anything server-side, and it showed those same two
+  // ✗ marks forever. The composer only ever held ONE title and body, so the
+  // chips could not have meant anything.
+  //
+  // They are now the real editor: one draft per language, a chip ticks when
+  // that language actually has both fields, and clicking a chip switches
+  // which language you are writing. The row went from decoration to the
+  // primary control.
+  const [drafts, setDrafts] = useState<Record<LocaleCode, Draft>>({
+    ...EMPTY_DRAFTS,
+    en: {
+      title: '🛕 Sawan Somvar is tomorrow!',
+      body: 'Observe the sacred Monday fast. Tap for rituals, muhurat timings and vrat rules.',
+    },
+  });
+  const [editing, setEditing] = useState<LocaleCode>('en');
+
+  const draft = drafts[editing];
+  const title = draft.title;
+  const message = draft.body;
+
+  function setDraft(patch: Partial<Draft>) {
+    setDrafts((prev) => ({ ...prev, [editing]: { ...prev[editing], ...patch } }));
+  }
+
+  /** Languages with a complete draft — what actually gets sent. */
+  const written = LOCALES.filter((l) => isReady(drafts[l.code]));
+
+  /** English is the fallback for any language left unwritten. */
+  const fallback = isReady(drafts.en) ? drafts.en : undefined;
 
   async function handleSend(event: React.FormEvent) {
     event.preventDefault();
@@ -35,17 +89,54 @@ export function NotificationsPage() {
     setResult(null);
     setError(null);
     try {
-      const res = await sendNotification({
-        title,
-        body: message,
-        target,
-        ...(target === 'locale' ? { locale } : {}),
-        ...(target === 'token' ? { token } : {}),
-      });
-      // Reports the DESTINATION, not "sent to 48,320 users" — FCM accepts a
-      // topic send without telling anyone how many devices it reached, and
-      // inventing a number is how the old placeholder copy went wrong.
-      setResult(`Sent to ${res.destination} · id ${res.messageId.slice(-12)}`);
+      if (target === 'all' && written.length > 1) {
+        // MULTILINGUAL BROADCAST. Send once per language topic, each with its
+        // own text, instead of one English push to `all_users`.
+        //
+        // ⚠️ It is one or the other, never both. The app subscribes a device
+        // to `all_users` AND to its own `locale_xx`, so doing both would
+        // deliver the same push twice to everyone. Because every user sits on
+        // exactly one locale topic, fanning out reaches the same audience —
+        // each person once, in their own language.
+        //
+        // Languages with no draft fall back to the English text, so nobody is
+        // silently skipped just because a translation is missing.
+        const sends = LOCALES.map((l) => {
+          const d = isReady(drafts[l.code]) ? drafts[l.code] : fallback;
+          if (!d) return null;
+          return sendNotification({
+            title: d.title,
+            body: d.body,
+            target: 'locale',
+            locale: l.code,
+          });
+        }).filter(Boolean) as Promise<{ messageId: string; destination: string }>[];
+
+        // `allSettled`, not `all`: one language failing must not hide the
+        // fact that the other four went out. A push cannot be recalled, so
+        // the operator needs to know exactly what landed before retrying.
+        const results = await Promise.allSettled(sends);
+        const ok = results.filter((r) => r.status === 'fulfilled').length;
+        const failed = results.length - ok;
+        setResult(
+          failed === 0
+            ? `Sent in ${ok} languages`
+            : `Sent in ${ok} languages · ${failed} failed — do not resend the ones that worked`,
+        );
+      } else {
+        const d = target === 'all' && fallback ? fallback : draft;
+        const res = await sendNotification({
+          title: d.title,
+          body: d.body,
+          target,
+          ...(target === 'locale' ? { locale } : {}),
+          ...(target === 'token' ? { token } : {}),
+        });
+        // Reports the DESTINATION, not "sent to 48,320 users" — FCM accepts a
+        // topic send without telling anyone how many devices it reached, and
+        // inventing a number is how the old placeholder copy went wrong.
+        setResult(`Sent to ${res.destination} · id ${res.messageId.slice(-12)}`);
+      }
     } catch (e) {
       setError(callableErrorMessage(e));
     } finally {
@@ -71,7 +162,7 @@ export function NotificationsPage() {
             <input
               className="notify__input"
               value={title}
-              onChange={(event) => setTitle(event.target.value)}
+              onChange={(event) => setDraft({ title: event.target.value })}
             />
           </label>
 
@@ -81,7 +172,7 @@ export function NotificationsPage() {
               className="notify__input notify__input--area"
               rows={3}
               value={message}
-              onChange={(event) => setMessage(event.target.value)}
+              onChange={(event) => setDraft({ body: event.target.value })}
             />
           </label>
 
@@ -130,20 +221,40 @@ export function NotificationsPage() {
           </div>
 
           <div className="notify__field">
-            <span className="notify__label">TRANSLATIONS</span>
+            <span className="notify__label">
+              TRANSLATIONS — click a language to write it
+            </span>
             <div className="notify__locales">
-              {NOTIFICATION_TRANSLATIONS.map((locale) => (
-                <span
-                  key={locale.label}
-                  className={
-                    locale.ready ? 'notify__locale notify__locale--ready' : 'notify__locale'
-                  }
-                  style={{ fontFamily: locale.font }}
-                >
-                  {locale.label} {locale.ready ? '✓' : '—'}
-                </span>
-              ))}
+              {LOCALES.map((l) => {
+                const ready = isReady(drafts[l.code]);
+                const active = editing === l.code;
+                return (
+                  <button
+                    key={l.code}
+                    type="button"
+                    onClick={() => setEditing(l.code)}
+                    aria-pressed={active}
+                    className={[
+                      'notify__locale',
+                      ready ? 'notify__locale--ready' : '',
+                      active ? 'notify__locale--active' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                    style={{ fontFamily: l.font }}
+                  >
+                    {l.label} {ready ? '✓' : '—'}
+                  </button>
+                );
+              })}
             </div>
+            <span className="notify__hint">
+              {target === 'all' && written.length > 1
+                ? `Will send ${written.length} separate pushes, one per language — everyone gets theirs once.`
+                : target === 'all'
+                  ? 'Only English is written, so this goes to everyone in English. Write another language to send per-language.'
+                  : `Sending the ${LOCALES.find((l) => l.code === (target === 'locale' ? locale : editing))?.label} version.`}
+            </span>
           </div>
 
           {/* Scheduling was a label with nothing behind it — there is no

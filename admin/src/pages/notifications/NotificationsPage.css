@@ -115,6 +115,31 @@
   color: var(--vd-green);
 }
 
+/* The chips became BUTTONS on 21 Sep 2026 (they select which language you are
+   writing), so they need the browser's button defaults stripped — otherwise
+   they inherit the UA font and lose the per-script font set inline, which is
+   exactly what turns Telugu and Kannada into tofu. */
+button.notify__locale {
+  font-family: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+
+/* Which language the editor is currently on. Saffron outline rather than a
+   fill, so it reads as "you are here" without competing with the green
+   "this one is written" state — a chip is frequently both at once. */
+.notify__locale--active {
+  border-color: var(--vd-saffron);
+  box-shadow: inset 0 0 0 1px var(--vd-saffron);
+}
+
+.notify__hint {
+  margin-top: 6px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--vd-muted);
+}
+
 /* ---- Submit row ---- */
 
 .notify__submitRow {

@@ -262,12 +262,16 @@ const SUPPORTED_LOCALES = ["en", "hi", "te", "ta", "kn"] as const;
  * re-implemented with batching and retry as the user base grows; a topic send
  * is one call regardless of audience size, and FCM handles delivery.
  *
- * ⚠️ **This requires the client to SUBSCRIBE to its locale topic**, which it
- * does not do yet — `PushNotificationService` registers tokens but calls
- * `subscribeToTopic` nowhere. Until that ships, a locale-targeted send
- * reaches nobody. `target: "all"` works today via the `all_users` topic only
- * once the client subscribes to that too. **Do not report locale targeting as
- * working until the client half lands.**
+ * ✅ **The client half HAS landed** (corrected 21 Sep 2026 — this comment
+ * previously said locale targeting "reaches nobody", which stopped being true
+ * when `syncTopics` shipped). `PushNotificationService.syncTopics` subscribes
+ * every device to `all_users` AND to its own `locale_<code>`, so both targets
+ * deliver.
+ *
+ * ⚠️ Because a device is on BOTH topics, a broadcast must use one or the
+ * other, never both — sending to `all_users` and to the five locale topics
+ * would deliver the same push twice to everyone. The console's multilingual
+ * send fans out across locale topics only, for exactly this reason.
  *
  * A single-token test send (`token: "..."`) works right now with no client
  * change, which is what makes this testable.
