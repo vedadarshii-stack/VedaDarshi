@@ -40,6 +40,44 @@ export interface RenderedReport {
   expiresAtMs: number;
 }
 
+/**
+ * Deletes every rendered report belonging to [uid].
+ *
+ * ADDED 23 Sep 2026, closing a real data-deletion gap PROVEN in production:
+ * after `deleteAccount` ran to completion — Auth user gone, Firestore
+ * subtree gone — `detailedReports/{uid}/career.pdf` was still sitting in
+ * this bucket. A full birth-chart reading, behind a signed URL that stays
+ * valid for seven days after issue.
+ *
+ * ⚠️ `deleteAccount`'s own `listCollections()` trick cannot catch this.
+ * That mechanism exists so a subcollection added later is not orphaned, and
+ * its comment even anticipates "a future `reports` collection" — but it
+ * enumerates FIRESTORE. Cloud Storage is a different service, so nothing
+ * about this bucket is discoverable from there. **Any future user data put
+ * somewhere other than `/users/{uid}` has to be deleted explicitly, here.**
+ *
+ * Resolves to `false` rather than throwing. The caller records the failure
+ * and carries on: blocking the account deletion would not remove these
+ * files, it would only leave the Firestore data behind them as well.
+ */
+export async function deleteRenderedReports(uid: string): Promise<boolean> {
+  try {
+    await admin
+      .storage()
+      .bucket(REPORTS_BUCKET)
+      // The trailing slash matters: without it this prefix would also match
+      // `detailedReports/<uid-with-this-as-a-prefix>/…`, deleting another
+      // user's reports. Firebase uids are fixed-length today, so no uid is
+      // a prefix of another — but that is an accident of the id format, not
+      // a guarantee, and it is not one worth betting someone else's data on.
+      .deleteFiles({ prefix: `detailedReports/${uid}/`, force: true });
+    return true;
+  } catch (e) {
+    console.error("deleteRenderedReports failed", { uid }, e);
+    return false;
+  }
+}
+
 function storagePathFor(uid: string, reportId: string): string {
   // Namespaced by uid so one user's report can never collide with another's,
   // and so a future per-user cleanup is a prefix delete.

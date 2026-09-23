@@ -4,6 +4,7 @@ import {
   REVENUECAT_PROJECT_ID,
   REVENUECAT_SECRET_API_KEY,
 } from "./config";
+import { deleteRenderedReports } from "./reportRenderer";
 
 /**
  * Permanently deletes the signed-in user's account and all their data.
@@ -66,6 +67,18 @@ const FIRESTORE_DELETE_TIMEOUT_MESSAGE =
 const ORPHANED_RC_COLLECTION = "orphanedRevenueCatCustomers";
 
 /**
+ * Same idea as [ORPHANED_RC_COLLECTION], for rendered report PDFs we failed
+ * to remove from Cloud Storage. Also top-level, for the same reason: a
+ * record under `/users/{uid}` would be erased seconds later by the very
+ * delete it is recording.
+ *
+ * This one matters MORE than the RevenueCat list, because these are our own
+ * files in our own bucket — a leftover here is personal astrological data
+ * we promised to delete, not a third party's billing record.
+ */
+const ORPHANED_REPORTS_COLLECTION = "orphanedReportArtifacts";
+
+/**
  * Deletes the customer's RevenueCat records.
  *
  * ADDED 2 Sep 2026, closing a real gap: the app aliases the RevenueCat
@@ -83,6 +96,36 @@ const ORPHANED_RC_COLLECTION = "orphanedRevenueCatCustomers";
  * makes the function work with either key without anyone having to remember
  * which was issued.
  *
+ * 🚨 **THIS HAS NEVER ACTUALLY SUCCEEDED IN PRODUCTION — discovered
+ * 23 Sep 2026.** Every deletion since 2 Sep has logged a 403 and written an
+ * orphan record. The 2 Sep note calling this gap "closed" was wrong: the
+ * code shipped, but the credential behind it cannot perform the operation.
+ *
+ * Probed directly against the live API with the configured secret:
+ *
+ * | Call | Result |
+ * |---|---|
+ * | `GET /v2/projects` | 200 — the key is valid |
+ * | `GET /v2/…/customers/{id}` | 404 — read permission is present |
+ * | `DELETE /v2/…/customers/{id}` | **403 — "The API key needs at least the `customer_information:customers:read_write` permission defined"** |
+ * | `DELETE /v1/subscribers/{id}` | 403 code 7723 — "secret API key incompatible with RevenueCat API V1" |
+ *
+ * So `REVENUECAT_SECRET_API_KEY` is a V2 key holding customers:**read**
+ * only. Two consequences worth being precise about:
+ *
+ *  1. **The fix is a dashboard permission change, not a code change** —
+ *     grant `customer_information:customers:read_write` to the existing key
+ *     (or issue a new one with it and re-set the secret). Nothing here
+ *     needs editing once that is done.
+ *  2. **The V1 fallback is dead code for THIS key**, because V1 rejects V2
+ *     keys by construction rather than for lack of permission. It is kept
+ *     anyway: it costs one failed request on an already-failing path, and
+ *     it still earns its place if a legacy key is ever configured.
+ *
+ * Everything in `orphanedReportArtifacts`' sibling collection
+ * [ORPHANED_RC_COLLECTION] is a uid that needs re-deleting by hand once the
+ * permission is granted.
+ *
  * Returns true on success (INCLUDING 404 — a customer who never opened the
  * paywall simply does not exist at RevenueCat, which is not a failure).
  */
@@ -99,6 +142,7 @@ async function deleteRevenueCatCustomer(uid: string): Promise<boolean> {
   ];
 
   let lastStatus = 0;
+  let lastBody = "";
   for (const url of attempts) {
     try {
       const response = await fetch(url, {
@@ -111,6 +155,11 @@ async function deleteRevenueCatCustomer(uid: string): Promise<boolean> {
       // 404 = no such customer. Idempotent success, not an error.
       if (response.ok || response.status === 404) return true;
       lastStatus = response.status;
+      // RevenueCat says exactly which permission is missing, and without
+      // that line a 403 is indistinguishable from a wrong key, a wrong
+      // project id or a revoked key. Capped because it is third-party text
+      // going into our logs.
+      lastBody = (await response.text().catch(() => "")).slice(0, 300);
       // Only an auth rejection is worth retrying on the other API version;
       // anything else (429, 5xx) would fail the same way twice.
       if (response.status !== 401 && response.status !== 403) break;
@@ -122,6 +171,7 @@ async function deleteRevenueCatCustomer(uid: string): Promise<boolean> {
   console.error("deleteAccount: RevenueCat delete failed", {
     uid,
     lastStatus,
+    lastBody,
   });
   return false;
 }
@@ -165,6 +215,37 @@ export const deleteAccount = onCall(
         // Even the bookkeeping is best-effort — it must never be the reason
         // an account deletion fails.
         console.error("deleteAccount: could not record RC orphan", { uid }, e);
+      }
+    }
+
+    // ---- 0b. STORAGE: rendered report PDFs ------------------------------
+    //
+    // Before Firestore, for the same reason RevenueCat is: nothing the user
+    // cannot retry has happened yet, and this step is idempotent, so a
+    // later failure that sends them back through `deleteAccount` re-runs it
+    // harmlessly.
+    //
+    // ⚠️ This CANNOT be folded into the `listCollections()` enumeration
+    // below. That discovers Firestore subcollections; these files live in
+    // Cloud Storage, which it cannot see. Verified the hard way on
+    // 23 Sep 2026 — see `deleteRenderedReports`.
+    //
+    // Non-fatal, like RevenueCat: refusing to delete the account would not
+    // remove these files, it would just leave more data behind.
+    const reportsDeleted = await deleteRenderedReports(uid);
+    if (!reportsDeleted) {
+      try {
+        await db.collection(ORPHANED_REPORTS_COLLECTION).doc(uid).set({
+          uid,
+          storagePrefix: `detailedReports/${uid}/`,
+          failedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      } catch (e) {
+        console.error(
+          "deleteAccount: could not record report orphan",
+          { uid },
+          e
+        );
       }
     }
 
@@ -220,13 +301,14 @@ export const deleteAccount = onCall(
     console.log("deleteAccount: completed", {
       uid,
       revenueCatDeleted,
+      reportsDeleted,
       elapsedMs: Date.now() - startedAtMs,
     });
 
     // `success` reports the ACCOUNT deletion, which did happen. RevenueCat
-    // is reported separately rather than folded in — the client shows the
-    // same confirmation either way (the account really is gone), but the
-    // caller and the logs can tell the difference.
-    return { success: true, revenueCatDeleted };
+    // and the stored report PDFs are reported separately rather than folded
+    // in — the client shows the same confirmation either way (the account
+    // really is gone), but the caller and the logs can tell the difference.
+    return { success: true, revenueCatDeleted, reportsDeleted };
   }
 );
