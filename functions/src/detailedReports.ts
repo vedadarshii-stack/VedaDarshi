@@ -24,12 +24,39 @@ import { renderBrandedReport, signExistingReport } from "./reportRenderer";
  * contract but under the production-only `/api/*` tree, and the `/v2` alias
  * behaves identically.
  *
- * ⚠️ **The idempotency key goes in the BODY, not a header.** The spec
- * documents an `Idempotency-Key` / `X-Idempotency-Key` header and refuses the
- * call with `IDEMPOTENCY_KEY_REQUIRED` without one — but our proxy builds a
- * fresh header set and forwards no client headers, so a header can never
- * arrive. The body field `idempotencyKey` is accepted and works. Verified: a
- * replay returned the identical artifact with `"charged": 0`.
+ * ⚠️ **The idempotency key is an `Idempotency-Key` HEADER — spelt exactly
+ * that way. The other two spellings are both REJECTED, and this changed
+ * under us on 23 Sep 2026, breaking the feature in production.**
+ *
+ * Probed directly against the upstream (a deliberately invalid `reportType`
+ * makes each probe free, because the idempotency check runs BEFORE report
+ * validation — which is itself the trick worth remembering here):
+ *
+ * | What we send | Result |
+ * |---|---|
+ * | nothing | accepted — but then we have no dedup protection |
+ * | `Idempotency-Key` header | **accepted — this is the one** |
+ * | `X-Idempotency-Key` header | 400 `CONFLICTING_IDEMPOTENCY_KEYS` |
+ * | body `idempotencyKey` | 400 `CONFLICTING_IDEMPOTENCY_KEYS` |
+ *
+ * The error reads *"Conflicting paid-report idempotency keys were supplied.
+ * Send exactly one key."* — i.e. the upstream derives its own key and treats
+ * the other two spellings as a SECOND one. So the message is misleading:
+ * nothing on our side ever sent two.
+ *
+ * On 20 Sep the body field was the only thing that worked, and omitting it
+ * returned `IDEMPOTENCY_KEY_REQUIRED`. Three days later that inverted.
+ *
+ * The header (rather than nothing) is used because **this function calls
+ * Vedika DIRECTLY, not through our `vedika` proxy** — the proxy builds a
+ * fresh header set and forwards no client headers, which is why the body
+ * field looked like the only option when this was first probed through it.
+ * From here a header reaches them, so the deduplication guarantee is kept,
+ * and each render is a real charge on the client's prepaid wallet.
+ *
+ * ⚠️ The lesson worth keeping: this contract moved with no notice and no
+ * version change (`meta.version` is 2.1.0 both before and after). Re-run the
+ * probe above rather than trusting this comment if reports start failing.
  *
  * ⚠️ **This endpoint COSTS MONEY PER CALL** — a separate charge on top of
  * normal per-call billing, taken from the client's prepaid Vedika wallet.
@@ -269,12 +296,13 @@ export const generateDetailedReport = onCall(
             ...vedikaHeaders(),
             Accept: "application/json",
             "Content-Type": "application/json",
+            // `Idempotency-Key`, NOT `X-Idempotency-Key` and NOT the body —
+        // see the ⚠️ note in this file's header.
+            "Idempotency-Key": idempotencyKey,
           },
           body: JSON.stringify({
             reportType,
             lang: language,
-            // BODY, not a header — see this file's header comment.
-            idempotencyKey,
             ...(name ? { name } : {}),
             birthDetails: {
               datetime: birth.datetime,
@@ -367,11 +395,11 @@ async function generateEnglishFallback(params: {
         ...vedikaHeaders(),
         Accept: "application/json",
         "Content-Type": "application/json",
+        "Idempotency-Key": idempotencyKey,
       },
       body: JSON.stringify({
         reportType,
         lang: "en",
-        idempotencyKey,
         ...(name ? { name } : {}),
         birthDetails: {
           datetime: birth.datetime,
