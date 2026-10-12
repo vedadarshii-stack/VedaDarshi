@@ -1911,7 +1911,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get storeUnavailable => 'Not available right now.';
 
   @override
-  String get storeSubscribeHint => 'Subscribing unlocks every report instead';
+  String get storeSubscribeHint => 'See subscription plans';
 
   @override
   String get storeSubscriptionOnly => 'Subscription only';

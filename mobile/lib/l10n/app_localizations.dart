@@ -3476,10 +3476,10 @@ abstract class AppLocalizations {
   /// **'Not available right now.'**
   String get storeUnavailable;
 
-  /// Unified one-time purchase store. Added 10 Sep 2026.
+  /// Footer button on the one-time purchase Store that opens the subscription paywall. ⚠️ It used to read 'Subscribing unlocks every report instead', which became FALSE on 12 Sep 2026 when the client ruled that a subscription grants per-tier DISCOUNTS (5/10/15/20%), not free reports — the report screen was corrected then but this string was missed, and it kept promising free reports in all 5 languages. Deliberately neutral rather than advertising the discount, because the discount mechanism is not built yet and naming a percentage here would just be a different false claim. Say the discount here once it actually exists.
   ///
   /// In en, this message translates to:
-  /// **'Subscribing unlocks every report instead'**
+  /// **'See subscription plans'**
   String get storeSubscribeHint;
 
   /// A premium report Play does not sell individually (Sade Sati). Added 10 Sep 2026.

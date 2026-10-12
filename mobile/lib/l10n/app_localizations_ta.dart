@@ -1930,8 +1930,7 @@ class AppLocalizationsTa extends AppLocalizations {
   String get storeUnavailable => 'தற்போது கிடைக்கவில்லை.';
 
   @override
-  String get storeSubscribeHint =>
-      'சந்தா செலுத்தினால் அனைத்து அறிக்கைகளும் திறக்கும்';
+  String get storeSubscribeHint => 'சந்தா திட்டங்களைப் பார்க்கவும்';
 
   @override
   String get storeSubscriptionOnly => 'சந்தாவில் மட்டும்';

@@ -1917,8 +1917,7 @@ class AppLocalizationsKn extends AppLocalizations {
   String get storeUnavailable => 'ಸದ್ಯಕ್ಕೆ ಲಭ್ಯವಿಲ್ಲ.';
 
   @override
-  String get storeSubscribeHint =>
-      'ಚಂದಾದಾರರಾದರೆ ಎಲ್ಲಾ ವರದಿಗಳು ಅನ್‌ಲಾಕ್ ಆಗುತ್ತವೆ';
+  String get storeSubscribeHint => 'ಚಂದಾದಾರಿಕೆ ಯೋಜನೆಗಳನ್ನು ನೋಡಿ';
 
   @override
   String get storeSubscriptionOnly => 'ಚಂದಾದಾರಿಕೆಯಲ್ಲಿ ಮಾತ್ರ';

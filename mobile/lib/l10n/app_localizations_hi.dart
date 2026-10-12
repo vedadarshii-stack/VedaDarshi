@@ -1907,7 +1907,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get storeUnavailable => 'अभी उपलब्ध नहीं है।';
 
   @override
-  String get storeSubscribeHint => 'सदस्यता लेने पर सभी रिपोर्ट्स खुल जाती हैं';
+  String get storeSubscribeHint => 'सदस्यता योजनाएँ देखें';
 
   @override
   String get storeSubscriptionOnly => 'केवल सदस्यता में';

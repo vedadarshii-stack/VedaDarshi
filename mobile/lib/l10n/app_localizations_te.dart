@@ -1924,8 +1924,7 @@ class AppLocalizationsTe extends AppLocalizations {
   String get storeUnavailable => 'ప్రస్తుతం అందుబాటులో లేదు.';
 
   @override
-  String get storeSubscribeHint =>
-      'సబ్‌స్క్రైబ్ చేస్తే అన్ని నివేదికలు అన్‌లాక్ అవుతాయి';
+  String get storeSubscribeHint => 'సబ్‌స్క్రిప్షన్ ప్లాన్‌లు చూడండి';
 
   @override
   String get storeSubscriptionOnly => 'సబ్‌స్క్రిప్షన్‌లో మాత్రమే';
