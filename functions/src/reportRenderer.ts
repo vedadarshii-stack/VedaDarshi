@@ -78,10 +78,19 @@ export async function deleteRenderedReports(uid: string): Promise<boolean> {
   }
 }
 
-function storagePathFor(uid: string, reportId: string): string {
+function storagePathFor(
+  uid: string,
+  reportId: string,
+  language: string
+): string {
   // Namespaced by uid so one user's report can never collide with another's,
   // and so a future per-user cleanup is a prefix delete.
-  return `detailedReports/${uid}/${reportId}.pdf`;
+  //
+  // ⚠️ The LANGUAGE is part of the filename. Without it, the same report in
+  // Telugu would overwrite the English copy (and vice versa) — and, worse,
+  // the caller's cache lookup would hand back whichever language happened to
+  // be rendered first. See the cache note in `detailedReports.ts`.
+  return `detailedReports/${uid}/${reportId}-${language}.pdf`;
 }
 
 /**
@@ -93,9 +102,10 @@ function storagePathFor(uid: string, reportId: string): string {
  */
 export async function signExistingReport(
   uid: string,
-  reportId: string
+  reportId: string,
+  language: string
 ): Promise<RenderedReport | null> {
-  const path = storagePathFor(uid, reportId);
+  const path = storagePathFor(uid, reportId, language);
   const file = admin.storage().bucket(REPORTS_BUCKET).file(path);
   const [exists] = await file.exists();
   if (!exists) return null;
@@ -123,9 +133,10 @@ async function signFile(path: string): Promise<RenderedReport> {
 export async function renderBrandedReport(params: {
   uid: string;
   reportId: string;
+  language: string;
   iframeUrl: string;
 }): Promise<RenderedReport> {
-  const { uid, reportId, iframeUrl } = params;
+  const { uid, reportId, language, iframeUrl } = params;
 
   const res = await fetch(iframeUrl);
   if (!res.ok) {
@@ -161,7 +172,7 @@ export async function renderBrandedReport(params: {
       margin: { top: "0", right: "0", bottom: "0", left: "0" },
     });
 
-    const path = storagePathFor(uid, reportId);
+    const path = storagePathFor(uid, reportId, language);
     await admin
       .storage()
       .bucket(REPORTS_BUCKET)

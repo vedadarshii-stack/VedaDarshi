@@ -120,13 +120,28 @@ interface DetailedReportDoc {
   generatedAtMs: number;
 }
 
-function reportDocRef(uid: string, reportId: string) {
+/**
+ * ⚠️ The document id is `{reportId}__{language}`, NOT just `reportId`.
+ *
+ * FIXED 13 Oct 2026. Language was part of neither this id, the storage path,
+ * nor the idempotency key — so the first language a user generated a report
+ * in was the only one they could ever get. Download the Marriage report in
+ * English, switch the app to Telugu, download again: the cache branch below
+ * matched on `reportId` alone and returned the stored ENGLISH pdf, and even
+ * on a cache miss the idempotency key was identical so the upstream replayed
+ * its own English artifact. Silently wrong in a way no error surfaces.
+ *
+ * Caught before any real user hit it: there were zero stored reports at the
+ * time of the fix, because purchases are still blocked by the payments
+ * profile, so no migration was needed.
+ */
+function reportDocRef(uid: string, reportId: string, language: string) {
   return admin
     .firestore()
     .collection("users")
     .doc(uid)
     .collection("detailedReports")
-    .doc(reportId);
+    .doc(`${reportId}__${language}`);
 }
 
 /**
@@ -149,7 +164,8 @@ function reportDocRef(uid: string, reportId: string) {
 function idempotencyKeyFor(
   uid: string,
   reportType: string,
-  birth: VedikaBirthDetails
+  birth: VedikaBirthDetails,
+  language: string
 ): string {
   return createHash("sha256")
     .update(
@@ -160,6 +176,12 @@ function idempotencyKeyFor(
         birth.latitude,
         birth.longitude,
         birth.timezone,
+        // ⚠️ LOAD-BEARING. Omitting this made a second request in another
+        // language a REPLAY of the first: the upstream saw a key it had
+        // already fulfilled and returned the original artifact, in the
+        // original language, for `charged: 0`. It looked like a working
+        // cache and was actually a wrong document.
+        language,
       ].join("|")
     )
     .digest("hex")
@@ -222,6 +244,17 @@ export const generateDetailedReport = onCall(
       );
     }
 
+    // Resolved BEFORE the cache lookup, because the cache is keyed by
+    // language — see `reportDocRef`. The compiler caught this when the key
+    // changed: the lookup was reading `language` several statements before
+    // it was assigned.
+    const rawLanguage = (request.data as { language?: unknown } | undefined)
+      ?.language;
+    const language =
+      typeof rawLanguage === "string" && SUPPORTED_LANGUAGES.has(rawLanguage)
+        ? rawLanguage
+        : "en";
+
     // ---- 2. ALREADY GENERATED? ----------------------------------------
     //
     // The single most important branch in this file. Re-opening a report the
@@ -232,15 +265,15 @@ export const generateDetailedReport = onCall(
     // If the artifact URL ever expires, the right recovery is to call this
     // again with `force` — Vedika's own idempotency then returns the same
     // artifact for `charged: 0`, so even the recovery path is free.
-    const existing = (await reportDocRef(uid, reportId).get()).data() as
-      | DetailedReportDoc
-      | undefined;
+    const existing = (
+      await reportDocRef(uid, reportId, language).get()
+    ).data() as DetailedReportDoc | undefined;
     const force =
       (request.data as { force?: unknown } | undefined)?.force === true;
     if (existing?.storagePath && !force) {
       // Re-sign rather than reuse the stored URL: a signed link expires, and
       // re-signing is a metadata call — no Vedika charge, no chromium run.
-      const signed = await signExistingReport(uid, reportId);
+      const signed = await signExistingReport(uid, reportId, language);
       if (signed) {
         return { ...existing, ...signed, cached: true };
       }
@@ -256,14 +289,13 @@ export const generateDetailedReport = onCall(
     // generating the previous day's chart.
     const birth = await resolveBirthDetails(uid);
 
-    const rawLanguage = (request.data as { language?: unknown } | undefined)
-      ?.language;
-    const language =
-      typeof rawLanguage === "string" && SUPPORTED_LANGUAGES.has(rawLanguage)
-        ? rawLanguage
-        : "en";
 
-    const idempotencyKey = idempotencyKeyFor(uid, reportType, birth);
+    const idempotencyKey = idempotencyKeyFor(
+      uid,
+      reportType,
+      birth,
+      language
+    );
 
     // Numerology reports are driven by NAME, not by a chart — the contract is
     // explicit that they take `name` and/or `dob`. Sent for every type
@@ -350,7 +382,6 @@ export const generateDetailedReport = onCall(
           reportId,
           reportType,
           birth,
-          idempotencyKey,
           name,
         });
       }
@@ -367,7 +398,14 @@ export const generateDetailedReport = onCall(
       );
     }
 
-    return await storeAndReturn(uid, reportId, reportType, idempotencyKey, payload);
+    return await storeAndReturn(
+      uid,
+      reportId,
+      reportType,
+      language,
+      idempotencyKey,
+      payload
+    );
   }
 );
 
@@ -383,10 +421,18 @@ async function generateEnglishFallback(params: {
   reportId: string;
   reportType: string;
   birth: VedikaBirthDetails;
-  idempotencyKey: string;
   name?: string;
 }): Promise<Record<string, unknown>> {
-  const { uid, reportId, reportType, birth, idempotencyKey, name } = params;
+  const { uid, reportId, reportType, birth, name } = params;
+  // ⚠️ A DISTINCT key, derived for "en" — not the caller's key.
+  //
+  // The caller's key is bound to the language they asked for, which the
+  // upstream just refused. Reusing it here would ask the upstream to fulfil
+  // one key with two different documents, which is precisely what
+  // `CONFLICTING_IDEMPOTENCY_KEYS` exists to prevent. Deriving an "en" key
+  // also means this fallback shares its artifact with a genuine English
+  // request for the same chart — the second of the two is free.
+  const idempotencyKey = idempotencyKeyFor(uid, reportType, birth, "en");
   const res = await fetch(
     `${VEDIKA_BASE_URL.value()}/v2/reports/prebuilt/generate`,
     {
@@ -420,7 +466,19 @@ async function generateEnglishFallback(params: {
       "Could not generate the report. Please try again."
     );
   }
-  return await storeAndReturn(uid, reportId, reportType, idempotencyKey, payload);
+  // Stored under "en", because English is what this document actually IS.
+  // Filing it under the requested language would permanently cache an
+  // English pdf as (say) Telugu, so the user could never receive Telugu even
+  // after the upstream started serving it. This way the next request for
+  // that language misses the cache and re-tries it — self-healing.
+  return await storeAndReturn(
+    uid,
+    reportId,
+    reportType,
+    "en",
+    idempotencyKey,
+    payload
+  );
 }
 
 /** Persists the artifact and returns it to the caller. */
@@ -428,6 +486,7 @@ async function storeAndReturn(
   uid: string,
   reportId: string,
   reportType: string,
+  language: string,
   idempotencyKey: string,
   payload: Record<string, unknown>
 ): Promise<Record<string, unknown>> {
@@ -455,7 +514,12 @@ async function storeAndReturn(
       "The report service returned no document. Please try again."
     );
   }
-  const rendered = await renderBrandedReport({ uid, reportId, iframeUrl });
+  const rendered = await renderBrandedReport({
+    uid,
+    reportId,
+    language,
+    iframeUrl,
+  });
 
   const doc: DetailedReportDoc = {
     reportId,
@@ -477,7 +541,7 @@ async function storeAndReturn(
   // Written with the Admin SDK, and `detailedReports` is unwritable by the
   // client in the rules — the same stance as `reportPurchases`. A client that
   // could write here could mint itself a report it never bought.
-  await reportDocRef(uid, reportId).set(doc);
+  await reportDocRef(uid, reportId, language).set(doc);
 
   const billing = payload.billing as Record<string, unknown> | undefined;
   console.log("generateDetailedReport: generated", {
