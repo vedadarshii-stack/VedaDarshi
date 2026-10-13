@@ -63,8 +63,21 @@ const VENDOR_PATTERNS: readonly RegExp[] = [
   /வேதிகா\s*இன்டெலிஜென்ஸ்/g,
   // Then the bare vendor name per script.
   /वेदिका/g,
-  /వేదికా/g,
-  /వేదిక/g,
+  // ⚠️ TELUGU NEEDS A GUARD THE OTHER SCRIPTS DO NOT.
+  //
+  // `నివేదిక` is the ordinary Telugu word for "report" — and it CONTAINS
+  // `వేదిక`. Without the lookbehind, the report's own title
+  // "వైదిక వివాహం & ప్రేమ నివేదిక" came out as
+  // "వైదిక వివాహం & ప్రేమ నిVedadarshi": our brand glued onto a half-word,
+  // on the cover, in the one language where the vendor name happens to be a
+  // common noun. Shipped in a sample before it was caught by rendering the
+  // cover and reading it.
+  //
+  // Checked against the other three — `प्रतिवेदन` (hi), `ವರದಿ` (kn) and
+  // `அறிக்கை` (ta) share nothing with their vendor spellings, so only
+  // Telugu needs this.
+  /(?<!ని)వేదికా/g,
+  /(?<!ని)వేదిక/g,
   /ವೇದಿಕಾ/g,
   /ವೇದಿಕ/g,
   /வேதிகா/g,
