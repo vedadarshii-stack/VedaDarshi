@@ -29,7 +29,51 @@ import { join } from "node:path";
  * instead of shipping a branded-wrong document.
  */
 
-/** Matches the vendor name in any casing. */
+/**
+ * Every spelling of the vendor name we have actually observed, in the order
+ * they must be applied (longest and most specific first).
+ *
+ * ⚠️ **ADDED 13 Oct 2026 after a real leak reached generated documents.**
+ * Until then this was a lone `/vedika/gi` — Latin only. The regional reports
+ * print the vendor in their OWN script, so the Hindi report carried
+ * "वेदिका इंटेलिजेंस" in the footer of all 15 pages and sailed through
+ * `assertNoVendor` untouched. Counts from one Marriage report per language:
+ * hi 15, te 5, ta 1, kn 1.
+ *
+ * 🚨 **THE TRAP: each script has a legitimate near-homograph meaning
+ * "Vedic", and it differs by ONE VOWEL.** Replacing it would corrupt the
+ * report's own title — "वैदिक विवाह" (Vedic Marriage) is not the vendor.
+ *
+ *   script       vendor      legitimate "Vedic"   differs by
+ *   Devanagari   वेदिका       वैदिक                 वे  vs  वै
+ *   Telugu       వేదిక        వైదిక                 వే  vs  వై
+ *   Kannada      ವೇದಿಕಾ       ವೈದಿಕ                 ವೇ  vs  ವೈ
+ *   Tamil        வேதிகா       வேத                  the trailing ிகா
+ *
+ * So these are exact strings, never fuzzy stems. Adding a new one means
+ * checking its "Vedic" counterpart first.
+ */
+const VENDOR_PATTERNS: readonly RegExp[] = [
+  // Full company name first, so "Intelligence" goes with it rather than
+  // being left stranded next to our brand — the same reason the Latin
+  // "Vedika Intelligence" rule below precedes the bare name.
+  /वेदिका\s*इंटेलिजेंस/g,
+  /వేదిక\s*ఇంటెలిజెన్స్/g,
+  /ವೇದಿಕಾ\s*ಇಂಟೆಲಿಜೆನ್ಸ್/g,
+  /வேதிகா\s*இன்டெலிஜென்ஸ்/g,
+  // Then the bare vendor name per script.
+  /वेदिका/g,
+  /వేదికా/g,
+  /వేదిక/g,
+  /ವೇದಿಕಾ/g,
+  /ವೇದಿಕ/g,
+  /வேதிகா/g,
+  // Latin last — it is the broadest, and `Vedika Intelligence` is handled
+  // separately above it in `rebrandReportHtml`.
+  /vedika/gi,
+];
+
+/** Kept for the Latin-only callers below. */
 const VENDOR = /vedika/gi;
 
 /**
@@ -87,6 +131,12 @@ export function rebrandReportHtml(html: string): string {
   // miss into an error rather than a branded-wrong PDF.
   out = out.replace(VENDOR, "Vedadarshi");
 
+  // Every non-Latin spelling. Applied after the Latin pass so the ordering
+  // comment above still holds for "Vedika Intelligence".
+  for (const pattern of VENDOR_PATTERNS) {
+    out = out.replace(pattern, "Vedadarshi");
+  }
+
   return out;
 }
 
@@ -100,10 +150,17 @@ export function rebrandReportHtml(html: string): string {
  * the check.
  */
 export function assertNoVendor(html: string): void {
-  const hits = html.match(VENDOR);
-  if (hits && hits.length > 0) {
+  // Checks EVERY script, not just Latin. The Latin-only version of this
+  // check passed a Hindi report that said "वेदिका इंटेलिजेंस" on all 15
+  // pages — the assertion was real, it was just looking in one alphabet.
+  const found: string[] = [];
+  for (const pattern of VENDOR_PATTERNS) {
+    const hits = html.match(pattern);
+    if (hits && hits.length > 0) found.push(`${hits[0]} x${hits.length}`);
+  }
+  if (found.length > 0) {
     throw new Error(
-      `rebrandReportHtml left ${hits.length} vendor reference(s) in the document`
+      `rebrandReportHtml left vendor reference(s) in the document: ${found.join(", ")}`
     );
   }
 }

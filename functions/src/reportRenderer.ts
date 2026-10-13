@@ -1,3 +1,6 @@
+import { copyFileSync, existsSync, mkdirSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
 import * as admin from "firebase-admin";
 import chromium from "@sparticuz/chromium";
 import puppeteer from "puppeteer-core";
@@ -130,6 +133,77 @@ async function signFile(path: string): Promise<RenderedReport> {
  * browser run that produces a wrongly-branded document we would then have to
  * notice was wrong.
  */
+
+/**
+ * Makes the Indic fonts available to Chromium before it launches.
+ *
+ * 🚨 **WITHOUT THIS, TELUGU AND KANNADA REPORTS RENDER AS A PAGE OF EMPTY
+ * BOXES.** Found 13 Oct 2026 by rasterising the generated PDFs and looking
+ * at them; the client spotted it first.
+ *
+ * `@sparticuz/chromium` ships a minimal font set — Liberation (Latin) plus
+ * GNU FreeFont. FreeSans and FreeSerif happen to cover Devanagari and Tamil,
+ * which is why Hindi and Tamil looked perfect, but GNU FreeFont covers
+ * NEITHER Telugu NOR Kannada. Confirmed from the output itself: the hi and
+ * ta PDFs embed FreeSans/FreeSerif subsets, while te and kn embed nothing
+ * but Liberation.
+ *
+ * ⚠️ **The text layer was correct in every language the whole time.** Only
+ * the glyphs were missing, so `pdftotext` extracted perfect Telugu from a
+ * document that displayed as boxes — which is exactly why this survived a
+ * text-based verification. A rendered document has to be verified by
+ * RENDERING it.
+ *
+ * The mechanism is fontconfig, not CSS: the package sets
+ * `FONTCONFIG_PATH=/tmp/fonts` and inflates its own fonts there, so dropping
+ * ours into the same directory lets Chromium's ordinary per-character
+ * fallback find them — the same path by which it already finds FreeSans for
+ * Devanagari. Injecting `@font-face` rules instead would have meant editing
+ * every `font-family` declaration in a document we do not control.
+ *
+ * Must run AFTER `chromium.executablePath()` (which performs the inflation)
+ * and BEFORE `puppeteer.launch()`.
+ */
+function installIndicFonts(): void {
+  try {
+    const configDir = process.env["FONTCONFIG_PATH"] ?? join(tmpdir(), "fonts");
+    // ⚠️ The fonts do NOT go in FONTCONFIG_PATH itself. That directory holds
+    // `fonts.conf` plus a NESTED `fonts/` directory, and it is the nested one
+    // that fonts.conf actually scans. Dropping ttf files in the parent is
+    // silent and useless — the copy succeeds, fontconfig never looks there,
+    // and Telugu still renders as boxes. Confirmed from a runtime listing:
+    //   /tmp/fonts -> [ ...our ttfs..., 'fonts', 'fonts.conf' ]
+    // fonts.conf declares `<dir>/tmp/fonts</dir>` and fontconfig scans a
+    // <dir> RECURSIVELY, so the parent is correct and the nested `fonts/`
+    // subdirectory (where the package keeps its own Open_Sans) is covered by
+    // the same entry. Placement was never the problem.
+    const dir = configDir;
+    mkdirSync(dir, { recursive: true });
+    const src = join(__dirname, "..", "assets", "fonts");
+    if (!existsSync(src)) {
+      console.error("installIndicFonts: asset dir missing", { src });
+      return;
+    }
+    let copied = 0;
+    for (const file of readdirSync(src)) {
+      if (!file.endsWith(".ttf")) continue;
+      const dest = join(dir, file);
+      // Containers are reused between invocations, so skip the copy when the
+      // font is already in place rather than rewriting it every request.
+      if (!existsSync(dest)) {
+        copyFileSync(join(src, file), dest);
+        copied += 1;
+      }
+    }
+    console.log("installIndicFonts", { installedInto: dir, copied });
+  } catch (e) {
+    // Never fail a report over this. A missing font degrades to the old
+    // behaviour (boxes for that script); throwing would deny the user a
+    // document they paid for in EVERY language.
+    console.error("installIndicFonts failed", e);
+  }
+}
+
 export async function renderBrandedReport(params: {
   uid: string;
   reportId: string;
@@ -145,10 +219,34 @@ export async function renderBrandedReport(params: {
   const branded = rebrandReportHtml(await res.text());
   assertNoVendor(branded);
 
+  // Order is load-bearing: `executablePath()` performs the inflation that
+  // creates /tmp/fonts, so the fonts must be copied in after it resolves and
+  // before chromium starts reading fontconfig.
+  const executablePath = await chromium.executablePath();
+  installIndicFonts();
+
   const browser = await puppeteer.launch({
     args: chromium.args,
-    executablePath: await chromium.executablePath(),
+    executablePath,
     headless: true,
+    // ⚠️ FONTCONFIG_* passed EXPLICITLY.
+    //
+    // The variables are set on the Node process by the chromium package, and
+    // puppeteer does default to inheriting `process.env` — but the evidence
+    // said the browser was not reading that config at all: the package's own
+    // bundled Open_Sans never appeared in any output either, while Liberation
+    // and FreeSans (which live in the read-only system font dirs) did. So the
+    // browser was falling back to the system fontconfig and ignoring
+    // /tmp/fonts entirely. Naming the config file outright removes the
+    // ambiguity.
+    env: {
+      ...process.env,
+      FONTCONFIG_PATH: process.env["FONTCONFIG_PATH"] ?? "/tmp/fonts",
+      FONTCONFIG_FILE: join(
+        process.env["FONTCONFIG_PATH"] ?? "/tmp/fonts",
+        "fonts.conf"
+      ),
+    },
   });
 
   try {
