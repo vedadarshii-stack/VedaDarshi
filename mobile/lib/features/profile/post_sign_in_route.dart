@@ -64,6 +64,29 @@ Future<void> navigateAfterSignIn(BuildContext context, WidgetRef ref) async {
   );
 
   final profile = await ref.read(birthProfileRepositoryProvider).load();
+
+  // ⚠️ INVALIDATE BEFORE NAVIGATING — this is load-bearing, and its absence
+  // was a real first-run bug (found on a device 15 Oct 2026).
+  //
+  // On a fresh install `RootGate` reads the profile on the FIRST FRAME,
+  // before anyone has signed in. With no local cache and no authenticated
+  // user, that read resolves to null — and `birthProfileProvider` caches it.
+  // Signing in does not change that: the `load()` above is called on the
+  // REPOSITORY directly, so it sees the cloud copy and routes correctly to
+  // Home, while every widget still reads the cached null from the provider.
+  //
+  // The result was a signed-in user on Home with their profile sitting in
+  // Firestore, greeted by the static placeholder name, and every
+  // chart-dependent screen reporting "this report isn't available for your
+  // chart" — until the app was restarted, which rebuilt the providers with
+  // auth present. Reinstalls and new devices hit this every time.
+  //
+  // Sign-out already does exactly this (see `profile_settings_screen`); the
+  // sign-IN path simply never did.
+  ref.invalidate(birthProfileProvider);
+  ref.invalidate(hasBirthProfileProvider);
+  ref.invalidate(savedBirthProfilesProvider);
+
   if (!context.mounted) return;
 
   final destination = profile != null

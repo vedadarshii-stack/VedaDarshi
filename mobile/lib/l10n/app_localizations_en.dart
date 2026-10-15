@@ -683,9 +683,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get goPremium => 'Go Premium';
 
   @override
-  String goPremiumSubtitle(String total) {
-    return 'Unlock all $total reports + more daily AI questions';
-  }
+  String get goPremiumSubtitle =>
+      'More daily AI questions, horoscopes & full panchang';
 
   @override
   String get upgrade => 'Upgrade';

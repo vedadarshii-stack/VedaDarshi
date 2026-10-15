@@ -1364,11 +1364,11 @@ abstract class AppLocalizations {
   /// **'Go Premium'**
   String get goPremium;
 
-  /// Subtitle inside the Go Premium banner on the Premium Reports screen, naming the total number of reports in the full catalogue.
+  /// Subtitle on the Reports screen's Go Premium banner. ⚠️ It used to read 'Unlock all {total} reports + more daily AI questions', which has been FALSE since 12 Sep 2026 when the client ruled that a subscription grants per-tier DISCOUNTS on reports, not the reports themselves. Reports are bought individually. This now advertises only what a plan genuinely includes — AI questions, weekly/monthly horoscopes and the full panchang calendar, per the Access Control Matrix. It deliberately does NOT mention the discount, because the discount mechanism is still unbuilt; say it here once it exists. Note the {total} placeholder is gone, so the caller no longer passes a count.
   ///
   /// In en, this message translates to:
-  /// **'Unlock all {total} reports + more daily AI questions'**
-  String goPremiumSubtitle(String total);
+  /// **'More daily AI questions, horoscopes & full panchang'**
+  String get goPremiumSubtitle;
 
   /// Label of the pill CTA inside the Go Premium banner on the Premium Reports screen.
   ///

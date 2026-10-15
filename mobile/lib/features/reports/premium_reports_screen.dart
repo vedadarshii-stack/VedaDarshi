@@ -204,9 +204,7 @@ class _GoPremiumBanner extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        l10n.goPremiumSubtitle(
-                          ReportsStaticData.totalReports.toString(),
-                        ),
+                        l10n.goPremiumSubtitle,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: AppFonts.body(

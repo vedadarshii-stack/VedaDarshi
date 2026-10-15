@@ -686,9 +686,8 @@ class AppLocalizationsKn extends AppLocalizations {
   String get goPremium => 'ಪ್ರೀಮಿಯಂ ಪಡೆಯಿರಿ';
 
   @override
-  String goPremiumSubtitle(String total) {
-    return 'ಎಲ್ಲಾ $total ವರದಿಗಳು + ಪ್ರತಿದಿನ ಹೆಚ್ಚಿನ AI ಪ್ರಶ್ನೆಗಳನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಿ';
-  }
+  String get goPremiumSubtitle =>
+      'ಹೆಚ್ಚು ದೈನಂದಿನ AI ಪ್ರಶ್ನೆಗಳು, ರಾಶಿಫಲ & ಪೂರ್ಣ ಪಂಚಾಂಗ';
 
   @override
   String get upgrade => 'ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ';

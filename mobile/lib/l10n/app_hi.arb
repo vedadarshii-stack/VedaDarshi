@@ -210,7 +210,7 @@
   "aiMessageFailedToSend": "भेजा नहीं गया — कृपया पुनः प्रयास करें।",
   "premiumReportsTitle": "प्रीमियम रिपोर्ट",
   "goPremium": "प्रीमियम लें",
-  "goPremiumSubtitle": "सभी {total} रिपोर्ट + हर दिन अधिक AI प्रश्न अनलॉक करें",
+  "goPremiumSubtitle": "अधिक दैनिक AI प्रश्न, राशिफल और पूर्ण पंचांग",
   "upgrade": "अपग्रेड करें",
   "readMinutes": "{minutes} मिनट",
   "aiSummary": "AI सारांश",

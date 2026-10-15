@@ -684,9 +684,8 @@ class AppLocalizationsHi extends AppLocalizations {
   String get goPremium => 'प्रीमियम लें';
 
   @override
-  String goPremiumSubtitle(String total) {
-    return 'सभी $total रिपोर्ट + हर दिन अधिक AI प्रश्न अनलॉक करें';
-  }
+  String get goPremiumSubtitle =>
+      'अधिक दैनिक AI प्रश्न, राशिफल और पूर्ण पंचांग';
 
   @override
   String get upgrade => 'अपग्रेड करें';

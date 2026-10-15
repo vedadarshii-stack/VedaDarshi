@@ -689,9 +689,8 @@ class AppLocalizationsTa extends AppLocalizations {
   String get goPremium => 'பிரீமியம் பெறவும்';
 
   @override
-  String goPremiumSubtitle(String total) {
-    return 'அனைத்து $total அறிக்கைகள் + ஒவ்வொரு நாளும் கூடுதல் AI கேள்விகளைத் திறக்கவும்';
-  }
+  String get goPremiumSubtitle =>
+      'அதிக தினசரி AI கேள்விகள், ராசிபலன் & முழு பஞ்சாங்கம்';
 
   @override
   String get upgrade => 'மேம்படுத்தவும்';
