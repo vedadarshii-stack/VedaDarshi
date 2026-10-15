@@ -159,6 +159,60 @@ export const revenueCatWebhook = onRequest(
  * Idempotency lives in `grantPack`, keyed on the store transaction id, so
  * reconciling repeatedly cannot double-grant.
  */
+
+/**
+ * Resolves RevenueCat's INTERNAL product id to the store SKU.
+ *
+ * 🚨 **WITHOUT THIS, NO CONSUMABLE PURCHASE EVER GRANTED ANYTHING.** Found
+ * 15 Oct 2026 by completing the first real (sandbox) purchase on a device:
+ * Play said "Payment successful", the webhook fired and returned 200, and
+ * the user got nothing. The log said it all — `consumablesGranted: 0`.
+ *
+ * `GET /v2/.../customers/{id}/purchases` returns
+ *
+ *     { "product_id": "prodaf7cd6ba0e", ... }
+ *
+ * — RevenueCat's own opaque id, NOT the Play SKU. Every lookup below
+ * (`sku in AI_PACKS`, `sku === DAILY_READING_SKU`, `sku in REPORT_SKUS`) is
+ * keyed by the STORE identifier, so none of them could ever match. Reports,
+ * AI packs and the daily reading were all equally broken, and all three
+ * failed silently: nothing threw, the webhook reported success, and the
+ * purchase was real.
+ *
+ * ⚠️ `?expand=product` is NOT supported on that endpoint — it answers 400.
+ * The product has to be fetched by id, which is why this caches: products
+ * are immutable config, and without a cache a customer with several
+ * purchases would make one extra API call per purchase per webhook.
+ */
+const storeSkuCache = new Map<string, string>();
+
+async function resolveStoreSku(
+  productId: string,
+  key: string
+): Promise<string | null> {
+  const cached = storeSkuCache.get(productId);
+  if (cached) return cached;
+  try {
+    const res = await fetch(
+      `https://api.revenuecat.com/v2/projects/${REVENUECAT_PROJECT_ID}` +
+        `/products/${encodeURIComponent(productId)}`,
+      { headers: { Authorization: `Bearer ${key}`, Accept: "application/json" } }
+    );
+    if (!res.ok) {
+      console.error("resolveStoreSku failed", { productId, status: res.status });
+      return null;
+    }
+    const body = (await res.json()) as { store_identifier?: string };
+    const sku = body.store_identifier;
+    if (!sku) return null;
+    storeSkuCache.set(productId, sku);
+    return sku;
+  } catch (e) {
+    console.error("resolveStoreSku threw", { productId }, e);
+    return null;
+  }
+}
+
 async function reconcileConsumables(appUserId: string): Promise<number> {
   const key = REVENUECAT_SECRET_API_KEY.value();
   const url =
@@ -187,7 +241,17 @@ async function reconcileConsumables(appUserId: string): Promise<number> {
 
   let granted = 0;
   for (const item of body.items ?? []) {
-    const sku = item.product_id;
+    const rawProductId = item.product_id;
+    if (!rawProductId) continue;
+    // The id may already BE a store SKU (older records, and anything the V1
+    // API produced), so try it as-is before spending a lookup on it.
+    const known =
+      rawProductId in AI_PACKS ||
+      rawProductId === DAILY_READING_SKU ||
+      rawProductId in REPORT_SKUS;
+    const sku = known
+      ? rawProductId
+      : await resolveStoreSku(rawProductId, key);
     if (!sku) continue;
     // A refunded or charged-back purchase must not hand out anything.
     if (item.revenue_status === "refunded") continue;
