@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/purchases/purchases_providers.dart';
+
 import '../../core/astrology/astro_terms.dart';
 import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
@@ -69,15 +71,25 @@ class KundliPredictionsTab extends ConsumerWidget {
         if (predictions.isEmpty) {
           return _ErrorState(l10n: l10n, locale: locale, onRetry: onRetry);
         }
-        return PremiumGlimpse(
-          locale: locale,
-          previewHeight: 240,
-          ctaLabel: l10n.kundliPredictionsCta,
-          subtitle: l10n.kundliPredictionsSubtitle,
-          onUpgrade: () => Navigator.of(
-            context,
-          ).push(fadeThroughRoute(const SubscriptionPaywallScreen())),
-          child: Column(
+        // ⚠️ Unlocked for any paid tier (18 Oct 2026). Until now this tab
+        // glimpsed for EVERYONE, subscribers included — the same defect
+        // fixed on Gun Milan and the horoscope teaser the same day.
+        //
+        // ⚠️ JUDGEMENT CALL, flagged rather than hidden: the Access Control
+        // Matrix does not mention Kundli Predictions at all. It is gated at
+        // "any paid tier" because the approved design marks the tab
+        // "Predictions 👑" and there is no SKU to buy it with, so a
+        // subscription is the only thing that could ever unlock it. If the
+        // client wants it at Gold and up, change the one check below —
+        // `status.tier.hasAtLeast(SubscriptionTier.gold)` — and nothing
+        // else moves.
+        final status = ref.watch(subscriptionStatusValueProvider);
+        // Unknown means RevenueCat has not answered yet; glimpsing is the
+        // safe direction to be briefly wrong in (a subscriber sees a teaser
+        // that expands, rather than a free user seeing the whole reading).
+        final unlocked = status.isKnown && status.hasPaidAccess;
+
+        final body = Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -95,7 +107,18 @@ class KundliPredictionsTab extends ConsumerWidget {
                   _HouseRow(house: house, locale: locale, l10n: l10n),
               ],
             ],
-          ),
+        );
+
+        if (unlocked) return body;
+        return PremiumGlimpse(
+          locale: locale,
+          previewHeight: 240,
+          ctaLabel: l10n.kundliPredictionsCta,
+          subtitle: l10n.kundliPredictionsSubtitle,
+          onUpgrade: () => Navigator.of(
+            context,
+          ).push(fadeThroughRoute(const SubscriptionPaywallScreen())),
+          child: body,
         );
       },
     );

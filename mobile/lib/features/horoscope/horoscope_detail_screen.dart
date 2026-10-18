@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/purchases/purchases_providers.dart';
+import '../../core/purchases/subscription_tier.dart';
+
 import '../../core/astrology/astro_terms.dart';
 import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
@@ -231,7 +234,12 @@ class _DailyBody extends StatelessWidget {
               const SizedBox(height: 12),
               _MantraCard(l10n: l10n, locale: locale),
               const SizedBox(height: 12),
-              _PremiumTeaser(l10n: l10n, locale: locale),
+              // daily: unlocked from Bronze up, per the Access Control Matrix.
+              _PremiumTeaser(
+                l10n: l10n,
+                locale: locale,
+                requiredTier: SubscriptionTier.bronze,
+              ),
             ],
           ),
         ),
@@ -309,7 +317,12 @@ class _WeeklyBody extends StatelessWidget {
                 _WeeklyOutlookCard(weekly: weekly, l10n: l10n, locale: locale),
               ],
               const SizedBox(height: 12),
-              _PremiumTeaser(l10n: l10n, locale: locale),
+              // weekly: unlocked from Bronze up, per the Access Control Matrix.
+              _PremiumTeaser(
+                l10n: l10n,
+                locale: locale,
+                requiredTier: SubscriptionTier.bronze,
+              ),
             ],
           ),
         ),
@@ -567,7 +580,12 @@ class _MonthlyBody extends StatelessWidget {
                 _KeyDatesCard(keyDates: keyDates, l10n: l10n, locale: locale),
               ],
               const SizedBox(height: 12),
-              _PremiumTeaser(l10n: l10n, locale: locale),
+              // monthly: unlocked from Bronze up, per the Access Control Matrix.
+              _PremiumTeaser(
+                l10n: l10n,
+                locale: locale,
+                requiredTier: SubscriptionTier.bronze,
+              ),
             ],
           ),
         ),
@@ -802,7 +820,12 @@ class _YearlyBody extends StatelessWidget {
                 _RemedyCard(text: _joinRemedies(remedies), locale: locale),
                 const SizedBox(height: 12),
               ],
-              _PremiumTeaser(l10n: l10n, locale: locale),
+              // yearly: unlocked from Gold up, per the Access Control Matrix.
+              _PremiumTeaser(
+                l10n: l10n,
+                locale: locale,
+                requiredTier: SubscriptionTier.gold,
+              ),
             ],
           ),
         ),
@@ -2139,14 +2162,46 @@ class _MantraCard extends StatelessWidget {
 
 /// Premium teaser card (Figma node 49:41) with the gold glow pulse (motion
 /// spec item 5).
-class _PremiumTeaser extends StatelessWidget {
-  const _PremiumTeaser({required this.l10n, required this.locale});
+/// The gold "Unlock detailed monthly & yearly predictions" banner.
+///
+/// ⚠️ **HIDDEN ONCE THE VIEWER'S TIER ALREADY GRANTS THIS PERIOD**
+/// (18 Oct 2026). It used to render on all four tabs for everyone, so a
+/// paying subscriber was repeatedly sold the horoscopes they had bought —
+/// the same defect fixed on the Gun Milan screen.
+///
+/// ⚠️ **The gate is per-PERIOD, not a single paid/free flag**, because the
+/// Access Control Matrix does not grant the four tabs together:
+///
+///   daily    everyone        weekly   Bronze and up
+///   monthly  Bronze and up   yearly   GOLD and up
+///
+/// So a Bronze subscriber correctly still sees this banner on the Yearly
+/// tab — they genuinely do not have yearly — while it disappears from
+/// Weekly and Monthly. Collapsing that to `hasPaidAccess` would wrongly
+/// hide the one upsell that is still true for them, and is the reason this
+/// takes [requiredTier] rather than a bool.
+class _PremiumTeaser extends ConsumerWidget {
+  const _PremiumTeaser({
+    required this.l10n,
+    required this.locale,
+    required this.requiredTier,
+  });
 
   final AppLocalizations l10n;
   final Locale locale;
 
+  /// The lowest tier that unlocks the period this banner sits on.
+  final SubscriptionTier requiredTier;
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final status = ref.watch(subscriptionStatusValueProvider);
+    // Unknown = RevenueCat has not answered yet. Showing the banner then
+    // would flash a sales pitch at a subscriber, which is the bug itself,
+    // so render nothing until the answer lands.
+    if (!status.isKnown) return const SizedBox.shrink();
+    if (status.tier.hasAtLeast(requiredTier)) return const SizedBox.shrink();
+
     return GoldGlowPulse(
       borderRadius: BorderRadius.circular(16),
       child: Semantics(
