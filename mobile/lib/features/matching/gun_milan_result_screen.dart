@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/motion/app_motion.dart';
+import '../../core/purchases/purchases_providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
 import '../../core/vedika/vedika_config.dart';
@@ -1137,14 +1138,52 @@ class _RemediesBanner extends StatelessWidget {
 }
 
 /// Full-width "Get Detailed Compatibility Report" CTA (Figma node 20:60).
-class _ReportCta extends StatelessWidget {
+///
+/// ⚠️ **HIDDEN ENTIRELY FOR ANYONE ON A PAID PLAN** (fixed 18 Oct 2026,
+/// client-reported: a Bronze subscriber tapped it and was sent back to the
+/// plans page).
+///
+/// It used to push [SubscriptionPaywallScreen] unconditionally, with no
+/// entitlement check of any kind — so the people who had already paid were
+/// the ones being asked to pay again, on a screen that was already showing
+/// them everything they bought.
+///
+/// Hiding it rather than pointing it somewhere new is the correct fix,
+/// because **the detailed reading is already on this screen**: all eight
+/// kootas, the scores, the verdict and the remedies come from
+/// `/v2/astrology/guna-milan`, which this screen has always rendered in
+/// full. There is no separate "detailed report" being withheld.
+///
+/// ⚠️ And there must not be one built from a prebuilt milan PDF, which is
+/// the obvious-looking alternative. Those exist upstream
+/// (`milan-ashtakoot-standard`, 14 languages) but cost $2.98 each, and the
+/// Access Control Matrix promises 3/5/10/30 of them per month:
+///
+///   Bronze    3/mo x \$2.98 = ~Rs751 cost  vs  Rs219 revenue
+///   Platinum 30/mo x \$2.98 = ~Rs7510 cost vs  Rs999 revenue
+///
+/// Every tier loses money, Platinum catastrophically. The quota in the
+/// matrix is only affordable against the cheap live endpoint this screen
+/// already uses (~Rs1-4 a call), which is further evidence that "detailed
+/// compatibility" means THIS reading, not a bought document.
+class _ReportCta extends ConsumerWidget {
   const _ReportCta({required this.l10n, required this.locale});
 
   final AppLocalizations l10n;
   final Locale locale;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final status = ref.watch(subscriptionStatusValueProvider);
+
+    // Three states, not two — same rule as the Profile badge. `isKnown ==
+    // false` means RevenueCat has not answered yet (the first frames after
+    // launch); rendering the upsell then would flash a sales pitch at
+    // someone who is already paying, which is the very bug being fixed.
+    // Render nothing until the answer arrives.
+    if (!status.isKnown) return const SizedBox.shrink();
+    if (status.hasPaidAccess) return const SizedBox.shrink();
+
     return Semantics(
       button: true,
       label: l10n.detailedCompatibilityReport,
@@ -1264,7 +1303,16 @@ class _MissingPartnerScaffold extends StatelessWidget {
 /// and its remedial tips. The glimpse cuts off partway through the first
 /// koota, so the user reads something genuinely useful and specific to their
 /// own match before being asked to pay.
-class _DetailedReadingGlimpse extends StatelessWidget {
+/// ⚠️ **The glimpse is REMOVED for anyone on a paid plan** (18 Oct 2026),
+/// for the same reason as [_ReportCta] directly above: a Bronze subscriber
+/// was being shown a cut-off reading plus an upsell for the thing they had
+/// already bought. The Access Control Matrix grants detailed compatibility
+/// from Bronze upward, so a subscriber must see every koota in full.
+///
+/// [PremiumGlimpse] has no "unlocked" mode — it always truncates — so the
+/// fix is to not wrap the content in it at all once access is established,
+/// which is the same shape `report_detail_screen` uses for an owned report.
+class _DetailedReadingGlimpse extends ConsumerWidget {
   const _DetailedReadingGlimpse({
     required this.l10n,
     required this.locale,
@@ -1275,8 +1323,36 @@ class _DetailedReadingGlimpse extends StatelessWidget {
   final Locale locale;
   final List<GunaMilanGuna> gunas;
 
+  /// Wraps [child] in a [PremiumGlimpse] only while the reading is locked.
+  ///
+  /// Written as a helper rather than an `unlocked` flag on PremiumGlimpse
+  /// itself: that widget's whole contract is "truncate and upsell", and
+  /// giving it a mode where it does neither would make every call site read
+  /// as if it might not be a paywall at all.
+  Widget _maybeGlimpse({
+    required BuildContext context,
+    required bool unlocked,
+    required Widget child,
+  }) {
+    if (unlocked) return child;
+    return PremiumGlimpse(
+      locale: locale,
+      ctaLabel: l10n.matchDetailedCta,
+      subtitle: l10n.matchDetailedSubtitle,
+      onUpgrade: () => Navigator.of(
+        context,
+      ).push(fadeThroughRoute(const SubscriptionPaywallScreen())),
+      child: child,
+    );
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final status = ref.watch(subscriptionStatusValueProvider);
+    // Unknown means RevenueCat has not answered yet. Truncating then is the
+    // safe direction to be briefly wrong in: a subscriber sees a teaser that
+    // expands a moment later, rather than a free user glimpsing the lot.
+    final unlocked = status.isKnown && status.hasPaidAccess;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
@@ -1298,13 +1374,9 @@ class _DetailedReadingGlimpse extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          PremiumGlimpse(
-            locale: locale,
-            ctaLabel: l10n.matchDetailedCta,
-            subtitle: l10n.matchDetailedSubtitle,
-            onUpgrade: () => Navigator.of(
-              context,
-            ).push(fadeThroughRoute(const SubscriptionPaywallScreen())),
+          _maybeGlimpse(
+            context: context,
+            unlocked: unlocked,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
