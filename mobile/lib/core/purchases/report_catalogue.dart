@@ -5,6 +5,7 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../auth/auth_providers.dart';
 import 'purchases_providers.dart';
+import 'subscription_tier.dart';
 
 /// Individually purchasable reports, from RevenueCat's `reports` offering.
 ///
@@ -15,13 +16,36 @@ import 'purchases_providers.dart';
 /// `daily_reading`'s sibling by accident.
 @immutable
 class PurchasableReport {
-  const PurchasableReport({required this.reportId, required this.package});
+  const PurchasableReport({
+    required this.reportId,
+    required this.package,
+    this.discounted,
+  });
 
   /// Matches `ReportsStaticData.reports[].id`.
   final String reportId;
+
+  /// The FULL-PRICE offering package. Always present — it is what a free
+  /// user buys, and what everyone falls back to if the discounted SKU is
+  /// missing from the store.
   final Package package;
 
-  String get priceString => package.storeProduct.priceString;
+  /// The tier-matched discounted product, when the viewer is a subscriber
+  /// AND that SKU exists in Play. Null for free users, and null whenever
+  /// the discounted product has not been created yet — which is what lets
+  /// this ship before the store catalogue catches up.
+  final StoreProduct? discounted;
+
+  /// What the user will actually be charged.
+  StoreProduct get product => discounted ?? package.storeProduct;
+
+  String get priceString => product.priceString;
+
+  /// The struck-through "was" price, or null when there is no discount.
+  String? get fullPriceString =>
+      discounted == null ? null : package.storeProduct.priceString;
+
+  bool get isDiscounted => discounted != null;
 }
 
 /// ⚠️ **Only reports the app can actually deliver appear here**, and this map
@@ -63,16 +87,55 @@ final reportCatalogueProvider =
       final packages = await service.fetchReportPackages();
 
       final byId = <String, PurchasableReport>{};
+      final baseSkuFor = <String, String>{};
       for (final package in packages) {
-        final reportId = reportSkus[package.storeProduct.identifier];
+        final sku = package.storeProduct.identifier;
+        final reportId = reportSkus[sku];
         // A package whose SKU is not in the map is DROPPED, not guessed at —
         // that is how the three undeliverable products stay unbuyable in the
         // app even while they exist in Play.
         if (reportId == null) continue;
+        baseSkuFor[reportId] = sku;
         byId[reportId] = PurchasableReport(
           reportId: reportId,
           package: package,
         );
+      }
+
+      // ---- per-tier discount (client, 11 Sep 2026) ----------------------
+      //
+      // Google Play owns the price: a product has ONE price and no API
+      // charges a given buyer less, so "10% off for Silver" can only exist
+      // as a DIFFERENT product. The discounted SKU is the base SKU plus the
+      // tier name, and it grants the same report — the server derives both
+      // from one table (`REPORT_SKUS`), so they cannot drift apart.
+      //
+      // Fetched by SKU rather than through a second Offering: that way the
+      // discount needs only the Play products, with no extra RevenueCat
+      // packages and no second offering to keep in step.
+      //
+      // ⚠️ Anything missing is simply skipped, so a subscriber sees the full
+      // price rather than a broken button. That is deliberate: it lets this
+      // ship BEFORE the 44 discounted products exist in Play, and it means a
+      // half-finished store catalogue degrades to "no discount" instead of
+      // "cannot buy".
+      final tier = ref.watch(subscriptionStatusValueProvider).tier;
+      if (tier != SubscriptionTier.free && byId.isNotEmpty) {
+        final wanted = <String, String>{
+          for (final entry in baseSkuFor.entries)
+            '${entry.value}_${tier.name}': entry.key,
+        };
+        final found = await service.fetchProductsBySku(wanted.keys.toList());
+        for (final entry in found.entries) {
+          final reportId = wanted[entry.key];
+          final base = reportId == null ? null : byId[reportId];
+          if (reportId == null || base == null) continue;
+          byId[reportId] = PurchasableReport(
+            reportId: reportId,
+            package: base.package,
+            discounted: entry.value,
+          );
+        }
       }
       return byId;
     });

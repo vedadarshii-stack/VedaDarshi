@@ -243,6 +243,52 @@ class PurchasesService {
     }
   }
 
+  /// Fetches one-time products by SKU, straight from the store.
+  ///
+  /// Used for the per-tier DISCOUNTED report SKUs. They are fetched this way
+  /// rather than through an Offering so the discount needs only the Play
+  /// products to exist — no extra RevenueCat packages, and no second
+  /// Offering to keep in step with the first.
+  ///
+  /// Returns whatever the store recognises and silently omits the rest, so a
+  /// SKU that has not been created in Play yet simply does not come back and
+  /// the caller falls through to full price. That is what lets this ship
+  /// BEFORE the discounted products exist.
+  Future<Map<String, StoreProduct>> fetchProductsBySku(
+    List<String> skus,
+  ) async {
+    if (!_configured || skus.isEmpty) return const {};
+    try {
+      final products = await Purchases.getProducts(
+        skus,
+        productCategory: ProductCategory.nonSubscription,
+      );
+      return {for (final p in products) p.identifier: p};
+    } catch (e) {
+      // Never fatal: a failure here costs the user their discount, not their
+      // ability to buy, because the caller keeps the full-price package.
+      debugPrint('PurchasesService: discounted SKU fetch failed ($e)');
+      return const {};
+    }
+  }
+
+  /// Buys a bare [StoreProduct] (a discounted report SKU).
+  ///
+  /// Same contract as [purchaseConsumable]: no `StoreProductChangeInfo`, and
+  /// ownership is granted by the webhook server-side, never inferred from
+  /// this returning without throwing.
+  Future<void> purchaseStoreProduct(StoreProduct product) async {
+    if (!_configured) throw const PurchaseException(PurchaseFailure.unknown);
+    try {
+      await Purchases.purchase(PurchaseParams.storeProduct(product));
+    } on PlatformException catch (e) {
+      throw PurchaseException(_classify(e));
+    } catch (e) {
+      debugPrint('PurchasesService: discounted purchase failed ($e)');
+      throw const PurchaseException(PurchaseFailure.unknown);
+    }
+  }
+
   /// Buys any one-time (consumable) product.
   ///
   /// Deliberately separate from [purchase]: a consumable must NOT carry

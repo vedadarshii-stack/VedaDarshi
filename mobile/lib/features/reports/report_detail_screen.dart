@@ -298,9 +298,19 @@ class _BuyableGlimpseState extends ConsumerState<_BuyableGlimpse> {
     final l10n = widget.l10n;
     final messenger = ScaffoldMessenger.of(context);
     try {
-      await ref
-          .read(purchasesServiceProvider)
-          .purchaseConsumable(widget.offer.package);
+      // ⚠️ Buy the DISCOUNTED product when the viewer's tier has one.
+      //
+      // The two paths are not interchangeable: a discounted SKU is a bare
+      // StoreProduct (fetched by id, not part of an Offering), so it has no
+      // Package to pass. Both grant the same report — the server maps
+      // `{base}_{tier}` and `{base}` to one report id.
+      final service = ref.read(purchasesServiceProvider);
+      final discounted = widget.offer.discounted;
+      if (discounted != null) {
+        await service.purchaseStoreProduct(discounted);
+      } else {
+        await service.purchaseConsumable(widget.offer.package);
+      }
       if (!mounted) return;
       // No "unlocked!" claim: ownership is granted by the RevenueCat webhook
       // and arrives through `ownedReportsProvider`, a live Firestore stream,
@@ -326,7 +336,9 @@ class _BuyableGlimpseState extends ConsumerState<_BuyableGlimpse> {
         PremiumGlimpse(
           locale: widget.locale,
           previewHeight: 260,
-          // Play's own localized price, never formatted by us.
+          // Play's own localized price, never formatted by us — including
+          // the discounted one, so the figure on the button is exactly what
+          // the Play sheet will charge.
           ctaLabel:
               '${widget.l10n.reportBuyOnce} · ${widget.offer.priceString}',
           isBusy: _isBusy,

@@ -36,8 +36,8 @@ import * as admin from "firebase-admin";
  * but it is still a refund waiting to happen, which is why archiving them is
  * the real fix rather than a code change.
  */
-export const REPORT_SKUS: Record<string, string> = {
-  // Play SKU                          -> app report id
+/** Full-price Play SKU -> app report id. */
+const BASE_REPORT_SKUS: Record<string, string> = {
   vedadarshi_report_complete_life: "complete",
   vedadarshi_report_career: "career",
   vedadarshi_report_marriage: "marriage",
@@ -50,6 +50,57 @@ export const REPORT_SKUS: Record<string, string> = {
   vedadarshi_report_child_family: "childFamily",
   vedadarshi_report_business: "business",
 };
+
+/**
+ * The per-tier discount suffixes, in Access Control Matrix order.
+ *
+ * Bronze 5% · Silver 10% · Gold 15% · Platinum 20%.
+ */
+export const REPORT_DISCOUNT_TIERS = [
+  "bronze",
+  "silver",
+  "gold",
+  "platinum",
+] as const;
+
+/**
+ * Every Play SKU that grants a report, full-price and discounted alike.
+ *
+ * BUILT 21 Oct 2026, client (11 Sep): *"for subscription only discounts
+ * applicable for respective plans"*. Until now the paywall advertised
+ * "5% off premium reports" on every tier and **no discount existed
+ * anywhere** — a subscriber paid the same Rs299 as everyone else.
+ *
+ * ## Why a discounted SKU rather than a computed price
+ *
+ * Google Play owns the price. A product has ONE price and there is no API
+ * to charge a given buyer less, so "10% off for Silver" can only exist as a
+ * different product. That is the whole reason this sat open for six weeks:
+ * it is a store-catalogue problem wearing a code problem's clothes.
+ *
+ * ## Why derived rather than 44 hand-written lines
+ *
+ * `{base}_{tier}` resolves to the SAME report id as its base SKU, so the
+ * mapping cannot drift: adding a report to [BASE_REPORT_SKUS] creates its
+ * four discounted variants automatically, and there is no way to typo one
+ * of them into pointing at the wrong reading.
+ *
+ * ⚠️ `grantReport` needs no change at all — it looks a SKU up in here and
+ * grants whatever report id it finds, so a discounted purchase grants
+ * exactly what the full-price one does. The discount is purely a price
+ * difference at the store; ownership is identical.
+ */
+export const REPORT_SKUS: Record<string, string> = {
+  ...BASE_REPORT_SKUS,
+  ...Object.fromEntries(
+    Object.entries(BASE_REPORT_SKUS).flatMap(([sku, reportId]) =>
+      REPORT_DISCOUNT_TIERS.map((tier) => [`${sku}_${tier}`, reportId])
+    )
+  ),
+};
+
+/** The full-price SKUs only — what a free user is offered. */
+export const BASE_REPORT_SKU_IDS = Object.keys(BASE_REPORT_SKUS);
 
 export interface ReportPurchaseDoc {
   sku: string;
